@@ -37,6 +37,7 @@ if (isset($_GET['logout'])) {
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="js/fast-loader.js" defer></script>
+    <script src="js/dashboard-scripts.js" defer></script>
 </head>
 
 <body class="dashboard-page">
@@ -101,9 +102,21 @@ if (isset($_GET['logout'])) {
                                             </svg>
                                         </button>
                                         <ul class="nav-submenu" id="adjustmentfoodbeverage-submenu">
-                                            <li><a href="home.php?module=transaction-history&title=Transaction History" class="nav-link">Transaction History</a></li>
+                                            <li><a href="home.php?module=fnb-riwayat-transaksi" class="nav-link">Riwayat Transaksi</a></li>
+                                               <li><a href="home.php?module=fnb-transaction-history" class="nav-link">Transaction History</a></li>
                                         </ul>
                                     </li>
+                                        <li class="nav-group">
+                                            <button class="nav-group-header" onclick="toggleSubmenu('adjustmentfoodbeverage')">
+                                                <span>Food & Beverage</span>
+                                                <svg class="chevron-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                                </svg>
+                                            </button>
+                                            <ul class="nav-submenu" id="adjustmentfoodbeverage-submenu">
+                                                <li><a href="home.php?module=fnb-riwayat-transaksi" class="nav-link">Riwayat Transaksi</a></li>
+                                            </ul>
+                                        </li>
                                     
                                     <!-- === Front Office === -->
                                     <li class="nav-group">
@@ -128,8 +141,11 @@ if (isset($_GET['logout'])) {
                                             <li><a href="home.php?module=night-audit&title=Night Audit" class="nav-link">Night Audit</a></li>
                                             <li><a href="home.php?module=other-extrabill&title=Other Extrabill" class="nav-link">Other Extrabill</a></li>
                                             <li><a href="home.php?module=payment-pending&title=Payment Pending" class="nav-link">Payment Pending</a></li>
-                                            <li><a href="home.php?module=payment&title=Payment" class="nav-link">Payment</a></li>
-                                            <li><a href="home.php?module=room-status&title=Room Status" class="nav-link">Room Status</a></li>
+                                            <li><a href="home.php?module=pembayaran&title=Pembayaran" class="nav-link">Pembayaran</a></li>
+                                            <li><a href="home.php?module=refund&title=Refund" class="nav-link">Refund</a></li>
+                                            <li><a href="home.php?module=reprocess-clearance&title=Reprocess Clearance" class="nav-link">Reprocess Clearance</a></li>
+                                            <li><a href="home.php?module=room-charge&title=Room Charge" class="nav-link">Room Charge</a></li>
+                                            <li><a href="home.php?module=status-kamar&title=Status Kamar" class="nav-link">Status Kamar</a></li>
                                             <li><a href="home.php?module=upnormal-payment&title=Upnormal Payment" class="nav-link">Upnormal Payment</a></li>
                                         </ul>
                                     </li>
@@ -143,7 +159,7 @@ if (isset($_GET['logout'])) {
                                             </svg>
                                         </button>
                                         <ul class="nav-submenu" id="adjustmentkos-submenu">
-                                            <li><a href="home.php?module=kos-payment&title=Kos Payment" class="nav-link">Payment</a></li>
+                                            <li><a href="home.php?module=kos-pembayaran&title=Kos Pembayaran" class="nav-link">Pembayaran</a></li>
                                             <li><a href="home.php?module=kos-room-charge&title=Kos Room Charge" class="nav-link">Room Charge</a></li>
                                         </ul>
                                     </li>
@@ -157,7 +173,7 @@ if (isset($_GET['logout'])) {
                                             </svg>
                                         </button>
                                         <ul class="nav-submenu" id="adjustmentlaundry-submenu">
-                                            <li><a href="home.php?module=laundry-transaction&title=Laundry Transaction" class="nav-link">Laundry Transaction</a></li>
+                                            <li><a href="home.php?module=transaksi-laundry&title=Transaksi Laundry" class="nav-link">Transaksi Laundry</a></li>
                                         </ul>
                                     </li>
                                     
@@ -197,61 +213,61 @@ if (isset($_GET['logout'])) {
                                         <ul class="nav-submenu" id="foodbeveragechart-submenu">
                                             <li><a href="home.php?module=menu-fast-moving&title=Menu Fast Moving" class="nav-link">Menu Fast Moving</a></li>
                                             <li><a href="home.php?module=menu-slow-moving&title=Menu Slow Moving" class="nav-link">Menu Slow Moving</a></li>
-                                            <li><a href="home.php?module=sales-chart&title=Sales Chart" class="nav-link">Sales Chart</a></li>
-                                            <li><a href="home.php?module=sales-by-category&title=Sales by Category" class="nav-link">Sales by Category</a></li>
+                                            <li><a href="home.php?module=penjualan&title=Penjualan" class="nav-link">Penjualan</a></li>
+                                            <li><a href="home.php?module=penjualan-perkategori&title=Penjualan Perkategori" class="nav-link">Penjualan Perkategori</a></li>
                                         </ul>
                                     </li>
                                     <li class="nav-group">
                                         <button class="nav-group-header" onclick="toggleSubmenu('foodbeverageform')">
-                                            <span>Transaction Forms</span>
+                                            <span>Form Transaksi</span>
                                             <svg class="chevron-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                             </svg>
                                         </button>
                                         <ul class="nav-submenu" id="foodbeverageform-submenu">
-                                            <li><a href="home.php?module=direct-purchase&title=Direct Purchase" class="nav-link">Direct Purchase</a></li>
-                                            <li><a href="home.php?module=stock-request&title=Stock Request" class="nav-link">Stock Request</a></li>
-                                            <li><a href="home.php?module=external-guest&title=External Guest" class="nav-link">External Guest</a></li>
-                                            <li><a href="home.php?module=event-menu-setup&title=Event Menu Setup" class="nav-link">Event Menu Setup</a></li>
-                                            <li><a href="home.php?module=sales-transaction&title=Sales Transaction" class="nav-link">Sales Transaction</a></li>
-                                            <li><a href="home.php?module=pending-transaction&title=Pending Transaction" class="nav-link">Pending Transaction</a></li>
-                                            <li><a href="home.php?module=item-usage&title=Item Usage" class="nav-link">Item Usage</a></li>
-                                            <li><a href="home.php?module=expired-damaged-items&title=Expired/Damaged Items" class="nav-link">Expired/Damaged Items</a></li>
-                                            <li><a href="home.php?module=restaurant-stock-taking&title=Restaurant Stock Taking" class="nav-link">Restaurant Stock Taking</a></li>
+                                            <li><a href="home.php?module=fnb-pembelian-langsung&title=F&B Pembelian Langsung" class="nav-link">F&B Pembelian Langsung</a></li>
+                                            <li><a href="home.php?module=permintaan-stok-fnb&title=Permintaan Stok F & B" class="nav-link">Permintaan Stok F & B</a></li>
+                                            <li><a href="home.php?module=tamu-luar&title=Tamu Luar" class="nav-link">Tamu Luar</a></li>
+                                            <li><a href="home.php?module=atur-event-menu&title=Atur Event Menu" class="nav-link">Atur Event Menu</a></li>
+                                            <li><a href="home.php?module=transaksi-penjualan&title=Transaksi Penjualan" class="nav-link">Transaksi Penjualan</a></li>
+                                            <li><a href="home.php?module=transaksi-pending&title=Transaksi Pending" class="nav-link">Transaksi Pending</a></li>
+                                            <li><a href="home.php?module=pemakaian-barang-fnb&title=Pemakaian Barang F&B" class="nav-link">Pemakaian Barang F&B</a></li>
+                                            <li><a href="home.php?module=barang-expire-rusak-fnb&title=Barang Expire / Rusak F&B" class="nav-link">Barang Expire / Rusak F&B</a></li>
+                                            <li><a href="home.php?module=stok-opname-resto&title=Stok Opname Resto" class="nav-link">Stok Opname Resto</a></li>
                                         </ul>
                                     </li>
                                     <li class="nav-group">
                                         <button class="nav-group-header" onclick="toggleSubmenu('foodbeverageinfo')">
-                                            <span>Information</span>
+                                            <span>Informasi</span>
                                             <svg class="chevron-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                             </svg>
                                         </button>
                                         <ul class="nav-submenu" id="foodbeverageinfo-submenu">
-                                            <li><a href="home.php?module=stock-request-info&title=Stock Request Info" class="nav-link">Stock Request Info</a></li>
-                                            <li><a href="home.php?module=today-transaction&title=Today Transaction" class="nav-link">Today Transaction</a></li>
-                                            <li><a href="home.php?module=room-service-request&title=Room Service Request" class="nav-link">Room Service Request</a></li>
-                                            <li><a href="home.php?module=receivable-info&title=Receivable Info" class="nav-link">Receivable Info</a></li>
-                                            <li><a href="home.php?module=item-stock-info&title=Item Stock Info" class="nav-link">Item Stock Info</a></li>
-                                            <li><a href="home.php?module=stock-card&title=Stock Card" class="nav-link">Stock Card</a></li>
-                                            <li><a href="home.php?module=banquet-receivable&title=Banquet Receivable" class="nav-link">Banquet Receivable</a></li>
+                                            <li><a href="home.php?module=info-permintaan-stok-fnb&title=Info Permintaan Stok F&B" class="nav-link">Info Permintaan Stok F&B</a></li>
+                                            <li><a href="home.php?module=transaksi-hari-ini&title=Transaksi Hari ini" class="nav-link">Transaksi Hari ini</a></li>
+                                            <li><a href="home.php?module=permintaan-room-service&title=Permintaan Room Service" class="nav-link">Permintaan Room Service</a></li>
+                                            <li><a href="home.php?module=info-piutang-fnb&title=Info Piutang F&B" class="nav-link">Info Piutang F&B</a></li>
+                                            <li><a href="home.php?module=info-stok-barang-fnb&title=Info Stok Barang F&B" class="nav-link">Info Stok Barang F&B</a></li>
+                                            <li><a href="home.php?module=kartu-stok-fnb&title=Kartu Stok F&B" class="nav-link">Kartu Stok F&B</a></li>
+                                            <li><a href="home.php?module=piutang-banquet&title=Piutang Banquet" class="nav-link">Piutang Banquet</a></li>
                                         </ul>
                                     </li>
                                     <li class="nav-group">
                                         <button class="nav-group-header" onclick="toggleSubmenu('foodbeveragelaporan')">
-                                            <span>Reports</span>
+                                            <span>Laporan</span>
                                             <svg class="chevron-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                             </svg>
                                         </button>
                                         <ul class="nav-submenu" id="foodbeveragelaporan-submenu">
                                             <li><a href="home.php?module=night-audit-fnb&title=Night Audit F&B" class="nav-link">Night Audit F&B</a></li>
-                                            <li><a href="home.php?module=restaurant-sales-per-item&title=Restaurant Sales Per Item" class="nav-link">Restaurant Sales Per Item</a></li>
-                                            <li><a href="home.php?module=restaurant-sales&title=Restaurant Sales" class="nav-link">Restaurant Sales</a></li>
+                                            <li><a href="home.php?module=penjualan-resto-per-item&title=Penjualan Resto Per Item" class="nav-link">Penjualan Resto Per Item</a></li>
+                                            <li><a href="home.php?module=penjualan-restaurant&title=Penjualan Restaurant" class="nav-link">Penjualan Restaurant</a></li>
                                             <li><a href="home.php?module=shift-report&title=Shift Report" class="nav-link">Shift Report</a></li>
-                                            <li><a href="home.php?module=restaurant-guest-report&title=Restaurant Guest Report" class="nav-link">Restaurant Guest Report</a></li>
-                                            <li><a href="home.php?module=restaurant-stocktaking-history&title=Restaurant Stocktaking History" class="nav-link">Restaurant Stocktaking History</a></li>
-                                            <li><a href="home.php?module=restaurant-shift-report&title=Restaurant Shift Report" class="nav-link">Restaurant Shift Report</a></li>
+                                            <li><a href="home.php?module=lap-tamu-resto&title=Lap Tamu Resto" class="nav-link">Lap Tamu Resto</a></li>
+                                            <li><a href="home.php?module=riwayat-so-resto&title=Riwayat S/O Resto" class="nav-link">Riwayat S/O Resto</a></li>
+                                            <li><a href="home.php?module=resto-shift-report&title=Resto Shift Report" class="nav-link">Resto Shift Report</a></li>
                                         </ul>
                                     </li>
                                     <li class="nav-group">
@@ -263,10 +279,10 @@ if (isset($_GET['logout'])) {
                                         </button>
                                         <ul class="nav-submenu" id="foodbeveragemaster-submenu">
                                             <li><a href="home.php?module=master-discount&title=Master Discount" class="nav-link">Master Discount</a></li>
-                                            <li><a href="home.php?module=table-master&title=Table Master" class="nav-link">Table Master</a></li>
-                                            <li><a href="home.php?module=restaurant-menu-master&title=Restaurant Menu Master" class="nav-link">Restaurant Menu Master</a></li>
-                                            <li><a href="home.php?module=restaurant-menu-category&title=Restaurant Menu Category" class="nav-link">Restaurant Menu Category</a></li>
-                                            <li><a href="home.php?module=restaurant-menu-type&title=Restaurant Menu Type" class="nav-link">Restaurant Menu Type</a></li>
+                                            <li><a href="home.php?module=master-meja&title=Master Meja" class="nav-link">Master Meja</a></li>
+                                            <li><a href="home.php?module=master-menu-resto&title=Master Menu Resto" class="nav-link">Master Menu Resto</a></li>
+                                            <li><a href="home.php?module=kategori-menu-resto&title=Kategori Menu Resto" class="nav-link">Kategori Menu Resto</a></li>
+                                            <li><a href="home.php?module=jenis-menu-resto&title=Jenis Menu Resto" class="nav-link">Jenis Menu Resto</a></li>
                                         </ul>
                                     </li>
                                 </ul>
@@ -280,98 +296,99 @@ if (isset($_GET['logout'])) {
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                     </svg>
                                 </button>
-                                <ul class="nav-submenu show" id="frontoffice-submenu">
+                                <ul class="nav-submenu" id="frontoffice-submenu">
                                     <li class="nav-group">
                                         <button class="nav-group-header" onclick="toggleSubmenu('frontofficechart')">
-                                            <span>Charts & Analytics</span>
+                                            <span>Chart & Presentase</span>
                                             <svg class="chevron-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                             </svg>
                                         </button>
                                         <ul class="nav-submenu" id="frontofficechart-submenu">
-                                            <li><a href="home.php?module=monthly-room-chart&title=Monthly Room Chart" class="nav-link">Monthly Room Chart</a></li>
-                                            <li><a href="home.php?module=monthly-revenue-chart&title=Monthly Revenue Chart" class="nav-link">Monthly Revenue Chart</a></li>
+                                            <li><a href="home.php?module=chart-kamar-perbulan&title=Chart Kamar Per Bulan" class="nav-link">Guest By City</a></li>
+                                            <li><a href="home.php?module=chart-pendapatan-bulanan&title=Chart Pendapatan Bulanan" class="nav-link">Guest By Nation</a></li>
                                         </ul>
                                     </li>
                                     <li class="nav-group">
                                         <button class="nav-group-header" onclick="toggleSubmenu('frontofficeform')">
-                                            <span>Transaction Forms</span>
+                                            <span>Form Transaksi</span>
                                             <svg class="chevron-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                             </svg>
                                         </button>
-                                        <ul class="nav-submenu show" id="frontofficeform-submenu">
-                                            <li><a href="home.php?module=direct-purchase-fo&title=Direct Purchase FO" class="nav-link">Direct Purchase FO</a></li>
-                                            <li><a href="home.php?module=refresh-room-status&title=Refresh Room Status" class="nav-link">Refresh Room Status</a></li>
-                                            <li><a href="home.php?module=group-registration&title=Group Registration" class="nav-link">Group Registration</a></li>
-                                            <li><a href="home.php?module=laundry-transaction&title=Laundry Transaction" class="nav-link">Laundry Transaction</a></li>
-                                            <li><a href="home.php?module=reservation&title=Room Reservation Form" class="nav-link">Room Reservation Form</a></li>
-                                            <li><a href="home.php?module=registration&title=Room Registration Form" class="nav-link">Room Registration Form</a></li>
-                                            <li><a href="home.php?module=kost-registration&title=Kost Registration Form" class="nav-link">Kost Registration Form</a></li>
-                                            <li><a href="home.php?module=kost-reservation&title=Kost Reservation Form" class="nav-link">Kost Reservation Form</a></li>
-                                            <li><a href="home.php?module=meeting-room-transaction&title=Meeting Room Transaction" class="nav-link">Meeting Room Transaction</a></li>
-                                            <li><a href="home.php?module=extrabill-form&title=Extrabill Form" class="nav-link">Extrabill Form</a></li>
+                                        <ul class="nav-submenu" id="frontofficeform-submenu">
+                                            <li><a href="home.php?module=checkin-tamu&title=Check In Tamu" class="nav-link">Direct Purchase FO</a></li>
+                                            <li><a href="home.php?module=checkout-tamu&title=Check Out Tamu" class="nav-link">Refresh Room Status</a></li>
+                                            <li><a href="home.php?module=buat-reservasi&title=Buat Reservasi" class="nav-link">Registrasi Group</a></li>
+                                            <li><a href="home.php?module=ubah-reservasi&title=Ubah Reservasi" class="nav-link">Transaksi Laundry</a></li>
+                                            <li><a href="home.php?module=batal-reservasi&title=Batal Reservasi" class="nav-link">Form Reservasi Kamar</a></li>
+                                            <li><a href="home.php?module=extend-stay&title=Extend Stay" class="nav-link">Form Registrasi Kamar</a></li>
+                                            <li><a href="home.php?module=early-checkout&title=Early Check Out" class="nav-link">Form Registrasi Kost</a></li>
+                                            <li><a href="home.php?module=room-move&title=Room Move" class="nav-link">Form Reservasi Kost</a></li>
+                                            <li><a href="home.php?module=split-room&title=Split Room" class="nav-link">Transaksi Meeting Room</a></li>
+                                            <li><a href="home.php?module=join-room&title=Join Room" class="nav-link">Form Extrabill</a></li>
                                         </ul>
                                     </li>
                                     <li class="nav-group">
                                         <button class="nav-group-header" onclick="toggleSubmenu('frontofficeinfo')">
-                                            <span>Reservation Info</span>
+                                            <span>Info Reservasi</span>
                                             <svg class="chevron-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                             </svg>
                                         </button>
                                         <ul class="nav-submenu" id="frontofficeinfo-submenu">
-                                            <li><a href="home.php?module=info-reservasi-hari-ini&title=Reservation Today" class="nav-link">Reservation Today</a></li>
+                                            <li><a href="home.php?module=info-reservasi-hari-ini&title=Info Reservasi Hari Ini" class="nav-link">Reservation Today</a></li>
                                             <li><a href="home.php?module=deposit-report&title=Deposit Report" class="nav-link">Reservation By Deposit</a></li>
                                             <li><a href="home.php?module=group-reservation&title=Group Reservation" class="nav-link">All Reservation</a></li>
                                         </ul>
                                     </li>
                                     <li class="nav-group">
                                         <button class="nav-group-header" onclick="toggleSubmenu('frontofficeinformasi')">
-                                            <span>Information</span>
+                                            <span>Informasi</span>
                                             <svg class="chevron-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                             </svg>
                                         </button>
                                         <ul class="nav-submenu" id="frontofficeinformasi-submenu">
-                                            <li><a href="home.php?module=info-kamar-available&title=Available Room Info" class="nav-link">Available Room Info</a></li>
-                                            <li><a href="home.php?module=guest-history&title=Guest History" class="nav-link">Guest History</a></li>
+                                            <li><a href="home.php?module=info-kamar-available&title=Info Kamar Available" class="nav-link">Info Stock Extrabill</a></li>
+                                            <li><a href="home.php?module=guest-history&title=Guest History" class="nav-link">Group List</a></li>
                                         </ul>
                                     </li>
                                     <li class="nav-group">
                                         <button class="nav-group-header" onclick="toggleSubmenu('frontofficeinformasitamu')">
-                                            <span>Guest Information</span>
+                                            <span>Informasi Tamu</span>
                                             <svg class="chevron-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                             </svg>
                                         </button>
                                         <ul class="nav-submenu" id="frontofficeinformasitamu-submenu">
                                             <li><a href="home.php?module=guest-history&title=Guest History" class="nav-link">Guest Research</a></li>
-                                            <li><a href="home.php?module=info-checkout-hari-ini&title=Check In Today" class="nav-link">Check In Today</a></li>
-                                            <li><a href="home.php?module=early-checkout&title=Early Checkout" class="nav-link">Early Checkout</a></li>
-                                            <li><a href="home.php?module=info-pending-checkout&title=Expected Departure" class="nav-link">Expected Departure</a></li>
-                                            <li><a href="home.php?module=room-status-realtime&title=Room Status Real Time" class="nav-link">Room Status Real Time</a></li>
-                                            <li><a href="home.php?module=info-checkout-hari-ini&title=Checkout Today" class="nav-link">Checkout Today</a></li>
+                                            <li><a href="home.php?module=info-checkout-hari-ini&title=Info Check Out Hari Ini" class="nav-link">Check in Today</a></li>
+                                            <li><a href="home.php?module=early-checkout&title=Early Check Out" class="nav-link">Early Checkin</a></li>
+                                            <li><a href="home.php?module=info-pending-checkout&title=Info Pending Check Out" class="nav-link">Expected Departure</a></li>
+                                            <li><a href="home.php?module=room-status-realtime&title=Room Status Real Time" class="nav-link">Meeting Room Info</a></li>
+                                            <li><a href="home.php?module=info-checkout-hari-ini&title=Info Check Out Hari Ini" class="nav-link">Checkout Today</a></li>
                                             <li><a href="home.php?module=room-move&title=Room Move" class="nav-link">Change Room</a></li>
-                                            <li><a href="home.php?module=cancel-reservation&title=Cancellation Today" class="nav-link">Cancellation Today</a></li>
+                                            <li><a href="home.php?module=batal-reservasi&title=Batal Reservasi" class="nav-link">Cancellation Today</a></li>
                                             <li><a href="home.php?module=refund-deposit&title=Refund Deposit" class="nav-link">Refund</a></li>
-                                            <li><a href="home.php?module=blacklist-guest&title=Blacklist Guest" class="nav-link">Blacklist Guest</a></li>
+                                            <li><a href="home.php?module=blacklist-guest&title=Blacklist Guest" class="nav-link">Skipper</a></li>
+                                            <li><a href="home.php?module=guest-history&title=Guest History" class="nav-link">Guest History</a></li>
                                         </ul>
                                     </li>
                                     <li class="nav-group">
                                         <button class="nav-group-header" onclick="toggleSubmenu('frontofficelaporan')">
-                                            <span>Reports</span>
+                                            <span>Laporan</span>
                                             <svg class="chevron-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                             </svg>
                                         </button>
                                         <ul class="nav-submenu" id="frontofficelaporan-submenu">
                                             <li><a href="home.php?module=actual-shift-report&title=Actual Shift Report" class="nav-link">Actual Shift Report</a></li>
-                                            <li><a href="home.php?module=blacklist-management&title=Blacklist Management" class="nav-link">Blacklist Management</a></li>
-                                            <li><a href="home.php?module=night-audit-report&title=Night Audit Report" class="nav-link">Night Audit Report</a></li>
-                                            <li><a href="home.php?module=room-revenue-report&title=Room Revenue Report" class="nav-link">Room Revenue Report</a></li>
-                                            <li><a href="home.php?module=occupancy-report&title=Occupancy Report" class="nav-link">Occupancy Report</a></li>
-                                            <li><a href="home.php?module=adr-revpar-report&title=ADR RevPAR Report" class="nav-link">ADR RevPAR Report</a></li>
+                                            <li><a href="home.php?module=blacklist-management&title=Blacklist Management" class="nav-link">Daftar Blacklist</a></li>
+                                            <li><a href="home.php?module=night-audit-report&title=Night Audit Report" class="nav-link">Shift Report</a></li>
+                                            <li><a href="home.php?module=room-revenue-report&title=Room Revenue Report" class="nav-link">Lap Aktivitas User</a></li>
+                                            <li><a href="home.php?module=occupancy-report&title=Occupancy Report" class="nav-link">Lost & Found</a></li>
+                                            <li><a href="home.php?module=adr-revpar-report&title=ADR RevPAR Report" class="nav-link">Extrabed</a></li>
                                         </ul>
                                     </li>
                                     <li class="nav-group">
@@ -382,13 +399,14 @@ if (isset($_GET['logout'])) {
                                             </svg>
                                         </button>
                                         <ul class="nav-submenu" id="frontofficemasterdata-submenu">
-                                            <li><a href="home.php?module=room-maintenance-status&title=Room Maintenance Status" class="nav-link">Room Maintenance Status</a></li>
-                                            <li><a href="home.php?module=room-rate-master&title=Room Rate Master" class="nav-link">Room Rate Master</a></li>
-                                            <li><a href="home.php?module=master-charge-code&title=Master Charge Code" class="nav-link">Master Charge Code</a></li>
-                                            <li><a href="home.php?module=master-package&title=Master Package" class="nav-link">Master Package</a></li>
-                                            <li><a href="home.php?module=master-voucher&title=Master Voucher" class="nav-link">Master Voucher</a></li>
-                                            <li><a href="home.php?module=market-segment-analysis&title=Market Segment Analysis" class="nav-link">Market Segment Analysis</a></li>
-                                            <li><a href="home.php?module=master-guest&title=Master Guest" class="nav-link">Master Guest</a></li>
+                                            <li><a href="home.php?module=room-maintenance-status&title=Room Maintenance Status" class="nav-link">Ubah Status Kamar</a></li>
+                                            <li><a href="home.php?module=master-rate-kamar&title=Master Rate Kamar" class="nav-link">Master Harga Kamar</a></li>
+                                            <li><a href="home.php?module=master-charge-code&title=Master Charge Code" class="nav-link">Add Charge Meeting Room</a></li>
+                                            <li><a href="home.php?module=master-package&title=Master Package" class="nav-link">Additional Meeting Room</a></li>
+                                            <li><a href="home.php?module=master-voucher&title=Master Voucher" class="nav-link">Meeting Room Package</a></li>
+                                            <li><a href="home.php?module=market-segment-analysis&title=Market Segment Analysis" class="nav-link">Meeting Room Segment</a></li>
+                                            <li><a href="home.php?module=master-guest&title=Master Guest" class="nav-link">Pengaturan Admin</a></li>
+                                            <li><a href="home.php?module=master-charge-code&title=Master Charge Code" class="nav-link">Master Extra Bill</a></li>
                                         </ul>
                                     </li>
                                     <li class="nav-group">
@@ -703,8 +721,8 @@ if (isset($_GET['logout'])) {
 
                 // Module handling with organized folder structure
                 switch ($module) {
-                    case 'transaction-history':
-                        include 'modules/adjustment/foodbeverage/transaction_history.php';
+                    case 'fnb-riwayat-transaksi':
+                        include 'modules/adjustment/foodbeverage/riwayat_transaksi.php';
                         break;
                     
                     // Adjustment - Front Office modules
@@ -750,8 +768,8 @@ if (isset($_GET['logout'])) {
                     case 'payment-pending':
                         include 'modules/adjustment/frontoffice/payment_pending.php';
                         break;
-                    case 'payment':
-                        include 'modules/adjustment/frontoffice/payment.php';
+                    case 'pembayaran':
+                        include 'modules/adjustment/frontoffice/pembayaran.php';
                         break;
                     case 'refund':
                         include 'modules/adjustment/frontoffice/refund.php';
@@ -762,24 +780,24 @@ if (isset($_GET['logout'])) {
                     case 'room-charge':
                         include 'modules/adjustment/frontoffice/room_charge.php';
                         break;
-                    case 'room-status':
-                        include 'modules/adjustment/frontoffice/room_status.php';
+                    case 'status-kamar':
+                        include 'modules/adjustment/frontoffice/status_kamar.php';
                         break;
                     case 'upnormal-payment':
                         include 'modules/adjustment/frontoffice/upnormal_payment.php';
                         break;
                     
                     // Adjustment - Kos modules
-                    case 'kos-payment':
-                        include 'modules/adjustment/kos/payment.php';
+                    case 'kos-pembayaran':
+                        include 'modules/adjustment/kos/pembayaran.php';
                         break;
                     case 'kos-room-charge':
                         include 'modules/adjustment/kos/room_charge.php';
                         break;
                     
                     // Adjustment - Laundry modules
-                    case 'laundry-transaction':
-                        include 'modules/adjustment/laundry/laundry_transaction.php';
+                    case 'transaksi-laundry':
+                        include 'modules/adjustment/laundry/transaksi_laundry.php';
                         break;
                     
                     // Adjustment - Meeting Room modules
@@ -800,117 +818,117 @@ if (isset($_GET['logout'])) {
                     case 'menu-slow-moving':
                         include 'modules/foodbeverage/chart/menu_slow_moving.php';
                         break;
-                    case 'sales-chart':
-                        include 'modules/foodbeverage/chart/sales_chart.php';
+                    case 'penjualan':
+                        include 'modules/foodbeverage/chart/penjualan.php';
                         break;
-                    case 'sales-by-category':
-                        include 'modules/foodbeverage/chart/sales_by_category.php';
+                    case 'penjualan-perkategori':
+                        include 'modules/foodbeverage/chart/penjualan_perkategori.php';
                         break;
                     
                     // Food & Beverage - Form modules
-                    case 'direct-purchase':
-                        include 'modules/foodbeverage/form/direct_purchase.php';
+                    case 'fnb-pembelian-langsung':
+                        include 'modules/foodbeverage/form/pembelian_langsung.php';
                         break;
-                    case 'stock-request':
-                        include 'modules/foodbeverage/form/stock_request.php';
+                    case 'permintaan-stok-fnb':
+                        include 'modules/foodbeverage/form/permintaan_stok_fnb.php';
                         break;
-                    case 'external-guest':
-                        include 'modules/foodbeverage/form/external_guest.php';
+                    case 'tamu-luar':
+                        include 'modules/foodbeverage/form/tamu_luar.php';
                         break;
-                    case 'event-menu-setup':
-                        include 'modules/foodbeverage/form/event_menu_setup.php';
+                    case 'atur-event-menu':
+                        include 'modules/foodbeverage/form/atur_event_menu.php';
                         break;
-                    case 'sales-transaction':
-                        include 'modules/foodbeverage/form/sales_transaction.php';
+                    case 'transaksi-penjualan':
+                        include 'modules/foodbeverage/form/transaksi_penjualan.php';
                         break;
-                    case 'pending-transaction':
-                        include 'modules/foodbeverage/form/pending_transaction.php';
+                    case 'transaksi-pending':
+                        include 'modules/foodbeverage/form/transaksi_pending.php';
                         break;
-                    case 'item-usage':
-                        include 'modules/foodbeverage/form/item_usage.php';
+                    case 'pemakaian-barang-fnb':
+                        include 'modules/foodbeverage/form/pemakaian_barang_fnb.php';
                         break;
-                    case 'expired-damaged-items':
-                        include 'modules/foodbeverage/form/expired_damaged_items.php';
+                    case 'barang-expire-rusak-fnb':
+                        include 'modules/foodbeverage/form/barang_expire_rusak_fnb.php';
                         break;
-                    case 'restaurant-stock-taking':
-                        include 'modules/foodbeverage/form/restaurant_stock_taking.php';
+                    case 'stok-opname-resto':
+                        include 'modules/foodbeverage/form/stok_opname_resto.php';
                         break;
                     
                     // Food & Beverage - Info modules
-                    case 'stock-request-info':
-                        include 'modules/foodbeverage/info/stock_request_info.php';
+                    case 'info-permintaan-stok-fnb':
+                        include 'modules/foodbeverage/info/info_permintaan_stok_fnb.php';
                         break;
-                    case 'today-transaction':
-                        include 'modules/foodbeverage/info/today_transaction.php';
+                    case 'transaksi-hari-ini':
+                        include 'modules/foodbeverage/info/transaksi_hari_ini.php';
                         break;
-                    case 'room-service-request':
-                        include 'modules/foodbeverage/info/room_service_request.php';
+                    case 'permintaan-room-service':
+                        include 'modules/foodbeverage/info/permintaan_room_service.php';
                         break;
-                    case 'receivable-info':
-                        include 'modules/foodbeverage/info/receivable_info.php';
+                    case 'info-piutang-fnb':
+                        include 'modules/foodbeverage/info/info_piutang_fnb.php';
                         break;
-                    case 'item-stock-info':
-                        include 'modules/foodbeverage/info/item_stock_info.php';
+                    case 'info-stok-barang-fnb':
+                        include 'modules/foodbeverage/info/info_stok_barang_fnb.php';
                         break;
-                    case 'stock-card':
-                        include 'modules/foodbeverage/info/stock_card.php';
+                    case 'kartu-stok-fnb':
+                        include 'modules/foodbeverage/info/kartu_stok_fnb.php';
                         break;
-                    case 'banquet-receivable':
-                        include 'modules/foodbeverage/info/banquet_receivable.php';
+                    case 'piutang-banquet':
+                        include 'modules/foodbeverage/info/piutang_banquet.php';
                         break;
                     
                     // Food & Beverage - Laporan modules
                     case 'night-audit-fnb':
                         include 'modules/foodbeverage/laporan/night_audit_fnb.php';
                         break;
-                    case 'restaurant-sales-per-item':
-                        include 'modules/foodbeverage/laporan/restaurant_sales_per_item.php';
+                    case 'penjualan-resto-per-item':
+                        include 'modules/foodbeverage/laporan/penjualan_resto_per_item.php';
                         break;
-                    case 'restaurant-sales':
-                        include 'modules/foodbeverage/laporan/restaurant_sales.php';
+                    case 'penjualan-restaurant':
+                        include 'modules/foodbeverage/laporan/penjualan_restaurant.php';
                         break;
                     case 'shift-report':
                         include 'modules/foodbeverage/laporan/shift_report.php';
                         break;
-                    case 'restaurant-guest-report':
-                        include 'modules/foodbeverage/laporan/restaurant_guest_report.php';
+                    case 'lap-tamu-resto':
+                        include 'modules/foodbeverage/laporan/lap_tamu_resto.php';
                         break;
-                    case 'restaurant-stocktaking-history':
-                        include 'modules/foodbeverage/laporan/restaurant_stocktaking_history.php';
+                    case 'riwayat-so-resto':
+                        include 'modules/foodbeverage/laporan/riwayat_so_resto.php';
                         break;
-                    case 'restaurant-shift-report':
-                        include 'modules/foodbeverage/laporan/restaurant_shift_report.php';
+                    case 'resto-shift-report':
+                        include 'modules/foodbeverage/laporan/resto_shift_report.php';
                         break;
                     
                     // Food & Beverage - Master Data modules
                     case 'master-discount':
                         include 'modules/foodbeverage/master/master_discount.php';
                         break;
-                    case 'table-master':
-                        include 'modules/foodbeverage/master/table_master.php';
+                    case 'master-meja':
+                        include 'modules/foodbeverage/master/master_meja.php';
                         break;
-                    case 'restaurant-menu-master':
-                        include 'modules/foodbeverage/master/restaurant_menu_master.php';
+                    case 'master-menu-resto':
+                        include 'modules/foodbeverage/master/master_menu_resto.php';
                         break;
-                    case 'restaurant-menu-category':
-                        include 'modules/foodbeverage/master/restaurant_menu_category.php';
+                    case 'kategori-menu-resto':
+                        include 'modules/foodbeverage/master/kategori_menu_resto.php';
                         break;
-                    case 'restaurant-menu-type':
-                        include 'modules/foodbeverage/master/restaurant_menu_type.php';
+                    case 'jenis-menu-resto':
+                        include 'modules/foodbeverage/master/jenis_menu_resto.php';
                         break;
                     
                     // Front Office - Chart modules
-                    case 'monthly-room-chart':
-                        include 'modules/frontoffice/chart/monthly_room_chart.php';
+                    case 'chart-kamar-perbulan':
+                        include 'modules/frontoffice/chart/chart_kamar_perbulan.php';
                         break;
-                    case 'monthly-revenue-chart':
-                        include 'modules/frontoffice/chart/monthly_revenue_chart.php';
+                    case 'chart-pendapatan-bulanan':
+                        include 'modules/frontoffice/chart/chart_pendapatan_bulanan.php';
                         break;
-                    case 'occupancy-chart':
-                        include 'modules/frontoffice/chart/occupancy_chart.php';
+                    case 'chart-okupansi':
+                        include 'modules/frontoffice/chart/chart_okupansi.php';
                         break;
-                    case 'revenue-graph':
-                        include 'modules/frontoffice/chart/revenue_graph.php';
+                    case 'grafik-revenue':
+                        include 'modules/frontoffice/chart/grafik_revenue.php';
                         break;
                     case 'analisa-market-segment':
                         include 'modules/frontoffice/chart/analisa_market_segment.php';
@@ -922,82 +940,77 @@ if (isset($_GET['logout'])) {
                         include 'modules/frontoffice/chart/perbandingan_tahun.php';
                         break;
                     
-                    // Front Office - Form modules (Only 10 modules as per submenu)
-                    case 'registration':
-                        include 'modules/frontoffice/form/registration.php';
+                    // Front Office - Form modules
+                    case 'checkin-tamu':
+                        include 'modules/frontoffice/form/checkin_tamu.php';
                         break;
-                    case 'reservation':
-                        include 'modules/frontoffice/form/reservation.php';
+                    case 'checkout-tamu':
+                        include 'modules/frontoffice/form/checkout_tamu.php';
                         break;
-                    case 'direct-purchase-fo':
-                        include 'modules/frontoffice/form/direct_purchase_fo.php';
+                    case 'buat-reservasi':
+                        include 'modules/frontoffice/form/buat_reservasi.php';
                         break;
-                    case 'refresh-room-status':
-                        include 'modules/frontoffice/form/refresh_room_status.php';
+                    case 'ubah-reservasi':
+                        include 'modules/frontoffice/form/ubah_reservasi.php';
                         break;
-                    case 'group-registration':
-                        include 'modules/frontoffice/form/group_registration.php';
+                    case 'batal-reservasi':
+                        include 'modules/frontoffice/form/batal_reservasi.php';
                         break;
-                    case 'laundry-transaction':
-                        include 'modules/frontoffice/form/laundry_transaction.php';
+                    case 'extend-stay':
+                        include 'modules/frontoffice/form/extend_stay.php';
                         break;
-                    case 'kost-registration':
-                        include 'modules/frontoffice/form/kost_registration.php';
+                    case 'early-checkout':
+                        include 'modules/frontoffice/form/early_checkout.php';
                         break;
-                    case 'kost-reservation':
-                        include 'modules/frontoffice/form/kost_reservation.php';
+                    case 'room-move':
+                        include 'modules/frontoffice/form/room_move.php';
                         break;
-                    case 'meeting-room-transaction':
-                        include 'modules/frontoffice/form/meeting_room_transaction.php';
+                    case 'split-room':
+                        include 'modules/frontoffice/form/split_room.php';
                         break;
-                    case 'extrabill-form':
-                        include 'modules/frontoffice/form/extrabill_form.php';
+                    case 'join-room':
+                        include 'modules/frontoffice/form/join_room.php';
                         break;
-                    
-                    // Additional Front Office Form modules
-                    case 'direct-purchase-fo':
-                        include 'modules/frontoffice/form/direct_purchase_fo.php';
+                    case 'posting-manual':
+                        include 'modules/frontoffice/form/posting_manual.php';
                         break;
-                    case 'refresh-room-status':
-                        include 'modules/frontoffice/form/refresh_room_status.php';
+                    case 'koreksi-posting':
+                        include 'modules/frontoffice/form/koreksi_posting.php';
                         break;
-                    case 'group-registration':
-                        include 'modules/frontoffice/form/group_registration.php';
+                    case 'deposit-tamu':
+                        include 'modules/frontoffice/form/deposit_tamu.php';
                         break;
-                    case 'laundry-transaction':
-                        include 'modules/frontoffice/form/laundry_transaction.php';
+                    case 'refund-deposit':
+                        include 'modules/frontoffice/form/refund_deposit.php';
                         break;
-                    case 'kost-registration':
-                        include 'modules/frontoffice/form/kost_registration.php';
+                    case 'komplemen-kamar':
+                        include 'modules/frontoffice/form/komplemen_kamar.php';
                         break;
-                    case 'kost-reservation':
-                        include 'modules/frontoffice/form/kost_reservation.php';
+                    case 'house-use':
+                        include 'modules/frontoffice/form/house_use.php';
                         break;
-                    case 'meeting-room-transaction':
-                        include 'modules/frontoffice/form/meeting_room_transaction.php';
+                    case 'out-of-order':
+                        include 'modules/frontoffice/form/out_of_order.php';
                         break;
-                    case 'extrabill-form':
-                        include 'modules/frontoffice/form/extrabill_form.php';
+                    case 'maintenance-request':
+                        include 'modules/frontoffice/form/maintenance_request.php';
                         break;
-                    
-                    // Additional Front Office Form modules (non-existent files removed)
-                    // Note: Several placeholder modules were referenced but files don't exist
                     
                     // Front Office - Info modules
                     case 'info-kamar-available':
-                        include 'modules/frontoffice/info/room_availability_info.php';
+                        include 'modules/frontoffice/info/info_kamar_available.php';
                         break;
                     case 'info-tamu-inhouse':
-                        include 'modules/frontoffice/info/inhouse_guest_info.php';
+                        include 'modules/frontoffice/info/info_tamu_inhouse.php';
                         break;
                     case 'info-reservasi-hari-ini':
-                        include 'modules/frontoffice/info/today_reservation_info.php';
+                        include 'modules/frontoffice/info/info_reservasi_hari_ini.php';
                         break;
                     case 'info-checkout-hari-ini':
-                        include 'modules/frontoffice/info/today_checkout_info.php';
+                        include 'modules/frontoffice/info/info_checkout_hari_ini.php';
                         break;
                     case 'info-pending-checkout':
-                        include 'modules/frontoffice/info/pending_checkout_info.php';
+                        include 'modules/frontoffice/info/info_pending_checkout.php';
                         break;
                     case 'room-status-realtime':
                         include 'modules/frontoffice/info/room_status_realtime.php';
@@ -1088,13 +1101,13 @@ if (isset($_GET['logout'])) {
                     
                     // Front Office - Master modules
                     case 'master-kamar':
-                        include 'modules/frontoffice/master/room_master.php';
+                        include 'modules/frontoffice/master/master_kamar.php';
                         break;
                     case 'master-rate-kamar':
-                        include 'modules/frontoffice/master/room_rate_master.php';
+                        include 'modules/frontoffice/master/master_rate_kamar.php';
                         break;
                     case 'master-tipe-kamar':
-                        include 'modules/frontoffice/master/room_type_master.php';
+                        include 'modules/frontoffice/master/master_tipe_kamar.php';
                         break;
                     case 'master-guest':
                         include 'modules/frontoffice/master/master_guest.php';
@@ -1296,32 +1309,37 @@ if (isset($_GET['logout'])) {
                         break;
                     
                     // Laundry - Laporan modules
-                    case 'linen-par-level':
+                    case 'linen-status':
+                        include 'modules/laundry/laporan/linen_status.php';
+                        break;
+                    case 'linen-in-progress':
                         include 'modules/laundry/laporan/linen_par_level.php';
                         break;
-                    case 'laundry-report':
-                        include 'modules/laundry/laporan/laundry_report.php';
-                        break;
                     
-                    // Laundry - Master Data modules  
-                    // (Removed duplicates - use housekeeping versions instead)
+                    // Laundry - Master Data modules
+                    case 'laundry-amenities-stock':
+                        include 'modules/laundry/masterdata/amenities_stock.php';
+                        break;
+                    case 'linen-status-master':
+                        include 'modules/laundry/masterdata/linen_status.php';
+                        break;
                     
                     // HRD - Account Receivable modules
                     case 'laporan-pershift':
-                        include 'modules/hrd/accountreceivable/laporan/shift_report.php';
+                        include 'modules/hrd/accountreceivable/laporan/laporan_pershift.php';
                         break;
                     case 'laporan-night-audit':
-                        include 'modules/hrd/accountreceivable/laporan/night_audit_report.php';
+                        include 'modules/hrd/accountreceivable/laporan/laporan_night_audit.php';
                         break;
                     
                     // HRD - Accounting modules
                     case 'laporan-global-accounting':
-                        include 'modules/hrd/accounting/laporan/global_report.php';
+                        include 'modules/hrd/accounting/laporan/laporan_global.php';
                         break;
                     
                     // HRD - Administration modules
                     case 'profil-hotel':
-                        include 'modules/hrd/administration/masterdata/hotel_profile.php';
+                        include 'modules/hrd/administration/masterdata/profil_hotel.php';
                         break;
 
                     case 'dashboard':
@@ -1644,19 +1662,6 @@ if (isset($_GET['logout'])) {
             fadeOutDuration: 100  // Faster fade out (100ms instead of 150ms)
         };
         
-        // Loading system is now handled by fast-loader.js
-        // Initialize loading for navigation links
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add loading to all navigation links
-            const navLinks = document.querySelectorAll('.nav-link');
-            navLinks.forEach(link => {
-                link.addEventListener('click', function() {
-                    if (window.fastLoader) {
-                        window.fastLoader.show();
-                    }
-                });
-            });
-        });
-    </script>
-</body>
+        <!-- All dashboard scripts moved to js/dashboard-scripts.js -->
+    </body>
 </html>

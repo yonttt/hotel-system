@@ -3,24 +3,6 @@
 // Kategori: FRONTOFFICE
 // Sub-Kategori: FORM
 
-// Periksa apakah ada error message
-if (isset($error_message)): ?>
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            <?= htmlspecialchars($error_message) ?>
-        </div>
-    <?php endif; ?>
-
-<div class="border border-gray-300 bg-white">
-    <div class="flex items-center justify-between px-4 py-2 bg-gray-50 border-b border-gray-300">
-        <h2 class="text-xs font-semibold text-gray-800">REGISTRATION FORM</h2>
-        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">
-            Room Available
-        </button>
-    </div>
-
-    <form method="POST" class="p-0">
-
-<?php
 // Periksa apakah user sudah login
 if (!isset($_SESSION['user_id'])) {
     header('Location: index.php');
@@ -110,18 +92,25 @@ $rooms = $conn->query("SELECT room_number FROM rooms WHERE status = 'available' 
 $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY created_at DESC LIMIT 10")->fetchAll();
 ?>
 
-<div class="bg-white rounded-lg shadow-lg">
-    <?php if (isset($success_message)): ?>
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-            <?= htmlspecialchars($success_message) ?>
-        </div>
-    <?php endif; ?>
+<?php if (isset($success_message)): ?>
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+        <?= htmlspecialchars($success_message) ?>
+    </div>
+<?php endif; ?>
     
-    <?php if (isset($error_message)): ?>
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            <?= htmlspecialchars($error_message) ?>
-        </div>
-    <?php endif; ?>
+<?php if (isset($error_message)): ?>
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <?= htmlspecialchars($error_message) ?>
+    </div>
+<?php endif; ?>
+
+<div class="border border-gray-300 bg-white">
+    <div class="flex items-center justify-between px-4 py-2 bg-gray-50 border-b border-gray-300">
+        <h2 class="text-xs font-semibold text-gray-800">REGISTRATION FORM</h2>
+        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">
+            Room Available
+        </button>
+    </div>
 
     <form method="POST" class="p-0">
         <div class="grid grid-cols-1 lg:grid-cols-3">
@@ -283,13 +272,14 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Extra Bed</label>
                     <div class="flex gap-1">
-                        <span class="px-2 py-1 bg-gray-50 border border-gray-300 text-xs text-gray-600 flex-1">Night</span>
-                        <input type="number" name="extra_bed_qty" value="0" min="0" class="w-12 px-1 py-1 border border-gray-300 text-xs text-center">
-                        <span class="px-2 py-1 bg-gray-50 border border-gray-300 text-xs text-gray-600">Qty</span>
+                        <input type="number" name="extra_bed_nights" min="0" value="0" placeholder="Night"
+                               class="flex-1 px-1 py-1 border border-gray-300 text-xs text-center">
+                        <input type="number" name="extra_bed_qty" min="0" value="0" placeholder="Qty"
+                               class="w-12 px-1 py-1 border border-gray-300 text-xs text-center">
                     </div>
                 </div>
 
-                <div class="mb-3" id="room_number_container" style="display: none;">
+                <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Room Number</label>
                     <select name="room_number" class="w-full px-2 py-1 border border-gray-300 text-xs">
                         <option value="">None selected</option>
@@ -369,120 +359,3 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
         </div>
     </form>
 </div>
-    </div>
-</div>
-
-<script>
-// JavaScript untuk modul Form Registrasi Kamar
-console.log('Hotel Registration Form loaded');
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Set arrival date to today's date automatically (readonly, but updates daily)
-    const arrivalDateInput = document.querySelector('input[name="arrival_date"]');
-    const nightsSelect = document.querySelector('select[name="nights"]');
-    const departureDateInput = document.querySelector('input[name="departure_date"]');
-    
-    // Function to get today's date in YYYY-MM-DD format
-    function getTodayDate() {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-    
-    // Set arrival date to today automatically
-    if (arrivalDateInput) {
-        arrivalDateInput.value = getTodayDate();
-    }
-    
-    function calculateDepartureDate() {
-        if (arrivalDateInput && departureDateInput && nightsSelect) {
-            if (arrivalDateInput.value && nightsSelect.value) {
-                const arrivalDate = new Date(arrivalDateInput.value);
-                const nights = parseInt(nightsSelect.value);
-                const departureDate = new Date(arrivalDate);
-                departureDate.setDate(departureDate.getDate() + nights);
-                
-                const year = departureDate.getFullYear();
-                const month = String(departureDate.getMonth() + 1).padStart(2, '0');
-                const day = String(departureDate.getDate()).padStart(2, '0');
-                
-                departureDateInput.value = `${year}-${month}-${day}`;
-            }
-        }
-    }
-    
-    // Only listen to nights change since arrival date is now readonly
-    if (nightsSelect) nightsSelect.addEventListener('change', calculateDepartureDate);
-    
-    // Auto-calculate balance when payment amounts change
-    const paymentAmountInput = document.querySelector('input[name="payment_amount"]');
-    const discountInput = document.querySelector('input[name="discount"]');
-    const paymentDiskonInput = document.querySelector('input[name="payment_diskon"]');
-    const depositInput = document.querySelector('input[name="deposit"]');
-    const balanceInput = document.querySelector('input[name="balance"]');
-    
-    function calculateBalance() {
-        if (paymentAmountInput && balanceInput) {
-            const paymentAmount = parseFloat(paymentAmountInput.value) || 0;
-            const discount = parseFloat(discountInput?.value) || 0;
-            const paymentDiskon = parseFloat(paymentDiskonInput?.value) || 0;
-            const deposit = parseFloat(depositInput?.value) || 0;
-            
-            const balance = paymentAmount - discount - paymentDiskon - deposit;
-            balanceInput.value = balance.toFixed(2);
-        }
-    }
-    
-    if (paymentAmountInput) paymentAmountInput.addEventListener('input', calculateBalance);
-    if (discountInput) discountInput.addEventListener('input', calculateBalance);
-    if (paymentDiskonInput) paymentDiskonInput.addEventListener('input', calculateBalance);
-    if (depositInput) depositInput.addEventListener('input', calculateBalance);
-    
-    // Form validation
-    const form = document.querySelector('form');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            const guestName = document.querySelector('input[name="guest_name"]')?.value;
-            
-            if (!guestName?.trim()) {
-                alert('Guest name is required');
-                e.preventDefault();
-                return;
-            }
-            
-            // Confirmation
-            if (!confirm('Are you sure you want to process this registration?')) {
-                e.preventDefault();
-            }
-        });
-    }
-    
-    // Auto-uppercase guest name
-    const guestNameInput = document.querySelector('input[name="guest_name"]');
-    if (guestNameInput) {
-        guestNameInput.addEventListener('input', function() {
-            this.value = this.value.toUpperCase();
-        });
-    }
-    
-    // Show/hide room number based on guest type selection
-    const guestTypeSelect = document.getElementById('guest_type');
-    const roomNumberContainer = document.getElementById('room_number_container');
-
-    if (guestTypeSelect && roomNumberContainer) {
-        guestTypeSelect.addEventListener('change', function() {
-            if (this.value) {
-                roomNumberContainer.style.display = 'block';
-            } else {
-                roomNumberContainer.style.display = 'none';
-            }
-        });
-    }
-
-    // Initialize calculations
-    calculateDepartureDate();
-    calculateBalance();
-});
-</script>
