@@ -155,14 +155,16 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
 </style>
 
 <div class="reservation-container">
-    <div class="header-bar controls-bar">
-        <div>
+    <div class="header-bar controls-bar" style="align-items: center;">
+        <div style="display: flex; align-items: center;">
             <span style="font-size: 1.5em; margin-right: 10px;">☰</span>
             <strong>ALL RESERVATION LIST</strong>
+            <span style="margin-left: 20px; font-size: 1em;">Hotel :</span>
+            <select style="margin-left: 5px; padding: 3px 8px;">
+                <option value="ALL">All</option>
+                <option value="IDOLA">Hotel Idola</option>
+            </select>
         </div>
-        <select>
-            <option>Hotel...</option>
-        </select>
     </div>
 
     <div class="controls-bar">
