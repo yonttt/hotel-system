@@ -42,3 +42,18 @@ CREATE TABLE IF NOT EXISTS hotel_reservations (
 INSERT INTO hotel_reservations (reservation_no, guest_name, mobile_phone, arrival_date, departure_date) VALUES
 ('0000000001', 'John Doe', '+6281234567890', '2025-09-04', '2025-09-05'),
 ('0000000002', 'Jane Smith', '+6281234567891', '2025-09-05', '2025-09-07');
+
+CREATE TABLE `reservation_types` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- You can add more reservation types here as needed.
+INSERT INTO `reservation_types` (`name`) VALUES
+('Standard Reservation'),
+('Guaranteed'),
+('Corporate');
