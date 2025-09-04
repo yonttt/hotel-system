@@ -312,7 +312,7 @@ if (isset($_GET['logout'])) {
                                         <ul class="nav-submenu" id="frontofficeinfo-submenu">
                                             <li><a href="home.php?module=frontoffice/informasi_reservasi/reservation_today&title=Reservation Today" class="nav-link">Reservation Today</a></li>
                                             <li><a href="home.php?module=frontoffice/informasi_reservasi/reservation_by_deposit&title=Reservation By Deposit" class="nav-link">Reservation By Deposit</a></li>
-                                            <li><a href="home.php?module=frontoffice/informasi_reservasi/all_reservation&title=All Reservation" class="nav-link">All Reservation</a></li>
+                                            <li><a href="home.php?module=frontoffice/informasi_reservasi/all_reservation&title=All Reservation List" class="nav-link">All Reservation</a></li>
                                         </ul>
                                     </li>
                                     <li class="nav-group">
@@ -922,8 +922,8 @@ if (isset($_GET['logout'])) {
                     case 'frontoffice/laporan/deposit_report':
                         include 'modules/frontoffice/laporan/deposit_report.php';
                         break;
-                    case 'frontoffice/info/group_reservation':
-                        include 'modules/frontoffice/info/group_reservation.php';
+                    case 'frontoffice/informasi_reservasi/all_reservation':
+                        include 'modules/frontoffice/informasi_reservasi/all_reservation.php';
                         break;
                     case 'frontoffice/info/room_availability_info':
                         include 'modules/frontoffice/info/room_availability_info.php';
