@@ -10,9 +10,7 @@ if (isset($error_message)): ?>
         </div>
     <?php endif; ?>
 
-<!-- Form Container with Table-like Border -->
 <div class="border border-gray-300 bg-white">
-    <!-- Compact Header -->
     <div class="flex items-center justify-between px-4 py-2 bg-gray-50 border-b border-gray-300">
         <h2 class="text-xs font-semibold text-gray-800">REGISTRATION FORM</h2>
         <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">
@@ -20,7 +18,6 @@ if (isset($error_message)): ?>
         </button>
     </div>
 
-    <!-- Registration Form -->
     <form method="POST" class="p-0">
 
 <?php
@@ -62,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['category_market'] ?? 1,
             $_POST['market_segment'] ?? 'Normal',
             $_POST['member_id'] ?? '',
-            $_POST['transaction_by'] ?? '',
+            $_SESSION['username'] ?? '', // Menggunakan username dari session
             $_POST['id_card_type'] ?? 'KTP',
             $_POST['id_card_number'] ?? '',
             $_POST['guest_name'] ?? '',
@@ -126,20 +123,15 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
         </div>
     <?php endif; ?>
 
-    <!-- Registration Form -->
     <form method="POST" class="p-0">
-        <!-- Table-like structure -->
         <div class="grid grid-cols-1 lg:grid-cols-3">
-            <!-- Left Column -->
             <div class="p-4">
-                <!-- Registration Number -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">REGISTRATION NO</label>
                     <input type="text" value="<?= str_pad((count($recent_registrations) + 1), 10, '0', STR_PAD_LEFT) ?>" 
                            class="w-full px-2 py-1 border border-gray-300 text-xs bg-gray-50" readonly>
                 </div>
 
-                <!-- Category Market -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Category Market</label>
                     <select name="category_market" class="w-full px-2 py-1 border border-gray-300 text-xs">
@@ -151,7 +143,6 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                     </select>
                 </div>
 
-                <!-- Market Segment -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Market Segment</label>
                     <select name="market_segment" class="w-full px-2 py-1 border border-gray-300 text-xs">
@@ -161,19 +152,16 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                     </select>
                 </div>
 
-                <!-- Member ID -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Member ID</label>
                     <input type="text" name="member_id" class="w-full px-2 py-1 border border-gray-300 text-xs">
                 </div>
 
-                <!-- Transaction By -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Transaction By</label>
-                    <input type="text" name="transaction_by" value="YONATHAN" class="w-full px-2 py-1 border border-gray-300 text-xs">
+                    <input type="text" name="transaction_by" value="<?= htmlspecialchars($_SESSION['username'] ?? '') ?>" class="w-full px-2 py-1 border border-gray-300 text-xs bg-gray-50" readonly>
                 </div>
 
-                <!-- ID Card -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">ID Card</label>
                     <div class="flex gap-1">
@@ -186,7 +174,6 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                     </div>
                 </div>
 
-                <!-- Guest Name -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Guest Name</label>
                     <div class="flex gap-1">
@@ -199,19 +186,16 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                     </div>
                 </div>
 
-                <!-- Mobile Phone -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Mobile Phone</label>
                     <input type="text" name="mobile_phone" class="w-full px-2 py-1 border border-gray-300 text-xs">
                 </div>
 
-                <!-- Address -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Address</label>
                     <textarea name="address" rows="2" class="w-full px-2 py-1 border border-gray-300 text-xs resize-none"></textarea>
                 </div>
 
-                <!-- Nationality -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Nationality</label>
                     <select name="nationality" class="w-full px-2 py-1 border border-gray-300 text-xs">
@@ -223,7 +207,6 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                     </select>
                 </div>
 
-                <!-- City -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">City</label>
                     <select name="city" class="w-full px-2 py-1 border border-gray-300 text-xs">
@@ -236,22 +219,18 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                     </select>
                 </div>
 
-                <!-- Email -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Email</label>
                     <input type="email" name="email" class="w-full px-2 py-1 border border-gray-300 text-xs">
                 </div>
             </div>
 
-            <!-- Middle Column -->
             <div class="p-4">
-                <!-- Arrival Date -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Arrival Date</label>
                     <input type="date" name="arrival_date" value="<?= date('Y-m-d') ?>" class="w-full px-2 py-1 border border-gray-300 text-xs" readonly>
                 </div>
 
-                <!-- Nights -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Nights</label>
                     <div class="flex gap-1">
@@ -268,23 +247,21 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                     </div>
                 </div>
 
-                <!-- Departure -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Departure</label>
                     <input type="date" name="departure_date" value="<?= date('Y-m-d', strtotime('+1 day')) ?>" class="w-full px-2 py-1 border border-gray-300 text-xs">
                 </div>
 
-                <!-- Guest Type -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Guest Type</label>
-                    <select name="guest_type" class="w-full px-2 py-1 border border-gray-300 text-xs">
-                        <option value="Normal" selected>Normal</option>
+                    <select name="guest_type" id="guest_type" class="w-full px-2 py-1 border border-gray-300 text-xs">
+                        <option value="">-- Select Guest Type --</option>
+                        <option value="Normal">Normal</option>
                         <option value="VIP">VIP</option>
                         <option value="Corporate">Corporate</option>
                     </select>
                 </div>
 
-                <!-- Guest -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Guest</label>
                     <div class="flex gap-1">
@@ -303,7 +280,6 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                     </div>
                 </div>
 
-                <!-- Extra Bed -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Extra Bed</label>
                     <div class="flex gap-1">
@@ -313,8 +289,7 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                     </div>
                 </div>
 
-                <!-- Room Number -->
-                <div class="mb-3">
+                <div class="mb-3" id="room_number_container" style="display: none;">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Room Number</label>
                     <select name="room_number" class="w-full px-2 py-1 border border-gray-300 text-xs">
                         <option value="">None selected</option>
@@ -327,15 +302,12 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                 </div>
             </div>
 
-            <!-- Right Column -->
             <div class="p-4">
-                <!-- Transaction Status -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Transaction Status</label>
                     <input type="text" name="transaction_status" value="Registration" class="w-full px-2 py-1 border border-gray-300 text-xs bg-gray-50" readonly>
                 </div>
 
-                <!-- Payment Method -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Payment Method</label>
                     <select name="payment_method" class="w-full px-2 py-1 border border-gray-300 text-xs">
@@ -347,7 +319,6 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                     </select>
                 </div>
 
-                <!-- Registration Type -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Registration Type</label>
                     <select name="registration_type" class="w-full px-2 py-1 border border-gray-300 text-xs">
@@ -359,43 +330,36 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                     </select>
                 </div>
 
-                <!-- Note -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Note</label>
                     <textarea name="notes" rows="3" class="w-full px-2 py-1 border border-gray-300 text-xs resize-none"></textarea>
                 </div>
 
-                <!-- Payment Amount -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Payment Amount</label>
                     <input type="number" name="payment_amount" step="0.01" value="0" class="w-full px-2 py-1 border border-gray-300 text-xs">
                 </div>
 
-                <!-- Discount -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Discount</label>
                     <input type="number" name="discount" step="0.01" value="0" class="w-full px-2 py-1 border border-gray-300 text-xs">
                 </div>
 
-                <!-- Payment - Diskon -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Payment - Diskon</label>
                     <input type="number" name="payment_diskon" step="0.01" value="0" class="w-full px-2 py-1 border border-gray-300 text-xs">
                 </div>
 
-                <!-- Deposit -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Deposit</label>
                     <input type="number" name="deposit" step="0.01" value="0" class="w-full px-2 py-1 border border-gray-300 text-xs">
                 </div>
 
-                <!-- Balance -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Balance</label>
                     <input type="number" name="balance" step="0.01" value="0.00" class="w-full px-2 py-1 border border-gray-300 text-xs bg-gray-50" readonly>
                 </div>
 
-                <!-- Process Button -->
                 <div class="pt-2">
                     <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 border border-gray-300 font-medium text-sm transition-colors duration-200">
                         Process
@@ -503,6 +467,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Show/hide room number based on guest type selection
+    const guestTypeSelect = document.getElementById('guest_type');
+    const roomNumberContainer = document.getElementById('room_number_container');
+
+    if (guestTypeSelect && roomNumberContainer) {
+        guestTypeSelect.addEventListener('change', function() {
+            if (this.value) {
+                roomNumberContainer.style.display = 'block';
+            } else {
+                roomNumberContainer.style.display = 'none';
+            }
+        });
+    }
+
     // Initialize calculations
     calculateDepartureDate();
     calculateBalance();
