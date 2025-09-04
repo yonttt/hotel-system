@@ -310,9 +310,9 @@ if (isset($_GET['logout'])) {
                                             </svg>
                                         </button>
                                         <ul class="nav-submenu" id="frontofficeinfo-submenu">
-                                            <li><a href="home.php?module=frontoffice/info/today_reservation_info&title=Info Reservasi Hari Ini" class="nav-link">Reservation Today</a></li>
-                                            <li><a href="home.php?module=frontoffice/laporan/deposit_report&title=Deposit Report" class="nav-link">Reservation By Deposit</a></li>
-                                            <li><a href="home.php?module=frontoffice/info/group_reservation&title=Group Reservation" class="nav-link">All Reservation</a></li>
+                                            <li><a href="home.php?module=frontoffice/informasi_reservasi/reservation_today&title=Reservation Today" class="nav-link">Reservation Today</a></li>
+                                            <li><a href="home.php?module=frontoffice/informasi_reservasi/reservation_by_deposit&title=Reservation By Deposit" class="nav-link">Reservation By Deposit</a></li>
+                                            <li><a href="home.php?module=frontoffice/informasi_reservasi/all_reservation&title=All Reservation" class="nav-link">All Reservation</a></li>
                                         </ul>
                                     </li>
                                     <li class="nav-group">
@@ -1319,10 +1319,23 @@ if (isset($_GET['logout'])) {
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.classList.remove('active');
             });
-            
+
             // Add active class to clicked element
             if (clickedElement.classList.contains('nav-link')) {
                 clickedElement.classList.add('active');
+            }
+
+            // Persist sidebar submenu state except for home button
+            if (!clickedElement.href.endsWith('home.php')) {
+                // Find the closest nav-group-header and get its submenu name
+                const navGroupHeader = clickedElement.closest('.nav-group')?.querySelector('.nav-group-header');
+                if (navGroupHeader) {
+                    const match = navGroupHeader.getAttribute('onclick').match(/toggleSubmenu\('(.+?)'\)/);
+                    if (match) {
+                        const menuName = match[1];
+                        localStorage.setItem('submenu-' + menuName, true);
+                    }
+                }
             }
         }
         
