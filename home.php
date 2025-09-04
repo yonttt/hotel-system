@@ -335,17 +335,17 @@ if (isset($_GET['logout'])) {
                                             </svg>
                                         </button>
                                         <ul class="nav-submenu" id="frontofficeinformasitamu-submenu">
-                                            <li><a href="home.php?module=frontoffice/info/guest_history&title=Guest History" class="nav-link">Guest Research</a></li>
-                                            <li><a href="home.php?module=frontoffice/info/today_checkout_info&title=Info Check Out Hari Ini" class="nav-link">Check in Today</a></li>
-                                            <li><a href="home.php?module=frontoffice/info/late_checkout&title=Early Check Out" class="nav-link">Early Checkin</a></li>
-                                            <li><a href="home.php?module=frontoffice/info/pending_checkout_info&title=Info Pending Check Out" class="nav-link">Expected Departure</a></li>
-                                            <li><a href="home.php?module=frontoffice/info/room_status_realtime&title=Room Status Real Time" class="nav-link">Meeting Room Info</a></li>
-                                            <li><a href="home.php?module=frontoffice/info/today_checkout_info&title=Info Check Out Hari Ini" class="nav-link">Checkout Today</a></li>
-                                            <li><a href="home.php?module=frontoffice/info/room_status_realtime&title=Room Move" class="nav-link">Change Room</a></li>
-                                            <li><a href="home.php?module=frontoffice/info/no_show_report&title=Batal Reservasi" class="nav-link">Cancellation Today</a></li>
+                                            <li><a href="home.php?module=frontoffice/informasi_tamu/guest_history&title=Guest History" class="nav-link">Guest Research</a></li>
+                                            <li><a href="home.php?module=frontoffice/informasi_tamu/today_checkin_info&title=Check In Today" class="nav-link">Check in Today</a></li>
+                                            <li><a href="home.php?module=frontoffice/informasi_tamu/early_checkin_info&title=Early Checkin" class="nav-link">Early Checkin</a></li>
+                                            <li><a href="home.php?module=frontoffice/informasi_tamu/pending_checkout_info&title=Expected Departure" class="nav-link">Expected Departure</a></li>
+                                            <li><a href="home.php?module=frontoffice/informasi_tamu/meeting_room_info&title=Meeting Room Info" class="nav-link">Meeting Room Info</a></li>
+                                            <li><a href="home.php?module=frontoffice/informasi_tamu/today_checkout_info&title=Checkout Today" class="nav-link">Checkout Today</a></li>
+                                            <li><a href="home.php?module=frontoffice/informasi_tamu/room_move_info&title=Change Room" class="nav-link">Change Room</a></li>
+                                            <li><a href="home.php?module=frontoffice/informasi_tamu/no_show_report&title=Cancellation Today" class="nav-link">Cancellation Today</a></li>
                                             <li><a href="home.php?module=adjustment/frontoffice/refund&title=Refund Deposit" class="nav-link">Refund</a></li>
-                                            <li><a href="home.php?module=frontoffice/info/blacklist_guest&title=Blacklist Guest" class="nav-link">Skipper</a></li>
-                                            <li><a href="home.php?module=frontoffice/info/guest_history&title=Guest History" class="nav-link">Guest History</a></li>
+                                            <li><a href="home.php?module=frontoffice/informasi_tamu/blacklist_guest&title=Skipper" class="nav-link">Skipper</a></li>
+                                            <li><a href="home.php?module=frontoffice/informasi_tamu/guest_history&title=Guest History" class="nav-link">Guest History</a></li>
                                         </ul>
                                     </li>
                                     <li class="nav-group">
