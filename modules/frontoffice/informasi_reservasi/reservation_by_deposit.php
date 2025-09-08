@@ -25,13 +25,17 @@ $entries = isset($_GET['entries']) ? (int)$_GET['entries'] : 10;
 $offset = ($page - 1) * $entries;
 
 // Sorting
-$sort_column = isset($_GET['sort']) ? $_GET['sort'] : 'created_at';
+$sort_column = isset($_GET['sort']) ? $_GET['sort'] : 'deposit';
 $sort_order = isset($_GET['order']) && in_array(strtoupper($_GET['order']), ['ASC', 'DESC']) ? $_GET['order'] : 'DESC';
 
-// Whitelist allowed sortable columns to prevent SQL injection
-$allowed_sort_columns = ['guest_name', 'market_segment', 'created_at', 'arrival_date', 'departure_date', 'transaction_by', 'deposit'];
+// Whitelist allowed sortable columns
+$allowed_sort_columns = [
+    'reservation_no', 'guest_name', 'market_segment', 'created_at', 
+    'arrival_date', 'departure_date', 'transaction_by', 'deposit', 
+    'room_number', 'nights', 'transaction_status', 'payment_amount', 'balance'
+];
 if (!in_array($sort_column, $allowed_sort_columns)) {
-    $sort_column = 'created_at'; // Default sort column
+    $sort_column = 'deposit'; // Default sort column
 }
 
 // Search
@@ -39,30 +43,26 @@ $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
 
 // --- DATABASE QUERY ---
+$base_where = "WHERE deposit > 0";
+$sql_data = "SELECT *, (guest_male + guest_female + guest_child) AS guest_count FROM hotel_reservations $base_where";
+$sql_count = "SELECT COUNT(*) FROM hotel_reservations $base_where";
 
-// Base SQL with deposit filter
-$sql_count = "SELECT COUNT(*) FROM hotel_reservations WHERE deposit > 0";
-$sql_data = "SELECT reservation_no, guest_name, market_segment, created_at AS booking, arrival_date, departure_date, transaction_by AS reserved_by, 'N/A' AS deposit_by, deposit, (guest_male + guest_female + guest_child) AS guest_count FROM hotel_reservations WHERE deposit > 0";
-
-// Add search condition if a search term is provided
 $params = [];
+
 if (!empty($search)) {
-    $search_condition = " AND (guest_name LIKE :search OR market_segment LIKE :search OR reservation_no LIKE :search)";
+    $search_condition = " AND (guest_name LIKE :search OR market_segment LIKE :search OR reservation_no LIKE :search OR room_number LIKE :search)";
     $sql_count .= $search_condition;
     $sql_data .= $search_condition;
     $params[':search'] = '%' . $search . '%';
 }
 
-// Get total number of records
 $stmt_count = $pdo->prepare($sql_count);
 $stmt_count->execute($params);
 $total_records = $stmt_count->fetchColumn();
 $total_pages = ceil($total_records / $entries);
 
-// Add sorting and pagination to the data query
 $sql_data .= " ORDER BY $sort_column $sort_order LIMIT :limit OFFSET :offset";
 
-// Prepare and execute the final data query
 $stmt_data = $pdo->prepare($sql_data);
 $stmt_data->bindValue(':limit', $entries, PDO::PARAM_INT);
 $stmt_data->bindValue(':offset', $offset, PDO::PARAM_INT);
@@ -73,85 +73,27 @@ $stmt_data->execute();
 $reservations = $stmt_data->fetchAll();
 
 // --- HELPER FUNCTION FOR SORTING UI ---
-
 function get_sort_link($column, $display, $current_sort, $current_order) {
     $order = ($current_sort == $column && $current_order == 'ASC') ? 'DESC' : 'ASC';
-    $arrow = '';
-    if ($current_sort == $column) {
-        $arrow = $current_order == 'ASC' ? '▲' : '▼';
-    }
-    return "<a href=\"?module=frontoffice/informasi_reservasi/reservation_by_deposit&sort=$column&order=$order\">$display $arrow</a>";
+    $arrow = ($current_sort == $column) ? ($current_order == 'ASC' ? '▲' : '▼') : '';
+    $query_params = http_build_query(array_merge($_GET, ['sort' => $column, 'order' => $order]));
+    return "<a href=\"?{$query_params}\">$display $arrow</a>";
 }
-
 ?>
 
 <style>
-    /* General styles for the module */
-    .reservation-container {
-        font-family: Arial, sans-serif;
-        color: #333;
-    }
-    .controls-bar {
-        background-color: #f0f0f0;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-bottom: none;
-    }
-    .controls-bar, .header-bar, .table-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-    .controls-bar .search-box input {
-        padding: 5px;
-        border: 1px solid #ccc;
-        border-radius: 3px;
-    }
-    .controls-bar .actions button, .controls-bar .actions select {
-        padding: 5px 10px;
-        margin-left: 5px;
-        border: 1px solid #ccc;
-        border-radius: 3px;
-        background-color: #e0e0e0;
-        cursor: pointer;
-    }
-    .data-table {
-        width: 100%;
-        border-collapse: collapse;
-        border: 1px solid #ccc;
-    }
-    .data-table th, .data-table td {
-        border: 1px solid #ccc;
-        padding: 8px;
-        text-align: left;
-        font-size: 12px;
-    }
-    .data-table th {
-        background-color: #f7f7f7;
-        font-weight: bold;
-    }
-    .data-table th a {
-        color: #333;
-        text-decoration: none;
-    }
-    .table-footer {
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-top: none;
-        font-size: 12px;
-    }
-    .pagination-controls button {
-        padding: 5px 10px;
-        margin: 0 2px;
-        border: 1px solid #ccc;
-        background-color: #f0f0f0;
-        cursor: pointer;
-    }
-    .pagination-controls button:disabled {
-        cursor: not-allowed;
-        opacity: 0.5;
-    }
+    .reservation-container { font-family: Arial, sans-serif; color: #333; }
+    .controls-bar, .header-bar, .table-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; background-color: #f0f0f0; padding: 10px; border: 1px solid #ccc; border-bottom: none; }
+    .controls-bar .search-box input { padding: 5px; border: 1px solid #ccc; border-radius: 3px; }
+    .controls-bar .actions button, .controls-bar .actions select { padding: 5px 10px; margin-left: 5px; border: 1px solid #ccc; border-radius: 3px; background-color: #e0e0e0; cursor: pointer; }
+    .data-table-wrapper { overflow-x: auto; }
+    .data-table { width: 100%; border-collapse: collapse; border: 1px solid #ccc; }
+    .data-table th, .data-table td { border: 1px solid #ccc; padding: 8px; text-align: left; font-size: 11px; white-space: nowrap; }
+    .data-table th { background-color: #f7f7f7; font-weight: bold; }
+    .data-table th a { color: #333; text-decoration: none; }
+    .table-footer { padding: 10px; border: 1px solid #ccc; border-top: none; font-size: 12px; }
+    .pagination-controls button { padding: 5px 10px; margin: 0 2px; border: 1px solid #ccc; background-color: #f0f0f0; cursor: pointer; }
+    .pagination-controls button:disabled { cursor: not-allowed; opacity: 0.5; }
 </style>
 
 <div class="reservation-container">
@@ -184,44 +126,60 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
         </div>
     </div>
 
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th><?= get_sort_link('guest_name', 'Name', $sort_column, $sort_order) ?></th>
-                <th><?= get_sort_link('market_segment', 'Market', $sort_column, $sort_order) ?></th>
-                <th><?= get_sort_link('created_at', 'Booking', $sort_column, $sort_order) ?></th>
-                <th><?= get_sort_link('arrival_date', 'Arrival', $sort_column, $sort_order) ?></th>
-                <th><?= get_sort_link('departure_date', 'Departure', $sort_column, $sort_order) ?></th>
-                <th><?= get_sort_link('transaction_by', 'Reserved By', $sort_column, $sort_order) ?></th>
-                <th>Deposit By</th>
-                <th><?= get_sort_link('deposit', 'Deposit', $sort_column, $sort_order) ?></th>
-                <th>Guest</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (empty($reservations)): ?>
+    <div class="data-table-wrapper">
+        <table class="data-table">
+            <thead>
                 <tr>
-                    <td colspan="10" style="text-align: center;">No reservations with deposits found.</td>
+                    <th>No</th>
+                    <th><?= get_sort_link('reservation_no', 'Resv. No', $sort_column, $sort_order) ?></th>
+                    <th><?= get_sort_link('guest_name', 'Name', $sort_column, $sort_order) ?></th>
+                    <th><?= get_sort_link('market_segment', 'Market', $sort_column, $sort_order) ?></th>
+                    <th><?= get_sort_link('created_at', 'Booking Date', $sort_column, $sort_order) ?></th>
+                    <th><?= get_sort_link('arrival_date', 'Arrival', $sort_column, $sort_order) ?></th>
+                    <th><?= get_sort_link('departure_date', 'Departure', $sort_column, $sort_order) ?></th>
+                    <th><?= get_sort_link('nights', 'Nights', $sort_column, $sort_order) ?></th>
+                    <th><?= get_sort_link('room_number', 'Room', $sort_column, $sort_order) ?></th>
+                    <th>Guest</th>
+                    <th><?= get_sort_link('transaction_by', 'Reserved By', $sort_column, $sort_order) ?></th>
+                    <th>Deposit By</th>
+                    <th><?= get_sort_link('deposit', 'Deposit', $sort_column, $sort_order) ?></th>
+                    <th><?= get_sort_link('payment_amount', 'Payment', $sort_column, $sort_order) ?></th>
+                    <th><?= get_sort_link('balance', 'Balance', $sort_column, $sort_order) ?></th>
+                    <th><?= get_sort_link('transaction_status', 'Status', $sort_column, $sort_order) ?></th>
+                    <th>Detail</th>
                 </tr>
-            <?php else: ?>
-                <?php foreach ($reservations as $index => $res): ?>
-                <tr>
-                    <td><?= $offset + $index + 1 ?></td>
-                    <td><?= htmlspecialchars($res['guest_name']) ?></td>
-                    <td><?= htmlspecialchars($res['market_segment']) ?></td>
-                    <td><?= date('d-m-Y', strtotime($res['booking'])) ?></td>
-                    <td><?= date('d-m-Y', strtotime($res['arrival_date'])) ?></td>
-                    <td><?= date('d-m-Y', strtotime($res['departure_date'])) ?></td>
-                    <td><?= htmlspecialchars($res['reserved_by']) ?></td>
-                    <td><?= htmlspecialchars($res['deposit_by']) ?></td>
-                    <td><?= number_format($res['deposit'], 2) ?></td>
-                    <td><?= htmlspecialchars($res['guest_count']) ?></td>
-                </tr>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <?php if (empty($reservations)): ?>
+                    <tr>
+                        <td colspan="17" style="text-align: center;">No reservations with deposits found.</td>
+                    </tr>
+                <?php else: ?>
+                    <?php foreach ($reservations as $index => $res): ?>
+                    <tr>
+                        <td><?= $offset + $index + 1 ?></td>
+                        <td><?= htmlspecialchars($res['reservation_no']) ?></td>
+                        <td><?= htmlspecialchars($res['guest_title'] . '. ' . $res['guest_name']) ?></td>
+                        <td><?= htmlspecialchars($res['market_segment']) ?></td>
+                        <td><?= date('d-m-Y', strtotime($res['created_at'])) ?></td>
+                        <td><?= date('d-m-Y', strtotime($res['arrival_date'])) ?></td>
+                        <td><?= date('d-m-Y', strtotime($res['departure_date'])) ?></td>
+                        <td style="text-align:center;"><?= htmlspecialchars($res['nights']) ?></td>
+                        <td><?= htmlspecialchars($res['room_number']) ?></td>
+                        <td style="text-align:center;"><?= htmlspecialchars($res['guest_count']) ?></td>
+                        <td><?= htmlspecialchars($res['transaction_by']) ?></td>
+                        <td>N/A</td>
+                        <td><?= number_format($res['deposit'], 2) ?></td>
+                        <td><?= number_format($res['payment_amount'], 2) ?></td>
+                        <td><?= number_format($res['balance'], 2) ?></td>
+                        <td><?= htmlspecialchars($res['transaction_status']) ?></td>
+                        <td style="text-align:center;">🔍</td>
+                    </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
 
     <div class="table-footer">
         <div>Showing <?= $total_records > 0 ? $offset + 1 : 0 ?> to <?= min($offset + $entries, $total_records) ?> of <?= $total_records ?> entries</div>
@@ -249,7 +207,7 @@ function applyFilters() {
     let url = window.location.href;
     url = updateQueryString('search', document.getElementById('searchInput').value, url);
     url = updateQueryString('entries', document.getElementById('entriesSelect').value, url);
-    url = updateQueryString('page', 1, url); // Reset to first page on new search/filter
+    url = updateQueryString('page', 1, url);
     window.location.href = url;
 }
 
@@ -270,3 +228,4 @@ function goToPage(page) {
     window.location.href = updateQueryString('page', page);
 }
 </script>
+
