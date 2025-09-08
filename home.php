@@ -931,8 +931,8 @@ if (isset($_GET['logout'])) {
                     case 'frontoffice/info/inhouse_guest_info':
                         include 'modules/frontoffice/info/inhouse_guest_info.php';
                         break;
-                    case 'frontoffice/info/guest_history':
-                        include 'modules/frontoffice/info/guest_history.php';
+                    case 'frontoffice/informasi_tamu/guest_history':
+                        include 'modules/frontoffice/informasi_tamu/guest_history.php';
                         break;
                     case 'frontoffice/info/today_checkout_info':
                         include 'modules/frontoffice/info/today_checkout_info.php';
