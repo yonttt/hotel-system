@@ -916,11 +916,11 @@ if (isset($_GET['logout'])) {
                         break;
                     
                     // Front Office - Info modules
-                    case 'frontoffice/info/today_reservation_info':
-                        include 'modules/frontoffice/info/today_reservation_info.php';
+                    case 'frontoffice/informasi_reservasi/reservation_today':
+                        include 'modules/frontoffice/informasi_reservasi/reservation_today.php';
                         break;
-                    case 'frontoffice/laporan/deposit_report':
-                        include 'modules/frontoffice/laporan/deposit_report.php';
+                    case 'frontoffice/informasi_reservasi/reservation_by_deposit':
+                        include 'modules/frontoffice/informasi_reservasi/reservation_by_deposit.php';
                         break;
                     case 'frontoffice/informasi_reservasi/all_reservation':
                         include 'modules/frontoffice/informasi_reservasi/all_reservation.php';
