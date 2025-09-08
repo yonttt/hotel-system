@@ -1125,8 +1125,8 @@ if (isset($_GET['logout'])) {
                                 </div>';
                         break;
                     default:
-                        // Generic module handler for modules without specific files
-                        include 'modules/generic_module.php';
+                        // No handler for missing modules; optionally show a 404 or error message
+                        echo '<div class="content-card"><h2>Module not found</h2><p>The requested module does not exist.</p></div>';
                         break;
                 }
                 ?>
