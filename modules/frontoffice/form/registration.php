@@ -3,27 +3,6 @@
 // Kategori: FRONTOFFICE
 // Sub-Kategori: FORM
 
-// Periksa apakah ada error message
-if (isset($error_message)): ?>
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            <?= htmlspecialchars($error_message) ?>
-        </div>
-    <?php endif; ?>
-
-<!-- Form Container with Table-like Border -->
-<div class="border border-gray-300 bg-white">
-    <!-- Compact Header -->
-    <div class="flex items-center justify-between px-4 py-2 bg-gray-50 border-b border-gray-300">
-        <h2 class="text-xs font-semibold text-gray-800">REGISTRATION FORM</h2>
-        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">
-            Room Available
-        </button>
-    </div>
-
-    <!-- Registration Form -->
-    <form method="POST" class="p-0">
-
-<?php
 // Periksa apakah user sudah login
 if (!isset($_SESSION['user_id'])) {
     header('Location: index.php');
@@ -62,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['category_market'] ?? 1,
             $_POST['market_segment'] ?? 'Normal',
             $_POST['member_id'] ?? '',
-            $_POST['transaction_by'] ?? '',
+            $_SESSION['username'] ?? '', // Menggunakan username dari session
             $_POST['id_card_type'] ?? 'KTP',
             $_POST['id_card_number'] ?? '',
             $_POST['guest_name'] ?? '',
@@ -113,33 +92,35 @@ $rooms = $conn->query("SELECT room_number FROM rooms WHERE status = 'available' 
 $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY created_at DESC LIMIT 10")->fetchAll();
 ?>
 
-<div class="bg-white rounded-lg shadow-lg">
-    <?php if (isset($success_message)): ?>
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-            <?= htmlspecialchars($success_message) ?>
-        </div>
-    <?php endif; ?>
+<?php if (isset($success_message)): ?>
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+        <?= htmlspecialchars($success_message) ?>
+    </div>
+<?php endif; ?>
     
-    <?php if (isset($error_message)): ?>
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            <?= htmlspecialchars($error_message) ?>
-        </div>
-    <?php endif; ?>
+<?php if (isset($error_message)): ?>
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <?= htmlspecialchars($error_message) ?>
+    </div>
+<?php endif; ?>
 
-    <!-- Registration Form -->
+<div class="border border-gray-300 bg-white">
+    <div class="flex items-center justify-between px-4 py-2 bg-gray-50 border-b border-gray-300">
+        <h2 class="text-xs font-semibold text-gray-800">REGISTRATION FORM</h2>
+        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">
+            Room Available
+        </button>
+    </div>
+
     <form method="POST" class="p-0">
-        <!-- Table-like structure -->
         <div class="grid grid-cols-1 lg:grid-cols-3">
-            <!-- Left Column -->
             <div class="p-4">
-                <!-- Registration Number -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">REGISTRATION NO</label>
                     <input type="text" value="<?= str_pad((count($recent_registrations) + 1), 10, '0', STR_PAD_LEFT) ?>" 
                            class="w-full px-2 py-1 border border-gray-300 text-xs bg-gray-50" readonly>
                 </div>
 
-                <!-- Category Market -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Category Market</label>
                     <select name="category_market" class="w-full px-2 py-1 border border-gray-300 text-xs">
@@ -151,7 +132,6 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                     </select>
                 </div>
 
-                <!-- Market Segment -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Market Segment</label>
                     <select name="market_segment" class="w-full px-2 py-1 border border-gray-300 text-xs">
@@ -161,19 +141,16 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                     </select>
                 </div>
 
-                <!-- Member ID -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Member ID</label>
                     <input type="text" name="member_id" class="w-full px-2 py-1 border border-gray-300 text-xs">
                 </div>
 
-                <!-- Transaction By -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Transaction By</label>
-                    <input type="text" name="transaction_by" value="YONATHAN" class="w-full px-2 py-1 border border-gray-300 text-xs">
+                    <input type="text" name="transaction_by" value="<?= htmlspecialchars($_SESSION['username'] ?? '') ?>" class="w-full px-2 py-1 border border-gray-300 text-xs bg-gray-50" readonly>
                 </div>
 
-                <!-- ID Card -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">ID Card</label>
                     <div class="flex gap-1">
@@ -186,7 +163,6 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                     </div>
                 </div>
 
-                <!-- Guest Name -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Guest Name</label>
                     <div class="flex gap-1">
@@ -199,19 +175,16 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                     </div>
                 </div>
 
-                <!-- Mobile Phone -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Mobile Phone</label>
                     <input type="text" name="mobile_phone" class="w-full px-2 py-1 border border-gray-300 text-xs">
                 </div>
 
-                <!-- Address -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Address</label>
                     <textarea name="address" rows="2" class="w-full px-2 py-1 border border-gray-300 text-xs resize-none"></textarea>
                 </div>
 
-                <!-- Nationality -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Nationality</label>
                     <select name="nationality" class="w-full px-2 py-1 border border-gray-300 text-xs">
@@ -223,7 +196,6 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                     </select>
                 </div>
 
-                <!-- City -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">City</label>
                     <select name="city" class="w-full px-2 py-1 border border-gray-300 text-xs">
@@ -236,22 +208,18 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                     </select>
                 </div>
 
-                <!-- Email -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Email</label>
                     <input type="email" name="email" class="w-full px-2 py-1 border border-gray-300 text-xs">
                 </div>
             </div>
 
-            <!-- Middle Column -->
             <div class="p-4">
-                <!-- Arrival Date -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Arrival Date</label>
                     <input type="date" name="arrival_date" value="<?= date('Y-m-d') ?>" class="w-full px-2 py-1 border border-gray-300 text-xs" readonly>
                 </div>
 
-                <!-- Nights -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Nights</label>
                     <div class="flex gap-1">
@@ -268,23 +236,21 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                     </div>
                 </div>
 
-                <!-- Departure -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Departure</label>
                     <input type="date" name="departure_date" value="<?= date('Y-m-d', strtotime('+1 day')) ?>" class="w-full px-2 py-1 border border-gray-300 text-xs">
                 </div>
 
-                <!-- Guest Type -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Guest Type</label>
-                    <select name="guest_type" class="w-full px-2 py-1 border border-gray-300 text-xs">
-                        <option value="Normal" selected>Normal</option>
+                    <select name="guest_type" id="guest_type" class="w-full px-2 py-1 border border-gray-300 text-xs">
+                        <option value="">-- Select Guest Type --</option>
+                        <option value="Normal">Normal</option>
                         <option value="VIP">VIP</option>
                         <option value="Corporate">Corporate</option>
                     </select>
                 </div>
 
-                <!-- Guest -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Guest</label>
                     <div class="flex gap-1">
@@ -303,17 +269,16 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                     </div>
                 </div>
 
-                <!-- Extra Bed -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Extra Bed</label>
                     <div class="flex gap-1">
-                        <span class="px-2 py-1 bg-gray-50 border border-gray-300 text-xs text-gray-600 flex-1">Night</span>
-                        <input type="number" name="extra_bed_qty" value="0" min="0" class="w-12 px-1 py-1 border border-gray-300 text-xs text-center">
-                        <span class="px-2 py-1 bg-gray-50 border border-gray-300 text-xs text-gray-600">Qty</span>
+                        <input type="number" name="extra_bed_nights" min="0" value="0" placeholder="Night"
+                               class="flex-1 px-1 py-1 border border-gray-300 text-xs text-center">
+                        <input type="number" name="extra_bed_qty" min="0" value="0" placeholder="Qty"
+                               class="w-12 px-1 py-1 border border-gray-300 text-xs text-center">
                     </div>
                 </div>
 
-                <!-- Room Number -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Room Number</label>
                     <select name="room_number" class="w-full px-2 py-1 border border-gray-300 text-xs">
@@ -327,15 +292,12 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                 </div>
             </div>
 
-            <!-- Right Column -->
             <div class="p-4">
-                <!-- Transaction Status -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Transaction Status</label>
                     <input type="text" name="transaction_status" value="Registration" class="w-full px-2 py-1 border border-gray-300 text-xs bg-gray-50" readonly>
                 </div>
 
-                <!-- Payment Method -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Payment Method</label>
                     <select name="payment_method" class="w-full px-2 py-1 border border-gray-300 text-xs">
@@ -347,7 +309,6 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                     </select>
                 </div>
 
-                <!-- Registration Type -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Registration Type</label>
                     <select name="registration_type" class="w-full px-2 py-1 border border-gray-300 text-xs">
@@ -359,43 +320,36 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                     </select>
                 </div>
 
-                <!-- Note -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Note</label>
                     <textarea name="notes" rows="3" class="w-full px-2 py-1 border border-gray-300 text-xs resize-none"></textarea>
                 </div>
 
-                <!-- Payment Amount -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Payment Amount</label>
                     <input type="number" name="payment_amount" step="0.01" value="0" class="w-full px-2 py-1 border border-gray-300 text-xs">
                 </div>
 
-                <!-- Discount -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Discount</label>
                     <input type="number" name="discount" step="0.01" value="0" class="w-full px-2 py-1 border border-gray-300 text-xs">
                 </div>
 
-                <!-- Payment - Diskon -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Payment - Diskon</label>
                     <input type="number" name="payment_diskon" step="0.01" value="0" class="w-full px-2 py-1 border border-gray-300 text-xs">
                 </div>
 
-                <!-- Deposit -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Deposit</label>
                     <input type="number" name="deposit" step="0.01" value="0" class="w-full px-2 py-1 border border-gray-300 text-xs">
                 </div>
 
-                <!-- Balance -->
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Balance</label>
                     <input type="number" name="balance" step="0.01" value="0.00" class="w-full px-2 py-1 border border-gray-300 text-xs bg-gray-50" readonly>
                 </div>
 
-                <!-- Process Button -->
                 <div class="pt-2">
                     <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 border border-gray-300 font-medium text-sm transition-colors duration-200">
                         Process
@@ -405,106 +359,3 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
         </div>
     </form>
 </div>
-    </div>
-</div>
-
-<script>
-// JavaScript untuk modul Form Registrasi Kamar
-console.log('Hotel Registration Form loaded');
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Set arrival date to today's date automatically (readonly, but updates daily)
-    const arrivalDateInput = document.querySelector('input[name="arrival_date"]');
-    const nightsSelect = document.querySelector('select[name="nights"]');
-    const departureDateInput = document.querySelector('input[name="departure_date"]');
-    
-    // Function to get today's date in YYYY-MM-DD format
-    function getTodayDate() {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-    
-    // Set arrival date to today automatically
-    if (arrivalDateInput) {
-        arrivalDateInput.value = getTodayDate();
-    }
-    
-    function calculateDepartureDate() {
-        if (arrivalDateInput && departureDateInput && nightsSelect) {
-            if (arrivalDateInput.value && nightsSelect.value) {
-                const arrivalDate = new Date(arrivalDateInput.value);
-                const nights = parseInt(nightsSelect.value);
-                const departureDate = new Date(arrivalDate);
-                departureDate.setDate(departureDate.getDate() + nights);
-                
-                const year = departureDate.getFullYear();
-                const month = String(departureDate.getMonth() + 1).padStart(2, '0');
-                const day = String(departureDate.getDate()).padStart(2, '0');
-                
-                departureDateInput.value = `${year}-${month}-${day}`;
-            }
-        }
-    }
-    
-    // Only listen to nights change since arrival date is now readonly
-    if (nightsSelect) nightsSelect.addEventListener('change', calculateDepartureDate);
-    
-    // Auto-calculate balance when payment amounts change
-    const paymentAmountInput = document.querySelector('input[name="payment_amount"]');
-    const discountInput = document.querySelector('input[name="discount"]');
-    const paymentDiskonInput = document.querySelector('input[name="payment_diskon"]');
-    const depositInput = document.querySelector('input[name="deposit"]');
-    const balanceInput = document.querySelector('input[name="balance"]');
-    
-    function calculateBalance() {
-        if (paymentAmountInput && balanceInput) {
-            const paymentAmount = parseFloat(paymentAmountInput.value) || 0;
-            const discount = parseFloat(discountInput?.value) || 0;
-            const paymentDiskon = parseFloat(paymentDiskonInput?.value) || 0;
-            const deposit = parseFloat(depositInput?.value) || 0;
-            
-            const balance = paymentAmount - discount - paymentDiskon - deposit;
-            balanceInput.value = balance.toFixed(2);
-        }
-    }
-    
-    if (paymentAmountInput) paymentAmountInput.addEventListener('input', calculateBalance);
-    if (discountInput) discountInput.addEventListener('input', calculateBalance);
-    if (paymentDiskonInput) paymentDiskonInput.addEventListener('input', calculateBalance);
-    if (depositInput) depositInput.addEventListener('input', calculateBalance);
-    
-    // Form validation
-    const form = document.querySelector('form');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            const guestName = document.querySelector('input[name="guest_name"]')?.value;
-            
-            if (!guestName?.trim()) {
-                alert('Guest name is required');
-                e.preventDefault();
-                return;
-            }
-            
-            // Confirmation
-            if (!confirm('Are you sure you want to process this registration?')) {
-                e.preventDefault();
-            }
-        });
-    }
-    
-    // Auto-uppercase guest name
-    const guestNameInput = document.querySelector('input[name="guest_name"]');
-    if (guestNameInput) {
-        guestNameInput.addEventListener('input', function() {
-            this.value = this.value.toUpperCase();
-        });
-    }
-    
-    // Initialize calculations
-    calculateDepartureDate();
-    calculateBalance();
-});
-</script>
