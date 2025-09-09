@@ -1280,6 +1280,31 @@ if (isset($_GET['logout'])) {
             });
         }
         
+        // ===== SAVE & RESTORE SIDEBAR SCROLL POSITION (IMPROVED) =====
+
+// Before the page unloads, save the current scroll position.
+window.addEventListener('beforeunload', function() {
+    const sidebarNav = document.querySelector('.sidebar-nav');
+    if (sidebarNav) {
+        sessionStorage.setItem('sidebarScrollPos', sidebarNav.scrollTop);
+    }
+});
+
+/**
+ * Restores the sidebar's scroll position.
+ * This function will be called after the sidebar has been initialized.
+ */
+function restoreScrollPosition() {
+    const scrollPos = sessionStorage.getItem('sidebarScrollPos');
+    if (scrollPos) {
+        const sidebarNav = document.querySelector('.sidebar-nav');
+        if (sidebarNav) {
+            // Apply the saved scroll position.
+            sidebarNav.scrollTop = parseInt(scrollPos, 10);
+        }
+    }
+}
+        
         // ==========================================
         // NAVIGATION ACTIVE STATE MANAGEMENT
         // ==========================================
@@ -1384,6 +1409,9 @@ if (isset($_GET['logout'])) {
             
             // Set active navigation item based on current module
             setActiveNavByModule();
+
+            // We use setTimeout to ensure this runs after the sidebar is fully expanded.
+            setTimeout(restoreScrollPosition, 0);
             
             // Add click listeners to all nav-links for active state management
             document.querySelectorAll('.nav-link').forEach(link => {
