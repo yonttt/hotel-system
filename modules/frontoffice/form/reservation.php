@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $room_number = $_POST['room_number'];
     $transaction_status = $_POST['transaction_status'];
     $payment_method = $_POST['payment_method'];
-    $reservation_type = $_POST['reservation_type'];
+    $registration_type = $_POST['registration_type']; // Corrected from reservation_type
     $note = $_POST['note'];
     $payment_amount = $_POST['payment_amount'];
     $discount = $_POST['discount'];
@@ -47,11 +47,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $balance = $_POST['balance'];
 
     try {
-    $sql = "INSERT INTO hotel_reservations (reservation_no, category_market, market_segment, member_id, transaction_by, id_card_type, id_card_number, guest_title, guest_name, mobile_phone, address, nationality, city, email, arrival_date, nights, departure_date, guest_type, guest_male, guest_female, guest_child, extra_bed_nights, extra_bed_qty, room_number, transaction_status, payment_method, reservation_type, note, payment_amount, discount, payment_diskon, deposit, balance, created_at) 
+    // Corrected SQL query to use 'registration_type' instead of 'reservation_type'
+    $sql = "INSERT INTO hotel_reservations (reservation_no, category_market, market_segment, member_id, transaction_by, id_card_type, id_card_number, guest_title, guest_name, mobile_phone, address, nationality, city, email, arrival_date, nights, departure_date, guest_type, guest_male, guest_female, guest_child, extra_bed_nights, extra_bed_qty, room_number, transaction_status, payment_method, registration_type, note, payment_amount, discount, payment_diskon, deposit, balance, created_at) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
         $stmt = $conn->prepare($sql);
         $stmt->execute([
-            $reservation_no, $category_market, $market_segment, $member_id, $transaction_by, $id_card_type, $id_card_number, $guest_title, $guest_name, $mobile_phone, $address, $nationality, $city, $email, $arrival_date, $nights, $departure_date, $guest_type, $guest_male, $guest_female, $guest_child, $extra_bed_nights, $extra_bed_qty, $room_number, $transaction_status, $payment_method, $reservation_type, $note, $payment_amount, $discount, $payment_diskon, $deposit, $balance
+            $reservation_no, $category_market, $market_segment, $member_id, $transaction_by, $id_card_type, $id_card_number, $guest_title, $guest_name, $mobile_phone, $address, $nationality, $city, $email, $arrival_date, $nights, $departure_date, $guest_type, $guest_male, $guest_female, $guest_child, $extra_bed_nights, $extra_bed_qty, $room_number, $transaction_status, $payment_method, $registration_type, $note, $payment_amount, $discount, $payment_diskon, $deposit, $balance
         ]);
         echo "<script>alert('Reservation saved successfully! Reservation No: $reservation_no'); window.location.href='home.php?module=frontoffice/form/reservation&title=Room Reservation Form';</script>";
         exit;
@@ -250,7 +251,7 @@ if (isset($error_message)): ?>
                 </div>
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Registration Type</label>
-                    <select name="reservation_type" class="w-full px-2 py-1 border border-gray-300 text-xs">
+                    <select name="registration_type" class="w-full px-2 py-1 border border-gray-300 text-xs">
                         <option value="Reservation" selected>Reservation</option>
                         <option value="Walk-in">Walk-in</option>
                     </select>
@@ -318,3 +319,4 @@ if (isset($error_message)): ?>
         return confirm('Are you sure you want to save this reservation?');
     }
 </script>
+
