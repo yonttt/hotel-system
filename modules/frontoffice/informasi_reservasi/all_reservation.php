@@ -3,6 +3,8 @@
 
 // Ensure the path to the database configuration is correct
 require_once __DIR__ . '/../../../config/database.php';
+require_once __DIR__ . '/_reservation_query.php';
+require_once __DIR__ . '/_reservation_filtering_and_sorting.php';
 
 // Establish a PDO connection if it's not already set
 if (!isset($pdo)) {
@@ -17,29 +19,7 @@ if (!isset($pdo)) {
     }
 }
 
-// --- CONFIGURATION & PARAMETER HANDLING ---
 
-// Pagination
-$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-$entries = isset($_GET['entries']) ? (int)$_GET['entries'] : 10;
-$offset = ($page - 1) * $entries;
-
-// Sorting
-$sort_column = isset($_GET['sort']) ? $_GET['sort'] : 'created_at';
-$sort_order = isset($_GET['order']) && in_array(strtoupper($_GET['order']), ['ASC', 'DESC']) ? $_GET['order'] : 'DESC';
-
-// Whitelist allowed sortable columns to prevent SQL injection
-$allowed_sort_columns = [
-    'reservation_no', 'guest_name', 'market_segment', 'created_at', 
-    'arrival_date', 'departure_date', 'transaction_by', 'deposit', 
-    'room_number', 'nights', 'transaction_status', 'payment_amount', 'balance'
-];
-if (!in_array($sort_column, $allowed_sort_columns)) {
-    $sort_column = 'created_at'; // Default sort column
-}
-
-// Search
-$search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
 
 // --- DATABASE QUERY ---
@@ -57,24 +37,11 @@ if (!empty($search)) {
     $params[':search'] = '%' . $search . '%';
 }
 
-// Get total number of records
-$stmt_count = $pdo->prepare($sql_count);
-$stmt_count->execute($params);
-$total_records = $stmt_count->fetchColumn();
-$total_pages = ceil($total_records / $entries);
+$result = get_reservations($pdo, $sql_count, $sql_data, $params, $sort_column, $sort_order, $page, $entries);
+$reservations = $result['reservations'];
+$total_records = $result['total_records'];
+$total_pages = $result['total_pages'];
 
-// Add sorting and pagination to the data query
-$sql_data .= " ORDER BY $sort_column $sort_order LIMIT :limit OFFSET :offset";
-
-// Prepare and execute the final data query
-$stmt_data = $pdo->prepare($sql_data);
-$stmt_data->bindValue(':limit', $entries, PDO::PARAM_INT);
-$stmt_data->bindValue(':offset', $offset, PDO::PARAM_INT);
-if (!empty($search)) {
-    $stmt_data->bindValue(':search', '%' . $search . '%');
-}
-$stmt_data->execute();
-$reservations = $stmt_data->fetchAll();
 
 // --- HELPER FUNCTION FOR SORTING UI ---
 
@@ -167,11 +134,14 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
                         <td colspan="17" style="text-align: center;">No data available in table</td>
                     </tr>
                 <?php else: ?>
-                    <?php foreach ($reservations as $index => $res): ?>
+                    <?php foreach ($reservations as $index => $res):
+                    // Corrected the concatenation for guest_title and guest_name
+                    $guest_name_display = htmlspecialchars($res['guest_title'] . ". " . $res['guest_name']);
+                    ?>
                     <tr>
                         <td><?= $offset + $index + 1 ?></td>
                         <td><?= htmlspecialchars($res['reservation_no']) ?></td>
-                        <td><?= htmlspecialchars($res['guest_title'] . '. ' . $res['guest_name']) ?></td>
+                        <td><?= $guest_name_display ?></td>
                         <td><?= htmlspecialchars($res['market_segment']) ?></td>
                         <td><?= date('d-m-Y', strtotime($res['created_at'])) ?></td>
                         <td><?= date('d-m-Y', strtotime($res['arrival_date'])) ?></td>

@@ -9,79 +9,30 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Include database connection
+// Include database connection and query function
 require_once __DIR__ . '/../../../config/database.php';
-
-// --- FILTERING & PAGINATION SETUP ---
-$search = $_GET['search'] ?? '';
-$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-$entries = isset($_GET['entries']) ? (int)$_GET['entries'] : 100;
-$offset = ($page - 1) * $entries;
-
-// Sorting parameters
-$sort_column = $_GET['sort'] ?? 'arrival_date';
-$sort_order = isset($_GET['order']) && in_array(strtoupper($_GET['order']), ['ASC', 'DESC']) ? $_GET['order'] : 'DESC';
-// Expanded sortable columns
-$allowed_sort_columns = [
-    'registration_no', 'id_card_number', 'guest_name', 'market_segment', 'nights', 'arrival_date', 
-    'departure_date', 'room_number', 'transaction_status', 'payment_amount', 'deposit', 'balance'
-];
-if (!in_array($sort_column, $allowed_sort_columns)) {
-    $sort_column = 'arrival_date';
-}
+require_once __DIR__ . '/_guest_registration_query.php';
+require_once __DIR__ . '/_pagination_and_sorting.php';
+require_once __DIR__ . '/_common_functions.php';
 
 // --- DATABASE QUERY ---
-$registrations = [];
-$total_records = 0;
-$error_message = '';
 $today_date = date('Y-m-d'); // Always use the current date
+$where_clauses = ["arrival_date = :today_date"];
+$params = [':today_date' => $today_date];
 
-try {
-    $params = [':today_date' => $today_date];
-    $where_clauses = ["arrival_date = :today_date"];
-
-    // Add search condition
-    if (!empty($search)) {
-        $where_clauses[] = "(guest_name LIKE :search OR id_card_number LIKE :search OR market_segment LIKE :search OR registration_no LIKE :search OR room_number LIKE :search)";
-        $params[':search'] = '%' . $search . '%';
-    }
-
-    $where_sql = 'WHERE ' . implode(' AND ', $where_clauses);
-
-    // Get total record count for pagination
-    $sql_count = "SELECT COUNT(*) FROM guest_registrations $where_sql";
-    $stmt_count = $pdo->prepare($sql_count);
-    $stmt_count->execute($params);
-    $total_records = $stmt_count->fetchColumn();
-    $total_pages = ceil($total_records / $entries);
-
-    // Fetch the data for the current page, selecting all columns
-    $sql_data = "SELECT *, (guest_count_male + guest_count_female + guest_count_child) as total_ci FROM guest_registrations $where_sql ORDER BY $sort_column $sort_order LIMIT :limit OFFSET :offset";
-    
-    $stmt_data = $pdo->prepare($sql_data);
-    
-    // Bind parameters
-    foreach ($params as $key => &$val) {
-        $stmt_data->bindParam($key, $val);
-    }
-    $stmt_data->bindValue(':limit', $entries, PDO::PARAM_INT);
-    $stmt_data->bindValue(':offset', $offset, PDO::PARAM_INT);
-    
-    $stmt_data->execute();
-    $registrations = $stmt_data->fetchAll(PDO::FETCH_ASSOC);
-
-} catch (PDOException $e) {
-    $error_message = "Database error: " . $e->getMessage();
+// Add search condition
+if (!empty($search)) {
+    $where_clauses[] = "(guest_name LIKE :search OR id_card_number LIKE :search OR market_segment LIKE :search OR registration_no LIKE :search OR room_number LIKE :search)";
+    $params[':search'] = '%' . $search . '%';
 }
 
-// Helper function for creating sortable table headers
-function get_sort_link($column, $display, $current_sort, $current_order) {
-    $order = ($current_sort == $column && $current_order == 'ASC') ? 'DESC' : 'ASC';
-    $arrow = ($current_sort == $column) ? ($current_order == 'ASC' ? '▲' : '▼') : '';
-    // Preserve other GET parameters when creating the link
-    $query_params = http_build_query(array_merge($_GET, ['sort' => $column, 'order' => $order]));
-    return "<a href=\"?{$query_params}\">$display $arrow</a>";
-}
+$data = get_registration_data($pdo, $where_clauses, $params, $sort_column, $sort_order, $page, $entries);
+$registrations = $data['registrations'];
+$total_records = $data['total_records'];
+$total_pages = $data['total_pages'];
+$offset = $data['offset'];
+$error_message = $data['error_message'];
+
 ?>
 
 <style>
@@ -226,4 +177,3 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
         }
     }
 </script>
-

@@ -3,6 +3,8 @@
 
 // Ensure the path to the database configuration is correct
 require_once __DIR__ . '/../../../config/database.php';
+require_once __DIR__ . '/_reservation_query.php';
+require_once __DIR__ . '/_reservation_filtering_and_sorting.php';
 
 // Establish a PDO connection if it's not already set
 if (!isset($pdo)) {
@@ -17,33 +19,8 @@ if (!isset($pdo)) {
     }
 }
 
-// --- CONFIGURATION & PARAMETER HANDLING ---
-$today_date = date('Y-m-d');
-
-// Pagination
-$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-$entries = isset($_GET['entries']) ? (int)$_GET['entries'] : 10;
-$offset = ($page - 1) * $entries;
-
-// Sorting
-$sort_column = isset($_GET['sort']) ? $_GET['sort'] : 'created_at';
-$sort_order = isset($_GET['order']) && in_array(strtoupper($_GET['order']), ['ASC', 'DESC']) ? $_GET['order'] : 'DESC';
-
-// Whitelist allowed sortable columns
-$allowed_sort_columns = [
-    'reservation_no', 'guest_name', 'market_segment', 'created_at', 
-    'arrival_date', 'departure_date', 'transaction_by', 'deposit', 
-    'room_number', 'nights', 'transaction_status', 'payment_amount', 'balance'
-];
-if (!in_array($sort_column, $allowed_sort_columns)) {
-    $sort_column = 'created_at'; // Default sort column
-}
-
-// Search
-$search = isset($_GET['search']) ? trim($_GET['search']) : '';
-
-
 // --- DATABASE QUERY ---
+$today_date = date('Y-m-d');
 $sql_data = "SELECT *, (guest_male + guest_female + guest_child) AS guest_count FROM hotel_reservations WHERE arrival_date = :today_date";
 $sql_count = "SELECT COUNT(*) FROM hotel_reservations WHERE arrival_date = :today_date";
 
@@ -56,22 +33,11 @@ if (!empty($search)) {
     $params[':search'] = '%' . $search . '%';
 }
 
-$stmt_count = $pdo->prepare($sql_count);
-$stmt_count->execute($params);
-$total_records = $stmt_count->fetchColumn();
-$total_pages = ceil($total_records / $entries);
-
-$sql_data .= " ORDER BY $sort_column $sort_order LIMIT :limit OFFSET :offset";
-
-$stmt_data = $pdo->prepare($sql_data);
-$stmt_data->bindValue(':limit', $entries, PDO::PARAM_INT);
-$stmt_data->bindValue(':offset', $offset, PDO::PARAM_INT);
-$stmt_data->bindValue(':today_date', $today_date);
-if (!empty($search)) {
-    $stmt_data->bindValue(':search', '%' . $search . '%');
-}
-$stmt_data->execute();
-$reservations = $stmt_data->fetchAll();
+$result = get_reservations($pdo, $sql_count, $sql_data, $params, $sort_column, $sort_order, $page, $entries);
+$reservations = $result['reservations'];
+$total_records = $result['total_records'];
+$total_pages = $result['total_pages'];
+$offset = ($page - 1) * $entries;
 
 // --- HELPER FUNCTION FOR SORTING UI ---
 function get_sort_link($column, $display, $current_sort, $current_order) {
@@ -156,7 +122,8 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
                         <td colspan="17" style="text-align: center;">No reservations for today.</td>
                     </tr>
                 <?php else: ?>
-                    <?php foreach ($reservations as $index => $res): ?>
+                    <?php foreach ($reservations as $index => $res):
+                    ?>
                     <tr>
                         <td><?= $offset + $index + 1 ?></td>
                         <td><?= htmlspecialchars($res['reservation_no']) ?></td>
@@ -199,7 +166,7 @@ function updateQueryString(key, value, url) {
     const re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
     const separator = url.indexOf('?') !== -1 ? "&" : "?";
     if (url.match(re)) {
-        return url.replace(re, '$1' + key + "=" + value + '$2');
+        return url.replace(re, '$1' + key + "=" + value + '$2");
     }
     return url + separator + key + "=" + value;
 }
@@ -229,4 +196,3 @@ function goToPage(page) {
     window.location.href = updateQueryString('page', page);
 }
 </script>
-
