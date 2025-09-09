@@ -3,19 +3,10 @@
 // Kategori: FRONTOFFICE
 // Sub-Kategori: FORM
 
-// Include database connection
+// Include standardized database connection
 require_once __DIR__ . '/../../../config/database.php';
-// Ensure $pdo is defined from database.php
-if (!isset($pdo)) {
-    try {
-        $pdo = new PDO($dsn, $db_user, $db_pass, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-        ]);
-    } catch (Exception $e) {
-        die('Database connection failed: ' . $e->getMessage());
-    }
-}
+$db = new Database();
+$conn = $db->getConnection();
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -58,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
     $sql = "INSERT INTO hotel_reservations (reservation_no, category_market, market_segment, member_id, transaction_by, id_card_type, id_card_number, guest_title, guest_name, mobile_phone, address, nationality, city, email, arrival_date, nights, departure_date, guest_type, guest_male, guest_female, guest_child, extra_bed_nights, extra_bed_qty, room_number, transaction_status, payment_method, reservation_type, note, payment_amount, discount, payment_diskon, deposit, balance, created_at) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
-        $stmt = $pdo->prepare($sql);
+        $stmt = $conn->prepare($sql);
         $stmt->execute([
             $reservation_no, $category_market, $market_segment, $member_id, $transaction_by, $id_card_type, $id_card_number, $guest_title, $guest_name, $mobile_phone, $address, $nationality, $city, $email, $arrival_date, $nights, $departure_date, $guest_type, $guest_male, $guest_female, $guest_child, $extra_bed_nights, $extra_bed_qty, $room_number, $transaction_status, $payment_method, $reservation_type, $note, $payment_amount, $discount, $payment_diskon, $deposit, $balance
         ]);
@@ -74,8 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Get next reservation number
 $next_reservation_no = '0000000001';
 try {
-    if (isset($pdo)) {
-        $result = $pdo->query("SELECT COUNT(*) as count FROM hotel_reservations");
+    if (isset($conn)) {
+        $result = $conn->query("SELECT COUNT(*) as count FROM hotel_reservations");
         if ($result) {
             $count = $result->fetch()['count'];
             $next_reservation_no = str_pad($count + 1, 10, '0', STR_PAD_LEFT);
