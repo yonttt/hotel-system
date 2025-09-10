@@ -217,7 +217,7 @@ if (isset($error_message)): ?>
                 </div>
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Departure</label>
-                    <input type="date" name="departure_date" id="departureDate" class="w-full px-2 py-1 border border-gray-300 text-xs" required>
+                    <input type="date" name="departure_date" id="departureDate" class="w-full px-2 py-1 border border-gray-300 text-xs" readonly>
                 </div>
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Guest Type</label>
@@ -343,6 +343,9 @@ if (isset($error_message)): ?>
 
     // Add event listener for arrival date changes
     document.getElementById('arrivalDate').addEventListener('change', calculateDeparture);
+    
+    // Add event listener for nights changes
+    document.getElementById('nightsSelect').addEventListener('change', calculateDeparture);
 
     // Form validation
     function validateReservationForm() {

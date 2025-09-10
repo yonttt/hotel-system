@@ -217,13 +217,13 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
             <div class="p-4">
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Arrival Date</label>
-                    <input type="date" name="arrival_date" value="<?= date('Y-m-d') ?>" class="w-full px-2 py-1 border border-gray-300 text-xs" readonly>
+                    <input type="date" name="arrival_date" id="arrivalDate" value="<?= date('Y-m-d') ?>" class="w-full px-2 py-1 border border-gray-300 text-xs" readonly>
                 </div>
 
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Nights</label>
                     <div class="flex gap-1">
-                        <select name="nights" class="w-16 px-2 py-1 border border-gray-300 text-xs">
+                        <select name="nights" id="nightsSelect" onchange="calculateDeparture()" class="w-16 px-2 py-1 border border-gray-300 text-xs">
                             <option value="1" selected>1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
@@ -238,7 +238,7 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
 
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Departure</label>
-                    <input type="date" name="departure_date" value="<?= date('Y-m-d', strtotime('+1 day')) ?>" class="w-full px-2 py-1 border border-gray-300 text-xs">
+                    <input type="date" name="departure_date" id="departureDate" value="<?= date('Y-m-d', strtotime('+1 day')) ?>" class="w-full px-2 py-1 border border-gray-300 text-xs" readonly>
                 </div>
 
                 <div class="mb-3">
@@ -359,3 +359,20 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
         </div>
     </form>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        calculateDeparture();
+    });
+
+    function calculateDeparture() {
+        const arrivalDate = new Date(document.getElementById('arrivalDate').value);
+        const nights = parseInt(document.getElementById('nightsSelect').value);
+        if (!isNaN(arrivalDate.getTime()) && nights > 0) {
+            const departureDate = new Date(arrivalDate);
+            departureDate.setDate(departureDate.getDate() + nights);
+            document.getElementById('departureDate').value = departureDate.toISOString().split('T')[0];
+        }
+    }
+
+    document.getElementById('nightsSelect').addEventListener('change', calculateDeparture);
+</script>
