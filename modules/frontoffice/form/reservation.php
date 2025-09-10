@@ -10,50 +10,61 @@ $conn = $db->getConnection();
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // (PHP form handling logic remains here...)
-    // This part does not affect the visual layout
-    $reservation_no = $_POST['reservation_no'];
-    $category_market = $_POST['category_market'];
-    $market_segment = $_POST['market_segment'];
-    $member_id = $_POST['member_id'];
-    $transaction_by = $_POST['transaction_by'];
-    $id_card_type = $_POST['id_card_type'];
-    $id_card_number = $_POST['id_card_number'];
-    $guest_title = $_POST['guest_title'];
-    $guest_name = $_POST['guest_name'];
-    $mobile_phone = $_POST['mobile_phone'];
-    $address = $_POST['address'];
-    $nationality = $_POST['nationality'];
-    $city = $_POST['city'];
-    $email = $_POST['email'];
-    $arrival_date = $_POST['arrival_date'];
-    $nights = $_POST['nights'];
-    $departure_date = $_POST['departure_date'];
-    $guest_type = $_POST['guest_type'];
-    $guest_male = $_POST['guest_male'];
-    $guest_female = $_POST['guest_female'];
-    $guest_child = $_POST['guest_child'];
-    $extra_bed_nights = $_POST['extra_bed_nights'];
-    $extra_bed_qty = $_POST['extra_bed_qty'];
-    $room_number = $_POST['room_number'];
-    $transaction_status = $_POST['transaction_status'];
-    $payment_method = $_POST['payment_method'];
-    $registration_type = $_POST['registration_type']; // Corrected from reservation_type
-    $note = $_POST['note'];
-    $payment_amount = $_POST['payment_amount'];
-    $discount = $_POST['discount'];
-    $payment_diskon = $_POST['payment_diskon'];
-    $deposit = $_POST['deposit'];
-    $balance = $_POST['balance'];
-
     try {
-    // Corrected SQL query to use 'registration_type' instead of 'reservation_type'
-    $sql = "INSERT INTO hotel_reservations (reservation_no, category_market, market_segment, member_id, transaction_by, id_card_type, id_card_number, guest_title, guest_name, mobile_phone, address, nationality, city, email, arrival_date, nights, departure_date, guest_type, guest_male, guest_female, guest_child, extra_bed_nights, extra_bed_qty, room_number, transaction_status, payment_method, registration_type, note, payment_amount, discount, payment_diskon, deposit, balance, created_at) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
-        $stmt = $conn->prepare($sql);
+        // Generate reservation number
+        $stmt = $conn->query("SELECT COUNT(*) as count FROM hotel_reservations");
+        $count = $stmt->fetch()['count'];
+        $reservation_no = str_pad($count + 1, 10, '0', STR_PAD_LEFT);
+
+        $stmt = $conn->prepare("
+            INSERT INTO hotel_reservations (
+                reservation_no, category_market, market_segment, member_id, 
+                transaction_by, id_card_type, id_card_number, guest_name, guest_title,
+                mobile_phone, address, nationality, city, email,
+                arrival_date, nights, departure_date, guest_type,
+                guest_male, guest_female, guest_child,
+                extra_bed_nights, extra_bed_qty, room_number, transaction_status,
+                payment_method, registration_type, note, payment_amount,
+                discount, payment_diskon, deposit, balance, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+        ");
+        
         $stmt->execute([
-            $reservation_no, $category_market, $market_segment, $member_id, $transaction_by, $id_card_type, $id_card_number, $guest_title, $guest_name, $mobile_phone, $address, $nationality, $city, $email, $arrival_date, $nights, $departure_date, $guest_type, $guest_male, $guest_female, $guest_child, $extra_bed_nights, $extra_bed_qty, $room_number, $transaction_status, $payment_method, $registration_type, $note, $payment_amount, $discount, $payment_diskon, $deposit, $balance
+            $reservation_no,
+            $_POST['category_market'] ?? 'Walkin',
+            $_POST['market_segment'] ?? 'Normal',
+            $_POST['member_id'] ?? '',
+            $_SESSION['username'] ?? '', // Menggunakan username dari session
+            $_POST['id_card_type'] ?? 'KTP',
+            $_POST['id_card_number'] ?? '',
+            $_POST['guest_name'] ?? '',
+            $_POST['guest_title'] ?? 'MR',
+            $_POST['mobile_phone'] ?? '',
+            $_POST['address'] ?? '',
+            $_POST['nationality'] ?? 'INDONESIA',
+            $_POST['city'] ?? '',
+            $_POST['email'] ?? '',
+            $_POST['arrival_date'] ?? date('Y-m-d'),
+            $_POST['nights'] ?? 1,
+            $_POST['departure_date'] ?? date('Y-m-d', strtotime('+1 day')),
+            $_POST['guest_type'] ?? 'Normal',
+            $_POST['guest_male'] ?? 0,
+            $_POST['guest_female'] ?? 0,
+            $_POST['guest_child'] ?? 0,
+            $_POST['extra_bed_nights'] ?? 0,
+            $_POST['extra_bed_qty'] ?? 0,
+            $_POST['room_number'] ?? '',
+            'Reservation', // Hardcoded status for reservation
+            $_POST['payment_method'] ?? 'Cash',
+            $_POST['registration_type'] ?? 'Reservation',
+            $_POST['note'] ?? '',
+            $_POST['payment_amount'] ?? 0,
+            $_POST['discount'] ?? 0,
+            $_POST['payment_diskon'] ?? 0,
+            $_POST['deposit'] ?? 0,
+            $_POST['balance'] ?? 0
         ]);
+        
         echo "<script>alert('Reservation saved successfully! Reservation No: $reservation_no'); window.location.href='home.php?module=frontoffice/form/reservation&title=Room Reservation Form';</script>";
         exit;
     } catch (PDOException $e) {
@@ -62,6 +73,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error_message = "Error: " . $e->getMessage();
     }
 }
+
+// Fetch data for dropdowns
+$market_segments = $conn->query("SELECT * FROM market_segments WHERE active = 1")->fetchAll();
+$countries = $conn->query("SELECT * FROM countries WHERE active = 1")->fetchAll();
+$cities = $conn->query("SELECT * FROM cities WHERE active = 1")->fetchAll();
+$payment_methods = $conn->query("SELECT * FROM payment_methods WHERE active = 1")->fetchAll();
+$registration_types = $conn->query("SELECT * FROM registration_types WHERE active = 1")->fetchAll();
+$rooms = $conn->query("SELECT room_number FROM rooms WHERE status = 'available' ORDER BY room_number")->fetchAll();
 
 // Get next reservation number
 $next_reservation_no = '0000000001';
@@ -103,10 +122,11 @@ if (isset($error_message)): ?>
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Category Market</label>
                     <select name="category_market" class="w-full px-2 py-1 border border-gray-300 text-xs">
-                        <option value="Walkin" selected>Walkin</option>
-                        <option value="Corporate">Corporate</option>
-                        <option value="Online">Online</option>
-                        <option value="Travel Agent">Travel Agent</option>
+                        <?php foreach ($market_segments as $segment): ?>
+                            <option value="<?= $segment['id'] ?>" <?= $segment['name'] == 'Walkin' ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($segment['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="mb-3">
@@ -115,7 +135,6 @@ if (isset($error_message)): ?>
                         <option value="Normal" selected>Normal</option>
                         <option value="VIP">VIP</option>
                         <option value="Corporate">Corporate</option>
-                        <option value="Group">Group</option>
                     </select>
                 </div>
                 <div class="mb-3">
@@ -124,7 +143,7 @@ if (isset($error_message)): ?>
                 </div>
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Transaction By</label>
-                    <input type="text" name="transaction_by" value="YONATHAN" class="w-full px-2 py-1 border border-gray-300 text-xs">
+                    <input type="text" name="transaction_by" value="<?= htmlspecialchars($_SESSION['username'] ?? '') ?>" class="w-full px-2 py-1 border border-gray-300 text-xs bg-gray-50" readonly>
                 </div>
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">ID Card</label>
@@ -132,8 +151,8 @@ if (isset($error_message)): ?>
                         <input type="text" name="id_card_number" class="flex-1 px-2 py-1 border border-gray-300 text-xs">
                         <select name="id_card_type" class="w-16 px-1 py-1 border border-gray-300 text-xs">
                             <option value="KTP" selected>KTP</option>
+                            <option value="Passport">Passport</option>
                             <option value="SIM">SIM</option>
-                            <option value="PASSPORT">PASSPORT</option>
                         </select>
                     </div>
                 </div>
@@ -159,16 +178,22 @@ if (isset($error_message)): ?>
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Nationality</label>
                     <select name="nationality" class="w-full px-2 py-1 border border-gray-300 text-xs">
-                        <option value="INDONESIA" selected>INDONESIA</option>
-                        <option value="OTHER">OTHER</option>
+                        <?php foreach ($countries as $country): ?>
+                            <option value="<?= $country['id'] ?>" <?= $country['name'] == 'INDONESIA' ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($country['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">City</label>
                     <select name="city" class="w-full px-2 py-1 border border-gray-300 text-xs">
                         <option value="">--City--</option>
-                        <option value="Jakarta">Jakarta</option>
-                        <option value="Bandung">Bandung</option>
+                        <?php foreach ($cities as $city): ?>
+                            <option value="<?= $city['id'] ?>">
+                                <?= htmlspecialchars($city['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="mb-3">
@@ -196,9 +221,11 @@ if (isset($error_message)): ?>
                 </div>
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Guest Type</label>
-                    <select name="guest_type" class="w-full px-2 py-1 border border-gray-300 text-xs">
-                        <option value="Normal" selected>Normal</option>
+                    <select name="guest_type" id="guest_type" class="w-full px-2 py-1 border border-gray-300 text-xs">
+                        <option value="">-- Select Guest Type --</option>
+                        <option value="Normal">Normal</option>
                         <option value="VIP">VIP</option>
+                        <option value="Corporate">Corporate</option>
                     </select>
                 </div>
                 <div class="mb-3">
@@ -221,39 +248,43 @@ if (isset($error_message)): ?>
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Extra Bed</label>
                     <div class="flex gap-1">
-                        <input type="number" name="extra_bed_nights" value="0" min="0" class="flex-1 px-1 py-1 border border-gray-300 text-xs text-center">
-                        <input type="number" name="extra_bed_qty" value="0" min="0" class="w-12 px-1 py-1 border border-gray-300 text-xs text-center">
+                        <input type="number" name="extra_bed_nights" min="0" value="0" placeholder="Night"
+                               class="flex-1 px-1 py-1 border border-gray-300 text-xs text-center">
+                        <input type="number" name="extra_bed_qty" min="0" value="0" placeholder="Qty"
+                               class="w-12 px-1 py-1 border border-gray-300 text-xs text-center">
                     </div>
                 </div>
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Room Number</label>
                     <select name="room_number" class="w-full px-2 py-1 border border-gray-300 text-xs">
                         <option value="">None selected</option>
-                        <option value="101">101</option>
-                        <option value="102">102</option>
+                        <?php foreach ($rooms as $room): ?>
+                            <option value="<?= $room['room_number'] ?>">
+                                <?= htmlspecialchars($room['room_number']) ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
             </div>
             <div class="p-4">
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Transaction Status</label>
-                    <select name="transaction_status" class="w-full px-2 py-1 border border-gray-300 text-xs" required>
-                        <option value="Pending" selected>Pending</option>
-                        <option value="Confirmed">Confirmed</option>
-                    </select>
+                    <input type="text" name="transaction_status" value="Reservation" class="w-full px-2 py-1 border border-gray-300 text-xs bg-gray-50" readonly>
                 </div>
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Payment Method</label>
                     <select name="payment_method" class="w-full px-2 py-1 border border-gray-300 text-xs">
-                        <option value="Cash" selected>Cash</option>
-                        <option value="Card">Card</option>
+                        <?php foreach ($payment_methods as $method): ?>
+                            <option value="<?= $method['id'] ?>" <?= $method['name'] == 'Debit BCA 446' ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($method['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Registration Type</label>
                     <select name="registration_type" class="w-full px-2 py-1 border border-gray-300 text-xs">
                         <option value="Reservation" selected>Reservation</option>
-                        <option value="Walk-in">Walk-in</option>
                     </select>
                 </div>
                 <div class="mb-3">
@@ -319,4 +350,3 @@ if (isset($error_message)): ?>
         return confirm('Are you sure you want to save this reservation?');
     }
 </script>
-
