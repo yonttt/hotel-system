@@ -328,20 +328,11 @@ body.dashboard-page {
     background: none;
     border: none;
     text-align: left;
-    outline: none;
-    scroll-behavior: auto;
 }
 
 .nav-group-header:hover {
     background: #374151;
     color: white;
-}
-
-.nav-group-header:focus {
-    background: #374151;
-    color: white;
-    outline: none;
-    box-shadow: none;
 }
 
 .nav-group-header.active {

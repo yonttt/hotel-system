@@ -35,7 +35,6 @@ if (isset($_GET['logout'])) {
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="js/fast-loader.js" defer></script>
-    <script src="js/dashboard-scripts.js" defer></script>
 </head>
 
 <body class="dashboard-page">
@@ -646,7 +645,7 @@ if (isset($_GET['logout'])) {
             </nav>
         </aside>
 
-        <div class="main-container" style="min-width: 0;">
+        <div class="flex-1 flex flex-col" style="min-width: 0;">
             <header class="top-header">
                 <div class="header-left">
                     <button class="header-btn header-btn-secondary">TRAVELSINU</button>
@@ -671,7 +670,7 @@ if (isset($_GET['logout'])) {
                     </div>
                     
                     <a href="?logout=1" class="header-btn header-btn-danger">Logout</a>
-                </div>
+                </div>  
             </header>
 
             <main class="main-content">
