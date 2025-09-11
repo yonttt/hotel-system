@@ -682,6 +682,9 @@ if (isset($_GET['logout'])) {
 
                 // Module handling with organized folder structure
                 switch ($module) {
+                    case 'frontoffice/informasi_tamu/guest_research':
+                        include 'modules/frontoffice/informasi_tamu/guest_research.php';
+                        break;
                     case 'adjustment/foodbeverage/transaction_history':
                         include 'modules/adjustment/foodbeverage/transaction_history.php';
                         break;
