@@ -127,14 +127,13 @@ if ($is_search_triggered) {
 
 function get_sort_link($column, $display, $current_sort, $current_order) {
     $order = ($current_sort == $column && $current_order == 'ASC') ? 'DESC' : 'ASC';
-    $arrow = ($current_sort == $column) ? ($current_order == 'ASC' ? '▲' : '▼') : '';
     $query_params = http_build_query(array_merge($_GET, ['sort' => $column, 'order' => $order]));
-    return "<a href=\"?{$query_params}\">$display $arrow</a>";
+    return "<a href=\"?{$query_params}\">$display</a>";
 }
 ?>
 
 <style>
-    /* Standardized Module Styles */
+    /* Main Container Styles */
     .module-container {
         font-family: Arial, sans-serif;
         font-size: 12px;
@@ -193,42 +192,109 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
     .btn-primary:hover {
         background-color: #286090;
     }
-    .results-container {
-        background-color: #fff;
+
+    /* Results Table Styles to match the image */
+    .result-header {
+        background-color: #f0f0f0;
         border: 1px solid #ccc;
+        border-bottom: none;
+        padding: 8px 12px;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 12px;
     }
     .controls-bar {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 10px;
-        background-color: #f5f5f5;
-        border-bottom: 1px solid #ccc;
+        padding: 8px 12px;
+        background-color: #fff;
+        border-left: 1px solid #ccc;
+        border-right: 1px solid #ccc;
+        font-size: 12px;
+    }
+    .controls-bar label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .controls-bar input[type="search"] {
+        width: 200px;
+    }
+    .controls-bar input, .controls-bar select {
+        padding: 4px 6px;
+        font-size: 12px;
+        border: 1px solid #ccc;
+        border-radius: 2px;
+    }
+    .data-table-wrapper {
+        overflow-x: auto;
+        border-left: 1px solid #ccc;
+        border-right: 1px solid #ccc;
     }
     .data-table {
         width: 100%;
         border-collapse: collapse;
+        font-size: 11px;
     }
     .data-table th, .data-table td {
-        border-bottom: 1px solid #ccc;
-        padding: 8px;
+        border-top: 1px solid #ccc;
+        padding: 8px 12px;
         text-align: left;
         white-space: nowrap;
     }
     .data-table th {
         background-color: #f0f0f0;
-        font-weight: bold;
+        font-weight: normal;
+    }
+    .data-table th a {
+        color: #333;
+        text-decoration: none;
+        display: inline-block;
+        padding-right: 15px;
+        position: relative;
+    }
+    .data-table th a::after, .data-table th a::before {
+        content: "";
+        position: absolute;
+        right: 5px;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        opacity: 0.5;
+    }
+    .data-table th a::before { /* Up arrow */
+        top: 6px;
+        border-bottom: 4px solid #333;
+    }
+    .data-table th a::after { /* Down arrow */
+        bottom: 6px;
+        border-top: 4px solid #333;
+    }
+    .data-table td.no-data {
+        text-align: center;
+        padding: 20px;
+        color: #555;
     }
     .table-footer {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 10px;
+        padding: 10px 12px;
+        font-size: 12px;
+        border: 1px solid #ccc;
+        border-top: none;
     }
     .pagination-controls button {
-        padding: 5px 10px;
+        padding: 4px 10px;
         margin-left: 5px;
         cursor: pointer;
+        border: 1px solid #ccc;
+        background-color: #f0f0f0;
+        border-radius: 3px;
+    }
+    .pagination-controls button:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
     }
 </style>
 
@@ -293,12 +359,15 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
         </form>
     </div>
 
-    <div class="results-container">
-        <div class="module-header-bar">RESULT</div>
+    <div>
+        <div class="result-header">RESULT</div>
         <div class="controls-bar">
             <div>
+                 <label>Search: <input type="search" id="resultSearchInput" onkeypress="applyResultSearch(event)" placeholder=""></label>
+            </div>
+            <div>
                 <label>Show 
-                    <select id="entries" onchange="applyFilters()">
+                    <select id="entries" onchange="document.getElementById('researchForm').submit()">
                         <option value="15" <?= $entries == 15 ? 'selected' : '' ?>>15</option>
                         <option value="25" <?= $entries == 25 ? 'selected' : '' ?>>25</option>
                         <option value="50" <?= $entries == 50 ? 'selected' : '' ?>>50</option>
@@ -306,42 +375,39 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
                     </select>
                 entries</label>
             </div>
-            <div>
-                 <label>Search: <input type="search" placeholder="" onkeyup="applySearch(event)"></label>
-            </div>
         </div>
 
-        <div style="overflow-x: auto;">
+        <div class="data-table-wrapper">
             <table class="data-table">
                 <thead>
                     <tr>
                         <th>No</th>
                         <th><?= get_sort_link('gr.registration_no', 'Registration No', $sort_column, $sort_order) ?></th>
                         <th><?= get_sort_link('gr.reservation_no', 'Reservation No', $sort_column, $sort_order) ?></th>
-                        <th>Bill No</th>
+                        <th><?= get_sort_link('r.bill_no', 'Bill No', $sort_column, $sort_order) ?></th>
                         <th><?= get_sort_link('gr.id_card_number', 'Card Id', $sort_column, $sort_order) ?></th>
                         <th><?= get_sort_link('gr.guest_name', 'Guest Name', $sort_column, $sort_order) ?></th>
                         <th><?= get_sort_link('gr.phone_number', 'Phone No', $sort_column, $sort_order) ?></th>
                         <th><?= get_sort_link('gr.nationality', 'Nationality', $sort_column, $sort_order) ?></th>
                         <th><?= get_sort_link('gr.city', 'City', $sort_column, $sort_order) ?></th>
-                        <th>Address</th>
+                        <th><?= get_sort_link('gr.address', 'Address', $sort_column, $sort_order) ?></th>
                         <th><?= get_sort_link('gr.market_segment', 'Market Segment', $sort_column, $sort_order) ?></th>
                         <th><?= get_sort_link('gr.room_number', 'Room', $sort_column, $sort_order) ?></th>
-                        <th>Checkin By</th>
+                        <th><?= get_sort_link('r.checkin_by', 'Checkin By', $sort_column, $sort_order) ?></th>
                         <th><?= get_sort_link('gr.arrival_date', 'Arrival', $sort_column, $sort_order) ?></th>
                         <th><?= get_sort_link('gr.departure_date', 'Departure', $sort_column, $sort_order) ?></th>
-                        <th>Checkout By</th>
+                        <th><?= get_sort_link('r.checkout_by', 'Checkout By', $sort_column, $sort_order) ?></th>
                         <th><?= get_sort_link('gr.payment_method', 'Payment By', $sort_column, $sort_order) ?></th>
                         <th><?= get_sort_link('gr.payment_amount', 'Total', $sort_column, $sort_order) ?></th>
-                        <th>Cashier</th>
-                        <th>Payment Date</th>
+                        <th><?= get_sort_link('r.cashier', 'Cashier', $sort_column, $sort_order) ?></th>
+                        <th><?= get_sort_link('r.payment_date', 'Payment Date', $sort_column, $sort_order) ?></th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (!$is_search_triggered): ?>
-                         <tr><td colspan="20" style="text-align: center;">Please provide search criteria and click "Detail Data".</td></tr>
+                         <tr><td colspan="20" class="no-data">Please provide search criteria and click "Detail Data".</td></tr>
                     <?php elseif (empty($results)): ?>
-                        <tr><td colspan="20" style="text-align: center;">No data available in table</td></tr>
+                        <tr><td colspan="20" class="no-data">No data available in table</td></tr>
                     <?php else: ?>
                         <?php foreach ($results as $index => $row): ?>
                             <tr>
@@ -376,13 +442,22 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
             <div>Showing <?= $total_records > 0 ? $offset + 1 : 0 ?> to <?= min($offset + $entries, $total_records) ?> of <?= $total_records ?> entries</div>
             <div class="pagination-controls">
                 <button onclick="goToPage(<?= $page - 1 ?>)" <?= $page <= 1 ? 'disabled' : '' ?>>Previous</button>
-                <button onclick="goToPage(<?= $page + 1 ?>)" <?= $page >= $total_pages ? 'disabled' : '' ?>>Next</button>
+                <button onclick="goToPage(<?= $page + 1 ?>)" <?= $page >= ($total_pages ?? 1) ? 'disabled' : '' ?>>Next</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Sync the result search box with the main guest name search box on load
+        const guestNameSearch = document.getElementById('guest_name').value;
+        const resultSearch = document.getElementById('resultSearchInput');
+        if (resultSearch) {
+            resultSearch.value = guestNameSearch;
+        }
+    });
+
     function applyFilters() {
         const form = document.getElementById('researchForm');
         const entriesSelect = document.getElementById('entries');
@@ -406,12 +481,26 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
         }
     }
     
-    function applySearch(event) {
+    function applyResultSearch(event) {
         if (event.key === 'Enter') {
              const searchTerm = event.target.value;
-             // You can enhance this to search across multiple fields
-             document.getElementById('guest_name').value = searchTerm;
-             document.getElementById('researchForm').submit();
+             const form = document.getElementById('researchForm');
+             
+             // This search bar will primarily search by guest name or reg no
+             form.guest_name.value = searchTerm;
+             form.registration_no.value = searchTerm;
+
+             // Ensure the 'action=search' parameter is included
+             let actionInput = form.querySelector('input[name="action"]');
+             if (!actionInput) {
+                actionInput = document.createElement('input');
+                actionInput.type = 'hidden';
+                actionInput.name = 'action';
+                form.appendChild(actionInput);
+             }
+             actionInput.value = 'search';
+
+             form.submit();
         }
     }
 </script>
