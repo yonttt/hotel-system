@@ -646,7 +646,7 @@ if (isset($_GET['logout'])) {
             </nav>
         </aside>
 
-        <div class="main-container">
+        <div class="main-container" style="min-width: 0;">
             <header class="top-header">
                 <div class="header-left">
                     <button class="header-btn header-btn-secondary">TRAVELSINU</button>
@@ -682,222 +682,31 @@ if (isset($_GET['logout'])) {
 
                 // Module handling with organized folder structure
                 switch ($module) {
-                    case 'frontoffice/informasi_tamu/guest_research':
-                        include 'modules/frontoffice/informasi_tamu/guest_research.php';
-                        break;
-                    case 'adjustment/foodbeverage/transaction_history':
-                        include 'modules/adjustment/foodbeverage/transaction_history.php';
-                        break;
+                    // Adjustment - Food Beverage modules
                     
                     // Adjustment - Front Office modules
-                    case 'adjustment/frontoffice/additional_deposit':
-                        include 'modules/adjustment/frontoffice/additional_deposit.php';
-                        break;
-                    case 'adjustment/frontoffice/charge_to_room':
-                        include 'modules/adjustment/frontoffice/charge_to_room.php';
-                        break;
-                    case 'adjustment/frontoffice/clearance_deposit':
-                        include 'modules/adjustment/frontoffice/clearance_deposit.php';
-                        break;
-                    case 'adjustment/frontoffice/clearance_deposit_pending':
-                        include 'modules/adjustment/frontoffice/clearance_deposit_pending.php';
-                        break;
-                    case 'adjustment/frontoffice/double_checkin':
-                        include 'modules/adjustment/frontoffice/double_checkin.php';
-                        break;
-                    case 'adjustment/frontoffice/extra_bed':
-                        include 'modules/adjustment/frontoffice/extra_bed.php';
-                        break;
-                    case 'adjustment/frontoffice/extrabill':
-                        include 'modules/adjustment/frontoffice/extrabill.php';
-                        break;
-                    case 'adjustment/frontoffice/guest_ledger':
-                        include 'modules/adjustment/frontoffice/guest_ledger.php';
-                        break;
-                    case 'adjustment/frontoffice/late_checkout':
-                        include 'modules/adjustment/frontoffice/late_checkout.php';
-                        break;
-                    case 'adjustment/frontoffice/market_segment':
-                        include 'modules/adjustment/frontoffice/market_segment.php';
-                        break;
-                    case 'adjustment/frontoffice/night_audit':
-                        include 'modules/adjustment/frontoffice/night_audit.php';
-                        break;
-                    case 'adjustment/frontoffice/other_extrabill':
-                        include 'modules/adjustment/frontoffice/other_extrabill.php';
-                        break;
-                    case 'adjustment/frontoffice/payment_pending':
-                        include 'modules/adjustment/frontoffice/payment_pending.php';
-                        break;
-                    case 'adjustment/frontoffice/payment':
-                        include 'modules/adjustment/frontoffice/payment.php';
-                        break;
-                    case 'adjustment/frontoffice/refund':
-                        include 'modules/adjustment/frontoffice/refund.php';
-                        break;
-                    case 'adjustment/frontoffice/reprocess_clearance':
-                        include 'modules/adjustment/frontoffice/reprocess_clearance.php';
-                        break;
-                    case 'adjustment/frontoffice/room_charge':
-                        include 'modules/adjustment/frontoffice/room_charge.php';
-                        break;
-                    case 'adjustment/frontoffice/room_status':
-                        include 'modules/adjustment/frontoffice/room_status.php';
-                        break;
-                    case 'adjustment/frontoffice/upnormal_payment':
-                        include 'modules/adjustment/frontoffice/upnormal_payment.php';
-                        break;
                     
                     // Adjustment - Kos modules
-                    case 'adjustment/kos/payment':
-                        include 'modules/adjustment/kos/payment.php';
-                        break;
-                    case 'adjustment/kos/room_charge':
-                        include 'modules/adjustment/kos/room_charge.php';
-                        break;
                     
                     // Adjustment - Laundry modules
-                    case 'laundry/form/laundry_order':
-                        include 'modules/laundry/form/laundry_order.php';
-                        break;
                     
                     // Adjustment - Meeting Room modules
-                    case 'adjustment/meetingroom/meeting_room_deposit':
-                        include 'modules/adjustment/meetingroom/meeting_room_deposit.php';
-                        break;
-                    case 'adjustment/meetingroom/meeting_room_refund':
-                        include 'modules/adjustment/meetingroom/meeting_room_refund.php';
-                        break;
-                    case 'adjustment/meetingroom/meeting_room_trans':
-                        include 'modules/adjustment/meetingroom/meeting_room_trans.php';
-                        break;
                     
                     // Food & Beverage - Chart modules
-                    case 'foodbeverage/chart/menu_fast_moving':
-                        include 'modules/foodbeverage/chart/menu_fast_moving.php';
-                        break;
-                    case 'foodbeverage/chart/menu_slow_moving':
-                        include 'modules/foodbeverage/chart/menu_slow_moving.php';
-                        break;
-                    case 'foodbeverage/chart/sales_chart':
-                        include 'modules/foodbeverage/chart/sales_chart.php';
-                        break;
-                    case 'foodbeverage/chart/sales_by_category':
-                        include 'modules/foodbeverage/chart/sales_by_category.php';
-                        break;
                     
                     // Food & Beverage - Form modules
-                    case 'foodbeverage/form/direct_purchase':
-                        include 'modules/foodbeverage/form/direct_purchase.php';
-                        break;
-                    case 'foodbeverage/form/stock_request':
-                        include 'modules/foodbeverage/form/stock_request.php';
-                        break;
-                    case 'foodbeverage/form/external_guest':
-                        include 'modules/foodbeverage/form/external_guest.php';
-                        break;
-                    case 'foodbeverage/form/event_menu_setup':
-                        include 'modules/foodbeverage/form/event_menu_setup.php';
-                        break;
-                    case 'foodbeverage/form/sales_transaction':
-                        include 'modules/foodbeverage/form/sales_transaction.php';
-                        break;
-                    case 'foodbeverage/form/pending_transaction':
-                        include 'modules/foodbeverage/form/pending_transaction.php';
-                        break;
-                    case 'foodbeverage/form/item_usage':
-                        include 'modules/foodbeverage/form/item_usage.php';
-                        break;
-                    case 'foodbeverage/form/expired_damaged_items':
-                        include 'modules/foodbeverage/form/expired_damaged_items.php';
-                        break;
-                    case 'foodbeverage/form/restaurant_stock_taking':
-                        include 'modules/foodbeverage/form/restaurant_stock_taking.php';
-                        break;
                     
                     // Food & Beverage - Info modules
-                    case 'foodbeverage/info/stock_request_info':
-                        include 'modules/foodbeverage/info/stock_request_info.php';
-                        break;
-                    case 'foodbeverage/info/today_transaction':
-                        include 'modules/foodbeverage/info/today_transaction.php';
-                        break;
-                    case 'foodbeverage/info/room_service_request':
-                        include 'modules/foodbeverage/info/room_service_request.php';
-                        break;
-                    case 'foodbeverage/info/receivable_info':
-                        include 'modules/foodbeverage/info/receivable_info.php';
-                        break;
-                    case 'foodbeverage/info/item_stock_info':
-                        include 'modules/foodbeverage/info/item_stock_info.php';
-                        break;
-                    case 'foodbeverage/info/stock_card':
-                        include 'modules/foodbeverage/info/stock_card.php';
-                        break;
-                    case 'foodbeverage/info/banquet_receivable':
-                        include 'modules/foodbeverage/info/banquet_receivable.php';
-                        break;
                     
                     // Food & Beverage - Laporan modules
-                    case 'foodbeverage/laporan/night_audit_fnb':
-                        include 'modules/foodbeverage/laporan/night_audit_fnb.php';
-                        break;
-                    case 'foodbeverage/laporan/restaurant_sales_per_item':
-                        include 'modules/foodbeverage/laporan/restaurant_sales_per_item.php';
-                        break;
-                    case 'foodbeverage/laporan/restaurant_sales':
-                        include 'modules/foodbeverage/laporan/restaurant_sales.php';
-                        break;
-                    case 'foodbeverage/laporan/shift_report':
-                        include 'modules/foodbeverage/laporan/shift_report.php';
-                        break;
-                    case 'foodbeverage/laporan/restaurant_guest_report':
-                        include 'modules/foodbeverage/laporan/restaurant_guest_report.php';
-                        break;
-                    case 'foodbeverage/laporan/restaurant_stocktaking_history':
-                        include 'modules/foodbeverage/laporan/restaurant_stocktaking_history.php';
-                        break;
-                    case 'foodbeverage/laporan/restaurant_shift_report':
-                        include 'modules/foodbeverage/laporan/restaurant_shift_report.php';
-                        break;
                     
                     // Food & Beverage - Master Data modules
-                    case 'foodbeverage/master/master_discount':
-                        include 'modules/foodbeverage/master/master_discount.php';
-                        break;
-                    case 'foodbeverage/master/table_master':
-                        include 'modules/foodbeverage/master/table_master.php';
-                        break;
-                    case 'foodbeverage/master/restaurant_menu_master':
-                        include 'modules/foodbeverage/master/restaurant_menu_master.php';
-                        break;
-                    case 'foodbeverage/master/restaurant_menu_category':
-                        include 'modules/foodbeverage/master/restaurant_menu_category.php';
-                        break;
-                    case 'foodbeverage/master/restaurant_menu_type':
-                        include 'modules/foodbeverage/master/restaurant_menu_type.php';
-                        break;
                     
                     // Front Office - Chart modules
-                    case 'frontoffice/chart/monthly_room_chart':
-                        include 'modules/frontoffice/chart/monthly_room_chart.php';
-                        break;
-                    case 'frontoffice/chart/monthly_revenue_chart':
-                        include 'modules/frontoffice/chart/monthly_revenue_chart.php';
-                        break;
                     
                     // Front Office - Form modules
-                    case 'frontoffice/form/direct_purchase_fo':
-                        include 'modules/frontoffice/form/direct_purchase_fo.php';
-                        break;
                     case 'frontoffice/form/refresh_room_status':
                         include 'modules/frontoffice/form/refresh_room_status.php';
-                        break;
-                    case 'frontoffice/form/group_registration':
-                        include 'modules/frontoffice/form/group_registration.php';
-                        break;
-                    case 'frontoffice/form/laundry_transaction':
-                        include 'modules/frontoffice/form/laundry_transaction.php';
                         break;
                     case 'frontoffice/form/reservation':
                         include 'modules/frontoffice/form/reservation.php';
@@ -905,20 +714,8 @@ if (isset($_GET['logout'])) {
                     case 'frontoffice/form/registration':
                         include 'modules/frontoffice/form/registration.php';
                         break;
-                    case 'frontoffice/form/kost_registration':
-                        include 'modules/frontoffice/form/kost_registration.php';
-                        break;
-                    case 'frontoffice/form/kost_reservation':
-                        include 'modules/frontoffice/form/kost_reservation.php';
-                        break;
-                    case 'frontoffice/form/meeting_room_transaction':
-                        include 'modules/frontoffice/form/meeting_room_transaction.php';
-                        break;
-                    case 'frontoffice/form/extrabill_form':
-                        include 'modules/frontoffice/form/extrabill_form.php';
-                        break;
                     
-                    // Front Office - Info modules
+                    // Front Office - Informasi reservasi modules
                     case 'frontoffice/informasi_reservasi/reservation_today':
                         include 'modules/frontoffice/informasi_reservasi/reservation_today.php';
                         break;
@@ -928,174 +725,18 @@ if (isset($_GET['logout'])) {
                     case 'frontoffice/informasi_reservasi/all_reservation':
                         include 'modules/frontoffice/informasi_reservasi/all_reservation.php';
                         break;
-                    case 'frontoffice/info/room_availability_info':
-                        include 'modules/frontoffice/info/room_availability_info.php';
-                        break;
-                    case 'frontoffice/info/inhouse_guest_info':
-                        include 'modules/frontoffice/info/inhouse_guest_info.php';
-                        break;
-                    case 'frontoffice/informasi_tamu/guest_history':
-                        include 'modules/frontoffice/informasi_tamu/guest_history.php';
-                        break;
-                    case 'frontoffice/informasi_tamu/today_checkin_info':
-                        include 'modules/frontoffice/informasi_tamu/today_checkin_info.php';
-                        break;
-                    case 'frontoffice/info/late_checkout':
-                        include 'modules/frontoffice/info/late_checkout.php';
-                        break;
-                    case 'frontoffice/info/pending_checkout_info':
-                        include 'modules/frontoffice/info/pending_checkout_info.php';
-                        break;
-                    case 'frontoffice/info/room_status_realtime':
-                        include 'modules/frontoffice/info/room_status_realtime.php';
-                        break;
-                    case 'frontoffice/info/no_show_report':
-                        include 'modules/frontoffice/info/no_show_report.php';
-                        break;
-                    case 'adjustment/frontoffice/refund':
-                        include 'modules/adjustment/frontoffice/refund.php';
-                        break;
-                    case 'frontoffice/info/blacklist_guest':
-                        include 'modules/frontoffice/info/blacklist_guest.php';
-                        break;
                     
-                    // Front Office - Laporan modules
-                    case 'frontoffice/laporan/actual_shift_report':
-                        include 'modules/frontoffice/laporan/actual_shift_report.php';
-                        break;
-                    case 'frontoffice/master/blacklist_management':
-                        include 'modules/frontoffice/master/blacklist_management.php';
-                        break;
-                    case 'frontoffice/laporan/night_audit_report':
-                        include 'modules/frontoffice/laporan/night_audit_report.php';
-                        break;
-                    case 'frontoffice/laporan/room_revenue_report':
-                        include 'modules/frontoffice/laporan/room_revenue_report.php';
-                        break;
-                    case 'frontoffice/laporan/occupancy_report':
-                        include 'modules/frontoffice/laporan/occupancy_report.php';
-                        break;
-                    case 'frontoffice/laporan/adr_revpar_report':
-                        include 'modules/frontoffice/laporan/adr_revpar_report.php';
-                        break;
+                    // Front Office - Informasi modules
                     
                     // Front Office - Master Data modules
-                    case 'frontoffice/status/room_maintenance_status':
-                        include 'modules/frontoffice/status/room_maintenance_status.php';
-                        break;
-                    case 'frontoffice/master/room_rate_master':
-                        include 'modules/frontoffice/master/room_rate_master.php';
-                        break;
-                    case 'frontoffice/master/master_charge_code':
-                        include 'modules/frontoffice/master/master_charge_code.php';
-                        break;
-                    case 'frontoffice/master/master_package':
-                        include 'modules/frontoffice/master/master_package.php';
-                        break;
-                    case 'frontoffice/master/master_voucher':
-                        include 'modules/frontoffice/master/master_voucher.php';
-                        break;
-                    case 'frontoffice/laporan/market_segment_analysis':
-                        include 'modules/frontoffice/laporan/market_segment_analysis.php';
-                        break;
-                    case 'frontoffice/master/master_guest':
-                        include 'modules/frontoffice/master/master_guest.php';
-                        break;
                     
                     // Housekeeping - Chart modules
-                    case 'housekeeping/chart/chart_room_cleaning':
-                        include 'modules/housekeeping/chart/chart_room_cleaning.php';
-                        break;
-                    
+
                     // Housekeeping - Form modules
-                    case 'housekeeping/form/room_assignment':
-                        include 'modules/housekeeping/form/room_assignment.php';
-                        break;
-                    case 'housekeeping/form/cleaning_schedule':
-                        include 'modules/housekeeping/form/cleaning_schedule.php';
-                        break;
-                    case 'laundry/form/linen_exchange':
-                        include 'modules/laundry/form/linen_exchange.php';
-                        break;
-                    case 'housekeeping/form/inventory_request':
-                        include 'modules/housekeeping/form/inventory_request.php';
-                        break;
-                    case 'housekeeping/form/maintenance_request_hk':
-                        include 'modules/housekeeping/form/maintenance_request_hk.php';
-                        break;
-                    case 'housekeeping/form/amenities_restock':
-                        include 'modules/housekeeping/form/amenities_restock.php';
-                        break;
-                    case 'housekeeping/form/lost_found_entry':
-                        include 'modules/housekeeping/form/lost_found_entry.php';
-                        break;
-                    case 'housekeeping/form/room_inspection':
-                        include 'modules/housekeeping/form/room_inspection.php';
-                        break;
-                    case 'housekeeping/form/deep_cleaning_schedule':
-                        include 'modules/housekeeping/form/deep_cleaning_schedule.php';
-                        break;
-                    case 'housekeeping/form/public_area_cleaning':
-                        include 'modules/housekeeping/form/public_area_cleaning.php';
-                        break;
                     
                     // Housekeeping - Informasi modules
-                    case 'housekeeping/info/cleaning_progress':
-                        include 'modules/housekeeping/info/cleaning_progress.php';
-                        break;
-                    case 'housekeeping/info/inventory_level':
-                        include 'modules/housekeeping/info/inventory_level.php';
-                        break;
-                    case 'housekeeping/info/linen_status':
-                        include 'modules/housekeeping/info/linen_status.php';
-                        break;
-                    case 'housekeeping/info/equipment_status':
-                        include 'modules/housekeeping/info/equipment_status.php';
-                        break;
-                    case 'housekeeping/info/room_status_hk':
-                        include 'modules/housekeeping/info/room_status_hk.php';
-                        break;
-                    case 'housekeeping/info/staff_assignment':
-                        include 'modules/housekeeping/info/staff_assignment.php';
-                        break;
-                    case 'housekeeping/info/amenities_stock':
-                        include 'modules/housekeeping/info/amenities_stock.php';
-                        break;
-                    case 'housekeeping/info/room_discrepancy':
-                        include 'modules/housekeeping/info/room_discrepancy.php';
-                        break;
                     
                     // Housekeeping - Laporan modules
-                    case 'housekeeping/laporan/linen_par_level':
-                        include 'modules/housekeeping/laporan/linen_par_level.php';
-                        break;
-                    case 'housekeeping/laporan/room_productivity_report':
-                        include 'modules/housekeeping/laporan/room_productivity_report.php';
-                        break;
-                    case 'housekeeping/laporan/maintenance_summary':
-                        include 'modules/housekeeping/laporan/maintenance_summary.php';
-                        break;
-                    case 'housekeeping/laporan/daily_housekeeping_report':
-                        include 'modules/housekeeping/laporan/daily_housekeeping_report.php';
-                        break;
-                    case 'housekeeping/laporan/lost_found_report':
-                        include 'modules/housekeeping/laporan/lost_found_report.php';
-                        break;
-                    case 'housekeeping/laporan/inventory_usage_report':
-                        include 'modules/housekeeping/laporan/inventory_usage_report.php';
-                        break;
-                    case 'housekeeping/laporan/room_cleaning_report':
-                        include 'modules/housekeeping/laporan/room_cleaning_report.php';
-                        break;
-                    case 'housekeeping/laporan/room_maintenance_history':
-                        include 'modules/housekeeping/laporan/room_maintenance_history.php';
-                        break;
-                    case 'housekeeping/laporan/extra_bed_history':
-                        include 'modules/housekeeping/laporan/extra_bed_history.php';
-                        break;
-                    case 'housekeeping/laporan/inspection_report':
-                        include 'modules/housekeeping/laporan/inspection_report.php';
-                        break;
                     
                     // Housekeeping - Master Data modules
                     case 'housekeeping/info/maintenance_status':
@@ -1103,24 +744,11 @@ if (isset($_GET['logout'])) {
                         break;
                     
                     // HRD - Account Receivable modules
-                    case 'hrd/accountreceivable/laporan/laporan_pershift':
-                        include 'modules/hrd/accountreceivable/laporan/laporan_pershift.php';
-                        break;
-                    case 'hrd/accountreceivable/laporan/laporan_night_audit':
-                        include 'modules/hrd/accountreceivable/laporan/laporan_night_audit.php';
-                        break;
                     
                     // HRD - Accounting modules
-                    case 'hrd/accounting/laporan/global_report':
-                        include 'modules/hrd/accounting/laporan/global_report.php';
-                        break;
                     
                     // HRD - Administration modules
-                    case 'hrd/administration/masterdata/hotel_profile':
-                        include 'modules/hrd/administration/masterdata/hotel_profile.php';
-                        break;
-
-                    case 'dashboard':
+ 
                         // Default dashboard content
                         echo '<div class="content-card">
                                 <h1 class="page-title">Eva Group Hotel Management System</h1>
