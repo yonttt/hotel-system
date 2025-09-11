@@ -335,7 +335,7 @@ if (isset($_GET['logout'])) {
                                         </button>
                                         <ul class="nav-submenu" id="frontofficeinformasitamu-submenu">
                                             <li><a href="home.php?module=frontoffice/informasi_tamu/guest_research&title=Guest Research" class="nav-link">Guest Research</a></li>
-                                            <li><a href="home.php?module=frontoffice/informasi_tamu/today_checkin_info&title=Check In Today" class="nav-link">Check in Today</a></li>
+                                            <li><a href="home.php?module=frontoffice/informasi_tamu/today_checkin&title=Check In Today" class="nav-link">Check in Today</a></li>
                                             <li><a href="home.php?module=frontoffice/informasi_tamu/early_checkin_info&title=Early Checkin" class="nav-link">Early Checkin</a></li>
                                             <li><a href="home.php?module=frontoffice/informasi_tamu/pending_checkout_info&title=Expected Departure" class="nav-link">Expected Departure</a></li>
                                             <li><a href="home.php?module=frontoffice/informasi_tamu/meeting_room_info&title=Meeting Room Info" class="nav-link">Meeting Room Info</a></li>
@@ -725,8 +725,16 @@ if (isset($_GET['logout'])) {
                         include 'modules/frontoffice/informasi_reservasi/all_reservation.php';
                         break;
                     
-                    // Front Office - Informasi modules
-                    
+                    // Front Office - Informasi tamu modules
+                    case 'frontoffice/informasi_tamu/guest_history':
+                        include 'modules/frontoffice/informasi_tamu/guest_history.php';
+                        break;
+                    case 'frontoffice/informasi_tamu/guest_research':
+                        include 'modules/frontoffice/informasi_tamu/guest_research.php';
+                        break;
+                    case 'frontoffice/informasi_tamu/today_checkin':
+                        include 'modules/frontoffice/informasi_tamu/today_checkin.php';
+                        break;
                     // Front Office - Master Data modules
                     
                     // Housekeeping - Chart modules
