@@ -8,6 +8,7 @@ $conn = $db->getConnection();
 
 // --- CONFIGURATION & PARAMETER HANDLING ---
 $today_date = date('Y-m-d');
+$hotel_name = "New Idola Hotel"; // Set hotel name
 
 // Pagination
 $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
@@ -33,10 +34,10 @@ $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
 
 // --- DATABASE QUERY ---
-$sql_data = "SELECT *, (guest_male + guest_female + guest_child) AS guest_count FROM hotel_reservations WHERE arrival_date = :today_date";
-$sql_count = "SELECT COUNT(*) FROM hotel_reservations WHERE arrival_date = :today_date";
+$sql_data = "SELECT *, (guest_male + guest_female + guest_child) AS guest_count FROM hotel_reservations WHERE arrival_date = :today_date AND hotel_name = :hotel_name";
+$sql_count = "SELECT COUNT(*) FROM hotel_reservations WHERE arrival_date = :today_date AND hotel_name = :hotel_name";
 
-$params = [':today_date' => $today_date];
+$params = [':today_date' => $today_date, ':hotel_name' => $hotel_name];
 
 if (!empty($search)) {
     $search_condition = " AND (guest_name LIKE :search OR market_segment LIKE :search OR reservation_no LIKE :search OR room_number LIKE :search)";
@@ -56,6 +57,7 @@ $stmt_data = $conn->prepare($sql_data);
 $stmt_data->bindValue(':limit', $entries, PDO::PARAM_INT);
 $stmt_data->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt_data->bindValue(':today_date', $today_date);
+$stmt_data->bindValue(':hotel_name', $hotel_name);
 if (!empty($search)) {
     $stmt_data->bindValue(':search', '%' . $search . '%');
 }
@@ -93,8 +95,7 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
             <strong>RESERVATION TODAY (<?= htmlspecialchars($today_date) ?>)</strong>
             <span style="margin-left: 20px; font-size: 1em;">Hotel :</span>
             <select style="margin-left: 5px; padding: 3px 8px;">
-                <option value="ALL">All</option>
-                <option value="IDOLA">Hotel Idola</option>
+                <option value="IDOLA">New Idola Hotel</option>
             </select>
         </div>
     </div>

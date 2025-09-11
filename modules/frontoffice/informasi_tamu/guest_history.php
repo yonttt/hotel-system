@@ -15,6 +15,7 @@ $db = new Database();
 $conn = $db->getConnection();
 
 // --- FILTERING & PAGINATION SETUP ---
+$hotel_name = "New Idola Hotel"; // Set hotel name
 $date_from = $_GET['date_from'] ?? '2020-01-01';
 $date_to = $_GET['date_to'] ?? date('Y-m-d');
 $search = $_GET['search'] ?? '';
@@ -40,8 +41,8 @@ $total_records = 0;
 $error_message = '';
 
 try {
-    $params = [];
-    $where_clauses = [];
+    $params = [':hotel_name' => $hotel_name];
+    $where_clauses = ["hotel_name = :hotel_name"];
 
     // Add date range condition
     $where_clauses[] = "arrival_date BETWEEN :date_from AND :date_to";
@@ -120,7 +121,7 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
             <input type="date" id="date_to" name="date_to" value="<?= htmlspecialchars($date_to) ?>">
             <label for="hotel" class="ml-4">Hotel:</label>
             <select id="hotel" name="hotel">
-                <option>ALL</option>
+                <option>New Idola Hotel</option>
             </select>
         </form>
     </div>

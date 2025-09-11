@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $stmt = $conn->prepare("
             INSERT INTO guest_registrations (
-                registration_no, category_market_id, market_segment, member_id, 
+                registration_no, hotel_name, category_market_id, market_segment, member_id, 
                 transaction_by, id_card_type, id_card_number, guest_name, guest_title,
                 mobile_phone, address, nationality_id, city_id, email,
                 arrival_date, arrival_time, nights, departure_date, guest_type,
@@ -33,11 +33,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 extra_bed_nights, extra_bed_qty, room_number, transaction_status,
                 payment_method_id, registration_type_id, notes, payment_amount,
                 discount, payment_diskon, deposit, balance, created_by
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         
         $stmt->execute([
             $registration_no,
+            'New Idola Hotel', // Save the hotel name
             $_POST['category_market'] ?? 1,
             $_POST['market_segment'] ?? 'Normal',
             $_POST['member_id'] ?? '',

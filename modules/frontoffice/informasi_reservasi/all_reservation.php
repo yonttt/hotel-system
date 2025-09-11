@@ -7,6 +7,7 @@ $db = new Database();
 $conn = $db->getConnection();
 
 // --- CONFIGURATION & PARAMETER HANDLING ---
+$hotel_name = "New Idola Hotel"; // Set hotel name
 
 // Pagination
 $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
@@ -34,13 +35,13 @@ $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 // --- DATABASE QUERY ---
 
 // Base SQL for counting records
-$sql_count = "SELECT COUNT(*) FROM hotel_reservations";
-$sql_data = "SELECT *, (guest_male + guest_female + guest_child) AS guest_count FROM hotel_reservations";
+$sql_count = "SELECT COUNT(*) FROM hotel_reservations WHERE hotel_name = :hotel_name";
+$sql_data = "SELECT *, (guest_male + guest_female + guest_child) AS guest_count FROM hotel_reservations WHERE hotel_name = :hotel_name";
 
 // Add search condition if a search term is provided
-$params = [];
+$params = [':hotel_name' => $hotel_name];
 if (!empty($search)) {
-    $search_condition = " WHERE guest_name LIKE :search OR market_segment LIKE :search OR reservation_no LIKE :search OR room_number LIKE :search";
+    $search_condition = " AND (guest_name LIKE :search OR market_segment LIKE :search OR reservation_no LIKE :search OR room_number LIKE :search)";
     $sql_count .= $search_condition;
     $sql_data .= $search_condition;
     $params[':search'] = '%' . $search . '%';
@@ -59,6 +60,7 @@ $sql_data .= " ORDER BY $sort_column $sort_order LIMIT :limit OFFSET :offset";
 $stmt_data = $conn->prepare($sql_data);
 $stmt_data->bindValue(':limit', $entries, PDO::PARAM_INT);
 $stmt_data->bindValue(':offset', $offset, PDO::PARAM_INT);
+$stmt_data->bindValue(':hotel_name', $hotel_name);
 if (!empty($search)) {
     $stmt_data->bindValue(':search', '%' . $search . '%');
 }
@@ -101,8 +103,7 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
             <strong>ALL RESERVATION LIST</strong>
             <span style="margin-left: 20px; font-size: 1em;">Hotel :</span>
             <select style="margin-left: 5px; padding: 3px 8px;">
-                <option value="ALL">All</option>
-                <option value="IDOLA">Hotel Idola</option>
+                <option value="IDOLA">New Idola Hotel</option>
             </select>
         </div>
     </div>

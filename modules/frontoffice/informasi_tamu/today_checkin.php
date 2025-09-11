@@ -15,6 +15,7 @@ $db = new Database();
 $conn = $db->getConnection();
 
 // --- FILTERING & PAGINATION SETUP ---
+$hotel_name = "New Idola Hotel"; // Set hotel name
 $search = $_GET['search'] ?? '';
 $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $entries = isset($_GET['entries']) ? (int)$_GET['entries'] : 100;
@@ -25,7 +26,7 @@ $sort_column = $_GET['sort'] ?? 'arrival_date';
 $sort_order = isset($_GET['order']) && in_array(strtoupper($_GET['order']), ['ASC', 'DESC']) ? $_GET['order'] : 'DESC';
 // Expanded sortable columns
 $allowed_sort_columns = [
-    'registration_no', 'id_card_number', 'guest_name', 'market_segment', 'nights', 'arrival_date', 
+    'registration_no', 'id_card_number', 'guest_name', 'market_segment', 'nights', 'arrival_date',
     'departure_date', 'room_number', 'transaction_status', 'payment_amount', 'deposit', 'balance'
 ];
 if (!in_array($sort_column, $allowed_sort_columns)) {
@@ -39,8 +40,8 @@ $error_message = '';
 $today_date = date('Y-m-d'); // Always use the current date
 
 try {
-    $params = [':today_date' => $today_date];
-    $where_clauses = ["arrival_date = :today_date"];
+    $params = [':today_date' => $today_date, ':hotel_name' => $hotel_name];
+    $where_clauses = ["arrival_date = :today_date", "hotel_name = :hotel_name"];
 
     // Add search condition
     if (!empty($search)) {
@@ -110,7 +111,7 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
             <strong>Check In Information (<?= htmlspecialchars($today_date) ?>)</strong>
             <label for="hotel" class="ml-4">Hotel:</label>
             <select id="hotel" name="hotel">
-                <option>ALL</option>
+                <option>New Idola Hotel</option>
             </select>
         </form>
     </div>

@@ -17,9 +17,10 @@ $results = [];
 $total_records = 0;
 $error_message = '';
 $is_search_triggered = isset($_GET['action']) && $_GET['action'] === 'search';
+$hotel_name = "New Idola Hotel"; // Set hotel name
 
 // --- FILTERING & PAGINATION SETUP ---
-$params = [];
+$params = [':hotel_name' => $hotel_name];
 $search_criteria = [
     'guest_type' => $_GET['guest_type'] ?? 'ROOM',
     'registration_no' => $_GET['registration_no'] ?? '',
@@ -39,9 +40,9 @@ $offset = ($page - 1) * $entries;
 $sort_column = $_GET['sort'] ?? 'gr.arrival_date';
 $sort_order = isset($_GET['order']) && in_array(strtoupper($_GET['order']), ['ASC', 'DESC']) ? $_GET['order'] : 'DESC';
 $allowed_sort_columns = [
-    'gr.registration_no', 'gr.reservation_no', 'gr.id_card_number', 'gr.guest_name', 'gr.phone_number',
-    'gr.nationality', 'gr.city', 'gr.market_segment', 'gr.room_number', 'gr.arrival_date',
-    'gr.departure_date', 'gr.payment_method', 'gr.payment_amount'
+    'gr.registration_no', 'gr.reservation_no', 'r.bill_no', 'gr.id_card_number', 'gr.guest_name', 'gr.phone_number',
+    'gr.nationality', 'gr.city', 'gr.address', 'gr.market_segment', 'gr.room_number', 'r.checkin_by', 'gr.arrival_date',
+    'gr.departure_date', 'r.checkout_by', 'gr.payment_method', 'gr.payment_amount', 'r.cashier', 'r.payment_date'
 ];
 if (!in_array($sort_column, $allowed_sort_columns)) {
     $sort_column = 'gr.arrival_date';
@@ -50,7 +51,7 @@ if (!in_array($sort_column, $allowed_sort_columns)) {
 // --- DATABASE QUERY (ONLY IF SEARCH IS TRIGGERED) ---
 if ($is_search_triggered) {
     try {
-        $where_clauses = [];
+        $where_clauses = ["gr.hotel_name = :hotel_name"];
 
         // Build WHERE clauses from search criteria
         if (!empty($search_criteria['registration_no'])) {
@@ -242,7 +243,7 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
             <div class="filter-form-grid">
                 <div class="form-group">
                     <label for="hotel_name">HOTEL NAME</label>
-                    <input type="text" id="hotel_name" name="hotel_name" value="CCTV PUSAT" readonly>
+                    <input type="text" id="hotel_name" name="hotel_name" value="New Idola Hotel" readonly>
                 </div>
                 <div class="form-group">
                     <label for="guest_type">GUEST TYPE</label>
