@@ -313,11 +313,7 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Registration Type</label>
                     <select name="registration_type" class="w-full px-2 py-1 border border-gray-300 text-xs">
-                        <?php foreach ($registration_types as $type): ?>
-                            <option value="<?= $type['id'] ?>" <?= $type['name'] == 'Registration' ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($type['name']) ?>
-                            </option>
-                        <?php endforeach; ?>
+                        <option value="Registration" selected>Registration</option>
                     </select>
                 </div>
 

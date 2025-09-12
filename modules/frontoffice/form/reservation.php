@@ -1,10 +1,11 @@
-﻿<?php
+<?php
 // Modul Form Reservasi Kamar
 // Kategori: FRONTOFFICE
 // Sub-Kategori: FORM
 
-// Include standardized database connection
-require_once __DIR__ . '/../../../config/database.php';
+// Include koneksi database
+require_once $_SERVER['DOCUMENT_ROOT'] . '/hotel-system/config/database.php';
+
 $db = new Database();
 $conn = $db->getConnection();
 
@@ -66,8 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['balance'] ?? 0
         ]);
         
-        echo "<script>alert('Reservation saved successfully! Reservation No: $reservation_no'); window.location.href='home.php?module=frontoffice/form/reservation&title=Room Reservation Form';</script>";
-        exit;
+        $success_message = "Reservation saved successfully! Reservation No: $reservation_no";
     } catch (PDOException $e) {
         $error_message = "Database error: " . $e->getMessage();
     } catch (Exception $e) {
@@ -82,6 +82,9 @@ $cities = $conn->query("SELECT * FROM cities WHERE active = 1")->fetchAll();
 $payment_methods = $conn->query("SELECT * FROM payment_methods WHERE active = 1")->fetchAll();
 $registration_types = $conn->query("SELECT * FROM registration_types WHERE active = 1")->fetchAll();
 $rooms = $conn->query("SELECT room_number FROM rooms WHERE status = 'available' ORDER BY room_number")->fetchAll();
+
+// Fetch recent reservations for count
+$recent_reservations = $conn->query("SELECT * FROM hotel_reservations ORDER BY created_at DESC LIMIT 10")->fetchAll();
 
 // Get next reservation number
 $next_reservation_no = '0000000001';
@@ -98,8 +101,13 @@ try {
 }
 ?>
 
-<?php // Periksa apakah ada error message
-if (isset($error_message)): ?>
+<?php if (isset($success_message)): ?>
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+        <?= htmlspecialchars($success_message) ?>
+    </div>
+<?php endif; ?>
+    
+<?php if (isset($error_message)): ?>
     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
         <?= htmlspecialchars($error_message) ?>
     </div>
@@ -285,7 +293,11 @@ if (isset($error_message)): ?>
                 <div class="mb-3">
                     <label class="block text-xs font-medium text-gray-700 mb-1">Registration Type</label>
                     <select name="registration_type" class="w-full px-2 py-1 border border-gray-300 text-xs">
-                        <option value="Reservation" selected>Reservation</option>
+                        <?php foreach ($registration_types as $type): ?>
+                            <option value="<?= $type['id'] ?>" <?= $type['name'] == 'Reservation' ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($type['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="mb-3">
