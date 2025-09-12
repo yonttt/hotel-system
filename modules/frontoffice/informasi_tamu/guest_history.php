@@ -94,18 +94,80 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
 ?>
 
 <style>
-    .checkin-container { font-family: Arial, sans-serif; color: #333; }
-    .header-bar, .controls-bar, .table-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; background-color: #f0f0f0; padding: 10px; border: 1px solid #ccc; }
+    .checkin-container { 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        color: #333; 
+    }
+    .header-bar, .controls-bar, .table-footer { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        flex-wrap: wrap; 
+        background-color: #f0f0f0; 
+        padding: 10px; 
+        border: 1px solid #ccc; 
+        font-size: 13px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
     .header-bar { border-bottom: none; }
     .controls-bar { border-bottom: none; }
-    .controls-bar .search-box input, .header-bar input, .header-bar select { padding: 5px; border: 1px solid #ccc; border-radius: 3px; }
-    .controls-bar .actions button, .controls-bar .actions select { padding: 5px 10px; margin-left: 5px; border: 1px solid #ccc; border-radius: 3px; background-color: #e0e0e0; cursor: pointer; }
-    .data-table { width: 100%; border-collapse: collapse; border: 1px solid #ccc; }
-    .data-table th, .data-table td { border: 1px solid #ccc; padding: 8px; text-align: left; font-size: 11px; white-space: nowrap; } /* smaller font and nowrap */
-    .data-table th { background-color: #f7f7f7; font-weight: bold; }
-    .data-table th a { color: #333; text-decoration: none; }
-    .table-footer { border-top: none; font-size: 12px; }
-    .pagination-controls button { padding: 5px 10px; margin: 0 2px; border: 1px solid #ccc; background-color: #fff; cursor: pointer; }
+    .controls-bar .search-box input, .header-bar input, .header-bar select { 
+        padding: 5px; 
+        border: 1px solid #ccc; 
+        border-radius: 3px; 
+        font-size: 13px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .controls-bar .actions button, .controls-bar .actions select { 
+        padding: 5px 10px; 
+        margin-left: 5px; 
+        border: 1px solid #ccc; 
+        border-radius: 3px; 
+        background-color: #e0e0e0; 
+        cursor: pointer; 
+        font-size: 13px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-weight: 600;
+    }
+    .data-table { 
+        width: 100%; 
+        border-collapse: collapse; 
+        border: 1px solid #ccc; 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .data-table th, .data-table td { 
+        border: 1px solid #ccc; 
+        padding: 8px; 
+        text-align: left; 
+        font-size: 12px; 
+        white-space: nowrap; 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .data-table th { 
+        background-color: #f7f7f7; 
+        font-weight: 600; 
+        font-size: 13px;
+    }
+    .data-table th a { 
+        color: #333; 
+        text-decoration: none; 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .table-footer { 
+        border-top: none; 
+        font-size: 13px; 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .pagination-controls button { 
+        padding: 5px 10px; 
+        margin: 0 2px; 
+        border: 1px solid #ccc; 
+        background-color: #fff; 
+        cursor: pointer; 
+        font-size: 13px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-weight: 600;
+    }
     .pagination-controls button:disabled { cursor: not-allowed; opacity: 0.5; }
 </style>
 

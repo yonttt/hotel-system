@@ -1,7 +1,13 @@
-<?php
+﻿<?php
 // Modul Form Reservasi Kamar
 // Kategori: FRONTOFFICE
 // Sub-Kategori: FORM
+
+// Periksa apakah user sudah login
+if (!isset($_SESSION['user_id'])) {
+    header('Location: index.php');
+    exit();
+}
 
 // Include koneksi database
 require_once $_SERVER['DOCUMENT_ROOT'] . '/hotel-system/config/database.php';
@@ -101,6 +107,32 @@ try {
 }
 ?>
 
+<style>
+/* Enhanced fonts for better readability */
+.enhanced-form {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.enhanced-form label {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+.enhanced-form input, .enhanced-form select, .enhanced-form textarea {
+    font-size: 13px !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+.enhanced-form h2 {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+.enhanced-form button {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+</style>
+
 <?php if (isset($success_message)): ?>
     <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
         <?= htmlspecialchars($success_message) ?>
@@ -113,7 +145,7 @@ try {
     </div>
 <?php endif; ?>
 
-<div class="border border-gray-300 bg-white">
+<div class="border border-gray-300 bg-white enhanced-form">
     <div class="flex items-center justify-between px-4 py-2 bg-gray-50 border-b border-gray-300">
         <h2 class="text-xs font-semibold text-gray-800">RESERVATION FORM</h2>
         <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">
@@ -291,10 +323,10 @@ try {
                     </select>
                 </div>
                 <div class="mb-3">
-                    <label class="block text-xs font-medium text-gray-700 mb-1">Registration Type</label>
-                    <select name="registration_type" class="w-full px-2 py-1 border border-gray-300 text-xs">
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Reservation Type</label>
+                    <select name="reservation_type" class="w-full px-2 py-1 border border-gray-300 text-xs">
                         <?php foreach ($registration_types as $type): ?>
-                            <option value="<?= $type['id'] ?>" <?= $type['name'] == 'Reservation' ? 'selected' : '' ?>>
+                            <option value="<?= $type['id'] ?>" <?= $type['name'] == 'Reservation' ? 'selected' : '' ?> >
                                 <?= htmlspecialchars($type['name']) ?>
                             </option>
                         <?php endforeach; ?>

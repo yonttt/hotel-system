@@ -10,6 +10,23 @@ if (!isset($_SESSION['user_id'])) {
 }
 ?>
 
+<style>
+/* Enhanced fonts for better readability */
+body, .p-6, .bg-gradient-to-r, .bg-white, .min-w-full {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+.text-2xl, .text-xl, .text-lg, .text-base, .text-sm, .text-xs {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    font-weight: 600 !important;
+}
+table, th, td, button, input, select {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+</style>
+
 <div class="p-6">
     <!-- Page Header -->
     <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg shadow-lg p-6 mb-6">

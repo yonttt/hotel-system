@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 ?>
 
-<div class="p-6">
+<div class="p-6 enhanced-fonts">
     <!-- Page Header -->
     <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg shadow-lg p-6 mb-6">
         <div class="flex items-center justify-between">
@@ -113,6 +113,44 @@ if (!isset($_SESSION['user_id'])) {
         </div>
     </div>
 </div>
+
+<style>
+.enhanced-fonts * {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+
+.enhanced-fonts h1, .enhanced-fonts h2, .enhanced-fonts h3, .enhanced-fonts h4, .enhanced-fonts h5, .enhanced-fonts h6 {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    font-weight: 600 !important;
+}
+
+.enhanced-fonts table, .enhanced-fonts th, .enhanced-fonts td {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    font-size: 13px !important;
+}
+
+.enhanced-fonts .text-xl {
+    font-size: 18px !important;
+}
+
+.enhanced-fonts .text-lg {
+    font-size: 16px !important;
+}
+
+.enhanced-fonts .text-sm {
+    font-size: 13px !important;
+}
+
+.enhanced-fonts .text-xs {
+    font-size: 12px !important;
+}
+
+.enhanced-fonts button, .enhanced-fonts .button {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+}
+</style>
 
 <script>
 // Add any specific JavaScript for this module here

@@ -74,7 +74,7 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
 ?>
 
 <style>
-    .reservation-container { font-family: Arial, sans-serif; color: #333; }
+    .reservation-container { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; }
     .controls-bar, .header-bar, .table-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; background-color: #f0f0f0; padding: 10px; border: 1px solid #ccc; border-bottom: none; }
     .controls-bar .search-box input { padding: 5px; border: 1px solid #ccc; border-radius: 3px; }
     .controls-bar .actions button, .controls-bar .actions select { padding: 5px 10px; margin-left: 5px; border: 1px solid #ccc; border-radius: 3px; background-color: #e0e0e0; cursor: pointer; }

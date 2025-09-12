@@ -93,6 +93,32 @@ $rooms = $conn->query("SELECT room_number FROM rooms WHERE status = 'available' 
 $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY created_at DESC LIMIT 10")->fetchAll();
 ?>
 
+<style>
+/* Enhanced fonts for better readability */
+.enhanced-form {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.enhanced-form label {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+.enhanced-form input, .enhanced-form select, .enhanced-form textarea {
+    font-size: 13px !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+.enhanced-form h2 {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+.enhanced-form button {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+</style>
+
 <?php if (isset($success_message)): ?>
     <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
         <?= htmlspecialchars($success_message) ?>
@@ -105,7 +131,7 @@ $recent_registrations = $conn->query("SELECT * FROM guest_registrations ORDER BY
     </div>
 <?php endif; ?>
 
-<div class="border border-gray-300 bg-white">
+<div class="border border-gray-300 bg-white enhanced-form">
     <div class="flex items-center justify-between px-4 py-2 bg-gray-50 border-b border-gray-300">
         <h2 class="text-xs font-semibold text-gray-800">REGISTRATION FORM</h2>
         <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">

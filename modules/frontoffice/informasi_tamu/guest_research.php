@@ -135,23 +135,26 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
 <style>
     /* Main Container Styles */
     .module-container {
-        font-family: Arial, sans-serif;
-        font-size: 12px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 13px;
         background-color: #f9f9f9;
     }
     .module-header-bar {
         background-color: #e9e9e9;
         padding: 8px 15px;
-        font-weight: bold;
+        font-weight: 600;
+        font-size: 14px;
         color: #333;
         border: 1px solid #ccc;
         border-bottom: none;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     .filter-form-container {
         background-color: #fff;
         border: 1px solid #ccc;
         padding: 20px;
         margin-bottom: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     .filter-form-grid {
         display: grid;
@@ -166,15 +169,18 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
         gap: 10px;
     }
     .form-group label {
-        font-weight: bold;
+        font-weight: 600;
+        font-size: 13px;
         text-align: left;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     .form-group input, .form-group select {
         width: 100%;
         padding: 6px;
         border: 1px solid #ccc;
         border-radius: 3px;
-        font-size: 12px;
+        font-size: 13px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         box-sizing: border-box; /* Ensures padding doesn't add to width */
     }
     .form-actions {
@@ -187,7 +193,9 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
         border: none;
         cursor: pointer;
         border-radius: 3px;
-        font-weight: bold;
+        font-weight: 600;
+        font-size: 13px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     .btn-primary:hover {
         background-color: #286090;
@@ -199,9 +207,10 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
         border: 1px solid #ccc;
         border-bottom: none;
         padding: 8px 12px;
-        font-weight: bold;
+        font-weight: 600;
         text-transform: uppercase;
-        font-size: 12px;
+        font-size: 14px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     .controls-bar {
         display: flex;
@@ -211,7 +220,8 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
         background-color: #fff;
         border-left: 1px solid #ccc;
         border-right: 1px solid #ccc;
-        font-size: 12px;
+        font-size: 13px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     .controls-bar label {
         display: flex;
@@ -223,7 +233,8 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
     }
     .controls-bar input, .controls-bar select {
         padding: 4px 6px;
-        font-size: 12px;
+        font-size: 13px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         border: 1px solid #ccc;
         border-radius: 2px;
     }
@@ -235,17 +246,20 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
     .data-table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 11px;
+        font-size: 12px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     .data-table th, .data-table td {
         border-top: 1px solid #ccc;
         padding: 8px 12px;
         text-align: left;
         white-space: nowrap;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     .data-table th {
         background-color: #f0f0f0;
-        font-weight: normal;
+        font-weight: 600;
+        font-size: 13px;
     }
     .data-table th a {
         color: #333;

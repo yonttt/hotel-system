@@ -290,6 +290,7 @@ if (isset($_GET['logout'])) {
                                         </button>
                                         <ul class="nav-submenu" id="frontofficeform-submenu">
                                             <li><a href="home.php?module=frontoffice/form/direct_purchase_fo&title=Check In Tamu" class="nav-link">Direct Purchase FO</a></li>
+                                            <li><a href="home.php?module=frontoffice/form/refresh_room_status&title=Refresh Room Status" class="nav-link">Refresh Room Status</a></li>
                                             <li><a href="home.php?module=frontoffice/form/group_registration&title=Buat Reservasi" class="nav-link">Registrasi Group</a></li>
                                             <li><a href="home.php?module=frontoffice/form/laundry_transaction&title=Ubah Reservasi" class="nav-link">Transaksi Laundry</a></li>
                                             <li><a href="home.php?module=frontoffice/form/reservation&title=Room Reservation Form" class="nav-link">Form Reservasi Kamar</a></li>
@@ -388,7 +389,7 @@ if (isset($_GET['logout'])) {
                                             </svg>
                                         </button>
                                         <ul class="nav-submenu" id="frontofficestatuskamar-submenu">
-                                            <li><a href="home.php?module=frontoffice/status/room_status_realtime&title=Room Status Real Time" class="nav-link">Status Kamar FO</a></li>
+                                            <li><a href="home.php?module=frontoffice/status/status_kamar&title=Status Kamar FO" class="nav-link">Status Kamar FO</a></li>
                                         </ul>
                                     </li>
                                 </ul>
@@ -703,6 +704,9 @@ if (isset($_GET['logout'])) {
                     // Front Office - Chart modules
                     
                     // Front Office - Form modules
+                    case 'frontoffice/form/refresh_room_status':
+                        include 'modules/frontoffice/form/refresh_room_status.php';
+                        break;
                     case 'frontoffice/form/reservation':
                         include 'modules/frontoffice/form/reservation.php';
                         break;
@@ -731,6 +735,12 @@ if (isset($_GET['logout'])) {
                     case 'frontoffice/informasi_tamu/today_checkin':
                         include 'modules/frontoffice/informasi_tamu/today_checkin.php';
                         break;
+                    
+                    // Front Office - Status modules
+                    case 'frontoffice/status/status_kamar':
+                        include 'modules/frontoffice/status/status_kamar.php';
+                        break;
+                    
                     // Front Office - Master Data modules
                     
                     // Housekeeping - Chart modules

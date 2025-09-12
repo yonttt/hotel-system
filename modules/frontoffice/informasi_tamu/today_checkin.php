@@ -88,7 +88,7 @@ function get_sort_link($column, $display, $current_sort, $current_order) {
 ?>
 
 <style>
-    .checkin-container { font-family: Arial, sans-serif; color: #333; }
+    .checkin-container { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; }
     .header-bar, .controls-bar, .table-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; background-color: #f0f0f0; padding: 10px; border: 1px solid #ccc; }
     .header-bar { border-bottom: none; }
     .controls-bar { border-bottom: none; }
