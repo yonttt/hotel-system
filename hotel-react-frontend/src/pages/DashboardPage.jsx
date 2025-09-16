@@ -108,14 +108,6 @@ const DashboardPage = () => {
             <h2>Welcome to Eva Group Hotel Management</h2>
             <p>This is your central dashboard for managing hotel operations.</p>
             
-            <div className="quick-info">
-              <h3>Available Sections:</h3>
-              <ul>
-                <li>Operational - Manage front office, housekeeping, and other operations</li>
-                <li>Administration - Handle accounting, receivables, and HR management</li>
-              </ul>
-            </div>
-            
             <div className="system-status">
               <p><strong>System Status:</strong> Online and Ready</p>
               <p><strong>Current Date:</strong> {new Date().toLocaleDateString()}</p>

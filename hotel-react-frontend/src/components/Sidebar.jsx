@@ -5,8 +5,6 @@ import {
   CalendarIcon,
   UserGroupIcon,
   BuildingOfficeIcon,
-  Bars3Icon,
-  XMarkIcon,
   ChevronDownIcon,
   ChevronRightIcon,
   ClipboardDocumentIcon,
@@ -19,7 +17,6 @@ import {
 } from '@heroicons/react/24/outline'
 
 const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(false)
   const [expandedMenus, setExpandedMenus] = useState({
     operational: false,
     frontOffice: false,
@@ -29,13 +26,16 @@ const Sidebar = () => {
   const [scrollPosition, setScrollPosition] = useState(0)
   const location = useLocation()
 
-  // Simpan posisi scroll ketika navigasi
+  // Restore scroll position when menus expand/collapse, but not on route change
   useEffect(() => {
     const sidebarNav = document.querySelector('.sidebar-nav')
-    if (sidebarNav) {
-      sidebarNav.scrollTop = scrollPosition
+    if (sidebarNav && scrollPosition > 0) {
+      // Small delay to ensure DOM is updated after menu expansion
+      setTimeout(() => {
+        sidebarNav.scrollTop = scrollPosition
+      }, 100)
     }
-  }, [location.pathname, expandedMenus])
+  }, [expandedMenus, scrollPosition])
 
   // Otomatis buka menu yang sesuai dengan path saat ini
   useEffect(() => {
@@ -78,7 +78,9 @@ const Sidebar = () => {
   }
 
   const toggleMenu = (menu) => {
+    // Save current scroll position before toggling menu
     handleScrollSave()
+    
     setExpandedMenus(prev => ({
       ...prev,
       [menu]: !prev[menu]
@@ -129,12 +131,13 @@ const Sidebar = () => {
               ]
             },
             { title: 'Info Reservasi', path: '/operational/frontoffice/info-reservasi' },
+            
+            { title: 'Informasi Tamu', path: '/operational/frontoffice/informasi-tamu' },
             { 
               title: 'Status Kamar', 
               path: '/operational/frontoffice/status-kamar',
               hasRefresh: true
             },
-            { title: 'Informasi Tamu', path: '/operational/frontoffice/informasi-tamu' }
           ]
         },
         { title: 'Housekeeping', path: '/operational/housekeeping' },
@@ -196,9 +199,12 @@ const Sidebar = () => {
           isActive ? 'sidebar-active' : ''
         } ${depth === 0 ? 'sidebar-main-item' : 'sidebar-sub-item'} ${paddingClass}`}
         onClick={() => {
-          handleScrollSave()
+          // Only save scroll for non-home items and only reset for home
           if (item.isHome) {
             resetAllMenus()
+          } else {
+            // Don't reset scroll position for regular submenu navigation
+            // handleScrollSave() - removed this to prevent scroll reset
           }
         }}
       >
@@ -222,35 +228,12 @@ const Sidebar = () => {
   }
 
   return (
-    <>
-      {/* Mobile menu button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="mobile-menu-button lg:hidden"
-      >
-        {isOpen ? (
-          <XMarkIcon className="h-6 w-6" />
-        ) : (
-          <Bars3Icon className="h-6 w-6" />
-        )}
-      </button>
-
-      {/* Overlay */}
-      {isOpen && (
-        <div
-          className="mobile-overlay lg:hidden"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <div className={`sidebar ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
-        {/* Navigation */}
-        <div className="sidebar-nav">
-          {sidebarItems.map(item => renderMenuItem(item))}
-        </div>
+    <div className="sidebar translate-x-0">
+      {/* Navigation */}
+      <div className="sidebar-nav">
+        {sidebarItems.map(item => renderMenuItem(item))}
       </div>
-    </>
+    </div>
   )
 }
 

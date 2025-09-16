@@ -1,17 +1,13 @@
 // Google reCAPTCHA configuration
 export const RECAPTCHA_CONFIG = {
-  // Test site key - works on localhost and returns always valid
-  // Replace with your actual site key for production
-  SITE_KEY: '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-  
-  // Production site key (replace this with your actual key)
-  // SITE_KEY: 'your-production-site-key-here',
+  // Production site key
+  SITE_KEY: '6LdtA8srAAAAAPfjIh0FJKuejVnhR1czZU2LoT09',
   
   // reCAPTCHA API URL
   API_URL: 'https://www.google.com/recaptcha/api.js',
   
   // Theme options: 'light' or 'dark'
-  THEME: 'light',
+  THEME: 'dark',
   
   // Size options: 'compact' or 'normal'
   SIZE: 'normal'

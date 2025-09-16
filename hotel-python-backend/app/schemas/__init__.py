@@ -195,3 +195,90 @@ class ReservationResponse(ReservationBase):
     
     class Config:
         from_attributes = True
+
+# Guest Registration Schemas
+class GuestRegistrationBase(BaseModel):
+    registration_no: str
+    category_market_id: Optional[int] = None
+    market_segment: str = "Normal"
+    member_id: Optional[str] = None
+    transaction_by: Optional[str] = None
+    id_card_type: str = "KTP"
+    id_card_number: Optional[str] = None
+    guest_name: Optional[str] = None
+    guest_title: str = "MR"
+    mobile_phone: Optional[str] = None
+    address: Optional[str] = None
+    nationality_id: Optional[int] = None
+    city_id: Optional[int] = None
+    email: Optional[str] = None
+    arrival_date: Optional[datetime] = None
+    arrival_time: Optional[str] = None
+    nights: int = 1
+    departure_date: Optional[datetime] = None
+    guest_type: str = "Normal"
+    guest_count_male: int = 0
+    guest_count_female: int = 0
+    guest_count_child: int = 0
+    extra_bed_nights: int = 0
+    extra_bed_qty: int = 0
+    room_number: Optional[str] = None
+    transaction_status: str = "Registration"
+    payment_method_id: Optional[int] = None
+    registration_type_id: Optional[int] = None
+    notes: Optional[str] = None
+    payment_amount: Decimal = Decimal('0.00')
+    discount: Decimal = Decimal('0.00')
+    payment_diskon: Decimal = Decimal('0.00')
+    deposit: Decimal = Decimal('0.00')
+    balance: Decimal = Decimal('0.00')
+    created_by: Optional[int] = None
+    hotel_name: str = "New Idola Hotel"
+
+class GuestRegistrationCreate(GuestRegistrationBase):
+    pass
+
+class GuestRegistrationUpdate(BaseModel):
+    category_market_id: Optional[int] = None
+    market_segment: Optional[str] = None
+    member_id: Optional[str] = None
+    transaction_by: Optional[str] = None
+    id_card_type: Optional[str] = None
+    id_card_number: Optional[str] = None
+    guest_name: Optional[str] = None
+    guest_title: Optional[str] = None
+    mobile_phone: Optional[str] = None
+    address: Optional[str] = None
+    nationality_id: Optional[int] = None
+    city_id: Optional[int] = None
+    email: Optional[str] = None
+    arrival_date: Optional[datetime] = None
+    arrival_time: Optional[str] = None
+    nights: Optional[int] = None
+    departure_date: Optional[datetime] = None
+    guest_type: Optional[str] = None
+    guest_count_male: Optional[int] = None
+    guest_count_female: Optional[int] = None
+    guest_count_child: Optional[int] = None
+    extra_bed_nights: Optional[int] = None
+    extra_bed_qty: Optional[int] = None
+    room_number: Optional[str] = None
+    transaction_status: Optional[str] = None
+    payment_method_id: Optional[int] = None
+    registration_type_id: Optional[int] = None
+    notes: Optional[str] = None
+    payment_amount: Optional[Decimal] = None
+    discount: Optional[Decimal] = None
+    payment_diskon: Optional[Decimal] = None
+    deposit: Optional[Decimal] = None
+    balance: Optional[Decimal] = None
+    created_by: Optional[int] = None
+    hotel_name: Optional[str] = None
+
+class GuestRegistrationResponse(GuestRegistrationBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+    
+    class Config:
+        from_attributes = True

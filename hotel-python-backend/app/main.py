@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import auth, rooms, guests, reservations
+from app.api import auth, rooms, guests, reservations, hotel_registrations, hotel_reservations, cities, nationalities, category_markets, market_segments, payment_methods, registration_types
 from app.core.config import settings
 
 app = FastAPI(
@@ -23,6 +23,14 @@ app.include_router(auth.router, prefix="/api/auth", tags=["authentication"])
 app.include_router(rooms.router, prefix="/api/rooms", tags=["rooms"])
 app.include_router(guests.router, prefix="/api/guests", tags=["guests"])
 app.include_router(reservations.router, prefix="/api/reservations", tags=["reservations"])
+app.include_router(hotel_registrations.router, prefix="/api/hotel-registrations", tags=["hotel-registrations"])
+app.include_router(hotel_reservations.router, prefix="/api/hotel-reservations", tags=["hotel-reservations"])
+app.include_router(cities.router, prefix="/api", tags=["cities"])
+app.include_router(nationalities.router, prefix="/api", tags=["countries"])
+app.include_router(category_markets.router, prefix="/api", tags=["category-markets"])
+app.include_router(market_segments.router, prefix="/api", tags=["market-segments"])
+app.include_router(payment_methods.router, prefix="/api", tags=["payment-methods"])
+app.include_router(registration_types.router, prefix="/api", tags=["registration-types"])
 
 @app.get("/")
 def read_root():

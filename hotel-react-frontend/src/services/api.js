@@ -88,6 +88,10 @@ class ApiService {
     return this.client.get(`/reservations/by-status/${status}`)
   }
 
+  async getNextReservationNumber() {
+    return this.client.get('/reservations/next/reservation-number')
+  }
+
   // Rooms endpoints
   async getRooms(skip = 0, limit = 100) {
     return this.client.get(`/rooms/?skip=${skip}&limit=${limit}`)
@@ -136,6 +140,94 @@ class ApiService {
 
   async searchGuests(query) {
     return this.client.get(`/guests/search/${query}`)
+  }
+
+  // Hotel Registration endpoints
+  async getHotelRegistrations(skip = 0, limit = 100) {
+    return this.client.get(`/hotel-registrations/?skip=${skip}&limit=${limit}`)
+  }
+
+  async getHotelRegistration(id) {
+    return this.client.get(`/hotel-registrations/${id}`)
+  }
+
+  async getHotelRegistrationByNumber(registrationNo) {
+    return this.client.get(`/hotel-registrations/number/${registrationNo}`)
+  }
+
+  async createHotelRegistration(registrationData) {
+    return this.client.post('/hotel-registrations/', registrationData)
+  }
+
+  async updateHotelRegistration(id, registrationData) {
+    return this.client.put(`/hotel-registrations/${id}`, registrationData)
+  }
+
+  async deleteHotelRegistration(id) {
+    return this.client.delete(`/hotel-registrations/${id}`)
+  }
+
+  async getNextRegistrationNumber() {
+    return this.client.get('/hotel-registrations/next/registration-number')
+  }
+
+  // Hotel Reservation endpoints
+  async getHotelReservations(skip = 0, limit = 100) {
+    return this.client.get(`/hotel-reservations/?skip=${skip}&limit=${limit}`)
+  }
+
+  async getHotelReservation(id) {
+    return this.client.get(`/hotel-reservations/${id}`)
+  }
+
+  async getHotelReservationByNumber(reservationNo) {
+    return this.client.get(`/hotel-reservations/number/${reservationNo}`)
+  }
+
+  async createHotelReservation(reservationData) {
+    return this.client.post('/hotel-reservations/', reservationData)
+  }
+
+  async updateHotelReservation(id, reservationData) {
+    return this.client.put(`/hotel-reservations/${id}`, reservationData)
+  }
+
+  async deleteHotelReservation(id) {
+    return this.client.delete(`/hotel-reservations/${id}`)
+  }
+
+  async getNextReservationNumber() {
+    return this.client.get('/hotel-reservations/next/reservation-number')
+  }
+
+  // Cities endpoints
+  async getCities() {
+    return this.client.get('/cities/')
+  }
+
+  // Countries/Nationalities endpoints
+  async getCountries() {
+    return this.client.get('/countries/')
+  }
+
+  // Category Markets endpoints
+  async getCategoryMarkets() {
+    return this.client.get('/category-markets/')
+  }
+
+  // Market Segments endpoints
+  async getMarketSegments() {
+    return this.client.get('/market-segments/')
+  }
+
+  // Payment Methods endpoints
+  async getPaymentMethods() {
+    return this.client.get('/payment-methods/')
+  }
+
+  // Registration Types endpoints
+  async getRegistrationTypes() {
+    return this.client.get('/registration-types/')
   }
 }
 

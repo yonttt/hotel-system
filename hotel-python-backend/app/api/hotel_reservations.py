@@ -13,7 +13,7 @@ from app.schemas import (
 router = APIRouter()
 
 @router.post("/", response_model=ReservationResponse)
-def create_reservation(
+def create_hotel_reservation(
     reservation: ReservationCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -30,106 +30,107 @@ def create_reservation(
             detail="Reservation number already exists"
         )
     
-    db_reservation = HotelReservation(**reservation.dict())
+    # Set created_by to current user's ID
+    reservation_data = reservation.dict()
+    reservation_data['created_by'] = current_user.id
+    
+    db_reservation = HotelReservation(**reservation_data)
     db.add(db_reservation)
     db.commit()
     db.refresh(db_reservation)
     return db_reservation
 
 @router.get("/", response_model=List[ReservationResponse])
-def get_reservations(
+def get_hotel_reservations(
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Get all reservations with pagination."""
+    """Get all hotel reservations with pagination."""
     reservations = db.query(HotelReservation).offset(skip).limit(limit).all()
     return reservations
 
 @router.get("/{reservation_id}", response_model=ReservationResponse)
-def get_reservation(
+def get_hotel_reservation(
     reservation_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Get a specific reservation by ID."""
-    reservation = db.query(HotelReservation).filter(HotelReservation.id == reservation_id).first()
-    if not reservation:
+    """Get a specific hotel reservation by ID."""
+    db_reservation = db.query(HotelReservation).filter(HotelReservation.id == reservation_id).first()
+    if db_reservation is None:
         raise HTTPException(status_code=404, detail="Reservation not found")
-    return reservation
+    return db_reservation
+
+@router.get("/number/{reservation_no}", response_model=ReservationResponse)
+def get_hotel_reservation_by_number(
+    reservation_no: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Get a specific hotel reservation by reservation number."""
+    db_reservation = db.query(HotelReservation).filter(HotelReservation.reservation_no == reservation_no).first()
+    if db_reservation is None:
+        raise HTTPException(status_code=404, detail="Reservation not found")
+    return db_reservation
 
 @router.put("/{reservation_id}", response_model=ReservationResponse)
-def update_reservation(
+def update_hotel_reservation(
     reservation_id: int,
-    reservation_update: ReservationUpdate,
+    reservation: ReservationUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_manager_or_admin_user)
 ):
-    """Update a reservation (manager/admin only)."""
-    reservation = db.query(HotelReservation).filter(HotelReservation.id == reservation_id).first()
-    if not reservation:
+    """Update a hotel reservation."""
+    db_reservation = db.query(HotelReservation).filter(HotelReservation.id == reservation_id).first()
+    if db_reservation is None:
         raise HTTPException(status_code=404, detail="Reservation not found")
     
-    update_data = reservation_update.dict(exclude_unset=True)
-    for field, value in update_data.items():
-        setattr(reservation, field, value)
+    reservation_data = reservation.dict(exclude_unset=True)
+    for field, value in reservation_data.items():
+        setattr(db_reservation, field, value)
     
     db.commit()
-    db.refresh(reservation)
-    return reservation
+    db.refresh(db_reservation)
+    return db_reservation
 
 @router.delete("/{reservation_id}")
-def delete_reservation(
+def delete_hotel_reservation(
     reservation_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_manager_or_admin_user)
 ):
-    """Delete a reservation (manager/admin only)."""
-    reservation = db.query(HotelReservation).filter(HotelReservation.id == reservation_id).first()
-    if not reservation:
+    """Delete a hotel reservation."""
+    db_reservation = db.query(HotelReservation).filter(HotelReservation.id == reservation_id).first()
+    if db_reservation is None:
         raise HTTPException(status_code=404, detail="Reservation not found")
     
-    db.delete(reservation)
+    db.delete(db_reservation)
     db.commit()
     return {"message": "Reservation deleted successfully"}
-
-@router.get("/by-status/{status}", response_model=List[ReservationResponse])
-def get_reservations_by_status(
-    status: str,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    """Get reservations by status."""
-    reservations = db.query(HotelReservation).filter(
-        HotelReservation.transaction_status == status
-    ).all()
-    return reservations
 
 @router.get("/next/reservation-number")
 def get_next_reservation_number(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Generate next reservation number."""
-    # Get the latest reservation number from the database
-    latest_reservation = db.query(HotelReservation).order_by(
-        HotelReservation.created_at.desc()
-    ).first()
+    """Get the next available reservation number."""
+    # Get the latest reservation number
+    latest_reservation = db.query(HotelReservation).order_by(HotelReservation.id.desc()).first()
     
     if latest_reservation and latest_reservation.reservation_no:
         try:
-            # Extract number from the last reservation number
+            # Extract number from the reservation number (assuming 10-digit format like "0000000001")
             last_number = int(latest_reservation.reservation_no)
             next_number = last_number + 1
         except ValueError:
-            # If extraction fails, start from a base number
-            next_number = 1000000001
+            # If parsing fails, start from 1
+            next_number = 1
     else:
-        # If no reservations exist, start from base number
-        next_number = 1000000001
+        next_number = 1
     
-    # Format as 10-digit string with leading zeros
-    next_reservation_no = str(next_number).zfill(10)
+    # Format as 10 digits with leading zeros
+    next_reservation_no = f"{next_number:010d}"
     
     return {"next_reservation_no": next_reservation_no}

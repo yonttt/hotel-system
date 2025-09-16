@@ -11,7 +11,6 @@ import {
 
 const Header = () => {
   const [showUserMenu, setShowUserMenu] = useState(false)
-  const [showTravelMenu, setShowTravelMenu] = useState(false)
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
@@ -28,77 +27,37 @@ const Header = () => {
           <span className="header-brand-check">✓</span>
           <span className="header-brand-text">EVA GROUP HOTEL MANAGEMENT</span>
         </div>
-        
-        {/* Travel Menu */}
-        <div className="header-travel-menu">
-          <button 
-            className="travel-menu-button"
-            onClick={() => setShowTravelMenu(!showTravelMenu)}
-          >
-            <span className="travel-icon">✈</span>
-            <span>TRAVEL SINU</span>
-            <ChevronDownIcon className="w-3 h-3" />
-          </button>
-          
-          {showTravelMenu && (
-            <div className="travel-dropdown">
-              <a href="#" className="travel-dropdown-item">Travel Bookings</a>
-              <a href="#" className="travel-dropdown-item">Flight Status</a>
-              <a href="#" className="travel-dropdown-item">Hotel Reservations</a>
-            </div>
-          )}
-        </div>
       </div>
 
-      {/* Right side - All action buttons */}
+      {/* Right side - User menu and logout */}
       <div className="header-right">
-        {/* Info Karyawan */}
-        <button className="header-action-btn">
-          <InformationCircleIcon className="w-4 h-4" />
-          <span>Info Karyawan</span>
-        </button>
-
-        {/* Login Web Mail */}
-        <button className="header-action-btn">
-          <EnvelopeIcon className="w-4 h-4" />
-          <span>Login Web Mail</span>
-        </button>
-
         {/* User Menu */}
         <div className="header-user-menu">
           <button 
             className="user-menu-button"
             onClick={() => setShowUserMenu(!showUserMenu)}
           >
-            <UserIcon className="w-4 h-4" />
-            <span>ADMIN</span>
-            <ChevronDownIcon className="w-3 h-3" />
+            <UserIcon className="w-2.5 h-2.5" />
+            <span>{user?.username?.toUpperCase() || 'USER'}</span>
+            <ChevronDownIcon className="w-2 h-2" />
           </button>
           
           {showUserMenu && (
             <div className="user-dropdown">
-              <div className="user-dropdown-header">
-                <div className="user-avatar-large">
-                  {user?.username?.charAt(0)?.toUpperCase() || 'Y'}
-                </div>
-                <div>
-                  <div className="user-name">{user?.username || 'Yonathan'}</div>
-                  <div className="user-role">{user?.role || 'Administrator'}</div>
-                </div>
+              <div className="user-dropdown-header-new">
+                <div className="login-status-text">ANDA LOGIN SEBAGAI</div>
+                <div className="user-name-large">{user?.username?.toUpperCase()}</div>
+                <a href="#" className="account-link">Lihat Akun</a>
               </div>
-              <div className="user-dropdown-divider"></div>
-              <a href="#" className="user-dropdown-item">
-                <UserIcon className="w-4 h-4" />
-                <span>Profile</span>
-              </a>
-              <div className="user-dropdown-divider"></div>
-              <button onClick={handleLogout} className="user-dropdown-item logout">
-                <ArrowRightOnRectangleIcon className="w-4 h-4" />
-                <span>Logout</span>
-              </button>
             </div>
           )}
         </div>
+
+        {/* Logout Button */}
+        <button className="header-action-btn logout-btn" onClick={handleLogout}>
+          <ArrowRightOnRectangleIcon className="w-2.5 h-2.5" />
+          <span>Logout</span>
+        </button>
       </div>
     </header>
   )

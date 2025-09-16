@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import EvaGroupLogo from '../components/EvaGroupLogo'
-// import { getRecaptchaSiteKey, RECAPTCHA_CONFIG } from '../config/recaptcha' // Commented out for development
+import { getRecaptchaSiteKey, RECAPTCHA_CONFIG } from '../config/recaptcha'
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -11,8 +11,8 @@ const LoginPage = () => {
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  // const [recaptchaToken, setRecaptchaToken] = useState('') // Commented out for development
-  // const recaptchaRef = useRef(null) // Commented out for development
+  const [recaptchaToken, setRecaptchaToken] = useState('')
+  const recaptchaRef = useRef(null)
   const { login, isAuthenticated } = useAuth()
   const navigate = useNavigate()
 
@@ -84,11 +84,11 @@ const LoginPage = () => {
     }
 
     // Comment out reCAPTCHA validation for development
-    // if (!recaptchaToken) {
-    //   setError('Please complete the reCAPTCHA verification')
-    //   setLoading(false)
-    //   return
-    // }
+    if (!recaptchaToken) {
+      setError('Please complete the reCAPTCHA verification')
+      setLoading(false)
+      return
+    }
 
     const result = await login(formData.username, formData.password)
     
@@ -96,11 +96,11 @@ const LoginPage = () => {
       navigate('/dashboard')
     } else {
       setError(result.error)
-      // Reset reCAPTCHA on login failure - commented out for development
-      // if (window.grecaptcha) {
-      //   window.grecaptcha.reset()
-      //   setRecaptchaToken('')
-      // }
+      // Reset reCAPTCHA on login failure
+      if (window.grecaptcha) {
+        window.grecaptcha.reset()
+        setRecaptchaToken('')
+      }
     }
     
     setLoading(false)
@@ -109,23 +109,24 @@ const LoginPage = () => {
   return (
     <div className="login-container">
       <div className="login-card">
-        <EvaGroupLogo size={120} />
+        <EvaGroupLogo size={80} />
         
         <h1 className="login-title">EVA GROUP</h1>
-        <p className="login-subtitle">Eva Hotel Management Group</p>
+        <p className="login-subtitle">Hotel Management System</p>
         
-        <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '2rem', color: '#1e293b' }}>
-          Authorized Access
+        <h2 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1.5rem', color: '#000000' }}>
+          Authorized Access Only
         </h2>
 
         {error && (
           <div style={{ 
-            background: '#fee2e2', 
-            color: '#dc2626', 
-            padding: '0.75rem', 
-            borderRadius: '8px', 
+            background: '#f8f8f8', 
+            color: '#cc0000', 
+            padding: '0.6rem', 
+            borderRadius: '6px', 
             marginBottom: '1rem',
-            fontSize: '0.875rem'
+            fontSize: '0.85rem',
+            border: '1px solid #cc0000'
           }}>
             {error}
           </div>
@@ -156,10 +157,10 @@ const LoginPage = () => {
             />
           </div>
 
-          {/* Commented out for development - reCAPTCHA container */}
-          {/* <div className="recaptcha-container">
+          {/* reCAPTCHA container */}
+          <div className="recaptcha-container">
             <div ref={recaptchaRef}></div>
-          </div> */}
+          </div>
 
           <button 
             type="submit" 
@@ -171,10 +172,10 @@ const LoginPage = () => {
         </form>
 
         <div style={{ 
-          marginTop: '2rem', 
+          marginTop: '1.5rem', 
           textAlign: 'center', 
-          fontSize: '0.875rem', 
-          color: '#64748b' 
+          fontSize: '0.8rem', 
+          color: '#666666' 
         }}>
           © 2025 Eva Group Hotel Management System
         </div>
