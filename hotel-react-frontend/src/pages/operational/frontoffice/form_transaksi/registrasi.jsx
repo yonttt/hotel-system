@@ -219,80 +219,6 @@ const RegistrasiPage = () => {
     }
   }
 
-  const handleReservation = async (e) => {
-    e.preventDefault()
-    
-    try {
-      setLoading(true)
-      
-      // Prepare data for reservation submission
-      const reservationData = {
-        ...formData,
-        guest_count_male: parseInt(formData.guest_count_male) || 0,
-        guest_count_female: parseInt(formData.guest_count_female) || 0,
-        guest_count_child: parseInt(formData.guest_count_child) || 0,
-        nights: parseInt(formData.nights) || 1,
-        extra_bed_nights: parseInt(formData.extra_bed_nights) || 0,
-        extra_bed_qty: parseInt(formData.extra_bed_qty) || 0,
-        payment_amount: parseFloat(formData.payment_amount) || 0,
-        discount: parseFloat(formData.discount) || 0,
-        payment_diskon: parseFloat(formData.payment_diskon) || 0,
-        deposit: parseFloat(formData.deposit) || 0,
-        balance: parseFloat(formData.balance) || 0,
-        arrival_date: formData.arrival_date ? new Date(formData.arrival_date).toISOString() : null,
-        departure_date: formData.departure_date ? new Date(formData.departure_date).toISOString() : null,
-        transaction_status: 'Reservation' // Change status to reservation
-      }
-      
-      // Submit hotel reservation
-      const response = await apiService.createHotelReservation(reservationData)
-      
-      alert('Hotel reservation berhasil dibuat!')
-      
-      // Reset form and generate new registration number
-      try {
-        const registrationResponse = await apiService.getNextRegistrationNumber()
-        const newRegistrationNo = registrationResponse.data.next_registration_no
-        setFormData(prev => ({
-          ...prev,
-          registration_no: newRegistrationNo,
-          member_id: '',
-          id_card_number: '',
-          guest_name: '',
-          mobile_phone: '',
-          address: '',
-          email: '',
-          room_number: '',
-          notes: '',
-          payment_amount: 0,
-          discount: 0,
-          payment_diskon: 0,
-          deposit: 0,
-          balance: 0,
-          arrival_date: new Date().toISOString().split('T')[0],
-          departure_date: new Date().toISOString().split('T')[0]
-        }))
-        
-        // Reload available rooms
-        loadInitialData()
-      } catch (resetError) {
-        console.error('Error resetting form:', resetError)
-        // Fallback reset
-        const fallbackNo = generateRegistrationNo()
-        setFormData(prev => ({
-          ...prev,
-          registration_no: fallbackNo
-        }))
-      }
-      
-    } catch (error) {
-      console.error('Error creating hotel reservation:', error)
-      alert('Gagal membuat reservasi hotel. Silakan coba lagi.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
   // Validation function to check if required fields are filled
   const isFormValid = () => {
     return formData.guest_name && 
@@ -838,15 +764,7 @@ const RegistrasiPage = () => {
                   }
                 }}
               >
-                Reset Form
-              </button>
-              <button 
-                type="button" 
-                className="btn-reservation"
-                onClick={handleReservation}
-                disabled={loading || !isFormValid()}
-              >
-                {loading ? 'Processing...' : 'PROCESS RESERVATION'}
+                RESET FORM
               </button>
               <button 
                 type="submit" 
