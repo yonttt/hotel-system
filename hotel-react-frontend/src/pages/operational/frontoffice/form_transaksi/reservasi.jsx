@@ -2,11 +2,9 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../../../../context/AuthContext'
 import { apiService } from '../../../../services/api'
 import Layout from '../../../../components/Layout'
-import LoadingSpinner from '../../../../components/LoadingSpinner'
 
 const ReservasiPage = () => {
   const { user } = useAuth()
-  const [loading, setLoading] = useState(false)
   const [apiError, setApiError] = useState(null)
   const [rooms, setRooms] = useState([])
   const [cities, setCities] = useState([])
@@ -64,10 +62,8 @@ const ReservasiPage = () => {
 
   // Load initial data
   useEffect(() => {
-    if (user) {
-      loadInitialData()
-    }
-  }, [user])
+    loadInitialData()
+  }, [])
 
   // Auto calculate departure date when arrival date or nights change
   useEffect(() => {
@@ -84,7 +80,6 @@ const ReservasiPage = () => {
 
   const loadInitialData = async () => {
     try {
-      setLoading(true)
       setApiError(null)
       
       // Try to load data with fallbacks
@@ -130,8 +125,6 @@ const ReservasiPage = () => {
         ...prev,
         reservation_no: generateReservationNo()
       }))
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -159,8 +152,6 @@ const ReservasiPage = () => {
     }
 
     try {
-      setLoading(true)
-      
       const reservationData = {
         reservation_no: formData.reservation_no,
         category_market_id: formData.category_market_id,
@@ -209,8 +200,6 @@ const ReservasiPage = () => {
     } catch (error) {
       console.error('Error submitting reservation:', error)
       alert('Error submitting reservation: ' + (error.response?.data?.detail || error.message))
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -220,14 +209,6 @@ const ReservasiPage = () => {
            formData.room_number &&
            formData.mobile_phone &&
            formData.arrival_date
-  }
-
-  if (!user) {
-    return <LoadingSpinner isLoading={true} />
-  }
-
-  if (loading) {
-    return <LoadingSpinner isLoading={true} />
   }
 
   return (
@@ -746,9 +727,9 @@ const ReservasiPage = () => {
               <button 
                 type="submit" 
                 className="btn-process"
-                disabled={loading || !isFormValid()}
+                disabled={!isFormValid()}
               >
-                {loading ? 'Processing...' : 'PROCESS RESERVATION'}
+                PROCESS RESERVATION
               </button>
             </div>
           </form>

@@ -2,11 +2,9 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../../../../context/AuthContext'
 import { apiService } from '../../../../services/api'
 import Layout from '../../../../components/Layout'
-import LoadingSpinner from '../../../../components/LoadingSpinner'
 
 const RegistrasiPage = () => {
   const { user } = useAuth()
-  const [loading, setLoading] = useState(false)
   const [apiError, setApiError] = useState(null)
   const [rooms, setRooms] = useState([])
   const [cities, setCities] = useState([])
@@ -64,10 +62,8 @@ const RegistrasiPage = () => {
 
   // Load initial data
   useEffect(() => {
-    if (user) {
-      loadInitialData()
-    }
-  }, [user])
+    loadInitialData()
+  }, [])
 
   // Auto calculate departure date when arrival date or nights change
   useEffect(() => {
@@ -84,7 +80,6 @@ const RegistrasiPage = () => {
 
   const loadInitialData = async () => {
     try {
-      setLoading(true)
       setApiError(null)
       
       // Try to load data with fallbacks
@@ -112,7 +107,7 @@ const RegistrasiPage = () => {
       
       setFormData(prev => ({
         ...prev,
-        registration_no: registrationResponse.data.next_registration_no
+        registration_no: registrationResponse.data.next_registration_no || generateRegistrationNo()
       }))
       
       setRooms(roomsResponse.data || [])
@@ -130,8 +125,6 @@ const RegistrasiPage = () => {
         ...prev,
         registration_no: generateRegistrationNo()
       }))
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -159,8 +152,6 @@ const RegistrasiPage = () => {
     }
 
     try {
-      setLoading(true)
-      
       const registrationData = {
         registration_no: formData.registration_no,
         category_market_id: formData.category_market_id,
@@ -209,8 +200,6 @@ const RegistrasiPage = () => {
     } catch (error) {
       console.error('Error submitting registration:', error)
       alert('Error submitting registration: ' + (error.response?.data?.detail || error.message))
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -219,14 +208,6 @@ const RegistrasiPage = () => {
            formData.id_card_number && 
            formData.room_number &&
            formData.mobile_phone
-  }
-
-  if (!user) {
-    return <LoadingSpinner isLoading={true} />
-  }
-
-  if (loading) {
-    return <LoadingSpinner isLoading={true} />
   }
 
   return (
@@ -744,9 +725,9 @@ const RegistrasiPage = () => {
               <button 
                 type="submit" 
                 className="btn-process"
-                disabled={loading || !isFormValid()}
+                disabled={!isFormValid()}
               >
-                {loading ? 'Processing...' : 'PROCESS REGISTRATION'}
+                PROCESS REGISTRATION
               </button>
             </div>
           </form>
