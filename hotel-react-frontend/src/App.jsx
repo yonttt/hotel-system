@@ -1,13 +1,13 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import { AuthProvider } from './context/AuthContext'
-import LoginPage from './pages/LoginPage'
-import DashboardPage from './pages/DashboardPage'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import LoginPage from './pages/LoginPage';
+import DashboardPage from './pages/DashboardPage';
 
 // Operational - Front Office
-import RegistrasiPage from './pages/operational/frontoffice/form_transaksi/registrasi'
-import ReservasiPage from './pages/operational/frontoffice/form_transaksi/reservasi'
+import RegistrasiPage from './pages/operational/frontoffice/form_transaksi/registrasi';
+import ReservasiPage from './pages/operational/frontoffice/form_transaksi/reservasi';
 
-import ProtectedRoute from './components/ProtectedRoute'
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -25,15 +25,9 @@ function App() {
                 </ProtectedRoute>
               } 
             />
-            {/* Operational - Front Office */}
-            <Route 
-              path="/operational/frontoffice/form-transaksi" 
-              element={
-                <ProtectedRoute>
-                  <RegistrasiPage />
-                </ProtectedRoute>
-              } 
-            />
+            
+            {/* --- CORRECTED ROUTES --- */}
+            {/* Specific route for Registrasi */}
             <Route 
               path="/operational/frontoffice/form-transaksi/registrasi" 
               element={
@@ -42,6 +36,7 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+            {/* Specific route for Reservasi */}
             <Route 
               path="/operational/frontoffice/form-transaksi/reservasi" 
               element={
@@ -50,11 +45,13 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+            {/* --- END OF CORRECTION --- */}
+
           </Routes>
         </div>
       </Router>
     </AuthProvider>
-  )
+  );
 }
 
-export default App
+export default App;

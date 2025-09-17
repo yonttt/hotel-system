@@ -6,13 +6,17 @@ const ProtectedRoute = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <h2>Loading...</h2>
       </div>
     )
   }
 
-  return isAuthenticated() ? children : <Navigate to="/login" replace />
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" replace />
+  }
+
+  return children
 }
 
 export default ProtectedRoute

@@ -11,6 +11,8 @@ const RegistrasiPage = () => {
   const [countries, setCountries] = useState([])
   const [categoryMarkets, setCategoryMarkets] = useState([])
   const [marketSegments, setMarketSegments] = useState([])
+  const [paymentMethods, setPaymentMethods] = useState([])
+  const [registrationTypes, setRegistrationTypes] = useState([])
   const [nextRegistrationNo, setNextRegistrationNo] = useState('')
   
   const initialFormState = {
@@ -99,17 +101,21 @@ const RegistrasiPage = () => {
       setRooms(roomsResponse.data || [])
       
       // Load cities and nationalities
-      const [citiesResponse, countriesResponse, categoryMarketsResponse, marketSegmentsResponse] = await Promise.all([
+      const [citiesResponse, countriesResponse, categoryMarketsResponse, marketSegmentsResponse, paymentMethodsResponse, registrationTypesResponse] = await Promise.all([
         apiService.getCities(),
         apiService.getCountries(),
         apiService.getCategoryMarkets(),
-        apiService.getMarketSegments()
+        apiService.getMarketSegments(),
+        apiService.getPaymentMethods(),
+        apiService.getRegistrationTypes()
       ])
       
       setCities(citiesResponse.data || [])
       setCountries(countriesResponse.data || [])
       setCategoryMarkets(categoryMarketsResponse.data || [])
       setMarketSegments(marketSegmentsResponse.data || [])
+      setPaymentMethods(paymentMethodsResponse.data || [])
+      setRegistrationTypes(registrationTypesResponse.data || [])
       
       setFormData(prev => ({
         ...prev,
