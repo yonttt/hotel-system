@@ -1,5 +1,33 @@
+/* =====================================
+   HOTEL SYSTEM - MAIN STYLESHEET
+   =====================================
+   
+   This file contains all styles for the hotel management system.
+   Styles are organized by component/functionality with clear
+   section headers indicating where each style is used.
+   
+   ORGANIZATION:
+   1. Global Imports & Reset Styles
+   2. Main Layout Structure (Layout.jsx)
+   3. Header Bar Styles (Header.jsx)
+   4. Sidebar Navigation (Sidebar.jsx)
+   5. Dashboard Page (DashboardPage.jsx)
+   6. Login Page (LoginPage.jsx)
+   7. Registration/Reservation Forms (registrasi.jsx, reservasi.jsx)
+   8. Loading Spinner (LoadingSpinner.jsx)
+   9. Mobile Responsive Styles
+   10. Utility Classes
+   11. Animations & Keyframes
+   
+   ===================================== */
+
+/* ===================================
+   GLOBAL IMPORTS AND RESET STYLES
+   Used by: All components globally
+   =================================== */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+/* Global reset and base font family */
 * {
   margin: 0;
   padding: 0;
@@ -7,24 +35,29 @@
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
+/* Body styles - sets global background and text color */
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: #f8fafc;
   color: #1e293b;
   line-height: 1.6;
 }
 
+/* Root container styles */
 #root {
   height: 100vh;
   width: 100vw;
 }
 
+/* Main app wrapper */
 .app-wrapper {
   min-height: 100vh;
-  background: #f8fafc;
+  /* background: #f8fafc; */
 }
 
-/* Layout Styles */
+/* ===================================
+   MAIN LAYOUT STRUCTURE
+   Used by: Layout.jsx component
+   =================================== */
 .app-layout {
   display: flex;
   flex-direction: column;
@@ -38,6 +71,7 @@ body {
   overflow: hidden;
 }
 
+/* Main content area where pages are rendered */
 .content-area {
   flex: 1;
   padding: 1rem;
@@ -45,7 +79,10 @@ body {
   background: #f8fafc;
 }
 
-/* Header Bar Styles */
+/* ===================================
+   HEADER BAR STYLES
+   Used by: Header.jsx component
+   =================================== */
 .header-bar {
   background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
   height: 50px;
@@ -75,6 +112,7 @@ body {
   font-size: 0.75rem;
 }
 
+/* Header brand check icon */
 .header-brand-check {
   background: #10b981;
   color: white;
@@ -88,6 +126,7 @@ body {
   font-weight: bold;
 }
 
+/* Header brand text */
 .header-brand-text {
   color: white;
   font-weight: 500;
@@ -95,10 +134,15 @@ body {
   font-size: 0.875rem;
 }
 
+/* ===================================
+   HEADER TRAVEL/NAVIGATION MENU
+   Used by: Header.jsx dropdown menu
+   =================================== */
 .header-travel-menu {
   position: relative;
 }
 
+/* Travel menu button */
 .travel-menu-button {
   display: flex;
   align-items: center;
@@ -121,6 +165,7 @@ body {
   font-size: 0.875rem;
 }
 
+/* Dropdown menu that appears on travel button click */
 .travel-dropdown {
   position: absolute;
   top: 100%;
@@ -251,6 +296,11 @@ body {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
+/* ===================================
+   ANIMATIONS & KEYFRAMES
+   Used by: Various components for smooth transitions
+   =================================== */
+/* Dropdown slide animation for header dropdowns */
 @keyframes dropdownSlide {
   from {
     opacity: 0;
@@ -508,7 +558,10 @@ body {
   background: #fee2e2;
 }
 
-/* Sidebar Styles */
+/* ===================================
+   SIDEBAR NAVIGATION STYLES
+   Used by: Sidebar.jsx component
+   =================================== */
 .sidebar {
   width: 240px;
   background: linear-gradient(180deg, #374151 0%, #1f2937 100%);
@@ -734,7 +787,11 @@ body {
   transform: scale(1.05) rotate(90deg);
 }
 
-/* Deeper nesting styles */
+/* ===================================
+   UTILITY/HELPER CLASSES
+   Used by: Various components for spacing
+   =================================== */
+/* Deeper nesting styles for sidebar */
 .pl-14 {
   padding-left: 3.5rem;
 }
@@ -743,7 +800,10 @@ body {
   padding-left: 4.5rem;
 }
 
-/* Mobile Styles - Overlay Only */
+/* ===================================
+   MOBILE RESPONSIVE STYLES
+   Used by: Mobile device layouts
+   =================================== */
 .mobile-overlay {
   position: fixed;
   inset: 0;
@@ -751,7 +811,10 @@ body {
   z-index: 150;
 }
 
-/* Dashboard Styles */
+/* ===================================
+   DASHBOARD PAGE STYLES
+   Used by: DashboardPage.jsx component
+   =================================== */
 .dashboard-container {
   padding: 2rem;
   max-width: 1000px;
@@ -1096,6 +1159,7 @@ body {
   font-size: 0.875rem;
 }
 
+/* Slide up animation for various components */
 @keyframes slideUp {
   to {
     opacity: 1;
@@ -1308,7 +1372,10 @@ body {
   font-size: 0.875rem;
 }
 
-/* Login Page Styles - Grey Theme */
+/* ===================================
+   LOGIN PAGE STYLES
+   Used by: LoginPage.jsx component
+   =================================== */
 .login-container {
   min-height: 100vh;
   display: flex;
@@ -2759,28 +2826,214 @@ body {
   border: 1px solid #e2e8f0;
 }
 
-/* Loading Styles */
-.loading-container {
+/* ===================================
+   REGISTRATION & RESERVATION FORM STYLES
+   Used by: registrasi.jsx and reservasi.jsx components
+   =================================== */
+.registration-container, .reservation-container {
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.registration-header, .reservation-header {
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.registration-title, .reservation-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.header-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.tab-button {
+  padding: 0.5rem 1rem;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-button:hover {
+  background: #e5e7eb;
+}
+
+.tab-button.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.registration-form-container, .reservation-form-container {
+  background: black;
+  border-radius: 0.5rem;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.registration-form, .reservation-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e5e7eb;
+  margin-bottom: 1rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.form-input, .form-select {
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  background: white;
+}
+
+.form-input:focus, .form-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-input[readonly] {
+  background: #f9fafb;
+  color: #6b7280;
+}
+
+.form-actions {
   display: flex;
   justify-content: center;
-  align-items: center;
-  min-height: 400px;
-  flex-direction: column;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btn-process {
+  background: #10b981;
+  color: white;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 200px;
+}
+
+.btn-process:hover:not(:disabled) {
+  background: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-process:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.alert {
+  padding: 1rem;
+  border-radius: 0.375rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.alert-warning {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fbbf24;
+}
+
+/* ===================================
+   LOADING SPINNER STYLES
+   Used by: LoadingSpinner.jsx component
+   =================================== */
+.loading-container {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  z-index: 99999 !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  pointer-events: none !important;
 }
 
 .loading-spinner {
-  font-size: 18px;
-  color: #0ea5e9;
-  animation: pulse 1.5s ease-in-out infinite;
+  width: 40px !important;
+  height: 40px !important;
+  border: 3px solid #e5e7eb !important;
+  border-top: 3px solid #3b82f6 !important;
+  border-radius: 50% !important;
+  animation: simple-spin 1s linear infinite !important;
+  background: transparent !important;
 }
 
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
+.loading-percentage {
+  position: absolute !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  color: #3b82f6 !important;
+  background: transparent !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+/* Spinner rotation animation for loading components */
+@keyframes simple-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Hide any loading text */
+.loading-text {
+  display: none !important;
 }
 /* Registration Form Styles - Compact & Organized */
 .registration-container {
@@ -3248,4 +3501,280 @@ body {
   .guest-inputs {
     justify-content: space-between;
   }
+}
+
+/* Coming Soon Page Styles */
+.coming-soon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 2rem;
+  min-height: 400px;
+}
+
+.coming-soon h2 {
+  font-size: 2rem;
+  color: #2d3748;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.coming-soon p {
+  font-size: 1.1rem;
+  color: #718096;
+  margin-bottom: 2rem;
+}
+
+.feature-preview {
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  max-width: 500px;
+  width: 100%;
+}
+
+.feature-preview h3 {
+  font-size: 1.1rem;
+  color: #2d3748;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.feature-preview ul {
+  list-style: none;
+  text-align: left;
+}
+
+.feature-preview li {
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.feature-preview li::before {
+  content: "•";
+  color: #4299e1;
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+}
+
+/* Alert styles */
+.alert {
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.375rem;
+}
+
+.alert-warning {
+  color: #b45309;
+  background-color: #fef3c7;
+  border-color: #fbbf24;
+}
+
+/* Form styles for registration/reservation */
+.form-section {
+  margin-bottom: 2rem;
+}
+
+.form-section h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.form-input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Original Registration Form Styles */
+.registration-container {
+  padding: 1rem;
+  background: #f8fafc;
+  min-height: 100vh;
+}
+
+.registration-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.registration-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.header-tabs {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tab-button {
+  padding: 0.5rem 1rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.tab-button:hover {
+  background: #2563eb;
+}
+
+.registration-form-container {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.registration-form {
+  max-width: none;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 2rem 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.form-input,
+.form-select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  background: white;
+}
+
+.form-input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-input[readonly] {
+  background-color: #f9fafb;
+  color: #6b7280;
+}
+
+.btn-process {
+  background: #10b981;
+  color: white;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 1rem;
+}
+
+.btn-process:hover:not(:disabled) {
+  background: #059669;
+}
+
+.btn-process:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
 }

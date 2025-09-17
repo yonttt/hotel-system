@@ -1,11 +1,87 @@
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 
+// Error Boundary Component
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null, errorInfo: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    this.setState({
+      error: error,
+      errorInfo: errorInfo
+    });
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{
+          padding: '2rem',
+          backgroundColor: '#fef2f2',
+          border: '1px solid #fecaca',
+          borderRadius: '0.5rem',
+          margin: '1rem',
+          color: '#dc2626'
+        }}>
+          <h2>Something went wrong with this page</h2>
+          <details style={{ whiteSpace: 'pre-wrap', marginTop: '1rem' }}>
+            <summary>Error Details (click to expand)</summary>
+            <p><strong>Error:</strong> {this.state.error && this.state.error.toString()}</p>
+            <p><strong>Component Stack:</strong></p>
+            <pre>{this.state.errorInfo.componentStack}</pre>
+          </details>
+          <button 
+            onClick={() => this.setState({ hasError: false })}
+            style={{
+              marginTop: '1rem',
+              padding: '0.5rem 1rem',
+              backgroundColor: '#dc2626',
+              color: 'white',
+              border: 'none',
+              borderRadius: '0.25rem',
+              cursor: 'pointer'
+            }}
+          >
+            Try Again
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 // Operational - Front Office
 import RegistrasiPage from './pages/operational/frontoffice/form_transaksi/registrasi';
 import ReservasiPage from './pages/operational/frontoffice/form_transaksi/reservasi';
+
+// Operational - Other
+import AdjustmentPage from './pages/operational/AdjustmentPage';
+import FoodBeveragePage from './pages/operational/FoodBeveragePage';
+import HousekeepingPage from './pages/operational/HousekeepingPage';
+import LaundryPage from './pages/operational/LaundryPage';
+
+// Operational - Front Office - Other
+import InfoReservasiPage from './pages/operational/frontoffice/InfoReservasiPage';
+import InformasiTamuPage from './pages/operational/frontoffice/InformasiTamuPage';
+import StatusKamarPage from './pages/operational/frontoffice/StatusKamarPage';
+
+// HRD
+import AccountReceivablePage from './pages/hrd/AccountReceivablePage';
+import AccountingPage from './pages/hrd/AccountingPage';
+import AdministrationPage from './pages/hrd/AdministrationPage';
 
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -32,7 +108,9 @@ function App() {
               path="/operational/frontoffice/form-transaksi/registrasi" 
               element={
                 <ProtectedRoute>
-                  <RegistrasiPage />
+                  <ErrorBoundary>
+                    <RegistrasiPage />
+                  </ErrorBoundary>
                 </ProtectedRoute>
               } 
             />
@@ -41,7 +119,95 @@ function App() {
               path="/operational/frontoffice/form-transaksi/reservasi" 
               element={
                 <ProtectedRoute>
-                  <ReservasiPage />
+                  <ErrorBoundary>
+                    <ReservasiPage />
+                  </ErrorBoundary>
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Operational - Other Routes */}
+            <Route 
+              path="/operational/adjustment" 
+              element={
+                <ProtectedRoute>
+                  <AdjustmentPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/operational/foodbeverage" 
+              element={
+                <ProtectedRoute>
+                  <FoodBeveragePage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/operational/housekeeping" 
+              element={
+                <ProtectedRoute>
+                  <HousekeepingPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/operational/laundry" 
+              element={
+                <ProtectedRoute>
+                  <LaundryPage />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Front Office - Other Routes */}
+            <Route 
+              path="/operational/frontoffice/info-reservasi" 
+              element={
+                <ProtectedRoute>
+                  <InfoReservasiPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/operational/frontoffice/informasi-tamu" 
+              element={
+                <ProtectedRoute>
+                  <InformasiTamuPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/operational/frontoffice/status-kamar" 
+              element={
+                <ProtectedRoute>
+                  <StatusKamarPage />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* HRD Routes */}
+            <Route 
+              path="/hrd/account-receivable" 
+              element={
+                <ProtectedRoute>
+                  <AccountReceivablePage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/hrd/accounting" 
+              element={
+                <ProtectedRoute>
+                  <AccountingPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/hrd/administration" 
+              element={
+                <ProtectedRoute>
+                  <AdministrationPage />
                 </ProtectedRoute>
               } 
             />
