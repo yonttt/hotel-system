@@ -4,8 +4,9 @@ import { apiService } from '../../../../services/api'
 import Layout from '../../../../components/Layout'
 
 const ReservasiPage = () => {
+  console.log('ReservasiPage component rendering...');
+  
   const { user } = useAuth()
-  const [loading, setLoading] = useState(false)
   const [apiError, setApiError] = useState(null)
   const [rooms, setRooms] = useState([])
   const [cities, setCities] = useState([])
@@ -79,7 +80,6 @@ const ReservasiPage = () => {
   }, [formData.arrival_date, formData.nights])
 
   const loadInitialData = async () => {
-    setLoading(true); // Tambahkan state loading
     setApiError(null);
 
     try {
@@ -97,13 +97,21 @@ const ReservasiPage = () => {
       const results = await Promise.allSettled(promises);
 
       // Fungsi untuk mengekstrak data atau memberikan nilai default jika gagal
-      const getDataOrDefault = (result, defaultValue = []) => 
-        result.status === 'fulfilled' ? (result.value.data || defaultValue) : defaultValue;
+      const getDataOrDefault = (result, defaultValue = []) => {
+        if (result.status === 'fulfilled') {
+          // Handle both direct arrays and objects with data property
+          const responseData = result.value.data;
+          return Array.isArray(responseData) ? responseData : (responseData?.data || defaultValue);
+        }
+        return defaultValue;
+      };
 
       // Proses hasil dengan aman
       setFormData(prev => ({
         ...prev,
-        reservation_no: results[0].status === 'fulfilled' ? results[0].value.data.next_reservation_no : generateReservationNo()
+        reservation_no: results[0].status === 'fulfilled' ? 
+          (results[0].value.data?.next_reservation_no || generateReservationNo()) : 
+          generateReservationNo()
       }));
       
       setRooms(getDataOrDefault(results[1]));
@@ -116,8 +124,6 @@ const ReservasiPage = () => {
       // Catch ini akan menangani error yang lebih fundamental (bukan dari API)
       console.error('Critical error loading initial data:', error);
       setApiError('A critical error occurred. Please refresh the page.');
-    } finally {
-      setLoading(false); // Selalu set loading ke false
     }
   }
 
@@ -204,12 +210,15 @@ const ReservasiPage = () => {
            formData.arrival_date
   }
 
+  console.log('About to render ReservasiPage, rooms.length:', rooms.length, 'apiError:', apiError);
+  console.log('Rooms data:', rooms);
+
   return (
     <Layout>
-      <div className="registration-container">
+      <div className="reservation-container">
         {/* Header */}
-        <div className="registration-header">
-          <h1 className="registration-title">Hotel Reservation</h1>
+        <div className="reservation-header">
+          <h1 className="reservation-title">Hotel Reservation</h1>
           <div className="header-tabs">
             <button className="tab-button">Available Rooms</button>
           </div>
@@ -221,18 +230,26 @@ const ReservasiPage = () => {
           </div>
         )}
 
-        {/* Form Container */}
-        <div className="registration-form-container">
-          <form onSubmit={handleSubmit} className="registration-form">
+        {/* Always show the form instead of conditional loading */}
+        {rooms.length === 0 && !apiError && (
+          <div className="alert alert-info" style={{ marginBottom: '1rem' }}>
+            <p>Loading room data... Form will populate once data is available.</p>
+          </div>
+        )}
+        
+        <div className="reservation-form-container">
+            <form onSubmit={handleSubmit} className="reservation-form">
             
-            {/* Reservation and Basic Info */}
-            <div className="form-grid">
-              <div className="form-group">
-                <label>Reservation No.</label>
-                <input
-                  type="text"
-                  name="reservation_no"
-                  value={formData.reservation_no}
+            {/* Reservation Details Section */}
+            <div className="form-section">
+              <div className="form-section-title">Reservation Details</div>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Reservation No.</label>
+                  <input
+                    type="text"
+                    name="reservation_no"
+                    value={formData.reservation_no}
                   onChange={handleInputChange}
                   className="form-input"
                   readOnly
@@ -310,11 +327,13 @@ const ReservasiPage = () => {
                   readOnly
                 />
               </div>
+              </div>
             </div>
 
-            {/* Guest Information */}
-            <div className="form-section-title">Guest Information</div>
-            <div className="form-grid">
+            {/* Guest Information Section */}
+            <div className="form-section">
+              <div className="form-section-title">Guest Information</div>
+              <div className="form-grid">
               <div className="form-group">
                 <label>ID Card Type</label>
                 <select
@@ -445,10 +464,12 @@ const ReservasiPage = () => {
                   ))}
                 </select>
               </div>
+              </div>
             </div>
 
-            {/* Reservation Information */}
-            <div className="form-section-title">Reservation Information</div>
+            {/* Reservation Information Section */}
+            <div className="form-section">
+              <div className="form-section-title">Reservation Information</div>
             <div className="form-grid">
               <div className="form-group">
                 <label>Arrival Date*</label>
@@ -558,10 +579,12 @@ const ReservasiPage = () => {
                   min="0"
                 />
               </div>
+              </div>
             </div>
 
-            {/* Room and Payment Information */}
-            <div className="form-section-title">Room & Payment Information</div>
+            {/* Room and Payment Information Section */}
+            <div className="form-section">
+              <div className="form-section-title">Room & Payment Information</div>
             <div className="form-grid">
               <div className="form-group">
                 <label>Room Number*</label>
@@ -677,11 +700,13 @@ const ReservasiPage = () => {
                   className="form-input"
                 />
               </div>
+              </div>
             </div>
 
-            {/* Notes */}
-            <div className="form-section-title">Notes</div>
-            <div className="form-group">
+            {/* Notes Section */}
+            <div className="form-section">
+              <div className="form-section-title">Notes</div>
+              <div className="form-group">
               <label>Notes</label>
               <textarea
                 name="notes"
@@ -691,6 +716,7 @@ const ReservasiPage = () => {
                 rows="3"
                 placeholder="Additional notes or comments"
               />
+            </div>
             </div>
 
             {/* Submit Button */}

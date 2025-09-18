@@ -10,7 +10,6 @@ const LoginPage = () => {
     password: ''
   })
   const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
   const [recaptchaToken, setRecaptchaToken] = useState('')
   const recaptchaRef = useRef(null)
   const { login, isAuthenticated } = useAuth()
@@ -74,23 +73,20 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setLoading(true)
     setError('')
 
     if (!formData.username || !formData.password) {
       setError('Please fill in all fields')
-      setLoading(false)
       return
     }
 
     // Comment out reCAPTCHA validation for development
-    if (!recaptchaToken) {
-      setError('Please complete the reCAPTCHA verification')
-      setLoading(false)
-      return
-    }
+    // if (!recaptchaToken) {
+    //   setError('Please complete the reCAPTCHA verification')
+    //   return
+    // }
 
-    const result = await login(formData.username, formData.password)
+    const result = await login({ username: formData.username, password: formData.password })
     
     if (result.success) {
       navigate('/dashboard')
@@ -102,8 +98,6 @@ const LoginPage = () => {
         setRecaptchaToken('')
       }
     }
-    
-    setLoading(false)
   }
 
   return (
@@ -141,7 +135,6 @@ const LoginPage = () => {
               value={formData.username}
               onChange={handleChange}
               className="form-input"
-              disabled={loading}
             />
           </div>
 
@@ -153,7 +146,6 @@ const LoginPage = () => {
               value={formData.password}
               onChange={handleChange}
               className="form-input"
-              disabled={loading}
             />
           </div>
 
@@ -165,9 +157,8 @@ const LoginPage = () => {
           <button 
             type="submit" 
             className="login-button"
-            disabled={loading}
           >
-            {loading ? 'Logging in...' : 'Login'}
+            Login
           </button>
         </form>
 

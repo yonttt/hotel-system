@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import Layout from '../components/Layout'
-import LoadingSpinner from '../components/LoadingSpinner'
 import { apiService } from '../services/api'
 import {
   CalendarIcon,
@@ -16,7 +15,6 @@ const DashboardPage = () => {
     availableRooms: 0,
     occupiedRooms: 0
   })
-  const [loading, setLoading] = useState(true)
   const [recentReservations, setRecentReservations] = useState([])
 
   useEffect(() => {
@@ -25,8 +23,6 @@ const DashboardPage = () => {
 
   const fetchDashboardData = async () => {
     try {
-      setLoading(true)
-      
       // Fetch reservations
       const reservationsResponse = await apiService.getReservations(0, 10)
       const reservations = reservationsResponse.data
@@ -50,8 +46,6 @@ const DashboardPage = () => {
       })
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -81,10 +75,6 @@ const DashboardPage = () => {
       color: 'stat-orange'
     }
   ]
-
-  if (loading) {
-    return <LoadingSpinner isLoading={loading} />
-  }
 
   return (
     <Layout>

@@ -4,8 +4,9 @@ import { apiService } from '../../../../services/api'
 import Layout from '../../../../components/Layout'
 
 const RegistrasiPage = () => {
+  console.log('RegistrasiPage component rendering...');
+  
   const { user } = useAuth()
-  const [loading, setLoading] = useState(false)
   const [apiError, setApiError] = useState(null)
   const [rooms, setRooms] = useState([])
   const [cities, setCities] = useState([])
@@ -79,7 +80,7 @@ const RegistrasiPage = () => {
   }, [formData.arrival_date, formData.nights])
 
   const loadInitialData = async () => {
-    setLoading(true); // Tambahkan state loading
+    console.log('Loading initial data...');
     setApiError(null);
 
     try {
@@ -93,17 +94,27 @@ const RegistrasiPage = () => {
         apiService.getPaymentMethods()
       ];
 
+      console.log('Making API calls...');
       // Menggunakan Promise.allSettled agar tidak langsung gagal jika salah satu promise error
       const results = await Promise.allSettled(promises);
+      console.log('API calls completed:', results.map(r => r.status));
 
       // Fungsi untuk mengekstrak data atau memberikan nilai default jika gagal
-      const getDataOrDefault = (result, defaultValue = []) => 
-        result.status === 'fulfilled' ? (result.value.data || defaultValue) : defaultValue;
+      const getDataOrDefault = (result, defaultValue = []) => {
+        if (result.status === 'fulfilled') {
+          // Handle both direct arrays and objects with data property
+          const responseData = result.value.data;
+          return Array.isArray(responseData) ? responseData : (responseData?.data || defaultValue);
+        }
+        return defaultValue;
+      };
 
       // Proses hasil dengan aman
       setFormData(prev => ({
         ...prev,
-        registration_no: results[0].status === 'fulfilled' ? results[0].value.data.next_registration_no : generateRegistrationNo()
+        registration_no: results[0].status === 'fulfilled' ? 
+          (results[0].value.data?.next_registration_no || generateRegistrationNo()) : 
+          generateRegistrationNo()
       }));
       
       setRooms(getDataOrDefault(results[1]));
@@ -113,12 +124,11 @@ const RegistrasiPage = () => {
       setMarketSegments(getDataOrDefault(results[5]));
       setPaymentMethods(getDataOrDefault(results[6]));
       
+      console.log('Data loaded successfully');
     } catch (error) {
       // Catch ini akan menangani error yang lebih fundamental (bukan dari API)
       console.error('Critical error loading initial data:', error);
       setApiError('A critical error occurred. Please refresh the page.');
-    } finally {
-      setLoading(false); // Selalu set loading ke false
     }
   }
 
@@ -204,6 +214,9 @@ const RegistrasiPage = () => {
            formData.mobile_phone
   }
 
+  console.log('About to render RegistrasiPage, rooms.length:', rooms.length, 'apiError:', apiError);
+  console.log('Rooms data:', rooms);
+
   return (
     <Layout>
       <div className="registration-container">
@@ -221,475 +234,560 @@ const RegistrasiPage = () => {
           </div>
         )}
 
-        {/* Form Container */}
+        {/* Always show the form instead of conditional loading */}
+        {rooms.length === 0 && !apiError && (
+          <div className="alert alert-info" style={{ marginBottom: '1rem' }}>
+            <p>Loading room data... Form will populate once data is available.</p>
+          </div>
+        )}
+        
         <div className="registration-form-container">
           <form onSubmit={handleSubmit} className="registration-form">
             
-            {/* Registration and Basic Info */}
-            <div className="form-grid">
-              <div className="form-group">
-                <label>Registration No.</label>
-                <input
-                  type="text"
-                  name="registration_no"
-                  value={formData.registration_no}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  readOnly
-                />
-              </div>
+            {/* Registration Details Section */}
+            <div className="form-section">
+              <div className="form-section-title">Registration Details</div>
+              <div className="form-grid horizontal-compact">
+                <div className="form-group">
+                  <label>Registration No</label>
+                  <input
+                    type="text"
+                    name="registration_no"
+                    value={formData.registration_no}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    readOnly
+                  />
+                </div>
 
-              <div className="form-group">
-                <label>Category Market</label>
-                <select
-                  name="category_market"
-                  value={formData.category_market || ''}
-                  onChange={(e) => {
-                    const selectedCategoryMarket = categoryMarkets.find(cm => cm.name === e.target.value)
-                    setFormData(prev => ({
-                      ...prev,
-                      category_market: e.target.value,
-                      category_market_id: selectedCategoryMarket?.id || null
-                    }))
-                  }}
-                  className="form-select"
-                >
-                  <option value="">--Select Category Market--</option>
-                  {categoryMarkets.map(categoryMarket => (
-                    <option key={categoryMarket.id} value={categoryMarket.name}>
-                      {categoryMarket.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                <div className="form-group">
+                  <label>Transaction By</label>
+                  <input
+                    type="text"
+                    name="transaction_by"
+                    value={formData.transaction_by}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    readOnly
+                  />
+                </div>
 
-              <div className="form-group">
-                <label>Market Segment</label>
-                <select
-                  name="market_segment"
-                  value={formData.market_segment || ''}
-                  onChange={(e) => {
-                    const selectedMarketSegment = marketSegments.find(ms => ms.name === e.target.value)
-                    setFormData(prev => ({
-                      ...prev,
-                      market_segment: e.target.value,
-                      market_segment_id: selectedMarketSegment?.id || null
-                    }))
-                  }}
-                  className="form-select"
-                >
-                  <option value="">--Select Market Segment--</option>
-                  {marketSegments.map(marketSegment => (
-                    <option key={marketSegment.id} value={marketSegment.name}>
-                      {marketSegment.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Member ID</label>
-                <input
-                  type="text"
-                  name="member_id"
-                  value={formData.member_id}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  placeholder="Enter member ID"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Transaction By</label>
-                <input
-                  type="text"
-                  name="transaction_by"
-                  value={formData.transaction_by}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  readOnly
-                />
+                <div className="form-group">
+                  <label>Transaction Status</label>
+                  <select
+                    name="transaction_status"
+                    value={formData.transaction_status}
+                    onChange={handleInputChange}
+                    className="form-select"
+                  >
+                    <option value="Registration">Registration</option>
+                    <option value="Confirmed">Confirmed</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
+                </div>
               </div>
             </div>
 
-            {/* Guest Information */}
-            <div className="form-section-title">Guest Information</div>
-            <div className="form-grid">
-              <div className="form-group">
-                <label>ID Card Type</label>
-                <select
-                  name="id_card_type"
-                  value={formData.id_card_type}
-                  onChange={handleInputChange}
-                  className="form-select"
-                >
-                  <option value="KTP">KTP</option>
-                  <option value="Passport">Passport</option>
-                  <option value="Driver License">Driver License</option>
-                </select>
-              </div>
+            {/* Market & Membership Section */}
+            <div className="form-section">
+              <div className="form-section-title">Market & Membership</div>
+              <div className="form-grid horizontal-compact">
+                <div className="form-group">
+                  <label>Category Market</label>
+                  <select
+                    name="category_market"
+                    value={formData.category_market || ''}
+                    onChange={(e) => {
+                      const selectedCategoryMarket = categoryMarkets.find(cm => cm.name === e.target.value)
+                      setFormData(prev => ({
+                        ...prev,
+                        category_market: e.target.value,
+                        category_market_id: selectedCategoryMarket?.id || null
+                      }))
+                    }}
+                    className="form-select"
+                  >
+                    <option value="">Walkin</option>
+                    {categoryMarkets.map(categoryMarket => (
+                      <option key={categoryMarket.id} value={categoryMarket.name}>
+                        {categoryMarket.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              <div className="form-group">
-                <label>ID Card Number*</label>
-                <input
-                  type="text"
-                  name="id_card_number"
-                  value={formData.id_card_number}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  required
-                />
-              </div>
+                <div className="form-group">
+                  <label>Market Segment</label>
+                  <select
+                    name="market_segment"
+                    value={formData.market_segment || ''}
+                    onChange={(e) => {
+                      const selectedMarketSegment = marketSegments.find(ms => ms.name === e.target.value)
+                      setFormData(prev => ({
+                        ...prev,
+                        market_segment: e.target.value,
+                        market_segment_id: selectedMarketSegment?.id || null
+                      }))
+                    }}
+                    className="form-select"
+                  >
+                    <option value="">Normal</option>
+                    {marketSegments.map(marketSegment => (
+                      <option key={marketSegment.id} value={marketSegment.name}>
+                        {marketSegment.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              <div className="form-group">
-                <label>Guest Title</label>
-                <select
-                  name="guest_title"
-                  value={formData.guest_title}
-                  onChange={handleInputChange}
-                  className="form-select"
-                >
-                  <option value="MR">MR</option>
-                  <option value="MRS">MRS</option>
-                  <option value="MS">MS</option>
-                  <option value="DR">DR</option>
-                </select>
+                <div className="form-group">
+                  <label>Member ID</label>
+                  <input
+                    type="text"
+                    name="member_id"
+                    value={formData.member_id}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    placeholder="Enter member ID"
+                  />
+                </div>
               </div>
+            </div>
 
-              <div className="form-group">
-                <label>Guest Name*</label>
-                <input
-                  type="text"
-                  name="guest_name"
-                  value={formData.guest_name}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  required
-                />
+            {/* Guest Information Section */}
+            <div className="form-section">
+              <div className="form-section-title">Guest Information</div>
+              <div className="form-grid horizontal-compact">
+                <div className="form-group">
+                  <label>Guest Name</label>
+                  <div className="guest-name-section">
+                    <select
+                      name="guest_title"
+                      value={formData.guest_title}
+                      onChange={handleInputChange}
+                      className="form-select"
+                      style={{width: '60px', marginRight: '5px'}}
+                    >
+                      <option value="MR">MR</option>
+                      <option value="MRS">MRS</option>
+                      <option value="MS">MS</option>
+                    </select>
+                    <input
+                      type="text"
+                      name="guest_name"
+                      value={formData.guest_name}
+                      onChange={handleInputChange}
+                      className="form-input"
+                      placeholder="Guest Name"
+                      required
+                      style={{flex: 1}}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>ID Card</label>
+                  <div className="id-card-section">
+                    <select
+                      name="id_card_type"
+                      value={formData.id_card_type}
+                      onChange={handleInputChange}
+                      className="form-select"
+                      style={{width: '70px', marginRight: '5px'}}
+                    >
+                      <option value="KTP">KTP</option>
+                      <option value="Passport">Passport</option>
+                      <option value="Driver License">Driver License</option>
+                    </select>
+                    <input
+                      type="text"
+                      name="id_card_number"
+                      value={formData.id_card_number}
+                      onChange={handleInputChange}
+                      className="form-input"
+                      placeholder="ID Card Number"
+                      required
+                      style={{flex: 1}}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Mobile Phone</label>
+                  <input
+                    type="tel"
+                    name="mobile_phone"
+                    value={formData.mobile_phone}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    placeholder="Mobile Phone"
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    placeholder="Email"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Guest Type</label>
+                  <select
+                    name="guest_type"
+                    value={formData.guest_type}
+                    onChange={handleInputChange}
+                    className="form-select"
+                  >
+                    <option value="Normal">Normal</option>
+                    <option value="VIP">VIP</option>
+                    <option value="Member">Member</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Address</label>
+                  <textarea
+                    name="address"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    rows="1"
+                    placeholder="Address"
+                  />
+                </div>
               </div>
+            </div>
 
-              <div className="form-group">
-                <label>Mobile Phone*</label>
-                <input
-                  type="tel"
-                  name="mobile_phone"
-                  value={formData.mobile_phone}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  required
-                />
+            {/* Location Information Section */}
+            <div className="form-section">
+              <div className="form-section-title">Location Information</div>
+              <div className="form-grid horizontal-compact">
+                <div className="form-group">
+                  <label>Nationality</label>
+                  <select
+                    name="nationality"
+                    value={formData.nationality}
+                    onChange={(e) => {
+                      const selectedCountry = countries.find(c => c.name === e.target.value)
+                      setFormData(prev => ({
+                        ...prev,
+                        nationality: e.target.value,
+                        nationality_id: selectedCountry?.id || null
+                      }))
+                    }}
+                    className="form-select"
+                  >
+                    <option value="">INDONESIA</option>
+                    {countries.map(country => (
+                      <option key={country.id} value={country.name}>{country.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>City</label>
+                  <select
+                    name="city"
+                    value={formData.city}
+                    onChange={(e) => {
+                      const selectedCity = cities.find(c => c.name === e.target.value)
+                      setFormData(prev => ({
+                        ...prev,
+                        city: e.target.value,
+                        city_id: selectedCity?.id || null
+                      }))
+                    }}
+                    className="form-select"
+                  >
+                    <option value="">--City--</option>
+                    {cities.map(city => (
+                      <option key={city.id} value={city.name}>{city.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Room Number</label>
+                  <select
+                    name="room_number"
+                    value={formData.room_number}
+                    onChange={handleInputChange}
+                    className="form-select"
+                    required
+                  >
+                    <option value="">None selected *</option>
+                    {rooms.map(room => (
+                      <option key={room.id} value={room.room_number}>
+                        {room.room_number} - {room.room_type}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
+            </div>
 
-              <div className="form-group">
-                <label>Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="form-input"
-                />
+            {/* Stay Information Section */}
+            <div className="form-section">
+              <div className="form-section-title">Stay Information</div>
+              <div className="form-grid horizontal-compact">
+                <div className="form-group">
+                  <label>Arrival Date</label>
+                  <input
+                    type="date"
+                    name="arrival_date"
+                    value={formData.arrival_date}
+                    onChange={handleInputChange}
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Departure</label>
+                  <input
+                    type="date"
+                    name="departure_date"
+                    value={formData.departure_date}
+                    onChange={handleInputChange}
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Nights</label>
+                  <select
+                    name="nights"
+                    value={formData.nights}
+                    onChange={handleInputChange}
+                    className="form-select"
+                  >
+                    {[1,2,3,4,5,6,7,8,9,10].map(night => (
+                      <option key={night} value={night}>{night} Nights</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Guest</label>
+                  <div className="guest-counter">
+                    <span>M</span>
+                    <input
+                      type="number"
+                      name="guest_count_male"
+                      value={formData.guest_count_male}
+                      onChange={handleInputChange}
+                      className="form-input guest-count"
+                      min="0"
+                    />
+                    <span>F</span>
+                    <input
+                      type="number"
+                      name="guest_count_female"
+                      value={formData.guest_count_female}
+                      onChange={handleInputChange}
+                      className="form-input guest-count"
+                      min="0"
+                    />
+                    <span>C</span>
+                    <input
+                      type="number"
+                      name="guest_count_child"
+                      value={formData.guest_count_child}
+                      onChange={handleInputChange}
+                      className="form-input guest-count"
+                      min="0"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Extra Bed</label>
+                  <div className="extra-bed-section">
+                    <span>Night</span>
+                    <input
+                      type="number"
+                      name="extra_bed_nights"
+                      value={formData.extra_bed_nights}
+                      onChange={handleInputChange}
+                      className="form-input"
+                      min="0"
+                      style={{width: '50px'}}
+                    />
+                    <span>Qty</span>
+                    <input
+                      type="number"
+                      name="extra_bed_qty"
+                      value={formData.extra_bed_qty}
+                      onChange={handleInputChange}
+                      className="form-input"
+                      min="0"
+                      style={{width: '50px'}}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Room Number</label>
+                  <select
+                    name="room_number"
+                    value={formData.room_number}
+                    onChange={handleInputChange}
+                    className="form-select"
+                    required
+                  >
+                    <option value="">None selected *</option>
+                    {rooms.map(room => (
+                      <option key={room.id} value={room.room_number}>
+                        {room.room_number} - {room.room_type}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
+            </div>
 
+            {/* Payment Information Section */}
+            <div className="form-section">
+              <div className="form-section-title">Payment Information</div>
+              <div className="form-grid horizontal-compact">
+                <div className="form-group">
+                  <label>Payment Method</label>
+                  <select
+                    name="payment_method"
+                    value={formData.payment_method}
+                    onChange={(e) => {
+                      const selectedPaymentMethod = paymentMethods.find(pm => pm.name === e.target.value)
+                      setFormData(prev => ({
+                        ...prev,
+                        payment_method: e.target.value,
+                        payment_method_id: selectedPaymentMethod?.id || null
+                      }))
+                    }}
+                    className="form-select"
+                  >
+                    <option value="">Select Payment Method</option>
+                    {paymentMethods.map(pm => (
+                      <option key={pm.id} value={pm.name}>{pm.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Registration Type</label>
+                  <select
+                    name="registration_type"
+                    value={formData.registration_type}
+                    onChange={handleInputChange}
+                    className="form-select"
+                  >
+                    <option value="">Select Type</option>
+                    <option value="Walk-in">Walk-in</option>
+                    <option value="Registration">Registration</option>
+                    <option value="Group">Group</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Payment Amount</label>
+                  <input
+                    type="number"
+                    name="payment_amount"
+                    value={formData.payment_amount}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Discount</label>
+                  <select
+                    name="discount"
+                    value={formData.discount}
+                    onChange={handleInputChange}
+                    className="form-select"
+                  >
+                    <option value="0">IDR</option>
+                    <option value="5">5%</option>
+                    <option value="10">10%</option>
+                    <option value="15">15%</option>
+                    <option value="20">20%</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Payment - Diskon</label>
+                  <input
+                    type="number"
+                    name="payment_diskon"
+                    value={formData.payment_diskon}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Deposit</label>
+                  <input
+                    type="number"
+                    name="deposit"
+                    value={formData.deposit}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Balance</label>
+                  <input
+                    type="number"
+                    name="balance"
+                    value={formData.balance}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    step="0.01"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Hotel Name</label>
+                  <input
+                    type="text"
+                    name="hotel_name"
+                    value={formData.hotel_name}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    readOnly
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Notes Section */}
+            <div className="form-section">
+              <div className="form-section-title">Notes</div>
               <div className="form-group">
-                <label>Address</label>
+                <label>Notes</label>
                 <textarea
-                  name="address"
-                  value={formData.address}
+                  name="notes"
+                  value={formData.notes}
                   onChange={handleInputChange}
                   className="form-input"
-                  rows="2"
+                  rows="3"
+                  placeholder="Additional notes"
                 />
               </div>
-
-              <div className="form-group">
-                <label>Nationality</label>
-                <select
-                  name="nationality"
-                  value={formData.nationality}
-                  onChange={(e) => {
-                    const selectedCountry = countries.find(c => c.name === e.target.value)
-                    setFormData(prev => ({
-                      ...prev,
-                      nationality: e.target.value,
-                      nationality_id: selectedCountry?.id || null
-                    }))
-                  }}
-                  className="form-select"
-                >
-                  <option value="">Select Nationality</option>
-                  {countries.map(country => (
-                    <option key={country.id} value={country.name}>{country.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>City</label>
-                <select
-                  name="city"
-                  value={formData.city}
-                  onChange={(e) => {
-                    const selectedCity = cities.find(c => c.name === e.target.value)
-                    setFormData(prev => ({
-                      ...prev,
-                      city: e.target.value,
-                      city_id: selectedCity?.id || null
-                    }))
-                  }}
-                  className="form-select"
-                >
-                  <option value="">Select City</option>
-                  {cities.map(city => (
-                    <option key={city.id} value={city.name}>{city.name}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Stay Information */}
-            <div className="form-section-title">Stay Information</div>
-            <div className="form-grid">
-              <div className="form-group">
-                <label>Arrival Date</label>
-                <input
-                  type="date"
-                  name="arrival_date"
-                  value={formData.arrival_date}
-                  onChange={handleInputChange}
-                  className="form-input"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Departure Date</label>
-                <input
-                  type="date"
-                  name="departure_date"
-                  value={formData.departure_date}
-                  onChange={handleInputChange}
-                  className="form-input"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Nights</label>
-                <input
-                  type="number"
-                  name="nights"
-                  value={formData.nights}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  min="1"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Guest Type</label>
-                <select
-                  name="guest_type"
-                  value={formData.guest_type}
-                  onChange={handleInputChange}
-                  className="form-select"
-                >
-                  <option value="Normal">Normal</option>
-                  <option value="VIP">VIP</option>
-                  <option value="Member">Member</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Male Guests</label>
-                <input
-                  type="number"
-                  name="guest_count_male"
-                  value={formData.guest_count_male}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  min="0"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Female Guests</label>
-                <input
-                  type="number"
-                  name="guest_count_female"
-                  value={formData.guest_count_female}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  min="0"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Child Guests</label>
-                <input
-                  type="number"
-                  name="guest_count_child"
-                  value={formData.guest_count_child}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  min="0"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Extra Bed Quantity</label>
-                <input
-                  type="number"
-                  name="extra_bed_qty"
-                  value={formData.extra_bed_qty}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  min="0"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Extra Bed Nights</label>
-                <input
-                  type="number"
-                  name="extra_bed_nights"
-                  value={formData.extra_bed_nights}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  min="0"
-                />
-              </div>
-            </div>
-
-            {/* Room and Payment Information */}
-            <div className="form-section-title">Room & Payment Information</div>
-            <div className="form-grid">
-              <div className="form-group">
-                <label>Room Number*</label>
-                <select
-                  name="room_number"
-                  value={formData.room_number}
-                  onChange={handleInputChange}
-                  className="form-select"
-                  required
-                >
-                  <option value="">Select Room</option>
-                  {rooms.map(room => (
-                    <option key={room.id} value={room.room_number}>
-                      {room.room_number} - {room.room_type}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Payment Method</label>
-                <select
-                  name="payment_method"
-                  value={formData.payment_method}
-                  onChange={(e) => {
-                    const selectedPaymentMethod = paymentMethods.find(pm => pm.name === e.target.value)
-                    setFormData(prev => ({
-                      ...prev,
-                      payment_method: e.target.value,
-                      payment_method_id: selectedPaymentMethod?.id || null
-                    }))
-                  }}
-                  className="form-select"
-                >
-                  <option value="">Select Payment Method</option>
-                  {paymentMethods.map(pm => (
-                    <option key={pm.id} value={pm.name}>{pm.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Payment Amount</label>
-                <input
-                  type="number"
-                  name="payment_amount"
-                  value={formData.payment_amount}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  min="0"
-                  step="0.01"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Discount</label>
-                <input
-                  type="number"
-                  name="discount"
-                  value={formData.discount}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  min="0"
-                  step="0.01"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Payment Discount</label>
-                <input
-                  type="number"
-                  name="payment_diskon"
-                  value={formData.payment_diskon}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  min="0"
-                  step="0.01"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Deposit</label>
-                <input
-                  type="number"
-                  name="deposit"
-                  value={formData.deposit}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  min="0"
-                  step="0.01"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Balance</label>
-                <input
-                  type="number"
-                  name="balance"
-                  value={formData.balance}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  step="0.01"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Hotel Name</label>
-                <input
-                  type="text"
-                  name="hotel_name"
-                  value={formData.hotel_name}
-                  onChange={handleInputChange}
-                  className="form-input"
-                />
-              </div>
-            </div>
-
-            {/* Notes */}
-            <div className="form-section-title">Notes</div>
-            <div className="form-group">
-              <label>Notes</label>
-              <textarea
-                name="notes"
-                value={formData.notes}
-                onChange={handleInputChange}
-                className="form-input"
-                rows="3"
-                placeholder="Additional notes or comments"
-              />
             </div>
 
             {/* Submit Button */}
@@ -699,7 +797,7 @@ const RegistrasiPage = () => {
                 className="btn-process"
                 disabled={!isFormValid()}
               >
-                PROCESS REGISTRATION
+                Process
               </button>
             </div>
           </form>
