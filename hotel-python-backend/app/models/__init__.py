@@ -23,8 +23,7 @@ class Guest(Base):
     __tablename__ = "guests"
     
     id = Column(Integer, primary_key=True, index=True)
-    first_name = Column(String(50))
-    last_name = Column(String(50))
+    guest_name = Column(String(100))
     email = Column(String(100))
     phone = Column(String(20))
     address = Column(Text)

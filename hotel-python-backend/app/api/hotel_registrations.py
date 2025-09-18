@@ -19,26 +19,31 @@ def create_guest_registration(
     current_user: User = Depends(get_current_user)
 ):
     """Create a new guest registration."""
-    # Check if registration number already exists
-    existing_registration = db.query(HotelRegistration).filter(
-        HotelRegistration.registration_no == registration.registration_no
-    ).first()
-    
-    if existing_registration:
-        raise HTTPException(
-            status_code=400,
-            detail="Registration number already exists"
-        )
-    
-    # Set created_by to current user's ID
-    registration_data = registration.dict()
-    registration_data['created_by'] = current_user.id
-    
-    db_registration = HotelRegistration(**registration_data)
-    db.add(db_registration)
-    db.commit()
-    db.refresh(db_registration)
-    return db_registration
+    try:
+        # Check if registration number already exists
+        existing_registration = db.query(HotelRegistration).filter(
+            HotelRegistration.registration_no == registration.registration_no
+        ).first()
+        
+        if existing_registration:
+            raise HTTPException(
+                status_code=400,
+                detail="Registration number already exists"
+            )
+        
+        # Set created_by to current user's ID
+        registration_data = registration.dict()
+        registration_data['created_by'] = current_user.id
+        
+        db_registration = HotelRegistration(**registration_data)
+        db.add(db_registration)
+        db.commit()
+        db.refresh(db_registration)
+        return db_registration
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 @router.get("/", response_model=List[GuestRegistrationResponse])
 def get_guest_registrations(
@@ -48,6 +53,11 @@ def get_guest_registrations(
     current_user: User = Depends(get_current_user)
 ):
     """Get all guest registrations with pagination."""
+    try:
+        registrations = db.query(HotelRegistration).offset(skip).limit(limit).all()
+        return registrations
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
     registrations = db.query(HotelRegistration).offset(skip).limit(limit).all()
     return registrations
 
@@ -117,21 +127,24 @@ def get_next_registration_number(
     current_user: User = Depends(get_current_user)
 ):
     """Generate next available registration number."""
-    # Get the latest registration number
-    latest_registration = db.query(HotelRegistration).order_by(HotelRegistration.id.desc()).first()
-    
-    if latest_registration and latest_registration.registration_no:
-        try:
-            # Extract number from the registration number (assuming 10-digit format like "0000000001")
-            last_number = int(latest_registration.registration_no)
-            next_number = last_number + 1
-        except ValueError:
-            # If parsing fails, start from 1
+    try:
+        # Get the latest registration number
+        latest_registration = db.query(HotelRegistration).order_by(HotelRegistration.id.desc()).first()
+        
+        if latest_registration and latest_registration.registration_no:
+            try:
+                # Extract number from the registration number (assuming 10-digit format like "0000000001")
+                last_number = int(latest_registration.registration_no)
+                next_number = last_number + 1
+            except ValueError:
+                # If parsing fails, start from 1
+                next_number = 1
+        else:
             next_number = 1
-    else:
-        next_number = 1
-    
-    # Format as 10 digits with leading zeros
-    next_registration_no = f"{next_number:010d}"
-    
-    return {"next_registration_no": next_registration_no}
+        
+        # Format as 10 digits with leading zeros
+        next_registration_no = f"{next_number:010d}"
+        
+        return {"next_registration_no": next_registration_no}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

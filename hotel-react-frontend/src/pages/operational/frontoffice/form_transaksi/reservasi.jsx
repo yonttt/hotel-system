@@ -5,6 +5,7 @@ import Layout from '../../../../components/Layout'
 
 const ReservasiPage = () => {
   const { user } = useAuth()
+  const [loading, setLoading] = useState(false)
   const [apiError, setApiError] = useState(null)
   const [rooms, setRooms] = useState([])
   const [cities, setCities] = useState([])
@@ -12,7 +13,6 @@ const ReservasiPage = () => {
   const [categoryMarkets, setCategoryMarkets] = useState([])
   const [marketSegments, setMarketSegments] = useState([])
   const [paymentMethods, setPaymentMethods] = useState([])
-  const [registrationTypes, setRegistrationTypes] = useState([])
   
   const initialFormState = {
     reservation_no: '0000000001',
@@ -79,52 +79,45 @@ const ReservasiPage = () => {
   }, [formData.arrival_date, formData.nights])
 
   const loadInitialData = async () => {
+    setLoading(true); // Tambahkan state loading
+    setApiError(null);
+
     try {
-      setApiError(null)
-      
-      // Try to load data with fallbacks
       const promises = [
-        apiService.getNextReservationNumber().catch(() => ({ data: { next_reservation_no: generateReservationNo() } })),
-        apiService.getRoomsByStatus('available').catch(() => ({ data: [] })),
-        apiService.getCities().catch(() => ({ data: [] })),
-        apiService.getCountries().catch(() => ({ data: [] })),
-        apiService.getCategoryMarkets().catch(() => ({ data: [] })),
-        apiService.getMarketSegments().catch(() => ({ data: [] })),
-        apiService.getPaymentMethods().catch(() => ({ data: [] })),
-        apiService.getRegistrationTypes().catch(() => ({ data: [] }))
-      ]
-      
-      const [
-        reservationResponse,
-        roomsResponse,
-        citiesResponse,
-        countriesResponse,
-        categoryMarketsResponse,
-        marketSegmentsResponse,
-        paymentMethodsResponse,
-        registrationTypesResponse
-      ] = await Promise.all(promises)
-      
+        apiService.getNextReservationNumber(),
+        apiService.getRoomsByStatus('available'),
+        apiService.getCities(),
+        apiService.getCountries(),
+        apiService.getCategoryMarkets(),
+        apiService.getMarketSegments(),
+        apiService.getPaymentMethods()
+      ];
+
+      // Menggunakan Promise.allSettled agar tidak langsung gagal jika salah satu promise error
+      const results = await Promise.allSettled(promises);
+
+      // Fungsi untuk mengekstrak data atau memberikan nilai default jika gagal
+      const getDataOrDefault = (result, defaultValue = []) => 
+        result.status === 'fulfilled' ? (result.value.data || defaultValue) : defaultValue;
+
+      // Proses hasil dengan aman
       setFormData(prev => ({
         ...prev,
-        reservation_no: reservationResponse.data.next_reservation_no
-      }))
+        reservation_no: results[0].status === 'fulfilled' ? results[0].value.data.next_reservation_no : generateReservationNo()
+      }));
       
-      setRooms(roomsResponse.data || [])
-      setCities(citiesResponse.data || [])
-      setCountries(countriesResponse.data || [])
-      setCategoryMarkets(categoryMarketsResponse.data || [])
-      setMarketSegments(marketSegmentsResponse.data || [])
-      setPaymentMethods(paymentMethodsResponse.data || [])
-      setRegistrationTypes(registrationTypesResponse.data || [])
-      
+      setRooms(getDataOrDefault(results[1]));
+      setCities(getDataOrDefault(results[2]));
+      setCountries(getDataOrDefault(results[3]));
+      setCategoryMarkets(getDataOrDefault(results[4]));
+      setMarketSegments(getDataOrDefault(results[5]));
+      setPaymentMethods(getDataOrDefault(results[6]));
     } catch (error) {
-      console.error('Error loading initial data:', error)
-      setApiError('Some data could not be loaded. You can still use the form with limited functionality.')
-      setFormData(prev => ({
-        ...prev,
-        reservation_no: generateReservationNo()
-      }))
+      // Catch ini akan menangani error yang lebih fundamental (bukan dari API)
+      console.error('Critical error loading initial data:', error);
+      setApiError('A critical error occurred. Please refresh the page.');
+    } finally {
+      setLoading(false); // Selalu set loading ke false
     }
   }
 
@@ -606,28 +599,6 @@ const ReservasiPage = () => {
                   <option value="">Select Payment Method</option>
                   {paymentMethods.map(pm => (
                     <option key={pm.id} value={pm.name}>{pm.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Registration Type</label>
-                <select
-                  name="registration_type"
-                  value={formData.registration_type}
-                  onChange={(e) => {
-                    const selectedRegistrationType = registrationTypes.find(rt => rt.name === e.target.value)
-                    setFormData(prev => ({
-                      ...prev,
-                      registration_type: e.target.value,
-                      registration_type_id: selectedRegistrationType?.id || null
-                    }))
-                  }}
-                  className="form-select"
-                >
-                  <option value="">Select Registration Type</option>
-                  {registrationTypes.map(rt => (
-                    <option key={rt.id} value={rt.name}>{rt.name}</option>
                   ))}
                 </select>
               </div>

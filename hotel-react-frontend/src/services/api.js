@@ -63,35 +63,6 @@ class ApiService {
     return this.client.get('/auth/me')
   }
 
-  // Reservations endpoints
-  async getReservations(skip = 0, limit = 100) {
-    return this.client.get(`/reservations/?skip=${skip}&limit=${limit}`)
-  }
-
-  async getReservation(id) {
-    return this.client.get(`/reservations/${id}`)
-  }
-
-  async createReservation(reservationData) {
-    return this.client.post('/reservations/', reservationData)
-  }
-
-  async updateReservation(id, reservationData) {
-    return this.client.put(`/reservations/${id}`, reservationData)
-  }
-
-  async deleteReservation(id) {
-    return this.client.delete(`/reservations/${id}`)
-  }
-
-  async getReservationsByStatus(status) {
-    return this.client.get(`/reservations/by-status/${status}`)
-  }
-
-  async getNextReservationNumber() {
-    return this.client.get('/reservations/next/reservation-number')
-  }
-
   // Rooms endpoints
   async getRooms(skip = 0, limit = 100) {
     return this.client.get(`/rooms/?skip=${skip}&limit=${limit}`)
@@ -223,11 +194,6 @@ class ApiService {
   // Payment Methods endpoints
   async getPaymentMethods() {
     return this.client.get('/payment-methods/')
-  }
-
-  // Registration Types endpoints
-  async getRegistrationTypes() {
-    return this.client.get('/registration-types/')
   }
 }
 

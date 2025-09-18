@@ -15,18 +15,23 @@ def create_room(
     current_user: User = Depends(get_current_manager_or_admin_user)
 ):
     """Create a new room (manager/admin only)."""
-    existing_room = db.query(Room).filter(Room.room_number == room.room_number).first()
-    if existing_room:
-        raise HTTPException(
-            status_code=400,
-            detail="Room number already exists"
-        )
-    
-    db_room = Room(**room.dict())
-    db.add(db_room)
-    db.commit()
-    db.refresh(db_room)
-    return db_room
+    try:
+        existing_room = db.query(Room).filter(Room.room_number == room.room_number).first()
+        if existing_room:
+            raise HTTPException(
+                status_code=400,
+                detail="Room number already exists"
+            )
+        
+        db_room = Room(**room.dict())
+        db.add(db_room)
+        db.commit()
+        db.refresh(db_room)
+        return db_room
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 @router.get("/", response_model=List[RoomResponse])
 def get_rooms(
@@ -36,8 +41,11 @@ def get_rooms(
     current_user: User = Depends(get_current_user)
 ):
     """Get all rooms with pagination."""
-    rooms = db.query(Room).offset(skip).limit(limit).all()
-    return rooms
+    try:
+        rooms = db.query(Room).offset(skip).limit(limit).all()
+        return rooms
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 @router.get("/{room_number}", response_model=RoomResponse)
 def get_room(
@@ -92,5 +100,8 @@ def get_rooms_by_status(
     current_user: User = Depends(get_current_user)
 ):
     """Get rooms by status."""
-    rooms = db.query(Room).filter(Room.status == status).all()
-    return rooms
+    try:
+        rooms = db.query(Room).filter(Room.status == status).all()
+        return rooms
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
