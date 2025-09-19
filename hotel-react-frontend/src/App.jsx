@@ -77,6 +77,9 @@ import LaundryPage from './pages/operational/LaundryPage';
 import InfoReservasiPage from './pages/operational/frontoffice/InfoReservasiPage';
 import InformasiTamuPage from './pages/operational/frontoffice/InformasiTamuPage';
 import StatusKamarPage from './pages/operational/frontoffice/StatusKamarPage';
+import AllReservationPage from './pages/operational/frontoffice/informasi_reservasi/AllReservationPage';
+import ReservasiDeposit from './pages/operational/frontoffice/informasi_reservasi/ReservasiDeposit';
+import ReservasiToday from './pages/operational/frontoffice/informasi_reservasi/ReservasiToday';
 
 // HRD
 import AccountReceivablePage from './pages/hrd/AccountReceivablePage';
@@ -166,6 +169,36 @@ function App() {
               element={
                 <ProtectedRoute>
                   <InfoReservasiPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/operational/frontoffice/info-reservasi/all" 
+              element={
+                <ProtectedRoute>
+                  <ErrorBoundary>
+                    <AllReservationPage />
+                  </ErrorBoundary>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/operational/frontoffice/info-reservasi/deposit" 
+              element={
+                <ProtectedRoute>
+                  <ErrorBoundary>
+                    <ReservasiDeposit />
+                  </ErrorBoundary>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/operational/frontoffice/info-reservasi/today" 
+              element={
+                <ProtectedRoute>
+                  <ErrorBoundary>
+                    <ReservasiToday />
+                  </ErrorBoundary>
                 </ProtectedRoute>
               } 
             />

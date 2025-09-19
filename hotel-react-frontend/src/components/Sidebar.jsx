@@ -21,6 +21,8 @@ const Sidebar = () => {
     operational: false,
     frontOffice: false,
     formTransaksi: false,
+    infoReservasi: false,
+    informasiTamu: false,
     hrd: false
   })
   const [scrollPosition, setScrollPosition] = useState(0)
@@ -48,6 +50,12 @@ const Sidebar = () => {
         newExpandedMenus.frontOffice = true
         if (path.includes('/form-transaksi/')) {
           newExpandedMenus.formTransaksi = true
+        }
+        if (path.includes('/info-reservasi/')) {
+          newExpandedMenus.infoReservasi = true
+        }
+        if (path.includes('/informasi-tamu/')) {
+          newExpandedMenus.informasiTamu = true
         }
       }
     } else if (path.includes('/hrd/')) {
@@ -130,9 +138,34 @@ const Sidebar = () => {
                 { title: 'Reservasi', path: '/operational/frontoffice/form-transaksi/reservasi' }
               ]
             },
-            { title: 'Info Reservasi', path: '/operational/frontoffice/info-reservasi' },
-            
-            { title: 'Informasi Tamu', path: '/operational/frontoffice/informasi-tamu' },
+            { 
+              title: 'Info Reservasi', 
+              hasSubmenu: true,
+              submenu: 'infoReservasi',
+              children: [
+                { title: 'Reservation Today', path: '/operational/frontoffice/info-reservasi/today' },
+                { title: 'Reservation By Deposit', path: '/operational/frontoffice/info-reservasi/deposit' },
+                { title: 'All Reservation', path: '/operational/frontoffice/info-reservasi/all' }
+              ]
+            },
+            { 
+              title: 'Informasi Tamu', 
+              hasSubmenu: true,
+              submenu: 'informasiTamu',
+              children: [
+                { title: 'Guest Research', path: '/operational/frontoffice/informasi-tamu/guest-research' },
+                { title: 'Check in Today', path: '/operational/frontoffice/informasi-tamu/check-in-today' },
+                { title: 'Early Checkin', path: '/operational/frontoffice/informasi-tamu/early-checkin' },
+                { title: 'Expected Departure', path: '/operational/frontoffice/informasi-tamu/expected-departure' },
+                { title: 'Meeting Room Info', path: '/operational/frontoffice/informasi-tamu/meeting-room-info' },
+                { title: 'Checkout Today', path: '/operational/frontoffice/informasi-tamu/checkout-today' },
+                { title: 'Change Room', path: '/operational/frontoffice/informasi-tamu/change-room' },
+                { title: 'Cancelation Today', path: '/operational/frontoffice/informasi-tamu/cancelation-today' },
+                { title: 'Refund', path: '/operational/frontoffice/informasi-tamu/refund' },
+                { title: 'Skipper', path: '/operational/frontoffice/informasi-tamu/skipper' },
+                { title: 'Guest History', path: '/operational/frontoffice/informasi-tamu/guest-history' }
+              ]
+            },
             { 
               title: 'Status Kamar', 
               path: '/operational/frontoffice/status-kamar',
