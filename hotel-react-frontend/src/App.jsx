@@ -74,9 +74,6 @@ import HousekeepingPage from './pages/operational/HousekeepingPage';
 import LaundryPage from './pages/operational/LaundryPage';
 
 // Operational - Front Office - Other
-import InfoReservasiPage from './pages/operational/frontoffice/InfoReservasiPage';
-import InformasiTamuPage from './pages/operational/frontoffice/InformasiTamuPage';
-import StatusKamarPage from './pages/operational/frontoffice/StatusKamarPage';
 import AllReservationPage from './pages/operational/frontoffice/informasi_reservasi/AllReservationPage';
 import ReservasiDeposit from './pages/operational/frontoffice/informasi_reservasi/ReservasiDeposit';
 import ReservasiToday from './pages/operational/frontoffice/informasi_reservasi/ReservasiToday';
@@ -165,14 +162,6 @@ function App() {
             
             {/* Front Office - Other Routes */}
             <Route 
-              path="/operational/frontoffice/info-reservasi" 
-              element={
-                <ProtectedRoute>
-                  <InfoReservasiPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
               path="/operational/frontoffice/info-reservasi/all" 
               element={
                 <ProtectedRoute>
@@ -199,22 +188,6 @@ function App() {
                   <ErrorBoundary>
                     <ReservasiToday />
                   </ErrorBoundary>
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/operational/frontoffice/informasi-tamu" 
-              element={
-                <ProtectedRoute>
-                  <InformasiTamuPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/operational/frontoffice/status-kamar" 
-              element={
-                <ProtectedRoute>
-                  <StatusKamarPage />
                 </ProtectedRoute>
               } 
             />

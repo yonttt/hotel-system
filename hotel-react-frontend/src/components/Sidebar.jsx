@@ -166,11 +166,6 @@ const Sidebar = () => {
                 { title: 'Guest History', path: '/operational/frontoffice/informasi-tamu/guest-history' }
               ]
             },
-            { 
-              title: 'Status Kamar', 
-              path: '/operational/frontoffice/status-kamar',
-              hasRefresh: true
-            },
           ]
         },
         { title: 'Housekeeping', path: '/operational/housekeeping' },
