@@ -331,6 +331,8 @@ const RegistrasiPage = () => {
                   <select name="guest_type" value={formData.guest_type} onChange={handleInputChange} className="form-select">
                     <option value="Normal">Normal</option>
                     <option value="VIP">VIP</option>
+                    <option value="VVIP">VVIP</option>
+                    <option value="Corporate">INCOGNITO</option>
                   </select>
                 </div>
                 <div className="form-group">
@@ -392,10 +394,8 @@ const RegistrasiPage = () => {
                   <div className="form-group">
                       <label>Registration Type</label>
                       <select name="registration_type" value={formData.registration_type} onChange={handleInputChange} className="form-select">
-                          <option value="">Select Type</option>
-                          {/* Ganti dengan data dari API jika ada */}
-                          <option value="Individual">Individual</option>
-                          <option value="Group">Group</option>
+                          <option value="Normal">Normal</option>
+                          <option value="6hours">6 Hours</option>
                       </select>
                   </div>
                    <div className="form-group">
