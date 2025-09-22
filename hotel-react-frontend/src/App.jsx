@@ -73,10 +73,15 @@ import FoodBeveragePage from './pages/operational/FoodBeveragePage';
 import HousekeepingPage from './pages/operational/HousekeepingPage';
 import LaundryPage from './pages/operational/LaundryPage';
 
-// Operational - Front Office - Other
+// Operational - Front Office - Informasi Reservasi
 import AllReservationPage from './pages/operational/frontoffice/informasi_reservasi/AllReservationPage';
 import ReservasiDeposit from './pages/operational/frontoffice/informasi_reservasi/ReservasiDeposit';
 import ReservasiToday from './pages/operational/frontoffice/informasi_reservasi/ReservasiToday';
+
+// Operational - Front Office - Informasi Tamu
+import CheckinToday from './pages/operational/frontoffice/informasi_tamu/CheckinToday';
+import GuestHistory from './pages/operational/frontoffice/informasi_tamu/GuestHistory';
+import InhouseGuest from './pages/operational/frontoffice/informasi_tamu/InhouseGuest';
 
 // HRD
 import AccountReceivablePage from './pages/hrd/AccountReceivablePage';
@@ -187,6 +192,38 @@ function App() {
                 <ProtectedRoute>
                   <ErrorBoundary>
                     <ReservasiToday />
+                  </ErrorBoundary>
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Front Office - Informasi Tamu Routes */}
+            <Route 
+              path="/operational/frontoffice/informasi-tamu/check-in-today" 
+              element={
+                <ProtectedRoute>
+                  <ErrorBoundary>
+                    <CheckinToday />
+                  </ErrorBoundary>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/operational/frontoffice/informasi-tamu/guest-history" 
+              element={
+                <ProtectedRoute>
+                  <ErrorBoundary>
+                    <GuestHistory />
+                  </ErrorBoundary>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/operational/frontoffice/informasi-tamu/in-house-guest" 
+              element={
+                <ProtectedRoute>
+                  <ErrorBoundary>
+                    <InhouseGuest />
                   </ErrorBoundary>
                 </ProtectedRoute>
               } 

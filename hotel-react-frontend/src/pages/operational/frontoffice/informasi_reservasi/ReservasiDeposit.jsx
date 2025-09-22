@@ -16,6 +16,11 @@ const ReservasiDeposit = () => {
     loadReservations()
   }, [])
 
+  // Reset to first page when search/filter changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, showEntries])
+
   const loadReservations = async () => {
     try {
       setLoading(true)
@@ -26,7 +31,7 @@ const ReservasiDeposit = () => {
       
       // Filter reservations that have deposit information
       const depositReservations = response.data ? response.data.filter(reservation => 
-        reservation.deposit_amount && reservation.deposit_amount > 0
+        (reservation.deposit ?? 0) > 0
       ) : []
       
       setReservations(depositReservations)
@@ -43,7 +48,9 @@ const ReservasiDeposit = () => {
   const filteredReservations = reservations.filter(reservation =>
     reservation.guest_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     reservation.reservation_no?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    reservation.deposit_by?.toLowerCase().includes(searchTerm.toLowerCase())
+    reservation.category_market?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    reservation.transaction_by?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    reservation.payment_method?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   const totalPages = Math.ceil(filteredReservations.length / showEntries)
@@ -67,75 +74,99 @@ const ReservasiDeposit = () => {
   return (
     <Layout>
       <div className="unified-reservation-container">
-        {/* Combined Header and Controls */}
         <div className="unified-header-controls">
-          <div className="unified-header-left">
-            <select className="page-title-select">
-              <option>RESERVASI DEPOSIT</option>
-            </select>
-            <div className="search-section">
-              <label>Search:</label>
-              <input
-                type="text"
-                className="search-input"
-                placeholder="Search reservations..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+          <div className="header-row header-row-top">
+            <div className="unified-header-left">
+              <div className="header-title">
+                <span>RESERVATION BY DEPOSIT</span>
+              </div>
+              <div className="hotel-select">
+                <label>Hotel :</label>
+                <select className="header-hotel-select">
+                  <option>ALL</option>
+                </select>
+              </div>
             </div>
+            <div className="unified-header-right" />
           </div>
-          <div className="unified-header-right">
-            <div className="action-buttons">
-              <button title="Excel"></button>
-              <button title="CSV"></button>
-              <button title="Copy"></button>
-              <button title="PDF"></button>
+          <div className="header-row header-row-bottom">
+            <div className="unified-header-left">
+              <div className="search-section">
+                <label>Search :</label>
+                <input
+                  type="text"
+                  className="search-input"
+                  placeholder="Search here..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
             </div>
-            <button className="btn-print-unified">Print</button>
-            <select
-              className="entries-select"
-              value={showEntries}
-              onChange={(e) => setShowEntries(Number(e.target.value))}
-            >
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-            </select>
+            <div className="unified-header-right">
+              <div className="entries-control">
+                <span className="entries-label">Show entries:</span>
+                <select
+                  className="entries-select"
+                  value={showEntries}
+                  onChange={(e) => setShowEntries(Number(e.target.value))}
+                >
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Table Section */}
         <div className="unified-table-wrapper">
           <table className="reservation-table">
+            <colgroup>
+              <col style={{ width: '56px' }} />
+              <col style={{ width: '200px' }} />
+              <col style={{ width: '140px' }} />
+              <col style={{ width: '160px' }} />
+              <col style={{ width: '140px' }} />
+              <col style={{ width: '120px' }} />
+              <col style={{ width: '100px' }} />
+              <col style={{ width: '120px' }} />
+              <col style={{ width: '120px' }} />
+              <col style={{ width: '140px' }} />
+              <col style={{ width: '120px' }} />
+              <col style={{ width: '110px' }} />
+            </colgroup>
             <thead>
               <tr>
                 <th>No</th>
                 <th>Name</th>
-                <th>Market</th>
-                <th>Booking</th>
-                <th>Arrival</th>
-                <th>Departure</th>
-                <th>Reserved By</th>
+                <th>Group</th>
+                <th>Company</th>
+                <th>Telp/HP</th>
+                <th>Type</th>
+                <th>Room</th>
+                <th>Arrival Date</th>
+                <th>Departure Date</th>
                 <th>Deposit By</th>
                 <th>Deposit</th>
-                <th>Guest</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="10" className="no-data">Loading...</td>
+                  <td colSpan="12" className="no-data">Loading...</td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan="10" className="no-data">
+                  <td colSpan="12" className="no-data">
                     {error}
                   </td>
                 </tr>
               ) : currentReservations.length === 0 ? (
                 <tr>
-                  <td colSpan="10" className="no-data">
+                  <td colSpan="12" className="no-data">
                     No data available in table
                   </td>
                 </tr>
@@ -143,15 +174,19 @@ const ReservasiDeposit = () => {
                 currentReservations.map((reservation, index) => (
                   <tr key={reservation.id}>
                     <td>{startIndex + index + 1}</td>
-                    <td>{reservation.guest_name || 'N/A'}</td>
-                    <td>{reservation.market_segment || 'N/A'}</td>
-                    <td>{reservation.reservation_no || 'N/A'}</td>
+                    <td title={reservation.guest_name || 'N/A'}>{reservation.guest_name || 'N/A'}</td>
+                    <td title={reservation.category_market || 'N/A'}>{reservation.category_market || 'N/A'}</td>
+                    <td title={reservation.transaction_by || 'N/A'}>{reservation.transaction_by || 'N/A'}</td>
+                    <td title={reservation.mobile_phone || 'N/A'}>{reservation.mobile_phone || 'N/A'}</td>
+                    <td title={reservation.transaction_status || 'N/A'}>{reservation.transaction_status || 'N/A'}</td>
+                    <td className="align-center" title={reservation.room_number || 'N/A'}>{reservation.room_number || '-'}</td>
                     <td>{formatDate(reservation.arrival_date)}</td>
                     <td>{formatDate(reservation.departure_date)}</td>
-                    <td>{reservation.transaction_by || 'N/A'}</td>
-                    <td>{reservation.payment_method || 'N/A'}</td>
-                    <td>{formatCurrency(reservation.deposit || 0)}</td>
-                    <td>{(reservation.guest_count_male || 0) + (reservation.guest_count_female || 0) + (reservation.guest_count_child || 0)}</td>
+                    <td title={reservation.payment_method || 'N/A'}>{reservation.payment_method || 'N/A'}</td>
+                    <td className="align-right">{formatCurrency(reservation.deposit || 0)}</td>
+                    <td className="align-center">
+                      <button className="btn-table-action" title="View Details">View</button>
+                    </td>
                   </tr>
                 ))
               )}

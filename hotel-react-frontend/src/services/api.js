@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_BASE_URL = 'http://localhost:8000/api'
+const API_BASE_URL = 'http://localhost:8000'
 
 class ApiService {
   constructor() {
@@ -48,15 +48,43 @@ class ApiService {
 
   // Authentication endpoints
   async login(username, password) {
-    const formData = new FormData()
-    formData.append('username', username)
-    formData.append('password', password)
-    
-    return this.client.post('/auth/login', formData, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    })
+    try {
+      // Create URLSearchParams for x-www-form-urlencoded format
+      const formData = new URLSearchParams()
+      formData.append('username', username)
+      formData.append('password', password)
+      
+      const response = await this.client.post('/auth/login', formData.toString(), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        validateStatus: function (status) {
+          return status < 500 // Resolve only if the status code is less than 500
+        }
+      })
+      
+      // Check if login was successful
+      if (response.status === 200 && response.data.access_token) {
+        // Temporarily set token to get user info
+        const tempToken = response.data.access_token
+        this.setAuthToken(tempToken)
+        
+        try {
+          const userInfo = await this.getCurrentUser()
+          response.data.user = userInfo.data
+        } catch (userError) {
+          console.warn('Could not fetch user info after login:', userError)
+          // Don't fail the login if we can't get user info
+        }
+      }
+      
+      return response
+    } catch (error) {
+      if (!error.response) {
+        throw new Error('Network error - unable to connect to server')
+      }
+      throw error
+    }
   }
 
   async getCurrentUser() {

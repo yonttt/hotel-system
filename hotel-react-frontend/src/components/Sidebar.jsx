@@ -153,16 +153,8 @@ const Sidebar = () => {
               hasSubmenu: true,
               submenu: 'informasiTamu',
               children: [
-                { title: 'Guest Research', path: '/operational/frontoffice/informasi-tamu/guest-research' },
+                { title: 'In House Guest ', path: '/operational/frontoffice/informasi-tamu/in-house-guest' },
                 { title: 'Check in Today', path: '/operational/frontoffice/informasi-tamu/check-in-today' },
-                { title: 'Early Checkin', path: '/operational/frontoffice/informasi-tamu/early-checkin' },
-                { title: 'Expected Departure', path: '/operational/frontoffice/informasi-tamu/expected-departure' },
-                { title: 'Meeting Room Info', path: '/operational/frontoffice/informasi-tamu/meeting-room-info' },
-                { title: 'Checkout Today', path: '/operational/frontoffice/informasi-tamu/checkout-today' },
-                { title: 'Change Room', path: '/operational/frontoffice/informasi-tamu/change-room' },
-                { title: 'Cancelation Today', path: '/operational/frontoffice/informasi-tamu/cancelation-today' },
-                { title: 'Refund', path: '/operational/frontoffice/informasi-tamu/refund' },
-                { title: 'Skipper', path: '/operational/frontoffice/informasi-tamu/skipper' },
                 { title: 'Guest History', path: '/operational/frontoffice/informasi-tamu/guest-history' }
               ]
             },

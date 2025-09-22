@@ -18,26 +18,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Health check endpoints
+# Health check endpoint
 @app.get("/health")
 def health_check():
     return {"status": "healthy", "message": "Hotel Management System API is running"}
 
-@app.get("/api/health")
-def api_health_check():
-    return {"status": "healthy", "service": "hotel-management-api"}
-
-# Include routers with /api prefix
-app.include_router(auth.router, prefix="/api/auth", tags=["authentication"])
-app.include_router(rooms.router, prefix="/api/rooms", tags=["rooms"])
-app.include_router(guests.router, prefix="/api/guests", tags=["guests"])
-app.include_router(hotel_registrations.router, prefix="/api/hotel-registrations", tags=["hotel-registrations"])
-app.include_router(hotel_reservations.router, prefix="/api/hotel-reservations", tags=["hotel-reservations"])
-app.include_router(cities.router, prefix="/api", tags=["cities"])
-app.include_router(nationalities.router, prefix="/api", tags=["countries"])
-app.include_router(category_markets.router, prefix="/api", tags=["category-markets"])
-app.include_router(market_segments.router, prefix="/api", tags=["market-segments"])
-app.include_router(payment_methods.router, prefix="/api", tags=["payment-methods"])
+# Include routers
+app.include_router(auth.router, prefix="/auth", tags=["authentication"])
+app.include_router(rooms.router, prefix="/rooms", tags=["rooms"])
+app.include_router(guests.router, prefix="/guests", tags=["guests"])
+app.include_router(hotel_registrations.router, prefix="/hotel-registrations", tags=["hotel-registrations"])
+app.include_router(hotel_reservations.router, prefix="/hotel-reservations", tags=["hotel-reservations"])
+app.include_router(cities.router, prefix="", tags=["cities"])
+app.include_router(nationalities.router, prefix="", tags=["countries"])
+app.include_router(category_markets.router, prefix="", tags=["category-markets"])
+app.include_router(market_segments.router, prefix="", tags=["market-segments"])
+app.include_router(payment_methods.router, prefix="", tags=["payment-methods"])
 
 @app.get("/")
 def read_root():
@@ -50,9 +46,9 @@ async def startup_event():
         from app.core.database import engine
         from app.models import Base
         Base.metadata.create_all(bind=engine)
-        print("Database tables created successfully")
+        print("✅ Database tables created successfully")
     except Exception as e:
-        print(f"Database initialization failed: {e}")
+        print(f"⚠️ Database initialization failed: {e}")
         print("API will still work but database operations may fail")
 
 @app.get("/")

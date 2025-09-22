@@ -16,6 +16,11 @@ const AllReservationPage = () => {
     loadReservations();
   }, []);
 
+  // Reset to first page when search/filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, showEntries]);
+
   const loadReservations = async () => {
     try {
       setLoading(true);
@@ -38,7 +43,7 @@ const AllReservationPage = () => {
     reservation.transaction_by?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const totalPages = Math.ceil(filteredReservations.length / showEntries);
+  const totalPages = Math.max(1, Math.ceil(filteredReservations.length / showEntries));
   const startIndex = (currentPage - 1) * showEntries;
   const endIndex = startIndex + showEntries;
   const currentReservations = filteredReservations.slice(startIndex, endIndex);
@@ -80,47 +85,68 @@ const AllReservationPage = () => {
   return (
     <Layout>
       <div className="unified-reservation-container">
-        {/* Combined Header and Controls */}
+        {/* Header: top row (title + hotel), bottom row (search left, entries right) */}
         <div className="unified-header-controls">
-          <div className="unified-header-left">
-            <select className="page-title-select">
-              <option>ALL RESERVATION LIST</option>
-            </select>
-            <div className="search-section">
-              <label>Search:</label>
-              <input
-                type="text"
-                className="search-input"
-                placeholder="Search reservations..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+          <div className="header-row header-row-top">
+            <div className="unified-header-left">
+              <div className="header-title">
+                <span>ALL RESERVATION LIST</span>
+              </div>
+              <div className="hotel-select">
+                <label>Hotel :</label>
+                <select className="header-hotel-select">
+                  <option>ALL</option>
+                </select>
+              </div>
             </div>
+            <div className="unified-header-right" />
           </div>
-          <div className="unified-header-right">
-            <div className="action-buttons">
-              <button title="Excel"></button>
-              <button title="CSV"></button>
-              <button title="Copy"></button>
-              <button title="PDF"></button>
+          <div className="header-row header-row-bottom">
+            <div className="unified-header-left">
+              <div className="search-section">
+                <label>Search :</label>
+                <input
+                  type="text"
+                  className="search-input"
+                  placeholder="Search here..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
             </div>
-            <button className="btn-print-unified">Print</button>
-            <select
-              className="entries-select"
-              value={showEntries}
-              onChange={(e) => setShowEntries(Number(e.target.value))}
-            >
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-            </select>
+            <div className="unified-header-right">
+              <div className="entries-control">
+                <span className="entries-label">Show entries:</span>
+                <select
+                  className="entries-select"
+                  value={showEntries}
+                  onChange={(e) => setShowEntries(Number(e.target.value))}
+                >
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Table Section */}
         <div className="unified-table-wrapper">
           <table className="reservation-table">
+            <colgroup>
+              <col style={{ width: '56px' }} />   {/* No */}
+              <col style={{ width: '220px' }} />  {/* Name */}
+              <col style={{ width: '140px' }} />  {/* Market */}
+              <col style={{ width: '160px' }} />  {/* Booking */}
+              <col style={{ width: '120px' }} />  {/* Arrival */}
+              <col style={{ width: '120px' }} />  {/* Departure */}
+              <col style={{ width: '140px' }} />  {/* Reserved By */}
+              <col style={{ width: '140px' }} />  {/* Deposit By */}
+              <col style={{ width: '120px' }} />  {/* Deposit */}
+              <col style={{ width: '90px' }} />   {/* Guest */}
+            </colgroup>
             <thead>
               <tr>
                 <th>No</th>
@@ -147,18 +173,18 @@ const AllReservationPage = () => {
                   </td>
                 </tr>
               ) : (
-                currentReservations.map((reservation, index) => (
+                 currentReservations.map((reservation, index) => (
                   <tr key={reservation.id}>
                     <td>{startIndex + index + 1}</td>
-                    <td>{reservation.guest_name || 'N/A'}</td>
-                    <td>{reservation.market_segment || 'N/A'}</td>
-                    <td>{reservation.reservation_no || 'N/A'}</td>
+                    <td title={reservation.guest_name || 'N/A'}>{reservation.guest_name || 'N/A'}</td>
+                    <td title={reservation.market_segment || 'N/A'}>{reservation.market_segment || 'N/A'}</td>
+                    <td className="mono" title={reservation.reservation_no || 'N/A'}>{reservation.reservation_no || 'N/A'}</td>
                     <td>{formatDate(reservation.arrival_date)}</td>
                     <td>{formatDate(reservation.departure_date)}</td>
-                    <td>{reservation.transaction_by || 'N/A'}</td>
-                    <td>{reservation.payment_method || 'N/A'}</td>
-                    <td>{formatCurrency(reservation.deposit || 0)}</td>
-                    <td>{(reservation.guest_count_male || 0) + (reservation.guest_count_female || 0) + (reservation.guest_count_child || 0)}</td>
+                    <td title={reservation.transaction_by || 'N/A'}>{reservation.transaction_by || 'N/A'}</td>
+                    <td title={reservation.payment_method || 'N/A'}>{reservation.payment_method || 'N/A'}</td>
+                    <td className="align-right">{formatCurrency(reservation.deposit || 0)}</td>
+                    <td className="align-center">{(reservation.guest_count_male || 0) + (reservation.guest_count_female || 0) + (reservation.guest_count_child || 0)}</td>
                   </tr>
                 ))
               )}
@@ -186,13 +212,13 @@ const AllReservationPage = () => {
             </button>
             <button
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-              disabled={currentPage === totalPages}
+              disabled={currentPage === totalPages || filteredReservations.length === 0}
             >
               Next
             </button>
             <button
               onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage === totalPages}
+              disabled={currentPage === totalPages || filteredReservations.length === 0}
             >
               Last
             </button>

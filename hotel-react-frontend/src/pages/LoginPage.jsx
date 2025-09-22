@@ -75,8 +75,12 @@ const LoginPage = () => {
     e.preventDefault()
     setError('')
 
-    if (!formData.username || !formData.password) {
-      setError('Please fill in all fields')
+    // Clear any previous error
+    setError('')
+
+    // Validate form fields
+    if (!formData.username.trim() || !formData.password.trim()) {
+      setError('Please enter both username and password')
       return
     }
 
@@ -86,17 +90,35 @@ const LoginPage = () => {
     //   return
     // }
 
-    const result = await login({ username: formData.username, password: formData.password })
-    
-    if (result.success) {
-      navigate('/dashboard')
-    } else {
-      setError(result.error)
-      // Reset reCAPTCHA on login failure
-      if (window.grecaptcha) {
-        window.grecaptcha.reset()
-        setRecaptchaToken('')
+    try {
+      const result = await login({ 
+        username: formData.username.trim(), 
+        password: formData.password 
+      })
+      
+      if (result.success) {
+        navigate('/dashboard')
+      } else {
+        setError(result.error || 'Login failed. Please try again.')
+        // Reset form on error
+        setFormData(prev => ({
+          ...prev,
+          password: ''
+        }))
+        // Reset reCAPTCHA on login failure
+        if (window.grecaptcha) {
+          window.grecaptcha.reset()
+          setRecaptchaToken('')
+        }
       }
+    } catch (err) {
+      setError('A system error occurred. Please try again later.')
+      console.error('Login submission error:', err)
+      // Reset form
+      setFormData(prev => ({
+        ...prev,
+        password: ''
+      }))
     }
   }
 
@@ -114,14 +136,31 @@ const LoginPage = () => {
 
         {error && (
           <div style={{ 
-            background: '#f8f8f8', 
-            color: '#cc0000', 
-            padding: '0.6rem', 
-            borderRadius: '6px', 
-            marginBottom: '1rem',
-            fontSize: '0.85rem',
-            border: '1px solid #cc0000'
+            background: '#fff2f2', 
+            color: '#d32f2f',
+            padding: '0.75rem 1rem',
+            borderRadius: '8px', 
+            marginBottom: '1.5rem',
+            fontSize: '0.9rem',
+            border: '1px solid #ffcdd2',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
           }}>
+            <svg 
+              style={{ flexShrink: 0 }} 
+              width="20" 
+              height="20" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
             {error}
           </div>
         )}

@@ -9,14 +9,26 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkUser = async () => {
       const token = localStorage.getItem('token');
+      const storedRole = localStorage.getItem('user_role');
+      
       if (token) {
         apiService.setAuthToken(token);
         try {
           const response = await apiService.getCurrentUser();
-          setUser(response.data);
+          const userData = response.data;
+          
+          // Verify user data matches stored role
+          if (userData.role === storedRole) {
+            setUser(userData);
+          } else {
+            // If roles don't match, force re-login
+            throw new Error('User role mismatch');
+          }
         } catch (error) {
+          console.error('Session validation error:', error);
           setUser(null);
           localStorage.removeItem('token');
+          localStorage.removeItem('user_role');
           apiService.setAuthToken(null);
         }
       }
@@ -28,21 +40,68 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       const response = await apiService.login(credentials.username, credentials.password);
-      const { access_token } = response.data;
+      
+      if (response.status !== 200) {
+        throw new Error(`Login failed with status: ${response.status}`);
+      }
+      
+      const { access_token, user } = response.data;
+      
+      if (!access_token) {
+        throw new Error('No access token received');
+      }
       
       localStorage.setItem('token', access_token);
       apiService.setAuthToken(access_token);
       
-      const userResponse = await apiService.getCurrentUser();
-      setUser(userResponse.data);
+      // If we have user info, store it; otherwise fetch it
+      if (user) {
+        localStorage.setItem('user_role', user.role);
+        setUser(user);
+      } else {
+        try {
+          const userResponse = await apiService.getCurrentUser();
+          const userData = userResponse.data;
+          localStorage.setItem('user_role', userData.role);
+          setUser(userData);
+        } catch (userError) {
+          console.error('Could not fetch user data:', userError);
+          // Still consider login successful if we have the token
+        }
+      }
       
-      return { success: true };
+      return { 
+        success: true,
+        role: user?.role || 'staff' // Default role if not available
+      };
     } catch (error) {
       console.error('Login error:', error);
-      return { 
-        success: false, 
-        error: error.response?.data?.detail || 'Login failed' 
-      };
+      localStorage.removeItem('token');
+      localStorage.removeItem('user_role');
+      apiService.setAuthToken(null);
+      
+      // Handle different error cases
+      if (error.response?.status === 401) {
+        return {
+          success: false,
+          error: 'Invalid username or password'
+        };
+      } else if (error.response?.data?.detail) {
+        return {
+          success: false,
+          error: error.response.data.detail
+        };
+      } else if (error.message) {
+        return {
+          success: false,
+          error: error.message
+        };
+      } else {
+        return {
+          success: false,
+          error: 'Unable to connect to the server. Please try again.'
+        };
+      }
     }
   };
 
