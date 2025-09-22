@@ -70,21 +70,6 @@ class GuestResponse(GuestBase):
     class Config:
         from_attributes = True
 
-# Room Schemas
-class RoomBase(BaseModel):
-    room_number: str
-    status: str = "available"
-
-class RoomCreate(RoomBase):
-    pass
-
-class RoomUpdate(BaseModel):
-    status: Optional[str] = None
-
-class RoomResponse(RoomBase):
-    class Config:
-        from_attributes = True
-
 # Reservation Schemas
 class IDCardType(str, Enum):
     KTP = "KTP"

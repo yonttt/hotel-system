@@ -13,12 +13,6 @@ class User(Base):
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
-class Room(Base):
-    __tablename__ = "rooms"
-    
-    room_number = Column(String(20), primary_key=True)
-    status = Column(String(20), default='available')
-
 class Guest(Base):
     __tablename__ = "guests"
     
