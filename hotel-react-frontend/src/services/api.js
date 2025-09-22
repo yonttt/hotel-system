@@ -91,29 +91,110 @@ class ApiService {
     return this.client.get('/auth/me')
   }
 
-  // Rooms endpoints
+  // Hotel Rooms endpoints (updated to use new hotel_rooms table)
+  async getHotelRooms(skip = 0, limit = 100, room_type = null, floor = null, status = null) {
+    let url = `/hotel-rooms/?skip=${skip}&limit=${limit}`
+    if (room_type) url += `&room_type=${room_type}`
+    if (floor) url += `&floor=${floor}`
+    if (status) url += `&status=${status}`
+    return this.client.get(url)
+  }
+
+  async getHotelRoom(roomNumber) {
+    return this.client.get(`/hotel-rooms/${roomNumber}`)
+  }
+
+  async createHotelRoom(roomData) {
+    return this.client.post('/hotel-rooms/', roomData)
+  }
+
+  async updateHotelRoom(roomNumber, roomData) {
+    return this.client.put(`/hotel-rooms/${roomNumber}`, roomData)
+  }
+
+  async deleteHotelRoom(roomNumber) {
+    return this.client.delete(`/hotel-rooms/${roomNumber}`)
+  }
+
+  async getHotelRoomsByStatus(status) {
+    return this.client.get(`/hotel-rooms/status/${status}`)
+  }
+
+  async getHotelRoomsByType(roomType) {
+    return this.client.get(`/hotel-rooms/type/${roomType}`)
+  }
+
+  async getHotelRoomsByFloor(floorNumber) {
+    return this.client.get(`/hotel-rooms/floor/${floorNumber}`)
+  }
+
+  async getRoomAvailability(room_type = null, floor = null, status = null, min_price = null, max_price = null) {
+    let url = `/hotel-rooms/availability?`
+    const params = []
+    if (room_type) params.push(`room_type=${room_type}`)
+    if (floor) params.push(`floor=${floor}`)
+    if (status) params.push(`status=${status}`)
+    if (min_price) params.push(`min_price=${min_price}`)
+    if (max_price) params.push(`max_price=${max_price}`)
+    return this.client.get(url + params.join('&'))
+  }
+
+  async getRoomStatistics() {
+    return this.client.get('/hotel-rooms/stats')
+  }
+
+  async incrementRoomHitCount(roomNumber) {
+    return this.client.post(`/hotel-rooms/${roomNumber}/increment-hit`)
+  }
+
+  async getPopularRooms(limit = 10) {
+    return this.client.get(`/hotel-rooms/analytics/popular?limit=${limit}`)
+  }
+
+  async getUnderutilizedRooms(limit = 10) {
+    return this.client.get(`/hotel-rooms/analytics/underutilized?limit=${limit}`)
+  }
+
+  // Legacy compatibility methods (redirects to new hotel-rooms endpoints)
   async getRooms(skip = 0, limit = 100) {
-    return this.client.get(`/rooms/?skip=${skip}&limit=${limit}`)
+    return this.getHotelRooms(skip, limit)
   }
 
   async getRoom(roomNumber) {
-    return this.client.get(`/rooms/${roomNumber}`)
+    return this.getHotelRoom(roomNumber)
   }
 
   async createRoom(roomData) {
-    return this.client.post('/rooms/', roomData)
+    return this.createHotelRoom(roomData)
   }
 
   async updateRoom(roomNumber, roomData) {
-    return this.client.put(`/rooms/${roomNumber}`, roomData)
+    return this.updateHotelRoom(roomNumber, roomData)
   }
 
   async deleteRoom(roomNumber) {
-    return this.client.delete(`/rooms/${roomNumber}`)
+    return this.deleteHotelRoom(roomNumber)
   }
 
   async getRoomsByStatus(status) {
-    return this.client.get(`/rooms/status/${status}`)
+    return this.getHotelRoomsByStatus(status)
+  }
+
+  // Room Pricing endpoints
+  async getRoomPricing(roomType, checkDate = null) {
+    let url = `/room-pricing/pricing/${roomType}`
+    if (checkDate) {
+      url += `?check_date=${checkDate}`
+    }
+    return this.client.get(url)
+  }
+
+  async getAllRoomPricing() {
+    return this.client.get('/room-pricing/pricing')
+  }
+
+  async getRoomCategories() {
+    return this.client.get('/room-pricing/categories')
   }
 
   // Guests endpoints

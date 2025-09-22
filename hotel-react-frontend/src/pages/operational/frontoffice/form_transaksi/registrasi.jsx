@@ -14,6 +14,7 @@ const RegistrasiPage = () => {
   const [marketSegments, setMarketSegments] = useState([])
   const [paymentMethods, setPaymentMethods] = useState([])
   const [registrationTypes, setRegistrationTypes] = useState([])
+  const [pricingInfo, setPricingInfo] = useState(null)
 
   const initialFormState = {
     registration_no: '0000000001',
@@ -115,9 +116,46 @@ const RegistrasiPage = () => {
     return (timestamp + random.toString().padStart(4, '0')).slice(0, 10).padStart(10, '0');
   }
 
-  const handleInputChange = (e) => {
+  const handleInputChange = async (e) => {
     const { name, value } = e.target
+    
+    // Prevent manual editing of payment_amount (it's auto-calculated)
+    if (name === 'payment_amount') {
+      return
+    }
+    
+    // Update form data
     setFormData(prev => ({ ...prev, [name]: value }))
+    
+    // Auto-fetch pricing when room number changes
+    if (name === 'room_number' && value) {
+      try {
+        // Find the selected room to get its type
+        const selectedRoom = rooms.find(room => room.room_number === value)
+        if (selectedRoom && selectedRoom.room_type) {
+          const pricingResponse = await apiService.getRoomPricing(selectedRoom.room_type)
+          if (pricingResponse.data && pricingResponse.data.current_rate) {
+            // Store pricing information for display
+            setPricingInfo(pricingResponse.data)
+            setFormData(prev => ({
+              ...prev,
+              payment_amount: pricingResponse.data.current_rate
+            }))
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching room pricing:', error)
+        setPricingInfo(null)
+        // Don't show error to user, just log it
+      }
+    } else if (name === 'room_number' && !value) {
+      // Clear pricing info when no room is selected
+      setPricingInfo(null)
+      setFormData(prev => ({
+        ...prev,
+        payment_amount: 0
+      }))
+    }
   }
 
   // Helper functions to format data for SearchableSelect
@@ -152,7 +190,10 @@ const RegistrasiPage = () => {
   const formatRooms = () => {
     return [
       { value: '', label: 'None selected' },
-      ...rooms.map(room => ({ value: room.room_number, label: `${room.room_number} - ${room.room_type}` }))
+      ...rooms.map(room => ({ 
+        value: room.room_number, 
+        label: `${room.room_number} - ${room.room_type} (Floor ${room.floor_number}) - Hit: ${room.hit_count}` 
+      }))
     ]
   }
 
@@ -312,7 +353,7 @@ const RegistrasiPage = () => {
                 <div className="form-group">
                     <label>Arrival Date</label>
                     <div className="input-group">
-                        <input type="date" name="arrival_date" value={formData.arrival_date} onChange={handleInputChange} className="form-input" />
+                        <input type="date" name="arrival_date" value={formData.arrival_date} readOnly className="form-input bg-gray-100" />
                         <input type="text" name="arrival_time" value={formData.arrival_time} className="form-input" style={{maxWidth: '120px'}} readOnly />
                     </div>
                 </div>
@@ -403,8 +444,8 @@ const RegistrasiPage = () => {
                       <textarea name="notes" value={formData.notes} onChange={handleInputChange} className="form-input" rows="3" />
                   </div>
                   <div className="form-group">
-                    <label>Payment Amount</label>
-                    <input type="number" name="payment_amount" value={formData.payment_amount} onChange={handleInputChange} className="form-input" min="0" />
+                    <label>Payment Amount (Auto-calculated)</label>
+                    <input type="number" name="payment_amount" value={formData.payment_amount} readOnly className="form-input bg-gray-100" min="0" />
                   </div>
                   <div className="form-group">
                     <label>Discount</label>

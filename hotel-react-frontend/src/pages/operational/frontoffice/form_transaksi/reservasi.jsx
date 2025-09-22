@@ -14,6 +14,7 @@ const ReservasiPage = () => {
   const [marketSegments, setMarketSegments] = useState([])
   const [paymentMethods, setPaymentMethods] = useState([])
   const [registrationTypes, setRegistrationTypes] = useState([])
+  const [pricingInfo, setPricingInfo] = useState(null)
 
   const initialFormState = {
     reservation_no: '0000000001',
@@ -115,9 +116,55 @@ const ReservasiPage = () => {
     return (timestamp + random.toString().padStart(4, '0')).slice(0, 10).padStart(10, '0');
   }
 
-  const handleInputChange = (e) => {
+  const handleInputChange = async (e) => {
     const { name, value } = e.target
+    
+    // Prevent manual editing of payment_amount (it's auto-calculated)
+    if (name === 'payment_amount') {
+      return
+    }
+    
+    // Update form data
     setFormData(prev => ({ ...prev, [name]: value }))
+    
+    // Auto-fetch pricing when room number changes
+    if (name === 'room_number' && value) {
+      await fetchPricingForRoom(value, formData.arrival_date)
+    } else if (name === 'room_number' && !value) {
+      // Clear pricing info when no room is selected
+      setPricingInfo(null)
+      setFormData(prev => ({
+        ...prev,
+        payment_amount: 0
+      }))
+    }
+    
+    // Re-fetch pricing when arrival date changes (if room is selected)
+    if (name === 'arrival_date' && value && formData.room_number) {
+      await fetchPricingForRoom(formData.room_number, value)
+    }
+  }
+
+  const fetchPricingForRoom = async (roomNumber, arrivalDate) => {
+    try {
+      // Find the selected room to get its type
+      const selectedRoom = rooms.find(room => room.room_number === roomNumber)
+      if (selectedRoom && selectedRoom.room_type) {
+        const pricingResponse = await apiService.getRoomPricing(selectedRoom.room_type, arrivalDate)
+        if (pricingResponse.data && pricingResponse.data.current_rate) {
+          // Store pricing information for display
+          setPricingInfo(pricingResponse.data)
+          setFormData(prev => ({
+            ...prev,
+            payment_amount: pricingResponse.data.current_rate
+          }))
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching room pricing:', error)
+      setPricingInfo(null)
+      // Don't show error to user, just log it
+    }
   }
 
   // Helper functions to format data for SearchableSelect
@@ -152,7 +199,10 @@ const ReservasiPage = () => {
   const formatRooms = () => {
     return [
       { value: '', label: 'None selected' },
-      ...rooms.map(room => ({ value: room.room_number, label: `${room.room_number} - ${room.room_type}` }))
+      ...rooms.map(room => ({ 
+        value: room.room_number, 
+        label: `${room.room_number} - ${room.room_type} (Floor ${room.floor_number}) - Hit: ${room.hit_count}` 
+      }))
     ]
   }
 
@@ -402,8 +452,8 @@ const ReservasiPage = () => {
                       <textarea name="notes" value={formData.notes} onChange={handleInputChange} className="form-input" rows="3" />
                   </div>
                   <div className="form-group">
-                    <label>Payment Amount</label>
-                    <input type="number" name="payment_amount" value={formData.payment_amount} onChange={handleInputChange} className="form-input" min="0" />
+                    <label>Payment Amount (Auto-calculated)</label>
+                    <input type="number" name="payment_amount" value={formData.payment_amount} readOnly className="form-input bg-gray-100" min="0" />
                   </div>
                   <div className="form-group">
                     <label>Discount</label>
