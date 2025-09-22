@@ -452,7 +452,7 @@ const ReservasiPage = () => {
                       <textarea name="notes" value={formData.notes} onChange={handleInputChange} className="form-input" rows="3" />
                   </div>
                   <div className="form-group">
-                    <label>Payment Amount (Auto-calculated)</label>
+                    <label>Payment Amount</label>
                     <input type="number" name="payment_amount" value={formData.payment_amount} readOnly className="form-input bg-gray-100" min="0" />
                   </div>
                   <div className="form-group">
