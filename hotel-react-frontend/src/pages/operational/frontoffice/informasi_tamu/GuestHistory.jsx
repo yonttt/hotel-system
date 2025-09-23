@@ -131,13 +131,13 @@ const GuestHistory = () => {
         <div className="unified-table-wrapper">
           <table className="reservation-table">
             <colgroup>
-              <col style={{ width: '56px' }} />   {/* No */}
+              <col style={{ width: '60px' }} />   {/* No */}
               <col style={{ width: '140px' }} />  {/* ID Card */}
-              <col style={{ width: '200px' }} />  {/* Guest Name */}
+              <col style={{ width: '180px' }} />  {/* Guest Name */}
               <col style={{ width: '120px' }} />  {/* Market */}
               <col style={{ width: '80px' }} />   {/* Nights */}
-              <col style={{ width: '120px' }} />  {/* Arrival */}
-              <col style={{ width: '120px' }} />  {/* Departure */}
+              <col style={{ width: '110px' }} />  {/* Arrival */}
+              <col style={{ width: '110px' }} />  {/* Departure */}
               <col style={{ width: '120px' }} />  {/* Total C/I */}
               <col style={{ width: '100px' }} />  {/* Detail */}
             </colgroup>

@@ -104,18 +104,18 @@ const ReservasiToday = () => {
         <div className="unified-table-wrapper">
           <table className="reservation-table">
             <colgroup>
-              <col style={{ width: '56px' }} />
-              <col style={{ width: '200px' }} />
-              <col style={{ width: '160px' }} />
-              <col style={{ width: '160px' }} />
-              <col style={{ width: '140px' }} />
-              <col style={{ width: '120px' }} />
-              <col style={{ width: '100px' }} />
-              <col style={{ width: '120px' }} />
-              <col style={{ width: '120px' }} />
-              <col style={{ width: '140px' }} />
-              <col style={{ width: '120px' }} />
-              <col style={{ width: '110px' }} />
+              <col style={{ width: '60px' }} />   {/* No */}
+              <col style={{ width: '180px' }} />  {/* Name */}
+              <col style={{ width: '120px' }} />  {/* Group */}
+              <col style={{ width: '140px' }} />  {/* Company */}
+              <col style={{ width: '120px' }} />  {/* Telp/HP */}
+              <col style={{ width: '100px' }} />  {/* Type */}
+              <col style={{ width: '80px' }} />   {/* Room */}
+              <col style={{ width: '110px' }} />  {/* Arrival Date */}
+              <col style={{ width: '110px' }} />  {/* Departure Date */}
+              <col style={{ width: '130px' }} />  {/* Reserved By */}
+              <col style={{ width: '100px' }} />  {/* Deposit */}
+              <col style={{ width: '100px' }} />  {/* Action */}
             </colgroup>
             <thead>
               <tr>

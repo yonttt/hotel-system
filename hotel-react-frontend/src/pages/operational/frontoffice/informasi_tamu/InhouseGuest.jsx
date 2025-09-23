@@ -119,18 +119,18 @@ const InhouseGuest = () => {
         <div className="unified-table-wrapper">
           <table className="reservation-table">
             <colgroup>
-              <col style={{ width: '56px' }} />   {/* No */}
+              <col style={{ width: '60px' }} />   {/* No */}
               <col style={{ width: '180px' }} />  {/* Name */}
               <col style={{ width: '120px' }} />  {/* Market */}
               <col style={{ width: '80px' }} />   {/* Nights */}
-              <col style={{ width: '120px' }} />  {/* Booking Date */}
+              <col style={{ width: '110px' }} />  {/* Booking Date */}
               <col style={{ width: '100px' }} />  {/* Type */}
               <col style={{ width: '80px' }} />   {/* Room */}
-              <col style={{ width: '120px' }} />  {/* Arrival Date */}
-              <col style={{ width: '120px' }} />  {/* Departure Date */}
+              <col style={{ width: '110px' }} />  {/* Arrival Date */}
+              <col style={{ width: '110px' }} />  {/* Departure Date */}
               <col style={{ width: '120px' }} />  {/* Total Charge */}
               <col style={{ width: '120px' }} />  {/* Total Deposit */}
-              <col style={{ width: '120px' }} />  {/* Balance */}
+              <col style={{ width: '100px' }} />  {/* Balance */}
               <col style={{ width: '80px' }} />   {/* Guest */}
               <col style={{ width: '100px' }} />  {/* Action */}
             </colgroup>

@@ -4075,12 +4075,22 @@ select, .form-select {
   gap: 6px; /* tighter */
   margin: 0;
   border-radius: 0;
+  width: 100%; /* Ensure full width */
+  box-sizing: border-box; /* Include padding in width calculation */
 }
 
 /* Header rows */
-.header-row { display: flex; justify-content: space-between; align-items: center; }
+.header-row { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  width: 100%;
+}
 .header-row-top { padding-bottom: 2px; border-bottom: 1px solid #e5e7eb; }
-.header-row-bottom { padding-top: 2px; }
+.header-row-bottom { 
+  padding-top: 2px; 
+  min-height: 40px; /* Ensure consistent height */
+}
 
 /* Title with small grid icon */
 .header-title { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: #374151; }
@@ -4109,6 +4119,18 @@ select, .form-select {
   gap: 12px; /* tighter */
 }
 
+/* Ensure left section doesn't take up too much space */
+.unified-header-left {
+  flex: 0 1 auto; /* Don't grow, can shrink */
+  min-width: 0; /* Allow shrinking */
+}
+
+/* Ensure right section stays at the end */
+.unified-header-right {
+  flex: 0 0 auto; /* Don't grow or shrink */
+  margin-left: auto; /* Push to the right */
+}
+
 .page-title-select {
   border: 1px solid #ced4da;
   border-radius: 6px;
@@ -4130,12 +4152,14 @@ select, .form-select {
   display: flex;
   align-items: center;
   gap: 8px;
+  max-width: 300px; /* Limit width to prevent interference */
 }
 
 .unified-header-left .search-section label {
   font-weight: 500;
   color: #6c757d;
   font-size: 13px;
+  white-space: nowrap; /* Prevent label wrapping */
 }
 
 .unified-header-left .search-section .search-input {
@@ -4146,6 +4170,7 @@ select, .form-select {
   background-color: #ffffff;
   transition: all 0.2s ease;
   min-width: 200px;
+  max-width: 250px; /* Prevent search field from being too wide */
 }
 
 .unified-header-left .search-section .search-input:focus {
@@ -4296,11 +4321,18 @@ select, .form-select {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+/* Specific styling for bottom row entries control */
+.header-row-bottom .unified-header-right .entries-control {
+  margin-left: 20px; /* Add extra space from search section */
 }
 
 .unified-header-right .entries-label {
   color: #6c757d;
   font-size: 12px;
+  font-weight: 500;
 }
 
 /* Alignment helpers */
@@ -4386,4 +4418,15 @@ select, .form-select {
   border-color: #007bff;
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+.header-row {
+  display: flex;
+  justify-content: space-between; /* Ini kunci utamanya */
+  align-items: center;
+}
+
+.unified-header-left, .unified-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }

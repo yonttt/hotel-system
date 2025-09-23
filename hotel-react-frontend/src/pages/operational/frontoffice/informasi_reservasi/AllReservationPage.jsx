@@ -136,16 +136,16 @@ const AllReservationPage = () => {
         <div className="unified-table-wrapper">
           <table className="reservation-table">
             <colgroup>
-              <col style={{ width: '56px' }} />   {/* No */}
-              <col style={{ width: '220px' }} />  {/* Name */}
-              <col style={{ width: '140px' }} />  {/* Market */}
-              <col style={{ width: '160px' }} />  {/* Booking */}
-              <col style={{ width: '120px' }} />  {/* Arrival */}
-              <col style={{ width: '120px' }} />  {/* Departure */}
-              <col style={{ width: '140px' }} />  {/* Reserved By */}
-              <col style={{ width: '140px' }} />  {/* Deposit By */}
-              <col style={{ width: '120px' }} />  {/* Deposit */}
-              <col style={{ width: '90px' }} />   {/* Guest */}
+              <col style={{ width: '60px' }} />   {/* No */}
+              <col style={{ width: '180px' }} />  {/* Name */}
+              <col style={{ width: '120px' }} />  {/* Market */}
+              <col style={{ width: '140px' }} />  {/* Booking */}
+              <col style={{ width: '110px' }} />  {/* Arrival */}
+              <col style={{ width: '110px' }} />  {/* Departure */}
+              <col style={{ width: '130px' }} />  {/* Reserved By */}
+              <col style={{ width: '130px' }} />  {/* Deposit By */}
+              <col style={{ width: '100px' }} />  {/* Deposit */}
+              <col style={{ width: '80px' }} />   {/* Guest */}
             </colgroup>
             <thead>
               <tr>
