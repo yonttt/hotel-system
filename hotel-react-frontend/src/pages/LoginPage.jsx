@@ -85,10 +85,10 @@ const LoginPage = () => {
     }
 
     // Comment out reCAPTCHA validation for development
-    // if (!recaptchaToken) {
-    //   setError('Please complete the reCAPTCHA verification')
-    //   return
-    // }
+     if (!recaptchaToken) {
+       setError('Please complete the reCAPTCHA verification')
+       return
+    }
 
     try {
       const result = await login({ 
