@@ -12,6 +12,7 @@ const LoginPage = () => {
   const [error, setError] = useState('')
   const [recaptchaToken, setRecaptchaToken] = useState('')
   const recaptchaRef = useRef(null)
+  const recaptchaWidgetId = useRef(null)
   const { login, isAuthenticated } = useAuth()
   const navigate = useNavigate()
 
@@ -21,48 +22,71 @@ const LoginPage = () => {
     }
     
     // Initialize reCAPTCHA when component mounts
-    const script = document.querySelector('script[src*="recaptcha"]')
-    if (script && window.grecaptcha) {
-      initializeRecaptcha()
-    } else {
-      // Wait for script to load with timeout
-      let attempts = 0
-      const checkRecaptcha = setInterval(() => {
-        attempts++
-        if (window.grecaptcha) {
-          clearInterval(checkRecaptcha)
-          initializeRecaptcha()
-        } else if (attempts > 50) { // 5 seconds timeout
-          clearInterval(checkRecaptcha)
-          console.error('Failed to load Google reCAPTCHA')
-          setError('Failed to load reCAPTCHA. Please refresh the page.')
-        }
-      }, 100)
-      
-      // Cleanup interval on unmount
-      return () => clearInterval(checkRecaptcha)
-    }
-  }, [isAuthenticated, navigate])
+    const initializeRecaptcha = () => {
+      if (!window.grecaptcha || !window.grecaptcha.render) {
+        return false
+      }
 
-  const initializeRecaptcha = () => {
-    if (window.grecaptcha && window.grecaptcha.render) {
-      window.grecaptcha.ready(() => {
-        if (recaptchaRef.current) {
-          window.grecaptcha.render(recaptchaRef.current, {
+      // Check if already rendered
+      if (recaptchaWidgetId.current !== null) {
+        return true
+      }
+
+      // Check if ref exists and is empty
+      if (recaptchaRef.current && !recaptchaRef.current.hasChildNodes()) {
+        try {
+          recaptchaWidgetId.current = window.grecaptcha.render(recaptchaRef.current, {
             sitekey: getRecaptchaSiteKey(),
             theme: RECAPTCHA_CONFIG.THEME,
             size: RECAPTCHA_CONFIG.SIZE,
             callback: (token) => {
               setRecaptchaToken(token)
+              setError('') // Clear any previous errors
             },
             'expired-callback': () => {
               setRecaptchaToken('')
+              setError('reCAPTCHA expired. Please verify again.')
+            },
+            'error-callback': () => {
+              setRecaptchaToken('')
+              setError('reCAPTCHA error. Please try again.')
             }
           })
+          return true
+        } catch (err) {
+          console.error('Error rendering reCAPTCHA:', err)
+          return false
         }
-      })
+      }
+      return false
     }
-  }
+
+    // Wait for grecaptcha to be ready
+    if (window.grecaptcha && window.grecaptcha.ready) {
+      window.grecaptcha.ready(() => {
+        initializeRecaptcha()
+      })
+    } else {
+      // Fallback: poll for grecaptcha availability
+      let attempts = 0
+      const maxAttempts = 30 // 3 seconds
+      const checkInterval = setInterval(() => {
+        attempts++
+        if (window.grecaptcha && window.grecaptcha.ready) {
+          clearInterval(checkInterval)
+          window.grecaptcha.ready(() => {
+            initializeRecaptcha()
+          })
+        } else if (attempts >= maxAttempts) {
+          clearInterval(checkInterval)
+          console.error('Failed to load Google reCAPTCHA')
+          setError('Failed to load reCAPTCHA. Please refresh the page.')
+        }
+      }, 100)
+      
+      return () => clearInterval(checkInterval)
+    }
+  }, [isAuthenticated, navigate])
 
   const handleChange = (e) => {
     setFormData({
@@ -75,19 +99,16 @@ const LoginPage = () => {
     e.preventDefault()
     setError('')
 
-    // Clear any previous error
-    setError('')
-
     // Validate form fields
     if (!formData.username.trim() || !formData.password.trim()) {
       setError('Please enter both username and password')
       return
     }
 
-    // Comment out reCAPTCHA validation for development
-     if (!recaptchaToken) {
-       setError('Please complete the reCAPTCHA verification')
-       return
+    // Validate reCAPTCHA token
+    if (!recaptchaToken) {
+      setError('Please complete the reCAPTCHA verification')
+      return
     }
 
     try {
@@ -106,9 +127,13 @@ const LoginPage = () => {
           password: ''
         }))
         // Reset reCAPTCHA on login failure
-        if (window.grecaptcha) {
-          window.grecaptcha.reset()
-          setRecaptchaToken('')
+        if (window.grecaptcha && recaptchaWidgetId.current !== null) {
+          try {
+            window.grecaptcha.reset(recaptchaWidgetId.current)
+            setRecaptchaToken('')
+          } catch (err) {
+            console.error('Error resetting reCAPTCHA:', err)
+          }
         }
       }
     } catch (err) {
@@ -119,6 +144,15 @@ const LoginPage = () => {
         ...prev,
         password: ''
       }))
+      // Reset reCAPTCHA on error
+      if (window.grecaptcha && recaptchaWidgetId.current !== null) {
+        try {
+          window.grecaptcha.reset(recaptchaWidgetId.current)
+          setRecaptchaToken('')
+        } catch (err) {
+          console.error('Error resetting reCAPTCHA:', err)
+        }
+      }
     }
   }
 

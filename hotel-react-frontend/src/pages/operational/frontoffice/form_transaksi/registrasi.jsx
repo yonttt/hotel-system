@@ -80,8 +80,8 @@ const RegistrasiPage = () => {
 
         let calculatedDiscount = 0;
         const selectedSegment = marketSegments.find(segment => segment.name === formData.market_segment);
-        if (selectedSegment && selectedSegment.percentage > 0 && basePrice > 0) {
-            calculatedDiscount = basePrice * (selectedSegment.percentage / 100);
+        if (selectedSegment && selectedSegment.discount_percentage > 0 && basePrice > 0) {
+            calculatedDiscount = basePrice * (selectedSegment.discount_percentage / 100);
         }
 
         const priceAfterDiscount = basePrice - calculatedDiscount;
@@ -190,7 +190,7 @@ const RegistrasiPage = () => {
   const formatMarketSegments = () => {
     return [
       { value: 'Normal', label: 'Normal' },
-      ...filteredMarketSegments.map(ms => ({ value: ms.name, label: `${ms.name} - ${ms.percentage}%` }))
+      ...filteredMarketSegments.map(ms => ({ value: ms.name, label: `${ms.name} - ${ms.discount_percentage || 0}%` }))
     ]
   }
 
