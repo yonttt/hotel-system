@@ -14,7 +14,6 @@ const ReservasiPage = () => {
   const [marketSegments, setMarketSegments] = useState([])
   const [filteredMarketSegments, setFilteredMarketSegments] = useState([])
   const [paymentMethods, setPaymentMethods] = useState([])
-  const [registrationTypes, setRegistrationTypes] = useState([])
   const [pricingInfo, setPricingInfo] = useState(null)
 
   const initialFormState = {
@@ -44,7 +43,6 @@ const ReservasiPage = () => {
     room_number: '',
     transaction_status: 'Reservation',
     payment_method: '',
-    registration_type: '',
     notes: '',
     payment_amount: 0,
     discount: 0,
@@ -454,13 +452,6 @@ const ReservasiPage = () => {
                     />
                   </div>
                   <div className="form-group">
-                      <label>Reservation Type</label>
-                      <select name="reservation_type" value={formData.reservation_type} onChange={handleInputChange} className="form-select">
-                          <option value="Individual">Normal</option>
-                          <option value="Group">6 Hours</option>
-                      </select>
-                  </div>
-                   <div className="form-group">
                       <label>Note</label>
                       <textarea name="notes" value={formData.notes} onChange={handleInputChange} className="form-input" rows="3" />
                   </div>

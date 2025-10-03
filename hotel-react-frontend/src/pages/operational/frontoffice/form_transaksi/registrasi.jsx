@@ -14,7 +14,6 @@ const RegistrasiPage = () => {
   const [marketSegments, setMarketSegments] = useState([])
   const [filteredMarketSegments, setFilteredMarketSegments] = useState([])
   const [paymentMethods, setPaymentMethods] = useState([])
-  const [registrationTypes, setRegistrationTypes] = useState([])
   const [pricingInfo, setPricingInfo] = useState(null)
 
   const initialFormState = {
@@ -44,7 +43,6 @@ const RegistrasiPage = () => {
     room_number: '',
     transaction_status: 'Registration',
     payment_method: '',
-    registration_type: '',
     notes: '',
     payment_amount: 0,
     discount: 0,
@@ -122,8 +120,6 @@ const RegistrasiPage = () => {
         apiService.getCategoryMarkets(),
         apiService.getMarketSegments(),
         apiService.getPaymentMethods(),
-        // Anda mungkin perlu menambahkan endpoint untuk registration_types di api.js
-        // apiService.getRegistrationTypes() 
       ]);
 
       const getDataOrDefault = (result, defaultValue = []) =>
@@ -142,7 +138,6 @@ const RegistrasiPage = () => {
       setCategoryMarkets(getDataOrDefault(results[4]));
       setMarketSegments(getDataOrDefault(results[5]));
       setPaymentMethods(getDataOrDefault(results[6]));
-      // setRegistrationTypes(getDataOrDefault(results[7])); // Aktifkan jika endpoint ada
 
     } catch (error) {
       console.error('Critical error loading initial data:', error);
@@ -453,13 +448,6 @@ const RegistrasiPage = () => {
                     />
                   </div>
                   <div className="form-group">
-                      <label>Registration Type</label>
-                      <select name="registration_type" value={formData.registration_type} onChange={handleInputChange} className="form-select">
-                          <option value="Normal">Normal</option>
-                          <option value="6hours">6 Hours</option>
-                      </select>
-                  </div>
-                   <div className="form-group">
                       <label>Note</label>
                       <textarea name="notes" value={formData.notes} onChange={handleInputChange} className="form-input" rows="3" />
                   </div>
