@@ -182,28 +182,6 @@ def populate_dropdown_tables():
         else:
             print(f"Payment Methods already exist in database ({payment_count} methods found)")
         
-        # Insert Registration Types
-        registration_types_data = [
-            ('Individual', 'Individual guest registration'),
-            ('Group', 'Group registration'),
-            ('Corporate', 'Corporate booking registration'),
-            ('Event', 'Event-based registration'),
-            ('VIP', 'VIP guest registration'),
-            ('Complimentary', 'Complimentary stay registration'),
-            ('Staff', 'Hotel staff accommodation'),
-            ('Emergency', 'Emergency accommodation')
-        ]
-        
-        cursor.execute("SELECT COUNT(*) FROM registration_types")
-        reg_types_count = cursor.fetchone()[0]
-        
-        if reg_types_count == 0:
-            for name, description in registration_types_data:
-                cursor.execute("INSERT INTO registration_types (name, description) VALUES (%s, %s)", (name, description))
-            print("✅ Registration Types data inserted successfully")
-        else:
-            print(f"Registration Types already exist in database ({reg_types_count} types found)")
-        
         # Insert Sample Rooms
         rooms_data = [
             ('101', 'Standard', 'available'),

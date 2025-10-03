@@ -94,11 +94,6 @@ class TransactionStatus(str, Enum):
     Confirmed = "Confirmed"
     Cancelled = "Cancelled"
 
-class RegistrationType(str, Enum):
-    Reservasi = "Reservasi"
-    Walkin = "Walkin"
-    Group = "Group"
-
 class ReservationBase(BaseModel):
     reservation_no: str
     category_market: str = "Walkin"
@@ -126,7 +121,6 @@ class ReservationBase(BaseModel):
     room_number: Optional[str] = None
     transaction_status: TransactionStatus = TransactionStatus.Pending
     payment_method: str = "Debit BCA 446"
-    registration_type: RegistrationType = RegistrationType.Reservasi
     note: Optional[str] = None
     payment_amount: Decimal = Decimal('0.00')
     discount: Decimal = Decimal('0.00')
@@ -164,7 +158,6 @@ class ReservationUpdate(BaseModel):
     room_number: Optional[str] = None
     transaction_status: Optional[TransactionStatus] = None
     payment_method: Optional[str] = None
-    registration_type: Optional[RegistrationType] = None
     note: Optional[str] = None
     payment_amount: Optional[Decimal] = None
     discount: Optional[Decimal] = None
@@ -210,7 +203,6 @@ class GuestRegistrationBase(BaseModel):
     room_number: Optional[str] = None
     transaction_status: str = "Registration"
     payment_method_id: Optional[int] = None
-    registration_type_id: Optional[int] = None
     notes: Optional[str] = None
     payment_amount: Decimal = Decimal('0.00')
     discount: Decimal = Decimal('0.00')
@@ -250,7 +242,6 @@ class GuestRegistrationUpdate(BaseModel):
     room_number: Optional[str] = None
     transaction_status: Optional[str] = None
     payment_method_id: Optional[int] = None
-    registration_type_id: Optional[int] = None
     notes: Optional[str] = None
     payment_amount: Optional[Decimal] = None
     discount: Optional[Decimal] = None
