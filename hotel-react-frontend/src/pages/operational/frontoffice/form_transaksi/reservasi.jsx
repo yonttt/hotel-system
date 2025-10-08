@@ -98,10 +98,27 @@ const ReservasiPage = () => {
 
     useEffect(() => {
         if (formData.category_market === 'Walkin') {
-            const walkinSegments = marketSegments.filter(segment => segment.name.toLowerCase().includes('walkin'));
+            const walkinSegments = marketSegments.filter(segment => 
+                segment.name.toLowerCase().includes('walkin') || 
+                (segment.category && segment.category.toLowerCase() === 'walkin')
+            );
             setFilteredMarketSegments(walkinSegments);
+        } else if (formData.category_market === 'Online Travel Agent (OTA)') {
+            const otaSegments = marketSegments.filter(segment => 
+                segment.name.toLowerCase().includes('ota') || 
+                (segment.category && segment.category.toLowerCase() === 'online travel agent (ota)')
+            );
+            setFilteredMarketSegments(otaSegments);
         } else {
-            const otherSegments = marketSegments.filter(segment => !segment.name.toLowerCase().includes('walkin'));
+            // For other categories, show segments that don't belong to Walkin or OTA
+            const otherSegments = marketSegments.filter(segment => 
+                !segment.name.toLowerCase().includes('walkin') && 
+                !segment.name.toLowerCase().includes('ota') &&
+                (!segment.category || (
+                    segment.category.toLowerCase() !== 'walkin' && 
+                    segment.category.toLowerCase() !== 'online travel agent (ota)'
+                ))
+            );
             setFilteredMarketSegments(otherSegments);
         }
         setFormData(prev => ({ ...prev, market_segment: '' }));
