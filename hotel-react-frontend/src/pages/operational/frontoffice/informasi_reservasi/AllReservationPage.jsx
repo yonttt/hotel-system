@@ -92,6 +92,8 @@ const AllReservationPage = () => {
               <div className="header-title">
                 <span>ALL RESERVATION LIST</span>
               </div>
+            </div>
+            <div className="unified-header-right">
               <div className="hotel-select">
                 <label>Hotel :</label>
                 <select className="header-hotel-select">
@@ -99,7 +101,6 @@ const AllReservationPage = () => {
                 </select>
               </div>
             </div>
-            <div className="unified-header-right" />
           </div>
           <div className="header-row header-row-bottom">
             <div className="unified-header-left">

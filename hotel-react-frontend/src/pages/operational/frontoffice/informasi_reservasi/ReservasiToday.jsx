@@ -65,6 +65,8 @@ const ReservasiToday = () => {
               <div className="header-title">
                 <span>RESERVATION TODAY</span>
               </div>
+            </div>
+            <div className="unified-header-right">
               <div className="hotel-select">
                 <label>Hotel :</label>
                 <select className="header-hotel-select">
@@ -72,7 +74,6 @@ const ReservasiToday = () => {
                 </select>
               </div>
             </div>
-            <div className="unified-header-right" />
           </div>
           <div className="header-row header-row-bottom">
             <div className="unified-header-left">
