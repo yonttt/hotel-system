@@ -3973,49 +3973,110 @@ select, .form-select {
 }
 
 .unified-header-right .entries-select {
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  padding: 6px 10px;
+  border: 1px solid #b7b7b7;
+  border-radius: 3px;
+  padding: 4px;
   background-color: #fff;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
 
-.unified-header-right .entries-select:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+
+.unified-table-wrapper {
+  border: 1px solid #b7b7b7;
+  max-height: 500px;
+  overflow-y: auto;
+  background-color: white;
+  border-bottom: none;
+}
+
+.unified-reservation-container .reservation-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.unified-reservation-container .reservation-table th {
+  background-color: #f0f0f0;
+  border: 1px solid #c5c5c5;
+  padding: 8px;
+  text-align: left;
+  font-weight: bold;
+  border-top: none;
+  border-left: none;
+}
+
+.unified-reservation-container .reservation-table th:last-child {
+  border-right: none;
+}
+
+.unified-reservation-container .reservation-table td {
+  padding: 8px;
+  border: 1px solid #c5c5c5;
+  border-left: none;
+  border-bottom: none;
+}
+
+.unified-reservation-container .reservation-table td:last-child {
+  border-right: none;
+}
+
+.unified-reservation-container .reservation-table tbody tr:last-child td {
+ border-bottom: 1px solid #c5c5c5;
+}
+
+
+.unified-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  margin-top: 5px;
+  font-size: 12px;
+}
+
+.unified-footer .pagination {
+  display: flex;
+  gap: 4px;
+}
+
+.unified-footer .pagination button {
+  background-color: #f0f0f0;
+  border: 1px solid #b7b7b7;
+  border-radius: 3px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.unified-footer .pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* =======================================================
-   MODERN UNIFIED TABLE LAYOUT - IMPROVED VERSION
-   Clean, professional table design with better spacing
-   Used by: All reservation and guest information pages
+   MODERN UNIFIED TABLE LAYOUT (For AllReservationPage.jsx)
+   Single cohesive table layout without separate sections
    ======================================================= */
 
 .unified-reservation-container {
-  background: transparent;
-  border: none;
-  border-radius: 0;
+  background: transparent; /* blend with page */
+  border: none;            /* remove outer box */
+  border-radius: 0;        /* no rounded corners */
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 14px;
-  color: #1e293b;
-  box-shadow: none;
+  color: #495057;
+  box-shadow: none;        /* remove shadow card */
   overflow: visible;
 }
 
 .unified-header-controls {
-  background: linear-gradient(135deg, #f8f9fb, #eef2f7);
-  border-bottom: 2px solid #e2e8f0;
-  padding: 14px 20px;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-bottom: 1px solid #dee2e6;
+  padding: 10px 16px; /* tighter */
   display: grid;
   grid-template-rows: auto auto;
-  gap: 10px;
+  gap: 6px; /* tighter */
   margin: 0;
   border-radius: 0;
-  width: 100%;
-  box-sizing: border-box;
+  width: 100%; /* Ensure full width */
+  box-sizing: border-box; /* Include padding in width calculation */
 }
 
 /* Header rows */
@@ -4025,107 +4086,32 @@ select, .form-select {
   align-items: center; 
   width: 100%;
 }
-.header-row-top { 
-  padding-bottom: 8px; 
-  border-bottom: 1px solid #e2e8f0; 
-}
+.header-row-top { padding-bottom: 2px; border-bottom: 1px solid #e5e7eb; }
 .header-row-bottom { 
-  padding-top: 8px; 
-  min-height: 44px;
+  padding-top: 2px; 
+  min-height: 40px; /* Ensure consistent height */
 }
 
-/* Title styling */
-.header-title { 
-  display: inline-flex; 
-  align-items: center; 
-  gap: 8px; 
-  font-weight: 600; 
-  color: #1e293b;
-  font-size: 15px;
-  letter-spacing: 0.5px;
-}
+/* Title with small grid icon */
+.header-title { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: #374151; }
+/* removed logo/icon spacing */
 
 /* Hotel select inline */
-.hotel-select { 
-  display: inline-flex; 
-  align-items: center; 
-  gap: 8px; 
-  margin-left: 16px; 
-  color: #475569; 
-}
-.header-hotel-select { 
-  border: 1px solid #cbd5e1; 
-  border-radius: 6px; 
-  padding: 6px 12px; 
-  background: #fff; 
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-.header-hotel-select:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
+.hotel-select { display: inline-flex; align-items: center; gap: 6px; margin-left: 10px; color: #4b5563; }
+.header-hotel-select { border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px 8px; background: #fff; font-size: 12px; }
 
 /* Date range section for Guest History */
-.date-range-section { 
-  display: inline-flex; 
-  align-items: center; 
-  gap: 10px; 
-  margin-left: 16px; 
-  color: #475569; 
-}
-.date-input { 
-  border: 1px solid #cbd5e1; 
-  border-radius: 6px; 
-  padding: 6px 12px; 
-  background: #fff; 
-  font-size: 13px;
-  transition: all 0.2s ease;
-}
-.date-input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-.date-separator { 
-  color: #64748b; 
-  font-size: 13px; 
-  margin: 0 4px; 
-}
+.date-range-section { display: inline-flex; align-items: center; gap: 8px; margin-left: 14px; color: #4b5563; }
+.date-input { border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px 8px; background: #fff; font-size: 12px; }
+.date-separator { color: #6b7280; font-size: 12px; margin: 0 4px; }
 
-/* Search spacing */
-.header-row-bottom .search-section label { 
-  margin-right: 10px;
-  font-weight: 500;
-  color: #475569;
-}
-.header-row-bottom .search-section .search-input { 
-  min-width: 240px; 
-  padding: 8px 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  font-size: 13px;
-  transition: all 0.2s ease;
-}
-.header-row-bottom .search-section .search-input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
+/* Search spacing per screenshot */
+.header-row-bottom .search-section label { margin-right: 8px; }
+.header-row-bottom .search-section .search-input { min-width: 220px; padding: 6px 10px; }
 
 /* Entries block on right */
-.header-row-bottom .entries-control { 
-  display: inline-flex; 
-  align-items: center; 
-  gap: 8px; 
-}
-.header-row-bottom .entries-label { 
-  color: #64748b; 
-  font-size: 13px;
-  font-weight: 500;
-}
+.header-row-bottom .entries-control { display: inline-flex; align-items: center; gap: 6px; }
+.header-row-bottom .entries-label { color: #6b7280; font-size: 12px; }
 
 .unified-header-left, .unified-header-right {
   display: flex;
@@ -4247,14 +4233,13 @@ select, .form-select {
 }
 
 .unified-table-wrapper {
-  border: none;
+  border: none;                 /* remove card look */
   border-radius: 0;
   max-height: 600px;
   overflow: auto;
-  background-color: transparent;
+  background-color: transparent;/* blend with page background */
   box-shadow: none;
   margin: 0;
-  position: relative;
 }
 
 .unified-reservation-container .reservation-table {
@@ -4262,17 +4247,20 @@ select, .form-select {
   border-collapse: collapse;
   font-size: 13px;
   margin: 0;
-  border: 1px solid #e2e8f0;
+  /* show outer edges since wrapper border was removed */
+  border-left: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
 }
 
 .unified-reservation-container .reservation-table th {
-  background: linear-gradient(135deg, #f8f9fb, #eef2f7);
-  border-bottom: 2px solid #e2e8f0;
-  border-right: 1px solid #e2e8f0;
-  padding: 12px;
+  background: linear-gradient(135deg, #f1f3f4, #e8eaed);
+  border-bottom: 1px solid #dee2e6;
+  border-right: 1px solid #dee2e6;
+  border-top: 1px solid #dee2e6;
+  padding: 8px 10px; /* tighter */
   text-align: left;
   font-weight: 600;
-  color: #1e293b;
+  color: #495057;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -4281,61 +4269,51 @@ select, .form-select {
   z-index: 10;
 }
 
-.unified-reservation-container .reservation-table th:first-child { 
-  border-left: none; 
-}
-.unified-reservation-container .reservation-table th:last-child { 
-  border-right: none; 
-}
+.unified-reservation-container .reservation-table th:first-child { border-left: 1px solid #dee2e6; }
+.unified-reservation-container .reservation-table th:last-child { border-right: 1px solid #dee2e6; }
 
 .unified-reservation-container .reservation-table td {
-  padding: 12px;
-  border-bottom: 1px solid #e2e8f0;
-  border-right: 1px solid #f1f5f9;
-  color: #334155;
+  padding: 8px 10px; /* tighter */
+  border-bottom: 1px solid #e9ecef;
+  border-right: 1px solid #e9ecef;
+  color: #495057;
   vertical-align: middle;
   font-size: 13px;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  line-height: 1.6;
 }
 
-.unified-reservation-container .reservation-table td:first-child { 
-  border-left: none;
-  font-weight: 500;
-  color: #64748b;
-}
-.unified-reservation-container .reservation-table td:last-child { 
-  border-right: none; 
-}
+.unified-reservation-container .reservation-table td:first-child { border-left: 1px solid #e9ecef; }
+.unified-reservation-container .reservation-table td:last-child { border-right: 1px solid #e9ecef; }
+
+/* Remove any leftover rounding from older style */
+.unified-table-wrapper { border-top-left-radius: 0; border-top-right-radius: 0; }
 
 .unified-reservation-container .reservation-table tbody tr {
-  background-color: #ffffff;
   transition: all 0.2s ease;
 }
 
 .unified-reservation-container .reservation-table tbody tr:hover {
-  background-color: #ebf5ff;
+  background-color: #f8f9fa;
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .unified-reservation-container .reservation-table tbody tr:nth-child(even) {
-  background-color: #f9fafb;
+  background-color: #fdfdfd;
 }
 
 .unified-reservation-container .reservation-table tbody tr:nth-child(even):hover {
-  background-color: #ebf5ff;
+  background-color: #f8f9fa;
 }
 
 .unified-reservation-container .reservation-table .no-data {
   text-align: center;
-  color: #94a3b8;
+  color: #6c757d;
   font-style: italic;
-  padding: 32px;
+  padding: 24px;
   background-color: transparent;
-  font-size: 14px;
 }
 
 /* Header right entries control grouping */
@@ -4380,14 +4358,14 @@ select, .form-select {
   align-items: center;
   padding: 16px 20px;
   font-size: 13px;
-  background: linear-gradient(135deg, #f8f9fb, #eef2f7);
-  border-top: 2px solid #e2e8f0;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-top: 1px solid #dee2e6;
   margin: 0;
   border-radius: 0;
 }
 
 .unified-footer .entries-info {
-  color: #64748b;
+  color: #6c757d;
   font-weight: 500;
 }
 
@@ -4397,86 +4375,58 @@ select, .form-select {
 }
 
 .unified-footer .pagination button {
-  background: linear-gradient(145deg, #ffffff, #f8f9fb);
-  border: 1px solid #cbd5e1;
+  background: linear-gradient(145deg, #ffffff, #f8f9fa);
+  border: 1px solid #dee2e6;
   border-radius: 6px;
   padding: 8px 14px;
   cursor: pointer;
   font-size: 12px;
   font-weight: 500;
-  color: #334155;
+  color: #495057;
   transition: all 0.2s ease;
 }
 
 .unified-footer .pagination button:hover:not(:disabled) {
-  background: linear-gradient(145deg, #3b82f6, #2563eb);
+  background: linear-gradient(145deg, #007bff, #0056b3);
   color: white;
-  border-color: #3b82f6;
+  border-color: #007bff;
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
 }
 
 .unified-footer .pagination button:disabled {
   opacity: 0.4;
   cursor: not-allowed;
-  background: #f1f5f9;
-  color: #94a3b8;
+  background: #f8f9fa;
+  color: #adb5bd;
 }
 
 /* Table action button */
 .btn-table-action {
-  background: linear-gradient(145deg, #ffffff, #f8f9fb);
-  border: 1px solid #cbd5e1;
+  background: linear-gradient(145deg, #ffffff, #f8f9fa);
+  border: 1px solid #dee2e6;
   border-radius: 6px;
-  padding: 6px 12px;
+  padding: 6px 10px;
   cursor: pointer;
   font-size: 12px;
-  color: #334155;
-  font-weight: 500;
+  color: #495057;
   transition: all 0.2s ease;
 }
 .btn-table-action:hover {
-  background: linear-gradient(145deg, #3b82f6, #2563eb);
+  background: linear-gradient(145deg, #007bff, #0056b3);
   color: #fff;
-  border-color: #3b82f6;
+  border-color: #007bff;
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
 }
-/* Alignment and number formatting utilities */
-.unified-reservation-container .reservation-table td.align-right { 
-  text-align: right; 
-  font-variant-numeric: tabular-nums;
-}
-.unified-reservation-container .reservation-table td.align-center { 
-  text-align: center; 
-}
-.unified-reservation-container .reservation-table td.mono, 
-.unified-reservation-container .reservation-table td .mono {
-  font-family: ui-monospace, 'SF Mono', 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
-  letter-spacing: -0.5px;
+.header-row {
+  display: flex;
+  justify-content: space-between; /* Ini kunci utamanya */
+  align-items: center;
 }
 
-/* Improved row numbering */
-.unified-reservation-container .reservation-table tbody tr td:first-child {
-  text-align: center;
-  font-variant-numeric: tabular-nums;
-}
-
-/* Loading and error states */
-.unified-reservation-container .loading-spinner {
-  text-align: center;
-  padding: 40px;
-  color: #64748b;
-  font-size: 14px;
-}
-
-.unified-reservation-container .error-message {
-  text-align: center;
-  padding: 40px;
-  color: #dc2626;
-  font-size: 14px;
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 6px;
-  margin: 20px;
+.unified-header-left, .unified-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
