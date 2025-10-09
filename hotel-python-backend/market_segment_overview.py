@@ -88,7 +88,8 @@ try:
     print("   1. Walkin (41 segments)")
     print("   2. Online Travel Agent (OTA) (10 segments)")
     print("   3. Corporate Rate (20 segments)")
-    print("\n📝 Other categories use general filtering (excluding Walkin, OTA, Corporate)")
+    print("   4. Group (73 segments)")
+    print("\n📝 Other categories use general filtering (excluding Walkin, OTA, Corporate, Group)")
     
     cursor.close()
     conn.close()
