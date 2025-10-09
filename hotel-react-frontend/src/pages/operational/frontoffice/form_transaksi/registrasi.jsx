@@ -115,16 +115,24 @@ const RegistrasiPage = () => {
                 (segment.category && segment.category.toLowerCase() === 'corporate rate')
             );
             setFilteredMarketSegments(corporateSegments);
+        } else if (formData.category_market === 'Group') {
+            const groupSegments = marketSegments.filter(segment => 
+                segment.name.toLowerCase().includes('group') || 
+                (segment.category && segment.category.toLowerCase() === 'group')
+            );
+            setFilteredMarketSegments(groupSegments);
         } else {
-            // For other categories, show segments that don't belong to Walkin, OTA, or Corporate
+            // For other categories, show segments that don't belong to Walkin, OTA, Corporate, or Group
             const otherSegments = marketSegments.filter(segment => 
                 !segment.name.toLowerCase().includes('walkin') && 
                 !segment.name.toLowerCase().includes('ota') &&
                 !segment.name.toLowerCase().includes('corporate') &&
+                !segment.name.toLowerCase().includes('group') &&
                 (!segment.category || (
                     segment.category.toLowerCase() !== 'walkin' && 
                     segment.category.toLowerCase() !== 'online travel agent (ota)' &&
-                    segment.category.toLowerCase() !== 'corporate rate'
+                    segment.category.toLowerCase() !== 'corporate rate' &&
+                    segment.category.toLowerCase() !== 'group'
                 ))
             );
             setFilteredMarketSegments(otherSegments);
