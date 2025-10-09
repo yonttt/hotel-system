@@ -4034,7 +4034,7 @@ select, .form-select {
   min-height: 44px;
 }
 
-/* Title styling */
+/* Title styling - for left side of top row */
 .header-title { 
   display: inline-flex; 
   align-items: center; 
@@ -4043,15 +4043,21 @@ select, .form-select {
   color: #1e293b;
   font-size: 15px;
   letter-spacing: 0.5px;
+  margin: 0;
 }
 
-/* Hotel select inline */
+/* Hotel select - for right side of top row */
 .hotel-select { 
   display: inline-flex; 
   align-items: center; 
   gap: 8px; 
-  margin-left: 16px; 
+  margin-left: auto; /* Push to the right */
   color: #475569; 
+}
+.hotel-select label {
+  font-weight: 500;
+  font-size: 13px;
+  white-space: nowrap;
 }
 .header-hotel-select { 
   border: 1px solid #cbd5e1; 
@@ -4061,6 +4067,7 @@ select, .form-select {
   font-size: 13px;
   cursor: pointer;
   transition: all 0.2s ease;
+  min-width: 100px;
 }
 .header-hotel-select:focus {
   outline: none;
@@ -4095,54 +4102,102 @@ select, .form-select {
   margin: 0 4px; 
 }
 
-/* Search spacing */
-.header-row-bottom .search-section label { 
-  margin-right: 10px;
+/* Search section - left side of bottom row */
+.search-section { 
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-section label { 
   font-weight: 500;
   color: #475569;
+  font-size: 13px;
+  white-space: nowrap;
 }
-.header-row-bottom .search-section .search-input { 
-  min-width: 240px; 
+
+.search-section .search-input { 
+  min-width: 200px;
+  max-width: 280px;
   padding: 8px 12px;
   border: 1px solid #cbd5e1;
   border-radius: 6px;
   font-size: 13px;
   transition: all 0.2s ease;
+  background: #fff;
 }
-.header-row-bottom .search-section .search-input:focus {
+
+.search-section .search-input:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-/* Entries block on right */
-.header-row-bottom .entries-control { 
-  display: inline-flex; 
+/* Entries control - right side of bottom row */
+.entries-control { 
+  display: flex; 
   align-items: center; 
-  gap: 8px; 
+  gap: 8px;
+  white-space: nowrap;
 }
-.header-row-bottom .entries-label { 
+
+.entries-label { 
   color: #64748b; 
   font-size: 13px;
   font-weight: 500;
 }
 
-.unified-header-left, .unified-header-right {
+.entries-select {
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 6px 12px;
+  background: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 70px;
+}
+
+.entries-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Left and right sections for both header rows */
+.unified-header-left {
   display: flex;
   align-items: center;
-  gap: 12px; /* tighter */
+  gap: 12px;
+  flex: 0 1 auto;
+  min-width: 0;
 }
 
-/* Ensure left section doesn't take up too much space */
-.unified-header-left {
-  flex: 0 1 auto; /* Don't grow, can shrink */
-  min-width: 0; /* Allow shrinking */
-}
-
-/* Ensure right section stays at the end */
 .unified-header-right {
-  flex: 0 0 auto; /* Don't grow or shrink */
-  margin-left: auto; /* Push to the right */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+/* Top row specific: Title on left, Hotel selector on right */
+.header-row-top .unified-header-left {
+  flex: 1; /* Allow title to take space */
+}
+
+.header-row-top .unified-header-right {
+  flex: 0 0 auto; /* Keep hotel selector compact */
+}
+
+/* Bottom row specific: Search on left, Entries+buttons on right */
+.header-row-bottom .unified-header-left {
+  flex: 0 1 auto; /* Search field stays on left */
+}
+
+.header-row-bottom .unified-header-right {
+  flex: 0 0 auto; /* Entries and buttons stay on right */
+  gap: 16px; /* More space between entries and buttons */
 }
 
 .page-title-select {
@@ -4162,88 +4217,43 @@ select, .form-select {
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.1);
 }
 
-.unified-header-left .search-section {
+/* Action buttons container - for icon buttons next to entries */
+.action-buttons {
   display: flex;
   align-items: center;
   gap: 8px;
-  max-width: 300px; /* Limit width to prevent interference */
 }
 
-.unified-header-left .search-section label {
-  font-weight: 500;
-  color: #6c757d;
-  font-size: 13px;
-  white-space: nowrap; /* Prevent label wrapping */
-}
-
-.unified-header-left .search-section .search-input {
-  border: 1px solid #ced4da;
-  border-radius: 6px;
-  padding: 6px 10px;
-  font-size: 13px;
-  background-color: #ffffff;
-  transition: all 0.2s ease;
-  min-width: 200px;
-  max-width: 250px; /* Prevent search field from being too wide */
-}
-
-.unified-header-left .search-section .search-input:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.1);
-}
-
-.unified-header-right .action-buttons {
-  display: flex;
-  gap: 6px;
-}
-
-.unified-header-right .action-buttons button,
-.unified-header-right .btn-print-unified {
-  background: linear-gradient(145deg, #ffffff, #f8f9fa);
-  border: 1px solid #dee2e6;
+.action-buttons button,
+.btn-print-unified {
+  background: linear-gradient(145deg, #ffffff, #f8f9fb);
+  border: 1px solid #cbd5e1;
   border-radius: 6px;
   padding: 8px;
   cursor: pointer;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #475569;
 }
 
-.unified-header-right .action-buttons button:hover,
-.unified-header-right .btn-print-unified:hover {
-  background: linear-gradient(145deg, #007bff, #0056b3);
+.action-buttons button:hover,
+.btn-print-unified:hover {
+  background: linear-gradient(145deg, #3b82f6, #2563eb);
   color: white;
-  border-color: #007bff;
+  border-color: #3b82f6;
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
 }
 
-.unified-header-right .btn-print-unified {
+.btn-print-unified {
   width: auto;
   padding: 8px 16px;
   font-weight: 500;
   font-size: 13px;
-}
-
-.unified-header-right .entries-select {
-  border: 1px solid #ced4da;
-  border-radius: 6px;
-  padding: 6px 26px 6px 10px; /* add right padding for arrow */
-  min-width: 56px; /* ensures number not cramped */
-  background-color: #ffffff;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.unified-header-right .entries-select:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.1);
 }
 
 .unified-table-wrapper {
