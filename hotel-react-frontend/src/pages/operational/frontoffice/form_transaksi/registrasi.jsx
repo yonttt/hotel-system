@@ -121,21 +121,39 @@ const RegistrasiPage = () => {
                 (segment.category && segment.category.toLowerCase() === 'group')
             );
             setFilteredMarketSegments(groupSegments);
-        } else {
-            // For other categories, show segments that don't belong to Walkin, OTA, Corporate, or Group
-            const otherSegments = marketSegments.filter(segment => 
-                !segment.name.toLowerCase().includes('walkin') && 
-                !segment.name.toLowerCase().includes('ota') &&
-                !segment.name.toLowerCase().includes('corporate') &&
-                !segment.name.toLowerCase().includes('group') &&
-                (!segment.category || (
-                    segment.category.toLowerCase() !== 'walkin' && 
-                    segment.category.toLowerCase() !== 'online travel agent (ota)' &&
-                    segment.category.toLowerCase() !== 'corporate rate' &&
-                    segment.category.toLowerCase() !== 'group'
-                ))
+        } else if (formData.category_market === 'Government Rate') {
+            const governmentSegments = marketSegments.filter(segment => 
+                segment.name.toLowerCase().includes('government') || 
+                (segment.category && segment.category.toLowerCase() === 'government rate')
             );
-            setFilteredMarketSegments(otherSegments);
+            setFilteredMarketSegments(governmentSegments);
+        } else if (formData.category_market === 'Travel Agent') {
+            const travelAgentSegments = marketSegments.filter(segment => 
+                segment.name.toLowerCase().includes('travel agent') || 
+                (segment.category && segment.category.toLowerCase() === 'travel agent')
+            );
+            setFilteredMarketSegments(travelAgentSegments);
+        } else if (formData.category_market === 'Social Media') {
+            const socialMediaSegments = marketSegments.filter(segment => 
+                segment.name.toLowerCase().includes('social media') || 
+                (segment.category && segment.category.toLowerCase() === 'social media')
+            );
+            setFilteredMarketSegments(socialMediaSegments);
+        } else if (formData.category_market === 'WAWCARD') {
+            const wawcardSegments = marketSegments.filter(segment => 
+                segment.name.toLowerCase().includes('wawcard') || 
+                (segment.category && segment.category.toLowerCase() === 'wawcard')
+            );
+            setFilteredMarketSegments(wawcardSegments);
+        } else if (formData.category_market === 'SMS Blast') {
+            const smsBlastSegments = marketSegments.filter(segment => 
+                segment.name.toLowerCase().includes('sms blast') || 
+                (segment.category && segment.category.toLowerCase() === 'sms blast')
+            );
+            setFilteredMarketSegments(smsBlastSegments);
+        } else {
+            // For uncategorized segments, show all remaining segments
+            setFilteredMarketSegments(marketSegments);
         }
         // Reset market segment when category changes to avoid invalid selection
         setFormData(prev => ({ ...prev, market_segment: '' }));
