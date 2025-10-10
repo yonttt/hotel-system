@@ -3989,85 +3989,93 @@ select, .form-select {
 }
 
 /* =======================================================
-   MODERN UNIFIED TABLE LAYOUT - IMPROVED VERSION
-   Clean, professional table design with better spacing
+   BRAND NEW TABLE SYSTEM - 2025 REDESIGN
+   Fresh, clean, professional design with modern UI/UX
    Used by: All reservation and guest information pages
    ======================================================= */
 
 .unified-reservation-container {
-  background: transparent;
+  background: #ffffff;
   border: none;
-  border-radius: 0;
+  border-radius: 16px;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 14px;
-  color: #1e293b;
-  box-shadow: none;
-  overflow: visible;
+  color: #0f172a;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  margin: 24px;
 }
 
 .unified-header-controls {
-  background: linear-gradient(135deg, #f8f9fb, #eef2f7);
-  border-bottom: 2px solid #e2e8f0;
-  padding: 14px 20px;
-  display: grid;
-  grid-template-rows: auto auto;
-  gap: 10px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border-bottom: 1px solid #e2e8f0;
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   margin: 0;
-  border-radius: 0;
   width: 100%;
   box-sizing: border-box;
 }
 
-/* Header rows */
+/* Header rows - clean and spacious */
 .header-row { 
   display: flex; 
   justify-content: space-between; 
   align-items: center; 
   width: 100%;
+  gap: 24px;
 }
 .header-row-top { 
-  padding-bottom: 8px; 
-  border-bottom: 1px solid #e2e8f0; 
+  padding-bottom: 16px; 
+  border-bottom: 2px solid #f1f5f9; 
 }
 .header-row-bottom { 
-  padding-top: 8px; 
-  min-height: 44px;
+  padding-top: 4px; 
+  min-height: 48px;
 }
 
-/* Title styling - for left side of top row */
+/* Title styling - bold and prominent */
 .header-title { 
-  display: inline-flex; 
+  display: flex; 
   align-items: center; 
-  gap: 8px; 
-  font-weight: 600; 
-  color: #1e293b;
-  font-size: 15px;
-  letter-spacing: 0.5px;
+  gap: 12px; 
+  font-weight: 800; 
+  color: #0f172a;
+  font-size: 20px;
+  letter-spacing: -0.5px;
   margin: 0;
+  text-transform: uppercase;
 }
 
-/* Hotel select - for right side of top row */
+/* Hotel select - clean dropdown */
 .hotel-select { 
-  display: inline-flex; 
+  display: flex; 
   align-items: center; 
-  gap: 8px; 
-  margin-left: auto; /* Push to the right */
-  color: #475569; 
+  gap: 12px; 
+  margin-left: auto;
+  color: #1e293b; 
 }
 .hotel-select label {
-  font-weight: 500;
-  font-size: 13px;
+  font-weight: 600;
+  font-size: 14px;
   white-space: nowrap;
+  color: #64748b;
 }
 .header-hotel-select { 
-  border: 1px solid #cbd5e1; 
-  border-radius: 6px; 
-  padding: 6px 12px; 
-  background: #fff; 
-  font-size: 13px;
+  border: 2px solid #e2e8f0; 
+  border-radius: 8px; 
+  padding: 10px 16px; 
+  background: #ffffff; 
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
-  min-width: 100px;
+  transition: all 0.3s ease;
+  min-width: 140px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+.header-hotel-select:hover {
+  border-color: #cbd5e1;
 }
 .header-hotel-select:focus {
   outline: none;
@@ -4075,56 +4083,70 @@ select, .form-select {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-/* Date range section for Guest History */
+/* Date range section - modern clean inputs */
 .date-range-section { 
   display: inline-flex; 
   align-items: center; 
-  gap: 10px; 
-  margin-left: 16px; 
-  color: #475569; 
+  gap: 16px; 
+  margin-left: 20px; 
+  color: #1e293b;
+  font-weight: 700;
 }
 .date-input { 
-  border: 1px solid #cbd5e1; 
-  border-radius: 6px; 
-  padding: 6px 12px; 
+  border: 2px solid #e2e8f0; 
+  border-radius: 8px; 
+  padding: 10px 16px; 
   background: #fff; 
-  font-size: 13px;
-  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 160px;
 }
 .date-input:focus {
   outline: none;
   border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+  background: #f8fafc;
+}
+.date-input:hover {
+  border-color: #cbd5e1;
 }
 .date-separator { 
-  color: #64748b; 
-  font-size: 13px; 
-  margin: 0 4px; 
+  color: #475569; 
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 8px; 
 }
 
-/* Search section - left side of bottom row */
+/* Search section - modern input */
 .search-section { 
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .search-section label { 
-  font-weight: 500;
-  color: #475569;
-  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  font-size: 14px;
   white-space: nowrap;
 }
 
 .search-section .search-input { 
-  min-width: 200px;
-  max-width: 280px;
-  padding: 8px 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  font-size: 13px;
-  transition: all 0.2s ease;
-  background: #fff;
+  min-width: 280px;
+  max-width: 400px;
+  padding: 10px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.search-section .search-input:hover {
+  border-color: #cbd5e1;
 }
 
 .search-section .search-input:focus {
@@ -4133,29 +4155,39 @@ select, .form-select {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-/* Entries control - right side of bottom row */
+.search-section .search-input::placeholder {
+  color: #94a3b8;
+}
+
+/* Entries control - clean dropdown */
 .entries-control { 
   display: flex; 
   align-items: center; 
-  gap: 8px;
+  gap: 12px;
   white-space: nowrap;
 }
 
 .entries-label { 
   color: #64748b; 
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .entries-select {
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  padding: 6px 12px;
-  background: #fff;
-  font-size: 13px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 16px;
+  background: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
-  min-width: 70px;
+  transition: all 0.3s ease;
+  min-width: 80px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.entries-select:hover {
+  border-color: #cbd5e1;
 }
 
 .entries-select:focus {
@@ -4217,51 +4249,58 @@ select, .form-select {
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.1);
 }
 
-/* Action buttons container - for icon buttons next to entries */
+/* Action buttons container - modern icon buttons */
 .action-buttons {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .action-buttons button,
 .btn-print-unified {
-  background: linear-gradient(145deg, #ffffff, #f8f9fb);
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  padding: 8px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
   cursor: pointer;
-  width: 36px;
-  height: 36px;
-  transition: all 0.2s ease;
+  width: 44px;
+  height: 44px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #475569;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
 .action-buttons button:hover,
 .btn-print-unified:hover {
-  background: linear-gradient(145deg, #3b82f6, #2563eb);
-  color: white;
-  border-color: #3b82f6;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.5);
+}
+
+.action-buttons button:active,
+.btn-print-unified:active {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
 .btn-print-unified {
   width: auto;
-  padding: 8px 16px;
-  font-weight: 500;
+  padding: 12px 24px;
+  font-weight: 700;
   font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .unified-table-wrapper {
   border: none;
   border-radius: 0;
-  max-height: 600px;
+  max-height: 650px;
   overflow: auto;
-  background-color: transparent;
+  background-color: #ffffff;
   box-shadow: none;
   margin: 0;
   position: relative;
@@ -4269,42 +4308,46 @@ select, .form-select {
 
 .unified-reservation-container .reservation-table {
   width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
   margin: 0;
-  border: 1px solid #e2e8f0;
+  background: #ffffff;
 }
 
+/* Table Header - Dark professional style */
 .unified-reservation-container .reservation-table th {
-  background: linear-gradient(135deg, #f8f9fb, #eef2f7);
-  border-bottom: 2px solid #e2e8f0;
-  border-right: 1px solid #e2e8f0;
-  padding: 12px;
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  border: none;
+  padding: 18px 24px;
   text-align: left;
-  font-weight: 600;
-  color: #1e293b;
-  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1.5px;
   position: sticky;
   top: 0;
   z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-bottom: 3px solid #3b82f6;
 }
 
 .unified-reservation-container .reservation-table th:first-child { 
-  border-left: none; 
+  padding-left: 32px;
 }
 .unified-reservation-container .reservation-table th:last-child { 
-  border-right: none; 
+  padding-right: 32px;
 }
 
+/* Table Body - Clean rows */
 .unified-reservation-container .reservation-table td {
-  padding: 12px;
-  border-bottom: 1px solid #e2e8f0;
-  border-right: 1px solid #f1f5f9;
-  color: #334155;
+  padding: 18px 24px;
+  border-bottom: 1px solid #f1f5f9;
+  border-right: none;
+  color: #1e293b;
   vertical-align: middle;
-  font-size: 13px;
+  font-size: 14px;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -4312,40 +4355,48 @@ select, .form-select {
 }
 
 .unified-reservation-container .reservation-table td:first-child { 
-  border-left: none;
-  font-weight: 500;
-  color: #64748b;
+  font-weight: 700;
+  color: #0f172a;
+  padding-left: 32px;
+  background: linear-gradient(90deg, #f0f9ff 0%, #ffffff 100%);
 }
 .unified-reservation-container .reservation-table td:last-child { 
-  border-right: none; 
+  padding-right: 32px;
 }
 
+/* Table Rows - Modern hover effects */
 .unified-reservation-container .reservation-table tbody tr {
   background-color: #ffffff;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-left: 4px solid transparent;
 }
 
 .unified-reservation-container .reservation-table tbody tr:hover {
-  background-color: #ebf5ff;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+  background: linear-gradient(90deg, #dbeafe 0%, #eff6ff 50%, #ffffff 100%);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-left-color: #3b82f6;
 }
 
 .unified-reservation-container .reservation-table tbody tr:nth-child(even) {
-  background-color: #f9fafb;
+  background-color: #f8fafc;
 }
 
 .unified-reservation-container .reservation-table tbody tr:nth-child(even):hover {
-  background-color: #ebf5ff;
+  background: linear-gradient(90deg, #dbeafe 0%, #eff6ff 50%, #f8fafc 100%);
 }
 
+/* No data state - modern empty state */
 .unified-reservation-container .reservation-table .no-data {
   text-align: center;
-  color: #94a3b8;
-  font-style: italic;
-  padding: 32px;
-  background-color: transparent;
-  font-size: 14px;
+  color: #64748b;
+  font-weight: 600;
+  padding: 80px 40px;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  font-size: 16px;
+  border-radius: 12px;
+  margin: 24px;
+  border: 2px dashed #cbd5e1;
 }
 
 /* Header right entries control grouping */
@@ -4367,18 +4418,31 @@ select, .form-select {
   font-weight: 500;
 }
 
-/* Alignment helpers */
-.unified-reservation-container .reservation-table td.align-right { text-align: right; }
-.unified-reservation-container .reservation-table td.align-center { text-align: center; }
+/* Alignment helpers - clean modern alignment */
+.unified-reservation-container .reservation-table td.align-right { 
+  text-align: right; 
+  padding-right: 32px;
+}
+.unified-reservation-container .reservation-table td.align-center { 
+  text-align: center; 
+}
 .unified-reservation-container .reservation-table td.mono, 
 .unified-reservation-container .reservation-table td .mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-weight: 600;
+  color: #475569;
+  background: #f8fafc;
+  padding: 4px 12px;
+  border-radius: 6px;
+  display: inline-block;
 }
 
 /* Make long text truncate nicely */
 .unified-reservation-container .reservation-table td,
 .unified-reservation-container .reservation-table th {
   max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Ensure sticky header works over scroll container */
@@ -4388,69 +4452,78 @@ select, .form-select {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
-  font-size: 13px;
-  background: linear-gradient(135deg, #f8f9fb, #eef2f7);
-  border-top: 2px solid #e2e8f0;
+  padding: 24px 32px;
+  font-size: 14px;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  border-top: 1px solid #e2e8f0;
   margin: 0;
-  border-radius: 0;
+  border-radius: 0 0 16px 16px;
 }
 
 .unified-footer .entries-info {
-  color: #64748b;
-  font-weight: 500;
+  color: #475569;
+  font-weight: 600;
+  font-size: 14px;
 }
 
 .unified-footer .pagination {
   display: flex;
-  gap: 6px;
+  gap: 10px;
+  align-items: center;
 }
 
 .unified-footer .pagination button {
-  background: linear-gradient(145deg, #ffffff, #f8f9fb);
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  padding: 8px 14px;
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 18px;
   cursor: pointer;
-  font-size: 12px;
-  font-weight: 500;
-  color: #334155;
-  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 700;
+  color: #475569;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .unified-footer .pagination button:hover:not(:disabled) {
-  background: linear-gradient(145deg, #3b82f6, #2563eb);
+  background: linear-gradient(135deg, #1e293b, #0f172a);
   color: white;
-  border-color: #3b82f6;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  border-color: #1e293b;
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.3);
 }
 
 .unified-footer .pagination button:disabled {
-  opacity: 0.4;
+  opacity: 0.3;
   cursor: not-allowed;
-  background: #f1f5f9;
-  color: #94a3b8;
+  background: #f8fafc;
+  color: #cbd5e1;
+  border-color: #e2e8f0;
 }
 
-/* Table action button */
+/* Table action button - modern pill */
 .btn-table-action {
-  background: linear-gradient(145deg, #ffffff, #f8f9fb);
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  padding: 6px 12px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border: none;
+  border-radius: 20px;
+  padding: 8px 20px;
   cursor: pointer;
-  font-size: 12px;
-  color: #334155;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  font-size: 13px;
+  color: #ffffff;
+  font-weight: 700;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 .btn-table-action:hover {
-  background: linear-gradient(145deg, #3b82f6, #2563eb);
-  color: #fff;
-  border-color: #3b82f6;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
 }
 /* Alignment and number formatting utilities */
 .unified-reservation-container .reservation-table td.align-right { 
@@ -4472,21 +4545,27 @@ select, .form-select {
   font-variant-numeric: tabular-nums;
 }
 
-/* Loading and error states */
+/* Loading and error states - modern feedback */
 .unified-reservation-container .loading-spinner {
   text-align: center;
-  padding: 40px;
-  color: #64748b;
-  font-size: 14px;
+  padding: 80px 40px;
+  color: #475569;
+  font-size: 16px;
+  font-weight: 600;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 12px;
+  margin: 24px;
 }
 
 .unified-reservation-container .error-message {
   text-align: center;
-  padding: 40px;
-  color: #dc2626;
-  font-size: 14px;
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 6px;
-  margin: 20px;
+  padding: 32px 40px;
+  color: #991b1b;
+  font-size: 15px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  border: 3px solid #ef4444;
+  border-radius: 12px;
+  margin: 24px;
+  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.2);
 }
