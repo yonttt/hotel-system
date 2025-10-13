@@ -3989,25 +3989,26 @@ select, .form-select {
 }
 
 /* =======================================================
-   CLEAN & SIMPLE TABLE SYSTEM
-   Professional, tidy design - easy to read
+   SIMPLE BLACK & WHITE TABLE SYSTEM
+   Clean, professional design - easy to read
    Used by: All reservation and guest information pages
    ======================================================= */
 
 .unified-reservation-container {
   background: #ffffff;
   border: 1px solid #dee2e6;
-  border-radius: 4px;
+  border-radius: 6px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 14px;
   color: #212529;
   overflow: hidden;
   margin: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .unified-header-controls {
   background: #f8f9fa;
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 2px solid #dee2e6;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -4072,12 +4073,13 @@ select, .form-select {
   min-width: 140px;
 }
 .header-hotel-select:hover {
-  border-color: #adb5bd;
+  border-color: #495057;
+  background: #f8f9fa;
 }
 .header-hotel-select:focus {
   outline: none;
-  border-color: #80bdff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  border-color: #495057;
+  box-shadow: 0 0 0 0.15rem rgba(0, 0, 0, 0.1);
 }
 
 /* Date range section */
@@ -4102,11 +4104,11 @@ select, .form-select {
 }
 .date-input:focus {
   outline: none;
-  border-color: #80bdff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  border-color: #495057;
+  box-shadow: 0 0 0 0.15rem rgba(0, 0, 0, 0.1);
 }
 .date-input:hover {
-  border-color: #adb5bd;
+  border-color: #495057;
 }
 .date-separator { 
   color: #6c757d; 
@@ -4141,13 +4143,13 @@ select, .form-select {
 }
 
 .search-section .search-input:hover {
-  border-color: #adb5bd;
+  border-color: #495057;
 }
 
 .search-section .search-input:focus {
   outline: none;
-  border-color: #80bdff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  border-color: #495057;
+  box-shadow: 0 0 0 0.15rem rgba(0, 0, 0, 0.1);
 }
 
 .search-section .search-input::placeholder {
@@ -4181,13 +4183,13 @@ select, .form-select {
 }
 
 .entries-select:hover {
-  border-color: #adb5bd;
+  border-color: #495057;
 }
 
 .entries-select:focus {
   outline: none;
-  border-color: #80bdff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  border-color: #495057;
+  box-shadow: 0 0 0 0.15rem rgba(0, 0, 0, 0.1);
 }
 
 /* Left and right sections for both header rows */
@@ -4252,8 +4254,8 @@ select, .form-select {
 
 .action-buttons button,
 .btn-print-unified {
-  background: #007bff;
-  border: 1px solid #007bff;
+  background: #343a40;
+  border: 1px solid #343a40;
   border-radius: 4px;
   padding: 8px;
   cursor: pointer;
@@ -4268,8 +4270,8 @@ select, .form-select {
 
 .action-buttons button:hover,
 .btn-print-unified:hover {
-  background: #0056b3;
-  border-color: #0056b3;
+  background: #212529;
+  border-color: #212529;
 }
 
 .btn-print-unified {
@@ -4283,11 +4285,30 @@ select, .form-select {
   border: none;
   border-radius: 0;
   max-height: 650px;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: auto;
   background-color: #ffffff;
   box-shadow: none;
   margin: 0;
   position: relative;
+}
+
+.unified-table-wrapper::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.unified-table-wrapper::-webkit-scrollbar-track {
+  background: #f8f9fa;
+}
+
+.unified-table-wrapper::-webkit-scrollbar-thumb {
+  background: #6c757d;
+  border-radius: 4px;
+}
+
+.unified-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #495057;
 }
 
 .unified-reservation-container .reservation-table {
@@ -4298,7 +4319,7 @@ select, .form-select {
   background: #ffffff;
 }
 
-/* Table Header - Simple clean style */
+/* Table Header - Simple black & white */
 .unified-reservation-container .reservation-table th {
   background: #343a40;
   border-bottom: 2px solid #dee2e6;
@@ -4351,7 +4372,7 @@ select, .form-select {
 }
 
 .unified-reservation-container .reservation-table tbody tr:hover {
-  background-color: #f8f9fa;
+  background-color: #e9ecef;
 }
 
 .unified-reservation-container .reservation-table tbody tr:nth-child(even) {
@@ -4424,7 +4445,7 @@ select, .form-select {
   padding: 16px 20px;
   font-size: 13px;
   background: #f8f9fa;
-  border-top: 1px solid #dee2e6;
+  border-top: 2px solid #dee2e6;
   margin: 0;
 }
 
@@ -4457,9 +4478,9 @@ select, .form-select {
 }
 
 .unified-footer .pagination button:hover:not(:disabled) {
-  background: #007bff;
+  background: #343a40;
   color: white;
-  border-color: #007bff;
+  border-color: #343a40;
 }
 
 .unified-footer .pagination button:disabled {
@@ -4472,8 +4493,8 @@ select, .form-select {
 
 /* Table action button */
 .btn-table-action {
-  background: #007bff;
-  border: 1px solid #007bff;
+  background: #343a40;
+  border: 1px solid #343a40;
   border-radius: 4px;
   padding: 6px 14px;
   cursor: pointer;
@@ -4483,8 +4504,8 @@ select, .form-select {
   transition: all 0.2s ease;
 }
 .btn-table-action:hover {
-  background: #0056b3;
-  border-color: #0056b3;
+  background: #212529;
+  border-color: #212529;
 }
 /* Alignment and number formatting utilities */
 .unified-reservation-container .reservation-table td.align-right { 
