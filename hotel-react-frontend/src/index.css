@@ -4011,12 +4011,12 @@ select, .form-select {
 }
 
 .unified-header-controls {
-  background: #f8f9fa;
-  border-bottom: 2px solid #dee2e6;
-  padding: 20px;
+  background: #ffffff;
+  border-bottom: 1px solid #dee2e6;
+  padding: 16px 24px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   margin: 0;
   width: 100%;
   box-sizing: border-box;
@@ -4031,8 +4031,8 @@ select, .form-select {
   gap: 16px;
 }
 .header-row-top { 
-  padding-bottom: 12px; 
-  border-bottom: 1px solid #dee2e6; 
+  padding: 0;
+  border-bottom: none;
 }
 .header-row-bottom { 
   padding-top: 8px; 
@@ -4044,41 +4044,40 @@ select, .form-select {
   display: flex; 
   align-items: center; 
   gap: 8px; 
-  font-weight: 700; 
+  font-weight: 600; 
   color: #212529;
-  font-size: 18px;
+  font-size: 16px;
   margin: 0;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 /* Hotel select */
 .hotel-select { 
   display: flex; 
   align-items: center; 
-  gap: 10px; 
+  gap: 8px; 
   margin-left: auto;
   color: #495057; 
 }
 .hotel-select label {
-  font-weight: 600;
+  font-weight: 500;
   font-size: 13px;
   white-space: nowrap;
-  color: #6c757d;
+  color: #495057;
 }
 .header-hotel-select { 
   border: 1px solid #ced4da; 
   border-radius: 4px; 
-  padding: 8px 12px; 
+  padding: 6px 10px; 
   background: #ffffff; 
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 400;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-width: 140px;
+  min-width: 160px;
 }
 .header-hotel-select:hover {
   border-color: #495057;
-  background: #f8f9fa;
 }
 .header-hotel-select:focus {
   outline: none;
@@ -4129,19 +4128,19 @@ select, .form-select {
 }
 
 .search-section label { 
-  font-weight: 600;
-  color: #6c757d;
+  font-weight: 500;
+  color: #495057;
   font-size: 13px;
   white-space: nowrap;
 }
 
 .search-section .search-input { 
-  min-width: 250px;
-  max-width: 350px;
-  padding: 8px 12px;
+  min-width: 220px;
+  max-width: 320px;
+  padding: 6px 10px;
   border: 1px solid #ced4da;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 13px;
   transition: all 0.2s ease;
   background: #ffffff;
 }
@@ -4164,26 +4163,26 @@ select, .form-select {
 .entries-control { 
   display: flex; 
   align-items: center; 
-  gap: 10px;
+  gap: 8px;
   white-space: nowrap;
 }
 
 .entries-label { 
-  color: #6c757d; 
+  color: #495057; 
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .entries-select {
   border: 1px solid #ced4da;
   border-radius: 4px;
-  padding: 8px 12px;
+  padding: 6px 10px;
   background: #ffffff;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 400;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-width: 80px;
+  min-width: 70px;
 }
 
 .entries-select:hover {
