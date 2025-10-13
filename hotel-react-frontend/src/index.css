@@ -385,7 +385,7 @@ body {
    Used by: Sidebar.jsx component
    =================================== */
 .sidebar {
-  width: 240px;
+  width: 200px;
   background: linear-gradient(180deg, #374151 0%, #1f2937 100%);
   color: white;
   display: flex;

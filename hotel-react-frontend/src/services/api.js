@@ -15,7 +15,7 @@ class ApiService {
     this.client.interceptors.request.use(
       (config) => {
         const token = localStorage.getItem('token')
-        if (token) {
+        if (token && !config.headers.Authorization) {
           config.headers.Authorization = `Bearer ${token}`
         }
         return config
@@ -40,9 +40,11 @@ class ApiService {
 
   setAuthToken(token) {
     if (token) {
-      this.client.defaults.headers.Authorization = `Bearer ${token}`
+      this.client.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      localStorage.setItem('token', token)
     } else {
-      delete this.client.defaults.headers.Authorization
+      delete this.client.defaults.headers.common['Authorization']
+      localStorage.removeItem('token')
     }
   }
 
