@@ -3989,134 +3989,130 @@ select, .form-select {
 }
 
 /* =======================================================
-   BRAND NEW TABLE SYSTEM - 2025 REDESIGN
-   Fresh, clean, professional design with modern UI/UX
+   CLEAN & SIMPLE TABLE SYSTEM
+   Professional, tidy design - easy to read
    Used by: All reservation and guest information pages
    ======================================================= */
 
 .unified-reservation-container {
   background: #ffffff;
-  border: none;
-  border-radius: 16px;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 14px;
-  color: #0f172a;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  color: #212529;
   overflow: hidden;
-  margin: 24px;
+  margin: 20px;
 }
 
 .unified-header-controls {
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-  border-bottom: 1px solid #e2e8f0;
-  padding: 24px 32px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   margin: 0;
   width: 100%;
   box-sizing: border-box;
 }
 
-/* Header rows - clean and spacious */
+/* Header rows */
 .header-row { 
   display: flex; 
   justify-content: space-between; 
   align-items: center; 
   width: 100%;
-  gap: 24px;
+  gap: 16px;
 }
 .header-row-top { 
-  padding-bottom: 16px; 
-  border-bottom: 2px solid #f1f5f9; 
+  padding-bottom: 12px; 
+  border-bottom: 1px solid #dee2e6; 
 }
 .header-row-bottom { 
-  padding-top: 4px; 
-  min-height: 48px;
+  padding-top: 8px; 
+  min-height: 40px;
 }
 
-/* Title styling - bold and prominent */
+/* Title styling */
 .header-title { 
   display: flex; 
   align-items: center; 
-  gap: 12px; 
-  font-weight: 800; 
-  color: #0f172a;
-  font-size: 20px;
-  letter-spacing: -0.5px;
+  gap: 8px; 
+  font-weight: 700; 
+  color: #212529;
+  font-size: 18px;
   margin: 0;
   text-transform: uppercase;
 }
 
-/* Hotel select - clean dropdown */
+/* Hotel select */
 .hotel-select { 
   display: flex; 
   align-items: center; 
-  gap: 12px; 
+  gap: 10px; 
   margin-left: auto;
-  color: #1e293b; 
+  color: #495057; 
 }
 .hotel-select label {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13px;
   white-space: nowrap;
-  color: #64748b;
+  color: #6c757d;
 }
 .header-hotel-select { 
-  border: 2px solid #e2e8f0; 
-  border-radius: 8px; 
-  padding: 10px 16px; 
+  border: 1px solid #ced4da; 
+  border-radius: 4px; 
+  padding: 8px 12px; 
   background: #ffffff; 
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   min-width: 140px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 .header-hotel-select:hover {
-  border-color: #cbd5e1;
+  border-color: #adb5bd;
 }
 .header-hotel-select:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
-/* Date range section - modern clean inputs */
+/* Date range section */
 .date-range-section { 
   display: inline-flex; 
   align-items: center; 
-  gap: 16px; 
-  margin-left: 20px; 
-  color: #1e293b;
-  font-weight: 700;
+  gap: 12px; 
+  margin-left: 16px; 
+  color: #495057;
+  font-weight: 600;
 }
 .date-input { 
-  border: 2px solid #e2e8f0; 
-  border-radius: 8px; 
-  padding: 10px 16px; 
+  border: 1px solid #ced4da; 
+  border-radius: 4px; 
+  padding: 8px 12px; 
   background: #fff; 
   font-size: 14px;
-  font-weight: 600;
-  color: #1e293b;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  min-width: 160px;
+  font-weight: 400;
+  color: #495057;
+  transition: all 0.2s ease;
+  min-width: 150px;
 }
 .date-input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
-  background: #f8fafc;
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 .date-input:hover {
-  border-color: #cbd5e1;
+  border-color: #adb5bd;
 }
 .date-separator { 
-  color: #475569; 
-  font-size: 16px;
-  font-weight: 700;
-  margin: 0 8px; 
+  color: #6c757d; 
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 4px; 
 }
 
 /* Search section - modern input */
@@ -4128,72 +4124,70 @@ select, .form-select {
 
 .search-section label { 
   font-weight: 600;
-  color: #64748b;
-  font-size: 14px;
+  color: #6c757d;
+  font-size: 13px;
   white-space: nowrap;
 }
 
 .search-section .search-input { 
-  min-width: 280px;
-  max-width: 400px;
-  padding: 10px 16px;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
+  min-width: 250px;
+  max-width: 350px;
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
   font-size: 14px;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   background: #ffffff;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .search-section .search-input:hover {
-  border-color: #cbd5e1;
+  border-color: #adb5bd;
 }
 
 .search-section .search-input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
 .search-section .search-input::placeholder {
-  color: #94a3b8;
+  color: #adb5bd;
 }
 
-/* Entries control - clean dropdown */
+/* Entries control */
 .entries-control { 
   display: flex; 
   align-items: center; 
-  gap: 12px;
+  gap: 10px;
   white-space: nowrap;
 }
 
 .entries-label { 
-  color: #64748b; 
-  font-size: 14px;
+  color: #6c757d; 
+  font-size: 13px;
   font-weight: 600;
 }
 
 .entries-select {
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 10px 16px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 8px 12px;
   background: #ffffff;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   min-width: 80px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .entries-select:hover {
-  border-color: #cbd5e1;
+  border-color: #adb5bd;
 }
 
 .entries-select:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
 /* Left and right sections for both header rows */
@@ -4249,50 +4243,40 @@ select, .form-select {
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.1);
 }
 
-/* Action buttons container - modern icon buttons */
+/* Action buttons container */
 .action-buttons {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .action-buttons button,
 .btn-print-unified {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  border: none;
-  border-radius: 10px;
-  padding: 10px;
+  background: #007bff;
+  border: 1px solid #007bff;
+  border-radius: 4px;
+  padding: 8px;
   cursor: pointer;
-  width: 44px;
-  height: 44px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 36px;
+  height: 36px;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #ffffff;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
 .action-buttons button:hover,
 .btn-print-unified:hover {
-  background: linear-gradient(135deg, #2563eb, #1e40af);
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.5);
-}
-
-.action-buttons button:active,
-.btn-print-unified:active {
-  transform: translateY(-1px) scale(1.02);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  background: #0056b3;
+  border-color: #0056b3;
 }
 
 .btn-print-unified {
   width: auto;
-  padding: 12px 24px;
-  font-weight: 700;
+  padding: 8px 16px;
+  font-weight: 500;
   font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .unified-table-wrapper {
@@ -4308,95 +4292,85 @@ select, .form-select {
 
 .unified-reservation-container .reservation-table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
+  border-collapse: collapse;
   font-size: 14px;
   margin: 0;
   background: #ffffff;
 }
 
-/* Table Header - Dark professional style */
+/* Table Header - Simple clean style */
 .unified-reservation-container .reservation-table th {
-  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-  border: none;
-  padding: 18px 24px;
+  background: #343a40;
+  border-bottom: 2px solid #dee2e6;
+  padding: 12px 16px;
   text-align: left;
-  font-weight: 700;
+  font-weight: 600;
   color: #ffffff;
-  font-size: 11px;
+  font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: 0.5px;
   position: sticky;
   top: 0;
   z-index: 10;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  border-bottom: 3px solid #3b82f6;
 }
 
 .unified-reservation-container .reservation-table th:first-child { 
-  padding-left: 32px;
+  padding-left: 20px;
 }
 .unified-reservation-container .reservation-table th:last-child { 
-  padding-right: 32px;
+  padding-right: 20px;
 }
 
-/* Table Body - Clean rows */
+/* Table Body - Clean simple rows */
 .unified-reservation-container .reservation-table td {
-  padding: 18px 24px;
-  border-bottom: 1px solid #f1f5f9;
+  padding: 12px 16px;
+  border-bottom: 1px solid #dee2e6;
   border-right: none;
-  color: #1e293b;
+  color: #495057;
   vertical-align: middle;
   font-size: 14px;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .unified-reservation-container .reservation-table td:first-child { 
-  font-weight: 700;
-  color: #0f172a;
-  padding-left: 32px;
-  background: linear-gradient(90deg, #f0f9ff 0%, #ffffff 100%);
+  font-weight: 600;
+  color: #212529;
+  padding-left: 20px;
 }
 .unified-reservation-container .reservation-table td:last-child { 
-  padding-right: 32px;
+  padding-right: 20px;
 }
 
-/* Table Rows - Modern hover effects */
+/* Table Rows - Simple hover */
 .unified-reservation-container .reservation-table tbody tr {
   background-color: #ffffff;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-left: 4px solid transparent;
+  transition: background-color 0.15s ease;
 }
 
 .unified-reservation-container .reservation-table tbody tr:hover {
-  background: linear-gradient(90deg, #dbeafe 0%, #eff6ff 50%, #ffffff 100%);
-  transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  border-left-color: #3b82f6;
+  background-color: #f8f9fa;
 }
 
 .unified-reservation-container .reservation-table tbody tr:nth-child(even) {
-  background-color: #f8fafc;
+  background-color: #f8f9fa;
 }
 
 .unified-reservation-container .reservation-table tbody tr:nth-child(even):hover {
-  background: linear-gradient(90deg, #dbeafe 0%, #eff6ff 50%, #f8fafc 100%);
+  background-color: #e9ecef;
 }
 
-/* No data state - modern empty state */
+/* No data state */
 .unified-reservation-container .reservation-table .no-data {
   text-align: center;
-  color: #64748b;
-  font-weight: 600;
-  padding: 80px 40px;
-  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-  font-size: 16px;
-  border-radius: 12px;
-  margin: 24px;
-  border: 2px dashed #cbd5e1;
+  color: #6c757d;
+  font-weight: 400;
+  padding: 60px 40px;
+  background: #f8f9fa;
+  font-size: 14px;
+  font-style: italic;
 }
 
 /* Header right entries control grouping */
@@ -4418,29 +4392,24 @@ select, .form-select {
   font-weight: 500;
 }
 
-/* Alignment helpers - clean modern alignment */
+/* Alignment helpers */
 .unified-reservation-container .reservation-table td.align-right { 
   text-align: right; 
-  padding-right: 32px;
 }
 .unified-reservation-container .reservation-table td.align-center { 
   text-align: center; 
 }
 .unified-reservation-container .reservation-table td.mono, 
 .unified-reservation-container .reservation-table td .mono {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  font-weight: 600;
-  color: #475569;
-  background: #f8fafc;
-  padding: 4px 12px;
-  border-radius: 6px;
-  display: inline-block;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 500;
+  color: #495057;
 }
 
 /* Make long text truncate nicely */
 .unified-reservation-container .reservation-table td,
 .unified-reservation-container .reservation-table th {
-  max-width: 320px;
+  max-width: 300px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -4452,78 +4421,70 @@ select, .form-select {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 24px 32px;
-  font-size: 14px;
-  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-  border-top: 1px solid #e2e8f0;
+  padding: 16px 20px;
+  font-size: 13px;
+  background: #f8f9fa;
+  border-top: 1px solid #dee2e6;
   margin: 0;
-  border-radius: 0 0 16px 16px;
 }
 
 .unified-footer .entries-info {
-  color: #475569;
-  font-weight: 600;
-  font-size: 14px;
+  color: #495057;
+  font-weight: 500;
+  font-size: 13px;
 }
 
 .unified-footer .pagination {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
 }
 
 .unified-footer .pagination button {
   background: #ffffff;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 10px 18px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 8px 14px;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 700;
-  color: #475569;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  min-width: 44px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #495057;
+  transition: all 0.2s ease;
+  min-width: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .unified-footer .pagination button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #1e293b, #0f172a);
+  background: #007bff;
   color: white;
-  border-color: #1e293b;
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.3);
+  border-color: #007bff;
 }
 
 .unified-footer .pagination button:disabled {
-  opacity: 0.3;
+  opacity: 0.4;
   cursor: not-allowed;
-  background: #f8fafc;
-  color: #cbd5e1;
-  border-color: #e2e8f0;
+  background: #f8f9fa;
+  color: #adb5bd;
+  border-color: #dee2e6;
 }
 
-/* Table action button - modern pill */
+/* Table action button */
 .btn-table-action {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  border: none;
-  border-radius: 20px;
-  padding: 8px 20px;
+  background: #007bff;
+  border: 1px solid #007bff;
+  border-radius: 4px;
+  padding: 6px 14px;
   cursor: pointer;
   font-size: 13px;
   color: #ffffff;
-  font-weight: 700;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 .btn-table-action:hover {
-  background: linear-gradient(135deg, #2563eb, #1e40af);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
+  background: #0056b3;
+  border-color: #0056b3;
 }
 /* Alignment and number formatting utilities */
 .unified-reservation-container .reservation-table td.align-right { 
@@ -4545,27 +4506,25 @@ select, .form-select {
   font-variant-numeric: tabular-nums;
 }
 
-/* Loading and error states - modern feedback */
+/* Loading and error states */
 .unified-reservation-container .loading-spinner {
   text-align: center;
-  padding: 80px 40px;
-  color: #475569;
-  font-size: 16px;
-  font-weight: 600;
-  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-  border-radius: 12px;
-  margin: 24px;
+  padding: 60px 40px;
+  color: #6c757d;
+  font-size: 14px;
+  font-weight: 400;
+  background: #f8f9fa;
+  margin: 20px;
 }
 
 .unified-reservation-container .error-message {
   text-align: center;
-  padding: 32px 40px;
-  color: #991b1b;
-  font-size: 15px;
-  font-weight: 700;
-  background: linear-gradient(135deg, #fee2e2, #fecaca);
-  border: 3px solid #ef4444;
-  border-radius: 12px;
-  margin: 24px;
-  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.2);
+  padding: 24px 40px;
+  color: #721c24;
+  font-size: 14px;
+  font-weight: 500;
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  margin: 20px;
 }
