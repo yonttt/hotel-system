@@ -23,6 +23,8 @@ const Sidebar = () => {
     formTransaksi: false,
     infoReservasi: false,
     informasiTamu: false,
+    housekeeping: false,
+    masterData: false,
     hrd: false
   })
   const [scrollPosition, setScrollPosition] = useState(0)
@@ -56,6 +58,12 @@ const Sidebar = () => {
         }
         if (path.includes('/informasi-tamu/')) {
           newExpandedMenus.informasiTamu = true
+        }
+      }
+      if (path.includes('/housekeeping/')) {
+        newExpandedMenus.housekeeping = true
+        if (path.includes('/master-data/')) {
+          newExpandedMenus.masterData = true
         }
       }
     } else if (path.includes('/hrd/')) {
@@ -100,6 +108,10 @@ const Sidebar = () => {
       operational: false,
       frontOffice: false,
       formTransaksi: false,
+      infoReservasi: false,
+      informasiTamu: false,
+      housekeeping: false,
+      masterData: false,
       hrd: false
     })
     setScrollPosition(0)
@@ -160,7 +172,22 @@ const Sidebar = () => {
             },
           ]
         },
-        { title: 'Housekeeping', path: '/operational/housekeeping' },
+        {
+          title: 'Housekeeping',
+          hasSubmenu: true,
+          submenu: 'housekeeping',
+          children: [
+            {
+              title: 'Master Data',
+              hasSubmenu: true,
+              submenu: 'masterData',
+              children: [
+                { title: 'Master Room Type', path: '/operational/housekeeping/master-data/room-type' },
+                { title: 'Management Room', path: '/operational/housekeeping/master-data/management-room' }
+              ]
+            }
+          ]
+        },
         { title: 'Laundry', path: '/operational/laundry' }
       ]
     },
