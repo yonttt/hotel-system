@@ -70,7 +70,6 @@ import ReservasiPage from './pages/operational/frontoffice/form_transaksi/reserv
 // Operational - Other
 import AdjustmentPage from './pages/operational/AdjustmentPage';
 import FoodBeveragePage from './pages/operational/FoodBeveragePage';
-import HousekeepingPage from './pages/operational/HousekeepingPage';
 import LaundryPage from './pages/operational/LaundryPage';
 
 // Operational - Front Office - Informasi Reservasi
@@ -82,6 +81,10 @@ import ReservasiToday from './pages/operational/frontoffice/informasi_reservasi/
 import CheckinToday from './pages/operational/frontoffice/informasi_tamu/CheckinToday';
 import GuestHistory from './pages/operational/frontoffice/informasi_tamu/GuestHistory';
 import InhouseGuest from './pages/operational/frontoffice/informasi_tamu/InhouseGuest';
+
+// Operational - Housekeeping - Master Data
+import MasterRoomType from './pages/operational/housekeeping/master_data/MasterRoomType';
+import ManagementRoom from './pages/operational/housekeeping/master_data/ManagementRoom';
 
 // HRD
 import AccountReceivablePage from './pages/hrd/AccountReceivablePage';
@@ -149,18 +152,32 @@ function App() {
               } 
             />
             <Route 
-              path="/operational/housekeeping" 
-              element={
-                <ProtectedRoute>
-                  <HousekeepingPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
               path="/operational/laundry" 
               element={
                 <ProtectedRoute>
                   <LaundryPage />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Housekeeping - Master Data Routes */}
+            <Route 
+              path="/operational/housekeeping/master-data/room-type" 
+              element={
+                <ProtectedRoute>
+                  <ErrorBoundary>
+                    <MasterRoomType />
+                  </ErrorBoundary>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/operational/housekeeping/master-data/management-room" 
+              element={
+                <ProtectedRoute>
+                  <ErrorBoundary>
+                    <ManagementRoom />
+                  </ErrorBoundary>
                 </ProtectedRoute>
               } 
             />
