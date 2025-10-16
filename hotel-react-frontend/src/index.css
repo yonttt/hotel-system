@@ -4317,7 +4317,7 @@ select, .form-select {
 .unified-reservation-container .reservation-table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: auto;
   font-size: 14px;
   margin: 0;
   background: #ffffff;
@@ -4355,6 +4355,7 @@ select, .form-select {
   vertical-align: middle;
   font-size: 14px;
   line-height: 1.5;
+  white-space: nowrap;
 }
 
 .unified-reservation-container .reservation-table td:first-child { 
@@ -4426,42 +4427,6 @@ select, .form-select {
   font-family: 'Courier New', Courier, monospace;
   font-weight: 500;
   color: #495057;
-}
-
-/* Column widths for proper alignment - compact version */
-.unified-reservation-container .reservation-table th:nth-child(1),
-.unified-reservation-container .reservation-table td:nth-child(1) {
-  width: 50px;
-}
-
-.unified-reservation-container .reservation-table th:nth-child(2),
-.unified-reservation-container .reservation-table td:nth-child(2) {
-  width: 80px;
-}
-
-.unified-reservation-container .reservation-table th:nth-child(3),
-.unified-reservation-container .reservation-table td:nth-child(3) {
-  width: 120px;
-}
-
-.unified-reservation-container .reservation-table th:nth-child(4),
-.unified-reservation-container .reservation-table td:nth-child(4) {
-  width: 130px;
-}
-
-.unified-reservation-container .reservation-table th:nth-child(5),
-.unified-reservation-container .reservation-table td:nth-child(5) {
-  width: 130px;
-}
-
-.unified-reservation-container .reservation-table th:nth-child(6),
-.unified-reservation-container .reservation-table td:nth-child(6) {
-  width: 90px;
-}
-
-.unified-reservation-container .reservation-table th:nth-child(7),
-.unified-reservation-container .reservation-table td:nth-child(7) {
-  width: 100px;
 }
 
 /* Ensure sticky header works over scroll container */
