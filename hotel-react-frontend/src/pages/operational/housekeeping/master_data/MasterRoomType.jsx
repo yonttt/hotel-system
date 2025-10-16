@@ -19,11 +19,13 @@ const MasterRoomType = () => {
     try {
       setLoading(true);
       const response = await apiService.getRoomCategories();
-      setRoomTypes(response.data);
+      console.log('Room Categories Response:', response.data);
+      setRoomTypes(response.data || []);
       setError(null);
     } catch (err) {
-      setError('Failed to fetch room types');
+      setError('Failed to fetch room types: ' + (err.response?.data?.detail || err.message));
       console.error('Error fetching room types:', err);
+      console.error('Error details:', err.response);
     } finally {
       setLoading(false);
     }
@@ -32,10 +34,12 @@ const MasterRoomType = () => {
   // Filter data
   const filteredData = roomTypes.filter(item => {
     const matchesSearch = 
-      item.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.type?.toLowerCase().includes(searchTerm.toLowerCase());
+      item.category_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.category_name?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesHotel = selectedHotel === 'ALL' || item.hotel_name === selectedHotel;
+    // Note: room_categories table doesn't have hotel_name, so we show all for now
+    // If you need hotel filtering, the table needs to be updated
+    const matchesHotel = selectedHotel === 'ALL' || true;
     
     return matchesSearch && matchesHotel;
   });
@@ -155,11 +159,11 @@ const MasterRoomType = () => {
               currentItems.map((item, index) => (
                 <tr key={item.id || index}>
                   <td>{indexOfFirstItem + index + 1}</td>
-                  <td>{item.code || '-'}</td>
-                  <td>{item.type || '-'}</td>
+                  <td>{item.category_code || '-'}</td>
+                  <td>{item.category_name || '-'}</td>
                   <td className="align-right">{formatCurrency(item.normal_rate || 0)}</td>
                   <td className="align-right">{formatCurrency(item.weekend_rate || 0)}</td>
-                  <td className="align-right">{formatCurrency(item.six_hours_rate || 0)}</td>
+                  <td className="align-right">-</td>
                   <td>
                     <button className="btn-table-action">Edit</button>
                   </td>

@@ -4317,6 +4317,7 @@ select, .form-select {
 .unified-reservation-container .reservation-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
   font-size: 14px;
   margin: 0;
   background: #ffffff;
@@ -4353,9 +4354,6 @@ select, .form-select {
   color: #495057;
   vertical-align: middle;
   font-size: 14px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
   line-height: 1.5;
 }
 
@@ -4430,12 +4428,40 @@ select, .form-select {
   color: #495057;
 }
 
-/* Make long text truncate nicely */
-.unified-reservation-container .reservation-table td,
-.unified-reservation-container .reservation-table th {
-  max-width: 300px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+/* Column widths for proper alignment - compact version */
+.unified-reservation-container .reservation-table th:nth-child(1),
+.unified-reservation-container .reservation-table td:nth-child(1) {
+  width: 50px;
+}
+
+.unified-reservation-container .reservation-table th:nth-child(2),
+.unified-reservation-container .reservation-table td:nth-child(2) {
+  width: 80px;
+}
+
+.unified-reservation-container .reservation-table th:nth-child(3),
+.unified-reservation-container .reservation-table td:nth-child(3) {
+  width: 120px;
+}
+
+.unified-reservation-container .reservation-table th:nth-child(4),
+.unified-reservation-container .reservation-table td:nth-child(4) {
+  width: 130px;
+}
+
+.unified-reservation-container .reservation-table th:nth-child(5),
+.unified-reservation-container .reservation-table td:nth-child(5) {
+  width: 130px;
+}
+
+.unified-reservation-container .reservation-table th:nth-child(6),
+.unified-reservation-container .reservation-table td:nth-child(6) {
+  width: 90px;
+}
+
+.unified-reservation-container .reservation-table th:nth-child(7),
+.unified-reservation-container .reservation-table td:nth-child(7) {
+  width: 100px;
 }
 
 /* Ensure sticky header works over scroll container */
