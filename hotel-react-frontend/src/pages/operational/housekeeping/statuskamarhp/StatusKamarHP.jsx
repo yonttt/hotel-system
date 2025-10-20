@@ -32,56 +32,67 @@ const StatusKamarHP = () => {
 
   // Room status descriptions
   const roomStatusDescriptions = [
-    { no: 1, status: 'Checkout', color: 'black', description: 'Tamu baru saja checkout' },
-    { no: 2, status: 'General Cleaning', color: '#808080', description: 'Kamar dalam tahap pembersihan global / Pesto Control' },
-    { no: 3, status: 'Out Of Order', color: '#ff0000', description: 'Kamar rusak (Tidak dapat dijual)' },
-    { no: 4, status: 'Vacant Dirty', color: '#ff8c00', description: 'Kamar checkout yang sudah diassign room attendant untuk membersihkan kamar' },
-    { no: 5, status: 'Vacant Clean', color: '#90ee90', description: 'Kamar yang sudah dibersihkan room attendant namun belum dicek oleh Leader HK' },
-    { no: 6, status: 'Vacant Ready', color: '#008000', description: 'Kamar yang sudah dicek kelengkapannya dan siap untuk dijual' },
-    { no: 7, status: 'Vacant Uncheck', color: '#e6e6fa', description: 'Kamar yang harus dibersihkan/dicek kelengkapannya jika kamar blm terjual setelah melalui night audit' },
-    { no: 8, status: 'Arrival', color: '#87ceeb', description: 'Kamar reservasi yang akan menginap pada H-0' },
-    { no: 9, status: 'Incognito', color: '#008080', description: 'Tamu yang ingin dirahasiakan keberadaannya' },
-    { no: 10, status: 'DND (Do Not Disturb)', color: '#0000ff', description: 'Kamar terisi dan tamu meminta untuk tidak diganggu' },
-    { no: 11, status: 'Occupied Dirty', color: '#9acd32', description: 'Kamar terisi (extend) yang akan diassign room attendant untuk membersihkan kamar' },
-    { no: 12, status: 'Makeup Room', color: '#800080', description: 'Kamar terisi yang telah di assign room attendant untuk membersihkan kamar' },
-    { no: 13, status: 'Occupied clean', color: '#ff8c00', description: 'Kamar terisi dan telah selesai dibersihkan oleh room attendant' },
-    { no: 14, status: 'Occupied Ready', color: '#1e90ff', description: 'Kamar terisi dan sudah dibersihkan/tamu baru saja checkin' },
-    { no: 15, status: 'House Use', color: '#d3d3d3', description: 'Kamar yang digunakan oleh staff hotel' },
-    { no: 16, status: 'Sleep Out', color: '#ff69b4', description: 'Kamar yang sudah dibayar oleh tamu dan tidak ditempati' },
-    { no: 17, status: 'Skipper', color: '#ffffff', description: 'Tamu yang meninggalkan kamar tanpa ada informasi dari Front Office' },
-    { no: 18, status: 'Expected Departure', color: '#ffff00', description: 'Kamar yang akan checkout' }
+    { no: 1, status: 'Checkout', statusCode: 'CO', color: '#000000', description: 'Tamu baru saja checkout' },
+    { no: 2, status: 'General Cleaning', statusCode: 'GC', color: '#808080', description: 'Kamar dalam tahap pembersihan global / Pesto Control' },
+    { no: 3, status: 'Out Of Order', statusCode: 'OO', color: '#ff0000', description: 'Kamar rusak (Tidak dapat dijual)' },
+    { no: 4, status: 'Vacant Dirty', statusCode: 'VD', color: '#ff8c00', description: 'Kamar checkout yang sudah diassign room attendant untuk membersihkan kamar' },
+    { no: 5, status: 'Vacant Clean', statusCode: 'VC', color: '#90ee90', description: 'Kamar yang sudah dibersihkan room attendant namun belum dicek oleh Leader HK' },
+    { no: 6, status: 'Vacant Ready', statusCode: 'VR', color: '#008000', description: 'Kamar yang sudah dicek kelengkapannya dan siap untuk dijual' },
+    { no: 7, status: 'Vacant Uncheck', statusCode: 'VU', color: '#e6e6fa', description: 'Kamar yang harus dibersihkan/dicek kelengkapannya jika kamar blm terjual setelah melalui night audit' },
+    { no: 8, status: 'Arrival', statusCode: 'AR', color: '#87ceeb', description: 'Kamar reservasi yang akan menginap pada H-0' },
+    { no: 9, status: 'Incognito', statusCode: 'IC', color: '#008080', description: 'Tamu yang ingin dirahasiakan keberadaannya' },
+    { no: 10, status: 'DND (Do Not Disturb)', statusCode: 'DND', color: '#0000ff', description: 'Kamar terisi dan tamu meminta untuk tidak diganggu' },
+    { no: 11, status: 'Occupied Dirty', statusCode: 'OD', color: '#9acd32', description: 'Kamar terisi (extend) yang akan diassign room attendant untuk membersihkan kamar' },
+    { no: 12, status: 'Makeup Room', statusCode: 'MU', color: '#800080', description: 'Kamar terisi yang telah di assign room attendant untuk membersihkan kamar' },
+    { no: 13, status: 'Occupied Clean', statusCode: 'OC', color: '#ff8c00', description: 'Kamar terisi dan telah selesai dibersihkan oleh room attendant' },
+    { no: 14, status: 'Occupied Ready', statusCode: 'OR', color: '#1e90ff', description: 'Kamar terisi dan sudah dibersihkan/tamu baru saja checkin' },
+    { no: 15, status: 'House Use', statusCode: 'HU', color: '#d3d3d3', description: 'Kamar yang digunakan oleh staff hotel' },
+    { no: 16, status: 'Sleep Out', statusCode: 'SO', color: '#ff69b4', description: 'Kamar yang sudah dibayar oleh tamu dan tidak ditempati' },
+    { no: 17, status: 'Skipper', statusCode: 'SK', color: '#ffffff', description: 'Tamu yang meninggalkan kamar tanpa ada informasi dari Front Office' },
+    { no: 18, status: 'Expected Departure', statusCode: 'ED', color: '#ffff00', description: 'Kamar yang akan checkout' }
   ];
 
-  // Get room status color
+  // Get room status color based on status code
   const getStatusColor = (status) => {
     const statusMap = {
-      'checkout': 'black',
-      'co': 'black',
-      'c o': 'black',
-      'vr': '#008000', // Vacant Ready - green
+      'co': '#000000',      // Checkout - black
+      'c o': '#000000',     // Checkout - black
+      'checkout': '#000000',
+      'gc': '#808080',      // General Cleaning - gray
+      'oo': '#ff0000',      // Out of Order - red
+      'vd': '#ff8c00',      // Vacant Dirty - dark orange
+      'vc': '#90ee90',      // Vacant Clean - light green
+      'vr': '#008000',      // Vacant Ready - green
       'v r': '#008000',
-      'vacant ready': '#008000',
-      'arrival': '#87ceeb',
-      '1': '#0000ff', // DND
-      '2': '#1e90ff', // Occupied Ready
-      '3': '#008080', // Incognito
-      '6': '#0000ff', // SPR (assuming DND)
+      'vu': '#e6e6fa',      // Vacant Uncheck - lavender
+      'ar': '#87ceeb',      // Arrival - sky blue
+      'ic': '#008080',      // Incognito - teal
+      'dnd': '#0000ff',     // DND - blue
+      'od': '#9acd32',      // Occupied Dirty - yellow green
+      'mu': '#800080',      // Makeup Room - purple
+      'oc': '#ff8c00',      // Occupied Clean - dark orange
+      'or': '#1e90ff',      // Occupied Ready - dodger blue
+      'hu': '#d3d3d3',      // House Use - light gray
+      'so': '#ff69b4',      // Sleep Out - hot pink
+      'sk': '#ffffff',      // Skipper - white
+      'ed': '#ffff00',      // Expected Departure - yellow
+      '1': '#0000ff',       // Number status
+      '2': '#1e90ff',
+      '3': '#008080',
     };
     
     const statusLower = (status || '').toLowerCase().trim();
     return statusMap[statusLower] || '#808080'; // Default gray
   };
 
-  // Filter rooms
-  const filteredRooms = rooms.filter(room => {
-    const matchesHotel = selectedHotel === 'ALL' || room.hotel_name === selectedHotel;
-    const matchesType = selectedType === 'All Type' || room.room_type === selectedType;
-    const matchesStatus = selectedStatus === 'All Status' || room.status === selectedStatus;
-    return matchesHotel && matchesType && matchesStatus;
-  });
-
-  // Get room type counts
-  const getTypeCounts = () => {
+  // Get unique room types for filter
+  const roomTypes = ['All Type', ...new Set(rooms.map(r => r.room_type).filter(Boolean))];
+  
+  // Get unique statuses for filter
+  const roomStatuses = ['All Status', ...new Set(rooms.map(r => r.status).filter(Boolean))];
+  
+  // Get room type counts by status
+  const getStatusCounts = () => {
     const counts = {
       VD: 0, VC: 0, VR: 0, OR: 0, BO: 0, OD: 0, MU: 0, OC: 0,
       HU: 0, SO: 0, DND: 0, Checkout: 0, VU: 0, Maintanece: 0, OO: 0
@@ -89,7 +100,9 @@ const StatusKamarHP = () => {
     
     filteredRooms.forEach(room => {
       const status = (room.status || '').toUpperCase().trim();
-      if (counts.hasOwnProperty(status)) {
+      if (status === 'CO' || status === 'C O') {
+        counts.Checkout++;
+      } else if (counts.hasOwnProperty(status)) {
         counts[status]++;
       }
     });
@@ -97,7 +110,24 @@ const StatusKamarHP = () => {
     return counts;
   };
 
-  const typeCounts = getTypeCounts();
+  // Filter rooms
+  const filteredRooms = rooms.filter(room => {
+    const matchesHotel = selectedHotel === 'ALL' || room.hotel_name === selectedHotel;
+    const matchesType = selectedType === 'All Type' || room.room_type === selectedType;
+    
+    // Status matching - handle different formats
+    let matchesStatus = selectedStatus === 'All Status';
+    if (!matchesStatus) {
+      const roomStatus = (room.status || '').toUpperCase().trim();
+      const filterStatus = selectedStatus.toUpperCase().trim();
+      matchesStatus = roomStatus === filterStatus || 
+                     roomStatus.replace(/\s/g, '') === filterStatus.replace(/\s/g, '');
+    }
+    
+    return matchesHotel && matchesType && matchesStatus;
+  });
+
+  const statusCounts = getStatusCounts();
 
   return (
     <Layout>
@@ -122,22 +152,22 @@ const StatusKamarHP = () => {
           <>
             {/* Status Summary Bar */}
             <div className="status-summary-bar">
-              <span><strong>0 : VD</strong></span>
-              <span><strong>0 : VC</strong></span>
-              <span><strong>35 : VR</strong></span>
-              <span><strong>17: OR</strong></span>
-              <span><strong>0 : BO</strong></span>
-              <span><strong>1 : OD</strong></span>
-              <span><strong>0 : MU</strong></span>
-              <span><strong>0 : OC</strong></span>
-              <span><strong>8 : C</strong></span>
-              <span><strong>0 : HU</strong></span>
-              <span><strong>0 : SO</strong></span>
-              <span><strong>0 : DND</strong></span>
-              <span><strong>73 : Checkout</strong></span>
-              <span><strong>0 : VU</strong></span>
-              <span><strong>0 : Maintanece</strong></span>
-              <span><strong>0 : O O</strong></span>
+              <span><strong>{statusCounts.VD} : VD</strong></span>
+              <span><strong>{statusCounts.VC} : VC</strong></span>
+              <span><strong>{statusCounts.VR} : VR</strong></span>
+              <span><strong>{statusCounts.OR} : OR</strong></span>
+              <span><strong>{statusCounts.BO} : BO</strong></span>
+              <span><strong>{statusCounts.OD} : OD</strong></span>
+              <span><strong>{statusCounts.MU} : MU</strong></span>
+              <span><strong>{statusCounts.OC} : OC</strong></span>
+              <span><strong>{statusCounts.HU} : HU</strong></span>
+              <span><strong>{statusCounts.SO} : SO</strong></span>
+              <span><strong>{statusCounts.DND} : DND</strong></span>
+              <span><strong>{statusCounts.Checkout} : Checkout</strong></span>
+              <span><strong>{statusCounts.VU} : VU</strong></span>
+              <span><strong>{statusCounts.Maintanece} : Maintanece</strong></span>
+              <span><strong>{statusCounts.OO} : OO</strong></span>
+              <span><strong>Total: {filteredRooms.length} Kamar</strong></span>
             </div>
 
             {/* Filters */}
@@ -145,29 +175,25 @@ const StatusKamarHP = () => {
               <div className="filter-group">
                 <label>Lookup :</label>
                 <select value={selectedType} onChange={(e) => setSelectedType(e.target.value)}>
-                  <option>All Type</option>
-                  <option>APT</option>
-                  <option>BIS</option>
-                  <option>DLX</option>
-                  <option>EXE</option>
-                  <option>SPR</option>
-                  <option>STD</option>
+                  {roomTypes.map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
                 </select>
               </div>
               <div className="filter-group">
                 <label>Hotel :</label>
                 <select value={selectedHotel} onChange={(e) => setSelectedHotel(e.target.value)}>
-                  <option>HOTEL NEW IDOLA</option>
-                  <option>HOTEL IDOLA</option>
+                  <option value="ALL">ALL</option>
+                  <option value="HOTEL NEW IDOLA">HOTEL NEW IDOLA</option>
+                  <option value="HOTEL IDOLA">HOTEL IDOLA</option>
                 </select>
               </div>
               <div className="filter-group">
                 <label>Room Status :</label>
                 <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}>
-                  <option>All Status</option>
-                  <option>VR</option>
-                  <option>C O</option>
-                  <option>V R</option>
+                  {roomStatuses.map(status => (
+                    <option key={status} value={status}>{status}</option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -198,50 +224,30 @@ const StatusKamarHP = () => {
         ) : (
           /* Description Tab */
           <div className="status-description-container">
-            <table className="description-table">
+            <table className="description-table-single">
               <thead>
                 <tr>
-                  <th>No</th>
-                  <th>Room Status</th>
-                  <th>Description</th>
-                  <th>No</th>
-                  <th>Room Status</th>
+                  <th style={{ width: '60px' }}>No</th>
+                  <th style={{ width: '200px' }}>Room Status</th>
                   <th>Description</th>
                 </tr>
               </thead>
               <tbody>
-                {Array.from({ length: Math.ceil(roomStatusDescriptions.length / 2) }).map((_, idx) => {
-                  const leftItem = roomStatusDescriptions[idx * 2];
-                  const rightItem = roomStatusDescriptions[idx * 2 + 1];
-                  return (
-                    <tr key={idx}>
-                      <td>{leftItem.no}</td>
-                      <td>
-                        <div className="status-badge" style={{ backgroundColor: leftItem.color }}>
-                          {leftItem.status}
-                        </div>
-                      </td>
-                      <td>{leftItem.description}</td>
-                      {rightItem ? (
-                        <>
-                          <td>{rightItem.no}</td>
-                          <td>
-                            <div className="status-badge" style={{ backgroundColor: rightItem.color }}>
-                              {rightItem.status}
-                            </div>
-                          </td>
-                          <td>{rightItem.description}</td>
-                        </>
-                      ) : (
-                        <>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                        </>
-                      )}
-                    </tr>
-                  );
-                })}
+                {roomStatusDescriptions.map((item) => (
+                  <tr key={item.no}>
+                    <td style={{ textAlign: 'center', fontWeight: '600' }}>{item.no}</td>
+                    <td>
+                      <div className="status-badge" style={{ 
+                        backgroundColor: item.color,
+                        color: item.color === '#ffffff' ? '#000000' : '#ffffff',
+                        border: item.color === '#ffffff' ? '2px solid #000000' : 'none'
+                      }}>
+                        {item.status}
+                      </div>
+                    </td>
+                    <td>{item.description}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

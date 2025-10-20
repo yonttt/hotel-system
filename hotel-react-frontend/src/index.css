@@ -4642,12 +4642,14 @@ select, .form-select {
 
 .room-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-  gap: 10px;
-  padding: 20px;
-  background: #ffffff;
+  grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
+  gap: 8px;
+  padding: 15px;
+  background: #f8f9fa;
   border: 1px solid #dee2e6;
   border-radius: 4px;
+  max-height: 70vh;
+  overflow-y: auto;
 }
 
 .room-box {
@@ -4655,41 +4657,50 @@ select, .form-select {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 10px 5px;
-  border-radius: 4px;
+  padding: 8px 4px;
+  border-radius: 3px;
   cursor: pointer;
-  transition: all 0.2s;
-  min-height: 70px;
+  transition: all 0.15s ease;
+  min-height: 65px;
   color: #ffffff;
   font-weight: 600;
   text-align: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  border: 1px solid rgba(0,0,0,0.1);
 }
 
 .room-box:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transform: scale(1.05);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+  z-index: 10;
 }
 
 .room-type {
-  font-size: 11px;
-  margin-bottom: 2px;
+  font-size: 10px;
+  margin-bottom: 1px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .room-number {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
-  margin-bottom: 2px;
+  margin: 2px 0;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
 .room-status {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .status-description-container {
   padding: 20px;
   background: #ffffff;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .description-table {
@@ -4719,6 +4730,41 @@ select, .form-select {
 
 .description-table tbody tr:hover {
   background: #e9ecef;
+}
+
+.description-table-single {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.description-table-single th {
+  background: #343a40;
+  color: #ffffff;
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.description-table-single td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #dee2e6;
+  vertical-align: middle;
+  color: #495057;
+}
+
+.description-table-single tbody tr:nth-child(even) {
+  background: #f8f9fa;
+}
+
+.description-table-single tbody tr:hover {
+  background: #e9ecef;
+  transition: background-color 0.15s ease;
 }
 
 .status-badge {
