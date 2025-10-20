@@ -4416,10 +4416,12 @@ select, .form-select {
 }
 
 /* Alignment helpers */
-.unified-reservation-container .reservation-table td.align-right { 
+.unified-reservation-container .reservation-table td.align-right,
+.unified-reservation-container .reservation-table th.align-right { 
   text-align: right; 
 }
-.unified-reservation-container .reservation-table td.align-center { 
+.unified-reservation-container .reservation-table td.align-center,
+.unified-reservation-container .reservation-table th.align-center { 
   text-align: center; 
 }
 .unified-reservation-container .reservation-table td.mono, 

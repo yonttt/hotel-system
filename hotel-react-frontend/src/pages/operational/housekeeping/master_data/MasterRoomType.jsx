@@ -136,9 +136,9 @@ const MasterRoomType = () => {
               <th>No</th>
               <th>Code</th>
               <th>Type</th>
-              <th>Normal Rate</th>
-              <th>Weekend Rate</th>
-              <th>6 Hours</th>
+              <th className="align-right">Normal Rate</th>
+              <th className="align-right">Weekend Rate</th>
+              <th className="align-right">6 Hours</th>
               <th>Action</th>
             </tr>
           </thead>
