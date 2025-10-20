@@ -147,7 +147,8 @@ const Sidebar = () => {
               submenu: 'formTransaksi',
               children: [
                 { title: 'Registrasi', path: '/operational/frontoffice/form-transaksi/registrasi' },
-                { title: 'Reservasi', path: '/operational/frontoffice/form-transaksi/reservasi' }
+                { title: 'Reservasi', path: '/operational/frontoffice/form-transaksi/reservasi' },
+                { title: 'Group Booking', path: '/operational/frontoffice/form-transaksi/group-booking' }
               ]
             },
             { 

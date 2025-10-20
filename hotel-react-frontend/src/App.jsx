@@ -66,6 +66,7 @@ class ErrorBoundary extends React.Component {
 // Operational - Front Office
 import RegistrasiPage from './pages/operational/frontoffice/form_transaksi/registrasi';
 import ReservasiPage from './pages/operational/frontoffice/form_transaksi/reservasi';
+import GroupBooking from './pages/operational/frontoffice/form_transaksi/GroupBooking';
 
 // Operational - Other
 import AdjustmentPage from './pages/operational/AdjustmentPage';
@@ -130,6 +131,17 @@ function App() {
                 <ProtectedRoute>
                   <ErrorBoundary>
                     <ReservasiPage />
+                  </ErrorBoundary>
+                </ProtectedRoute>
+              } 
+            />
+            {/* Specific route for Group Booking */}
+            <Route 
+              path="/operational/frontoffice/form-transaksi/group-booking" 
+              element={
+                <ProtectedRoute>
+                  <ErrorBoundary>
+                    <GroupBooking />
                   </ErrorBoundary>
                 </ProtectedRoute>
               } 
