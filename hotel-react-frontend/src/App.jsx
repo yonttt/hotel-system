@@ -85,6 +85,7 @@ import InhouseGuest from './pages/operational/frontoffice/informasi_tamu/Inhouse
 // Operational - Housekeeping - Master Data
 import MasterRoomType from './pages/operational/housekeeping/master_data/MasterRoomType';
 import ManagementRoom from './pages/operational/housekeeping/master_data/ManagementRoom';
+import StatusKamarHP from './pages/operational/housekeeping/statuskamarhp/StatusKamarHP';
 
 // HRD
 import AccountReceivablePage from './pages/hrd/AccountReceivablePage';
@@ -160,7 +161,17 @@ function App() {
               } 
             />
             
-            {/* Housekeeping - Master Data Routes */}
+            {/* Housekeeping Routes */}
+            <Route 
+              path="/operational/housekeeping/status-kamar-hp" 
+              element={
+                <ProtectedRoute>
+                  <ErrorBoundary>
+                    <StatusKamarHP />
+                  </ErrorBoundary>
+                </ProtectedRoute>
+              } 
+            />
             <Route 
               path="/operational/housekeeping/master-data/room-type" 
               element={

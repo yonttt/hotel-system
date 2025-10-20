@@ -177,6 +177,7 @@ const Sidebar = () => {
           hasSubmenu: true,
           submenu: 'housekeeping',
           children: [
+            { title: 'Status Kamar HP', path: '/operational/housekeeping/status-kamar-hp' },
             {
               title: 'Master Data',
               hasSubmenu: true,
