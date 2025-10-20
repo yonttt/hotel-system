@@ -224,32 +224,67 @@ const StatusKamarHP = () => {
         ) : (
           /* Description Tab */
           <div className="status-description-container">
-            <table className="description-table-single">
-              <thead>
-                <tr>
-                  <th style={{ width: '60px' }}>No</th>
-                  <th style={{ width: '200px' }}>Room Status</th>
-                  <th>Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                {roomStatusDescriptions.map((item) => (
-                  <tr key={item.no}>
-                    <td style={{ textAlign: 'center', fontWeight: '600' }}>{item.no}</td>
-                    <td>
-                      <div className="status-badge" style={{ 
-                        backgroundColor: item.color,
-                        color: item.color === '#ffffff' ? '#000000' : '#ffffff',
-                        border: item.color === '#ffffff' ? '2px solid #000000' : 'none'
-                      }}>
-                        {item.status}
-                      </div>
-                    </td>
-                    <td>{item.description}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="description-two-columns">
+              {/* Left Column - Items 1-9 */}
+              <div className="description-column">
+                <table className="description-table-single">
+                  <thead>
+                    <tr>
+                      <th style={{ width: '50px' }}>No</th>
+                      <th style={{ width: '180px' }}>Room Status</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {roomStatusDescriptions.slice(0, 9).map((item) => (
+                      <tr key={item.no}>
+                        <td style={{ textAlign: 'center', fontWeight: '600' }}>{item.no}</td>
+                        <td>
+                          <div className="status-badge" style={{ 
+                            backgroundColor: item.color,
+                            color: item.color === '#ffffff' ? '#000000' : '#ffffff',
+                            border: item.color === '#ffffff' ? '2px solid #000000' : 'none'
+                          }}>
+                            {item.status}
+                          </div>
+                        </td>
+                        <td>{item.description}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Right Column - Items 10-18 */}
+              <div className="description-column">
+                <table className="description-table-single">
+                  <thead>
+                    <tr>
+                      <th style={{ width: '50px' }}>No</th>
+                      <th style={{ width: '180px' }}>Room Status</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {roomStatusDescriptions.slice(9).map((item) => (
+                      <tr key={item.no}>
+                        <td style={{ textAlign: 'center', fontWeight: '600' }}>{item.no}</td>
+                        <td>
+                          <div className="status-badge" style={{ 
+                            backgroundColor: item.color,
+                            color: item.color === '#ffffff' ? '#000000' : '#ffffff',
+                            border: item.color === '#ffffff' ? '2px solid #000000' : 'none'
+                          }}>
+                            {item.status}
+                          </div>
+                        </td>
+                        <td>{item.description}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         )}
       </div>

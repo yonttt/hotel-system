@@ -4699,8 +4699,17 @@ select, .form-select {
 .status-description-container {
   padding: 20px;
   background: #ffffff;
-  max-width: 1200px;
-  margin: 0 auto;
+}
+
+.description-two-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  width: 100%;
+}
+
+.description-column {
+  overflow-x: auto;
 }
 
 .description-table {
@@ -4735,27 +4744,29 @@ select, .form-select {
 .description-table-single {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
+  font-size: 13px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .description-table-single th {
   background: #343a40;
   color: #ffffff;
-  padding: 14px 16px;
+  padding: 12px 12px;
   text-align: left;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border-bottom: 2px solid #dee2e6;
+  white-space: nowrap;
 }
 
 .description-table-single td {
-  padding: 14px 16px;
+  padding: 10px 12px;
   border-bottom: 1px solid #dee2e6;
   vertical-align: middle;
   color: #495057;
+  font-size: 13px;
 }
 
 .description-table-single tbody tr:nth-child(even) {
@@ -4765,6 +4776,13 @@ select, .form-select {
 .description-table-single tbody tr:hover {
   background: #e9ecef;
   transition: background-color 0.15s ease;
+}
+
+/* Responsive layout for smaller screens */
+@media (max-width: 1200px) {
+  .description-two-columns {
+    grid-template-columns: 1fr;
+  }
 }
 
 .status-badge {
