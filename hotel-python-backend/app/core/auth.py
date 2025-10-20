@@ -13,9 +13,11 @@ def get_current_user(
 ) -> User:
     """Get current authenticated user from JWT token."""
     token = credentials.credentials
+    print(f"Received token: {token[:20]}..." if len(token) > 20 else token)
     username = verify_token(token)
     
     if username is None:
+        print("ERROR: Token verification failed - username is None")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
