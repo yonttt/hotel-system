@@ -85,11 +85,47 @@ const StatusKamarHP = () => {
     return statusMap[statusLower] || '#808080'; // Default gray
   };
 
+  // Get short status code from full status name
+  const getShortStatus = (status) => {
+    if (!status) return 'CO';
+    
+    const statusLower = status.toLowerCase().trim();
+    
+    // Check if it's already a short code (2-3 characters)
+    if (status.length <= 3) {
+      return status.toUpperCase();
+    }
+    
+    // Map full status names to short codes
+    const statusToCode = {
+      'checkout': 'CO',
+      'general cleaning': 'GC',
+      'out of order': 'OO',
+      'vacant dirty': 'VD',
+      'vacant clean': 'VC',
+      'vacant ready': 'VR',
+      'vacant uncheck': 'VU',
+      'arrival': 'AR',
+      'incognito': 'IC',
+      'do not disturb': 'DND',
+      'occupied dirty': 'OD',
+      'makeup room': 'MU',
+      'occupied clean': 'OC',
+      'occupied ready': 'OR',
+      'house use': 'HU',
+      'sleep out': 'SO',
+      'skipper': 'SK',
+      'expected departure': 'ED'  
+    };
+    
+    return statusToCode[statusLower] || status.toUpperCase();
+  };
+
   // Get unique room types for filter
   const roomTypes = ['All Type', ...new Set(rooms.map(r => r.room_type).filter(Boolean))];
   
-  // Get unique statuses for filter
-  const roomStatuses = ['All Status', ...new Set(rooms.map(r => r.status).filter(Boolean))];
+  // Get unique statuses for filter - show short codes
+  const roomStatuses = ['All Status', ...new Set(rooms.map(r => getShortStatus(r.status)).filter(Boolean))];
   
   // Get room type counts by status
   const getStatusCounts = () => {
@@ -115,13 +151,12 @@ const StatusKamarHP = () => {
     const matchesHotel = selectedHotel === 'ALL' || room.hotel_name === selectedHotel;
     const matchesType = selectedType === 'All Type' || room.room_type === selectedType;
     
-    // Status matching - handle different formats
+    // Status matching - compare short codes
     let matchesStatus = selectedStatus === 'All Status';
     if (!matchesStatus) {
-      const roomStatus = (room.status || '').toUpperCase().trim();
+      const roomShortStatus = getShortStatus(room.status);
       const filterStatus = selectedStatus.toUpperCase().trim();
-      matchesStatus = roomStatus === filterStatus || 
-                     roomStatus.replace(/\s/g, '') === filterStatus.replace(/\s/g, '');
+      matchesStatus = roomShortStatus === filterStatus;
     }
     
     return matchesHotel && matchesType && matchesStatus;
@@ -215,7 +250,7 @@ const StatusKamarHP = () => {
                   >
                     <div className="room-type">{room.room_type}</div>
                     <div className="room-number">{room.room_number}</div>
-                    <div className="room-status">{room.status || 'C O'}</div>
+                    <div className="room-status">{getShortStatus(room.status)}</div>
                   </div>
                 ))
               )}
