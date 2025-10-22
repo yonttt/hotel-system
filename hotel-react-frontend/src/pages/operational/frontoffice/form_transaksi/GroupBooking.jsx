@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { apiService } from '../../../../services/api';
 import Layout from '../../../../components/Layout';
 import SearchableSelect from '../../../../components/SearchableSelect';
 
 const GroupBooking = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -322,7 +324,25 @@ const GroupBooking = () => {
       <div className="registration-container">
         <div className="registration-header">
           <h1 className="registration-title">GROUP BOOKING FORM</h1>
-          <button type="button" className="tab-button active blue-button">Group Reservation</button>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button 
+              type="button" 
+              className="tab-button blue-button"
+              onClick={() => navigate('/operational/frontoffice/form-transaksi/registrasi')}
+              style={{ background: '#6c757d' }}
+            >
+              ← Back to Registration
+            </button>
+            <button 
+              type="button" 
+              className="tab-button blue-button"
+              onClick={() => navigate('/operational/frontoffice/form-transaksi/reservasi')}
+              style={{ background: '#6c757d' }}
+            >
+              ← Back to Reservation
+            </button>
+            <button type="button" className="tab-button active blue-button">Group Reservation</button>
+          </div>
         </div>
 
         {error && (
