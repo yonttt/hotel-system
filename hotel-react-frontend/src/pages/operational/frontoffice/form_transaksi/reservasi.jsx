@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../../../context/AuthContext'
+import { useNavigate } from 'react-router-dom'
 import { apiService } from '../../../../services/api'
 import Layout from '../../../../components/Layout'
 import SearchableSelect from '../../../../components/SearchableSelect'
 
 const ReservasiPage = () => {
-  const { user } = useAuth()
-  const [apiError, setApiError] = useState(null)
+  const { user } = useAuth()
+  const navigate = useNavigate()
+  const [apiError, setApiError] = useState(null)
   const [rooms, setRooms] = useState([])
   const [cities, setCities] = useState([])
   const [countries, setCountries] = useState([])
@@ -303,12 +305,20 @@ const ReservasiPage = () => {
   return (
     <Layout>
       <div className="registration-container">
-        <div className="registration-header">
-          <h1 className="registration-title">RESERVATION FORM</h1>
-          <button className="tab-button active blue-button">Room Available</button>
-        </div>
-        
-        <div className="registration-form-container">
+        <div className="registration-header">
+          <h1 className="registration-title">RESERVATION FORM</h1>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button type="button" className="tab-button active blue-button">Single Reservation</button>
+            <button 
+              type="button" 
+              className="tab-button blue-button"
+              onClick={() => navigate('/operational/frontoffice/form-transaksi/group-booking')}
+              style={{ background: '#28a745' }}
+            >
+              Group Booking
+            </button>
+          </div>
+        </div>        <div className="registration-form-container">
           <form onSubmit={handleSubmit} className="registration-form">
             <div className="form-grid">
               {/* KOLOM 1 */}
@@ -412,7 +422,7 @@ const ReservasiPage = () => {
                     placeholder="Select City"
                     className="form-select"
                   />
-                </div>
+                </div>w
                 <div className="form-group">
                   <label>Email</label>
                   <input type="email" name="email" value={formData.email} onChange={handleInputChange} className="form-input" />
