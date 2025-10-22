@@ -24,6 +24,7 @@ const Sidebar = () => {
     infoReservasi: false,
     informasiTamu: false,
     housekeeping: false,
+    statusKamar: false,
     masterData: false,
     hrd: false
   })
@@ -62,6 +63,9 @@ const Sidebar = () => {
       }
       if (path.includes('/housekeeping/')) {
         newExpandedMenus.housekeeping = true
+        if (path.includes('/status-kamar')) {
+          newExpandedMenus.statusKamar = true
+        }
         if (path.includes('/master-data/')) {
           newExpandedMenus.masterData = true
         }
@@ -111,6 +115,7 @@ const Sidebar = () => {
       infoReservasi: false,
       informasiTamu: false,
       housekeeping: false,
+      statusKamar: false,
       masterData: false,
       hrd: false
     })
@@ -178,7 +183,14 @@ const Sidebar = () => {
           hasSubmenu: true,
           submenu: 'housekeeping',
           children: [
-            { title: 'Status Kamar HP', path: '/operational/housekeeping/status-kamar-hp' },
+            {
+              title: 'Status Kamar',
+              hasSubmenu: true,
+              submenu: 'statusKamar',
+              children: [
+                { title: 'Status Kamar HP', path: '/operational/housekeeping/status-kamar-hp' }
+              ]
+            },
             {
               title: 'Master Data',
               hasSubmenu: true,
