@@ -1,25 +1,23 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '../../../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { apiService } from '../../../../services/api';
-import Layout from '../../../../components/Layout';
-import SearchableSelect from '../../../../components/SearchableSelect';
+import { useState, useEffect } from 'react'
+import { useAuth } from '../../../../context/AuthContext'
+import { useNavigate } from 'react-router-dom'
+import { apiService } from '../../../../services/api'
+import Layout from '../../../../components/Layout'
+import SearchableSelect from '../../../../components/SearchableSelect'
 
 const GroupBooking = () => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const { user } = useAuth()
+  const navigate = useNavigate()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
 
   // Reference data
-  const [rooms, setRooms] = useState([]);
-  const [availableRooms, setAvailableRooms] = useState([]);
-  const [categoryMarkets, setCategoryMarkets] = useState([]);
-  const [marketSegments, setMarketSegments] = useState([]);
-  const [paymentMethods, setPaymentMethods] = useState([]);
-  const [cities, setCities] = useState([]);
-  const [countries, setCountries] = useState([]);
+  const [rooms, setRooms] = useState([])
+  const [availableRooms, setAvailableRooms] = useState([])
+  const [paymentMethods, setPaymentMethods] = useState([])
+  const [cities, setCities] = useState([])
+  const [countries, setCountries] = useState([])
 
   // Group information
   const [groupInfo, setGroupInfo] = useState({
@@ -64,10 +62,25 @@ const GroupBooking = () => {
     loadReferenceData();
   }, []);
 
-  // Calculate nights when dates change
+  // Calculate nights when dates change OR departure when nights changes
   useEffect(() => {
-    calculateNights();
-  }, [groupInfo.arrival_date, groupInfo.departure_date]);
+    if (groupInfo.arrival_date && groupInfo.departure_date) {
+      calculateNights()
+    }
+  }, [groupInfo.arrival_date, groupInfo.departure_date])
+
+  // Calculate departure date when nights changes
+  useEffect(() => {
+    if (groupInfo.arrival_date && groupInfo.nights > 0) {
+      const arrival = new Date(groupInfo.arrival_date)
+      const departure = new Date(arrival)
+      departure.setDate(departure.getDate() + groupInfo.nights)
+      setGroupInfo(prev => ({
+        ...prev,
+        departure_date: departure.toISOString().split('T')[0]
+      }))
+    }
+  }, [groupInfo.arrival_date, groupInfo.nights])
 
   // Filter available rooms
   useEffect(() => {
@@ -75,34 +88,39 @@ const GroupBooking = () => {
   }, [rooms, groupInfo.arrival_date, groupInfo.departure_date, roomBookings]);
 
   const loadReferenceData = async () => {
+    setError('')
     try {
-      const [roomsData, marketsData, segmentsData, paymentsData, citiesData, countriesData] = await Promise.all([
-        apiService.getHotelRooms(),
-        apiService.getCategoryMarkets(),
-        apiService.getMarketSegments(),
+      const results = await Promise.allSettled([
+        apiService.getRoomsByStatus('available'),
         apiService.getPaymentMethods(),
         apiService.getCities(),
-        apiService.getNationalities()
-      ]);
-      setRooms(roomsData || []);
-      setCategoryMarkets(marketsData || []);
-      setMarketSegments(segmentsData || []);
-      setPaymentMethods(paymentsData || []);
-      setCities(citiesData || []);
-      setCountries(countriesData || []);
+        apiService.getCountries()
+      ])
+
+      const getDataOrDefault = (result, defaultValue = []) =>
+        result.status === 'fulfilled' && result.value.data ? (result.value.data.data || result.value.data) : defaultValue
+
+      const roomsData = getDataOrDefault(results[0])
+      console.log('Loaded rooms from database:', roomsData)
+      console.log('Sample room:', roomsData[0])
+      
+      setRooms(roomsData)
+      setPaymentMethods(getDataOrDefault(results[1]))
+      setCities(getDataOrDefault(results[2]))
+      setCountries(getDataOrDefault(results[3]))
     } catch (err) {
-      setError('Failed to load reference data: ' + err.message);
+      setError('Failed to load reference data: ' + err.message)
     }
-  };
+  }
 
   const filterAvailableRooms = () => {
-    const selectedRoomNumbers = roomBookings.map(rb => rb.room_number).filter(Boolean);
+    const selectedRoomNumbers = roomBookings.map(rb => rb.room_number).filter(Boolean)
+    // getRoomsByStatus already filters for available rooms, just remove selected ones
     const available = rooms.filter(room => 
-      (room.status === 'VR' || room.status === 'V R') && 
       !selectedRoomNumbers.includes(room.room_number)
-    );
-    setAvailableRooms(available);
-  };
+    )
+    setAvailableRooms(available)
+  }
 
   const calculateNights = () => {
     if (groupInfo.arrival_date && groupInfo.departure_date) {
@@ -145,30 +163,72 @@ const GroupBooking = () => {
     }
   };
 
-  const updateRoomBooking = (id, field, value) => {
-    setRoomBookings(roomBookings.map(rb => {
-      if (rb.id === id) {
-        const updated = { ...rb, [field]: value };
-        
-        // If room changes, update rate
-        if (field === 'room_number') {
-          const selectedRoom = rooms.find(r => r.room_number === value);
-          if (selectedRoom) {
-            updated.room_type = selectedRoom.room_type;
-            updated.rate = selectedRoom.rate || 0;
-          }
+  const updateRoomBooking = async (id, field, value) => {
+    if (field === 'room_number') {
+      // Handle room selection with pricing fetch
+      const selectedRoom = rooms.find(r => r.room_number === value)
+      
+      if (selectedRoom) {
+        try {
+          // Fetch room pricing from database
+          const pricingResponse = await apiService.getRoomPricing(selectedRoom.room_type)
+          const rate = pricingResponse.data?.current_rate 
+            ? parseFloat(pricingResponse.data.current_rate)
+            : parseFloat(selectedRoom.rate) || 0
+          
+          setRoomBookings(roomBookings.map(rb => {
+            if (rb.id === id) {
+              const updated = {
+                ...rb,
+                room_number: value,
+                room_type: selectedRoom.room_type,
+                rate: rate
+              }
+              const discount = parseFloat(updated.discount) || 0
+              updated.subtotal = (rate - discount) * groupInfo.nights
+              return updated
+            }
+            return rb
+          }))
+        } catch (error) {
+          console.error('Error fetching room pricing:', error)
+          // Fallback to room's rate
+          const rate = parseFloat(selectedRoom.rate) || 0
+          setRoomBookings(roomBookings.map(rb => {
+            if (rb.id === id) {
+              const updated = {
+                ...rb,
+                room_number: value,
+                room_type: selectedRoom.room_type,
+                rate: rate
+              }
+              const discount = parseFloat(updated.discount) || 0
+              updated.subtotal = (rate - discount) * groupInfo.nights
+              return updated
+            }
+            return rb
+          }))
         }
-        
-        // Calculate subtotal
-        const rate = parseFloat(updated.rate) || 0;
-        const discount = parseFloat(updated.discount) || 0;
-        updated.subtotal = (rate - discount) * groupInfo.nights;
-        
-        return updated;
       }
-      return rb;
-    }));
-  };
+    } else {
+      // Handle other field updates
+      setRoomBookings(roomBookings.map(rb => {
+        if (rb.id === id) {
+          const updated = { ...rb, [field]: value }
+          
+          // Recalculate subtotal for rate/discount changes
+          if (field === 'rate' || field === 'discount') {
+            const rate = parseFloat(updated.rate) || 0
+            const discount = parseFloat(updated.discount) || 0
+            updated.subtotal = (rate - discount) * groupInfo.nights
+          }
+          
+          return updated
+        }
+        return rb
+      }))
+    }
+  }
 
   const copyGuestInfo = (fromId) => {
     const sourceRoom = roomBookings.find(rb => rb.id === fromId);
@@ -197,83 +257,111 @@ const GroupBooking = () => {
   };
 
   const formatCities = () => {
-    return cities.map(city => ({
-      value: city.city_name,
-      label: city.city_name
-    }));
-  };
+    return [
+      { value: '', label: '--City--' },
+      ...cities.map(city => ({
+        value: city.city_name || city.name,
+        label: city.city_name || city.name
+      }))
+    ]
+  }
 
   const formatCountries = () => {
-    return countries.map(country => ({
-      value: country.nationality,
-      label: country.nationality
-    }));
-  };
+    return [
+      { value: 'INDONESIA', label: 'INDONESIA' },
+      ...countries.filter(c => (c.name || c.nationality) !== 'INDONESIA').map(country => ({
+        value: country.name || country.nationality,
+        label: country.name || country.nationality
+      }))
+    ]
+  }
+
+  const formatPaymentMethods = () => {
+    return [
+      { value: '', label: 'Select Payment Method' },
+      ...paymentMethods.map(pm => ({
+        value: pm.method_name || pm.name,
+        label: pm.method_name || pm.name
+      }))
+    ]
+  }
+
+  const formatRooms = () => {
+    console.log('Available rooms for dropdown:', availableRooms)
+    const formatted = [
+      { value: '', label: 'None selected' },
+      ...availableRooms.map(room => ({
+        value: room.room_number,
+        label: `${room.room_number} - ${room.room_type}${room.floor_number ? ` (Floor ${room.floor_number})` : ''}${room.hit_count ? ` - Hit: ${room.hit_count}` : ''}`
+      }))
+    ]
+    console.log('Formatted room options:', formatted)
+    return formatted
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
     
     // Validation
     if (!groupInfo.group_name) {
-      setError('Group name is required');
-      return;
+      setError('Group name is required')
+      return
     }
 
-    const invalidRooms = roomBookings.filter(rb => !rb.room_number || !rb.guest_name);
+    if (!groupInfo.payment_method) {
+      setError('Payment method is required')
+      return
+    }
+
+    const invalidRooms = roomBookings.filter(rb => !rb.room_number || !rb.guest_name)
     if (invalidRooms.length > 0) {
-      setError('All rooms must have room number and guest name filled');
-      return;
+      setError('All rooms must have room number and guest name filled')
+      return
     }
 
-    setLoading(true);
-    setError('');
-    setSuccess('');
+    setLoading(true)
+    setError('')
+    setSuccess('')
 
     try {
-      const groupId = `GRP-${Date.now()}`;
-      
-      // Create reservations for all rooms
-      const reservations = roomBookings.map((room, index) => ({
-        registration_no: `GRP${Date.now()}${String(index + 1).padStart(3, '0')}`.slice(0, 10),
-        category_market: 'Group',
-        market_segment: 'Normal',
-        member_id: groupId,
-        transaction_by: user?.username || 'ADMIN',
-        id_card_type: room.id_card_type,
-        id_card_number: room.id_card_number,
-        guest_name: room.guest_name,
-        guest_title: room.guest_title,
-        mobile_phone: room.mobile_phone,
-        address: room.address,
-        nationality: room.nationality,
-        city: room.city,
-        email: groupInfo.pic_email,
+      // Prepare group booking data
+      const bookingData = {
+        group_name: groupInfo.group_name,
+        group_pic: groupInfo.group_pic,
+        pic_phone: groupInfo.pic_phone,
+        pic_email: groupInfo.pic_email,
         arrival_date: groupInfo.arrival_date,
-        arrival_time: new Date().toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' }),
         departure_date: groupInfo.departure_date,
         nights: groupInfo.nights,
-        guest_type: 'Normal',
-        guest_count_male: room.guest_count_male,
-        guest_count_female: room.guest_count_female,
-        guest_count_child: room.guest_count_child,
-        extra_bed: room.extra_bed,
-        room_number: room.room_number,
-        transaction_status: 'Reservation',
         payment_method: groupInfo.payment_method,
-        notes: `Group: ${groupInfo.group_name}, PIC: ${groupInfo.group_pic}, Phone: ${groupInfo.pic_phone}. ${groupInfo.notes}`,
-        payment_amount: room.rate,
-        discount: room.discount,
-        payment_diskon: room.rate - room.discount,
-        deposit: index === 0 ? parseFloat(groupInfo.total_deposit) : 0,
-        balance: room.subtotal - (index === 0 ? parseFloat(groupInfo.total_deposit) : 0),
-        hotel_name: 'New Idola Hotel'
-      }));
+        total_deposit: parseFloat(groupInfo.total_deposit) || 0,
+        notes: groupInfo.notes,
+        created_by: user?.username || 'ADMIN',
+        hotel_name: 'New Idola Hotel',
+        rooms: roomBookings.map(room => ({
+          room_number: room.room_number,
+          room_type: room.room_type,
+          guest_name: room.guest_name,
+          guest_title: room.guest_title,
+          id_card_type: room.id_card_type,
+          id_card_number: room.id_card_number,
+          mobile_phone: room.mobile_phone,
+          nationality: room.nationality,
+          city: room.city,
+          address: room.address,
+          guest_count_male: room.guest_count_male,
+          guest_count_female: room.guest_count_female,
+          guest_count_child: room.guest_count_child,
+          extra_bed: room.extra_bed,
+          rate: parseFloat(room.rate) || 0,
+          discount: parseFloat(room.discount) || 0,
+          subtotal: parseFloat(room.subtotal) || 0
+        }))
+      }
 
-      const results = await Promise.all(
-        reservations.map(res => apiService.createReservation(res))
-      );
-
-      setSuccess(`✅ Successfully created ${results.length} room reservations!\nGroup ID: ${groupId}\n\nReservation Numbers:\n${results.map((r, i) => `Room ${i + 1}: ${reservations[i].registration_no}`).join('\n')}`);
+      const response = await apiService.createGroupBooking(bookingData)
+      
+      setSuccess(`Successfully created group booking!\nGroup ID: ${response.data.group_booking_id}\nTotal Rooms: ${response.data.total_rooms}\nTotal Amount: Rp ${response.data.total_amount.toLocaleString()}`)
       
       // Reset form
       setGroupInfo({
@@ -287,7 +375,7 @@ const GroupBooking = () => {
         payment_method: '',
         total_deposit: 0,
         notes: ''
-      });
+      })
       setRoomBookings([{
         id: Date.now(),
         room_number: '',
@@ -307,17 +395,17 @@ const GroupBooking = () => {
         rate: 0,
         discount: 0,
         subtotal: 0,
-      }]);
+      }])
 
       // Scroll to top to show success message
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'smooth' })
 
     } catch (err) {
-      setError('Failed to create group booking: ' + err.message);
+      setError('Failed to create group booking: ' + (err.response?.data?.detail || err.message))
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <Layout>
@@ -385,7 +473,7 @@ const GroupBooking = () => {
                 marginBottom: '15px',
                 paddingBottom: '10px',
                 borderBottom: '2px solid #dee2e6'
-              }}>📋 GROUP INFORMATION</h3>
+              }}>GROUP INFORMATION</h3>
               
               <div className="form-grid">
                 {/* COLUMN 1 */}
@@ -462,26 +550,35 @@ const GroupBooking = () => {
                 <div className="form-column">
                   <div className="form-group">
                     <label>Nights</label>
-                    <input
-                      type="number"
-                      className="form-input bg-gray-100"
-                      value={groupInfo.nights}
-                      readOnly
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Payment Method</label>
                     <select
+                      name="nights"
                       className="form-select"
-                      value={groupInfo.payment_method}
-                      onChange={(e) => setGroupInfo({...groupInfo, payment_method: e.target.value})}
-                      required
+                      value={groupInfo.nights}
+                      onChange={(e) => {
+                        const nights = parseInt(e.target.value)
+                        setGroupInfo({...groupInfo, nights})
+                        // Recalculate subtotals for all rooms
+                        setRoomBookings(roomBookings.map(rb => ({
+                          ...rb,
+                          subtotal: (parseFloat(rb.rate) - parseFloat(rb.discount || 0)) * nights
+                        })))
+                      }}
                     >
-                      <option value="">Select Payment Method</option>
-                      {paymentMethods.map(pm => (
-                        <option key={pm.id} value={pm.method_name}>{pm.method_name}</option>
+                      {[...Array(30).keys()].map(n => (
+                        <option key={n + 1} value={n + 1}>{n + 1}</option>
                       ))}
                     </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Payment Method <span style={{color: 'red'}}>*</span></label>
+                    <SearchableSelect
+                      name="payment_method"
+                      value={groupInfo.payment_method}
+                      onChange={(e) => setGroupInfo({...groupInfo, payment_method: e.target.value})}
+                      options={formatPaymentMethods()}
+                      placeholder="Search payment method..."
+                      required
+                    />
                   </div>
                   <div className="form-group">
                     <label>Total Deposit (Rp)</label>
@@ -528,7 +625,7 @@ const GroupBooking = () => {
                   fontWeight: '600',
                   color: '#343a40',
                   margin: 0
-                }}>🏨 ROOM BOOKINGS ({roomBookings.length})</h3>
+                }}>ROOM BOOKINGS ({roomBookings.length})</h3>
                 <button
                   type="button"
                   onClick={addRoom}
@@ -587,7 +684,7 @@ const GroupBooking = () => {
                             cursor: 'pointer'
                           }}
                         >
-                          📋 Copy Info to All
+                          Copy Info to All
                         </button>
                       )}
                       {roomBookings.length > 1 && (
@@ -614,23 +711,15 @@ const GroupBooking = () => {
                     {/* COLUMN 1 - Room & Guest Info */}
                     <div className="form-column">
                       <div className="form-group">
-                        <label>Room Number</label>
-                        <select
-                          className={`form-select ${!room.room_number ? 'required-field' : ''}`}
+                        <label>Room Number <span style={{color: 'red'}}>*</span></label>
+                        <SearchableSelect
+                          name="room_number"
                           value={room.room_number}
                           onChange={(e) => updateRoomBooking(room.id, 'room_number', e.target.value)}
+                          options={formatRooms()}
+                          placeholder="Search room..."
                           required
-                        >
-                          <option value="">Select Room</option>
-                          {availableRooms.map(r => (
-                            <option key={r.id} value={r.room_number}>
-                              {r.room_number} - {r.room_type}
-                            </option>
-                          ))}
-                          {room.room_number && !availableRooms.find(r => r.room_number === room.room_number) && (
-                            <option value={room.room_number}>{room.room_number}</option>
-                          )}
-                        </select>
+                        />
                       </div>
                       <div className="form-group">
                         <label>Room Type</label>
@@ -703,7 +792,7 @@ const GroupBooking = () => {
                         <SearchableSelect
                           name="nationality"
                           value={room.nationality}
-                          onChange={(value) => updateRoomBooking(room.id, 'nationality', value)}
+                          onChange={(e) => updateRoomBooking(room.id, 'nationality', e.target.value)}
                           options={formatCountries()}
                           placeholder="Select Nationality"
                           className="form-select"
@@ -714,7 +803,7 @@ const GroupBooking = () => {
                         <SearchableSelect
                           name="city"
                           value={room.city}
-                          onChange={(value) => updateRoomBooking(room.id, 'city', value)}
+                          onChange={(e) => updateRoomBooking(room.id, 'city', e.target.value)}
                           options={formatCities()}
                           placeholder="Select City"
                           className="form-select"
@@ -832,7 +921,7 @@ const GroupBooking = () => {
                 fontWeight: '600',
                 color: '#343a40',
                 marginBottom: '15px'
-              }}>💰 SUMMARY</h3>
+              }}>BOOKING SUMMARY</h3>
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(3, 1fr)',
@@ -907,7 +996,7 @@ const GroupBooking = () => {
                   transition: 'all 0.2s'
                 }}
               >
-                {loading ? '⏳ Creating Bookings...' : `✅ Create Group Booking (${roomBookings.length} rooms)`}
+                {loading ? 'Creating Bookings...' : `Create Group Booking (${roomBookings.length} rooms)`}
               </button>
             </div>
           </form>

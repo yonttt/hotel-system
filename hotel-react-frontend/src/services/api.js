@@ -292,6 +292,11 @@ class ApiService {
     return this.client.get('/countries/')
   }
 
+  // Alias for getCountries
+  async getNationalities() {
+    return this.getCountries()
+  }
+
   // Category Markets endpoints
   async getCategoryMarkets() {
     return this.client.get('/category-markets/')
@@ -305,6 +310,31 @@ class ApiService {
   // Payment Methods endpoints
   async getPaymentMethods() {
     return this.client.get('/payment-methods/')
+  }
+
+  // Group Bookings endpoints
+  async createGroupBooking(bookingData) {
+    return this.client.post('/group-bookings/', bookingData)
+  }
+
+  async getGroupBookings(skip = 0, limit = 100, status = null) {
+    let url = `/group-bookings/?skip=${skip}&limit=${limit}`
+    if (status) {
+      url += `&status=${status}`
+    }
+    return this.client.get(url)
+  }
+
+  async getGroupBooking(groupBookingId) {
+    return this.client.get(`/group-bookings/${groupBookingId}`)
+  }
+
+  async updateGroupBooking(groupBookingId, bookingData) {
+    return this.client.put(`/group-bookings/${groupBookingId}`, bookingData)
+  }
+
+  async deleteGroupBooking(groupBookingId) {
+    return this.client.delete(`/group-bookings/${groupBookingId}`)
   }
 }
 

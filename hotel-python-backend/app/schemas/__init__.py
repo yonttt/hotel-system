@@ -258,3 +258,90 @@ class GuestRegistrationResponse(GuestRegistrationBase):
     
     class Config:
         from_attributes = True
+
+# Group Booking Room Schema
+class GroupBookingRoomBase(BaseModel):
+    room_number: str
+    room_type: Optional[str] = None
+    guest_name: str
+    guest_title: Optional[str] = "MR"
+    id_card_type: Optional[str] = "KTP"
+    id_card_number: Optional[str] = None
+    mobile_phone: Optional[str] = None
+    nationality: Optional[str] = "INDONESIA"
+    city: Optional[str] = None
+    address: Optional[str] = None
+    guest_count_male: Optional[int] = 1
+    guest_count_female: Optional[int] = 0
+    guest_count_child: Optional[int] = 0
+    extra_bed: Optional[int] = 0
+    rate: Optional[Decimal] = Decimal('0.000')
+    discount: Optional[Decimal] = Decimal('0.000')
+    subtotal: Optional[Decimal] = Decimal('0.000')
+    room_status: Optional[str] = "Reserved"
+
+class GroupBookingRoomCreate(GroupBookingRoomBase):
+    group_booking_id: str
+    reservation_no: str
+
+class GroupBookingRoomResponse(GroupBookingRoomBase):
+    id: int
+    group_booking_id: str
+    reservation_no: str
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+# Group Booking Schema
+class GroupBookingBase(BaseModel):
+    group_name: str
+    group_pic: str
+    pic_phone: str
+    pic_email: Optional[str] = None
+    arrival_date: datetime
+    departure_date: datetime
+    nights: int
+    payment_method: str
+    total_deposit: Optional[Decimal] = Decimal('0.000')
+    notes: Optional[str] = None
+
+from typing import List
+
+class GroupBookingCreate(GroupBookingBase):
+    rooms: List[GroupBookingRoomBase]
+    created_by: Optional[str] = "ADMIN"
+    hotel_name: Optional[str] = "New Idola Hotel"
+
+class GroupBookingUpdate(BaseModel):
+    group_name: Optional[str] = None
+    group_pic: Optional[str] = None
+    pic_phone: Optional[str] = None
+    pic_email: Optional[str] = None
+    payment_method: Optional[str] = None
+    total_deposit: Optional[Decimal] = None
+    notes: Optional[str] = None
+    status: Optional[str] = None
+
+class GroupBookingResponse(GroupBookingBase):
+    id: int
+    group_booking_id: str
+    total_rooms: int
+    total_amount: Decimal
+    total_deposit: Decimal
+    total_balance: Decimal
+    status: str
+    created_by: str
+    hotel_name: str
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class GroupBookingWithRoomsResponse(GroupBookingResponse):
+    rooms: List[GroupBookingRoomResponse] = []
+
+    class Config:
+        from_attributes = True
