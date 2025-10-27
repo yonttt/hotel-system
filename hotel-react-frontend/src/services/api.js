@@ -30,8 +30,15 @@ class ApiService {
       (response) => response,
       (error) => {
         if (error.response?.status === 401) {
+          // Clear expired/invalid token
           localStorage.removeItem('token')
-          window.location.href = '/login'
+          localStorage.removeItem('user_role')
+          
+          // Only redirect if not already on login page
+          if (window.location.pathname !== '/login') {
+            console.warn('Authentication token expired or invalid. Redirecting to login...')
+            window.location.href = '/login'
+          }
         }
         return Promise.reject(error)
       }

@@ -26,10 +26,16 @@ export const AuthProvider = ({ children }) => {
           }
         } catch (error) {
           console.error('Session validation error:', error);
+          // Clear expired or invalid token
           setUser(null);
           localStorage.removeItem('token');
           localStorage.removeItem('user_role');
           apiService.setAuthToken(null);
+          
+          // If we're not on the login page, redirect there
+          if (window.location.pathname !== '/login') {
+            window.location.href = '/login';
+          }
         }
       }
     };
@@ -107,6 +113,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user_role');
     apiService.setAuthToken(null);
     setUser(null);
   };

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useAuth } from '../../../../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { apiService } from '../../../../services/api'
@@ -458,24 +458,7 @@ const GroupBooking = () => {
 
         <div className="registration-form-container">
           <form onSubmit={handleSubmit} className="registration-form">
-            {/* Group Information Section */}
-            <div style={{
-              background: '#f8f9fa',
-              padding: '15px',
-              marginBottom: '20px',
-              borderRadius: '4px',
-              border: '2px solid #dee2e6'
-            }}>
-              <h3 style={{
-                fontSize: '16px',
-                fontWeight: '600',
-                color: '#343a40',
-                marginBottom: '15px',
-                paddingBottom: '10px',
-                borderBottom: '2px solid #dee2e6'
-              }}>GROUP INFORMATION</h3>
-              
-              <div className="form-grid">
+            <div className="form-grid">
                 {/* COLUMN 1 */}
                 <div className="form-column">
                   <div className="form-group">
@@ -602,112 +585,86 @@ const GroupBooking = () => {
                   rows="2"
                 />
               </div>
-            </div>
 
             {/* Room Bookings Section */}
-            <div style={{
-              background: '#ffffff',
-              padding: '15px',
-              marginBottom: '20px',
-              borderRadius: '4px',
-              border: '2px solid #dee2e6'
-            }}>
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: '15px',
-                paddingBottom: '10px',
-                borderBottom: '2px solid #dee2e6'
-              }}>
-                <h3 style={{
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  color: '#343a40',
-                  margin: 0
-                }}>ROOM BOOKINGS ({roomBookings.length})</h3>
-                <button
-                  type="button"
-                  onClick={addRoom}
-                  style={{
-                    padding: '8px 16px',
-                    background: '#28a745',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    cursor: 'pointer'
-                  }}
-                >
-                  + Add Room
-                </button>
+            <div className="form-grid">
+              <div className="form-column" style={{ gridColumn: '1 / -1' }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '15px'
+                }}>
+                  <h3 style={{
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    color: '#343a40',
+                    margin: 0
+                  }}>ROOM BOOKINGS ({roomBookings.length})</h3>
+                  <button
+                    type="button"
+                    onClick={addRoom}
+                    className="blue-button"
+                    style={{
+                      padding: '8px 16px',
+                      background: '#28a745',
+                      fontSize: '14px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    + Add Room
+                  </button>
+                </div>
               </div>
 
               {roomBookings.map((room, index) => (
-                <div
-                  key={room.id}
-                  style={{
-                    background: '#f8f9fa',
-                    padding: '15px',
-                    marginBottom: '15px',
-                    borderRadius: '4px',
-                    border: '1px solid #dee2e6'
-                  }}
-                >
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: '15px',
-                    paddingBottom: '10px',
-                    borderBottom: '1px solid #dee2e6'
-                  }}>
-                    <h4 style={{
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      color: '#495057',
-                      margin: 0
-                    }}>Room #{index + 1}</h4>
-                    <div style={{ display: 'flex', gap: '10px' }}>
-                      {index === 0 && roomBookings.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => copyGuestInfo(room.id)}
-                          style={{
-                            padding: '6px 12px',
-                            background: '#17a2b8',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            fontSize: '12px',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          Copy Info to All
-                        </button>
-                      )}
-                      {roomBookings.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removeRoom(room.id)}
-                          style={{
-                            padding: '6px 12px',
-                            background: '#dc3545',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            fontSize: '12px',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          × Remove
-                        </button>
-                      )}
+                <React.Fragment key={room.id}>
+                  <div className="form-column" style={{ gridColumn: '1 / -1', background: '#f8f9fa', padding: '10px', marginBottom: '10px', borderRadius: '4px' }}>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}>
+                      <h4 style={{
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        color: '#495057',
+                        margin: 0
+                      }}>Room #{index + 1}</h4>
+                      <div style={{ display: 'flex', gap: '10px' }}>
+                        {index === 0 && roomBookings.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => copyGuestInfo(room.id)}
+                            className="blue-button"
+                            style={{
+                              padding: '6px 12px',
+                              background: '#17a2b8',
+                              fontSize: '12px'
+                            }}
+                          >
+                            Copy Info to All
+                          </button>
+                        )}
+                        {roomBookings.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeRoom(room.id)}
+                            className="blue-button"
+                            style={{
+                              padding: '6px 12px',
+                              background: '#dc3545',
+                              fontSize: '12px'
+                            }}
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                  <div className="form-grid">
+                  <div className="form-grid" style={{ gridColumn: '1 / -1', marginBottom: '20px' }}>
                     {/* COLUMN 1 - Room & Guest Info */}
                     <div className="form-column">
                       <div className="form-group">
@@ -903,70 +860,61 @@ const GroupBooking = () => {
                       </div>
                     </div>
                   </div>
-                </div>
+                </React.Fragment>
               ))}
             </div>
 
             {/* Summary Section */}
-            <div style={{
-              background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
-              padding: '20px',
-              marginBottom: '20px',
-              borderRadius: '4px',
-              border: '2px solid #28a745',
-              borderLeft: '6px solid #28a745'
-            }}>
-              <h3 style={{
-                fontSize: '16px',
-                fontWeight: '600',
-                color: '#343a40',
-                marginBottom: '15px'
-              }}>BOOKING SUMMARY</h3>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '20px'
-              }}>
-                <div style={{
-                  padding: '15px',
-                  background: 'white',
-                  borderRadius: '4px',
-                  border: '1px solid #dee2e6'
-                }}>
-                  <div style={{ fontSize: '13px', color: '#6c757d', marginBottom: '5px' }}>Total Rooms</div>
-                  <div style={{ fontSize: '24px', fontWeight: '600', color: '#212529' }}>
-                    {roomBookings.length}
-                  </div>
+            <div className="form-grid" style={{ marginTop: '20px', padding: '15px', background: '#f8f9fa', borderRadius: '4px' }}>
+              <div className="form-column" style={{ gridColumn: '1 / -1' }}>
+                <h3 style={{
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#343a40',
+                  marginBottom: '15px'
+                }}>BOOKING SUMMARY</h3>
+              </div>
+              
+              <div className="form-column">
+                <div className="form-group">
+                  <label>Total Rooms</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={roomBookings.length}
+                    readOnly
+                    style={{ fontWeight: '600' }}
+                  />
                 </div>
-                <div style={{
-                  padding: '15px',
-                  background: 'white',
-                  borderRadius: '4px',
-                  border: '1px solid #dee2e6'
-                }}>
-                  <div style={{ fontSize: '13px', color: '#6c757d', marginBottom: '5px' }}>Total Amount</div>
-                  <div style={{ fontSize: '24px', fontWeight: '600', color: '#28a745' }}>
-                    {new Intl.NumberFormat('id-ID', {
-                      style: 'currency',
-                      currency: 'IDR',
+              </div>
+              
+              <div className="form-column">
+                <div className="form-group">
+                  <label>Total Amount (Rp)</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={new Intl.NumberFormat('id-ID', {
                       minimumFractionDigits: 0
                     }).format(getTotalAmount())}
-                  </div>
+                    readOnly
+                    style={{ fontWeight: '600', color: '#28a745' }}
+                  />
                 </div>
-                <div style={{
-                  padding: '15px',
-                  background: 'white',
-                  borderRadius: '4px',
-                  border: '1px solid #dee2e6'
-                }}>
-                  <div style={{ fontSize: '13px', color: '#6c757d', marginBottom: '5px' }}>Deposit</div>
-                  <div style={{ fontSize: '24px', fontWeight: '600', color: '#007bff' }}>
-                    {new Intl.NumberFormat('id-ID', {
-                      style: 'currency',
-                      currency: 'IDR',
+              </div>
+              
+              <div className="form-column">
+                <div className="form-group">
+                  <label>Balance (Rp)</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={new Intl.NumberFormat('id-ID', {
                       minimumFractionDigits: 0
-                    }).format(parseFloat(groupInfo.total_deposit) || 0)}
-                  </div>
+                    }).format(getTotalAmount() - (parseFloat(groupInfo.total_deposit) || 0))}
+                    readOnly
+                    style={{ fontWeight: '600', color: '#007bff' }}
+                  />
                 </div>
               </div>
             </div>
@@ -974,26 +922,19 @@ const GroupBooking = () => {
             {/* Submit Button */}
             <div style={{
               display: 'flex',
-              justifyContent: 'flex-end',
-              padding: '20px',
-              background: 'white',
-              borderRadius: '4px',
-              border: '1px solid #dee2e6'
+              justifyContent: 'center',
+              marginTop: '20px'
             }}>
               <button
                 type="submit"
                 disabled={loading}
+                className="blue-button"
                 style={{
                   padding: '12px 40px',
                   background: loading ? '#6c757d' : '#007bff',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
                   fontSize: '16px',
                   fontWeight: '600',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  boxShadow: loading ? 'none' : '0 2px 4px rgba(0,123,255,0.3)',
-                  transition: 'all 0.2s'
+                  cursor: loading ? 'not-allowed' : 'pointer'
                 }}
               >
                 {loading ? 'Creating Bookings...' : `Create Group Booking (${roomBookings.length} rooms)`}
