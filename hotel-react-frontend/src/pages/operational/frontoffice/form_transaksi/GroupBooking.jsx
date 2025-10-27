@@ -286,11 +286,21 @@ const GroupBooking = () => {
     ]
   }
 
-  const formatRooms = () => {
+  const formatRooms = (currentRoomNumber = null) => {
     console.log('Available rooms for dropdown:', availableRooms)
+    
+    // Include currently selected room if it exists
+    let roomsToShow = [...availableRooms]
+    if (currentRoomNumber) {
+      const currentRoom = rooms.find(r => r.room_number === currentRoomNumber)
+      if (currentRoom && !roomsToShow.find(r => r.room_number === currentRoomNumber)) {
+        roomsToShow = [currentRoom, ...roomsToShow]
+      }
+    }
+    
     const formatted = [
       { value: '', label: 'None selected' },
-      ...availableRooms.map(room => ({
+      ...roomsToShow.map(room => ({
         value: room.room_number,
         label: `${room.room_number} - ${room.room_type}${room.floor_number ? ` (Floor ${room.floor_number})` : ''}${room.hit_count ? ` - Hit: ${room.hit_count}` : ''}`
       }))
@@ -673,7 +683,7 @@ const GroupBooking = () => {
                           name="room_number"
                           value={room.room_number}
                           onChange={(e) => updateRoomBooking(room.id, 'room_number', e.target.value)}
-                          options={formatRooms()}
+                          options={formatRooms(room.room_number)}
                           placeholder="Search room..."
                           required
                         />
