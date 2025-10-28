@@ -23,6 +23,7 @@ const Sidebar = () => {
     formTransaksi: false,
     infoReservasi: false,
     informasiTamu: false,
+    statusKamarFO: false,
     housekeeping: false,
     statusKamar: false,
     masterData: false,
@@ -59,6 +60,9 @@ const Sidebar = () => {
         }
         if (path.includes('/informasi-tamu/')) {
           newExpandedMenus.informasiTamu = true
+        }
+        if (path.includes('/status-kamar')) {
+          newExpandedMenus.statusKamarFO = true
         }
       }
       if (path.includes('/housekeeping/')) {
@@ -114,6 +118,7 @@ const Sidebar = () => {
       formTransaksi: false,
       infoReservasi: false,
       informasiTamu: false,
+      statusKamarFO: false,
       housekeeping: false,
       statusKamar: false,
       masterData: false,
@@ -173,6 +178,14 @@ const Sidebar = () => {
                 { title: 'In House Guest ', path: '/operational/frontoffice/informasi-tamu/in-house-guest' },
                 { title: 'Check in Today', path: '/operational/frontoffice/informasi-tamu/check-in-today' },
                 { title: 'Guest History', path: '/operational/frontoffice/informasi-tamu/guest-history' }
+              ]
+            },
+            {
+              title: 'Status Kamar',
+              hasSubmenu: true,
+              submenu: 'statusKamarFO',
+              children: [
+                { title: 'Status Kamar FO', path: '/operational/frontoffice/status-kamar-fo' }
               ]
             },
           ]

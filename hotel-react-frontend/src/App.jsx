@@ -88,6 +88,9 @@ import MasterRoomType from './pages/operational/housekeeping/master_data/MasterR
 import ManagementRoom from './pages/operational/housekeeping/master_data/ManagementRoom';
 import StatusKamarHP from './pages/operational/housekeeping/statuskamarhp/StatusKamarHP';
 
+// Operational - Front Office - Status Kamar FO
+import StatusKamarFO from './pages/operational/frontoffice/statuskamarfo/StatusKamarFO';
+
 // HRD
 import AccountReceivablePage from './pages/hrd/AccountReceivablePage';
 import AccountingPage from './pages/hrd/AccountingPage';
@@ -169,6 +172,18 @@ function App() {
               element={
                 <ProtectedRoute>
                   <LaundryPage />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Front Office - Status Kamar FO */}
+            <Route 
+              path="/operational/frontoffice/status-kamar-fo" 
+              element={
+                <ProtectedRoute>
+                  <ErrorBoundary>
+                    <StatusKamarFO />
+                  </ErrorBoundary>
                 </ProtectedRoute>
               } 
             />
