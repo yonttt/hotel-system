@@ -10,6 +10,10 @@ const StatusKamarHP = () => {
   const [selectedHotel, setSelectedHotel] = useState('HOTEL NEW IDOLA');
   const [selectedType, setSelectedType] = useState('All Type');
   const [selectedStatus, setSelectedStatus] = useState('All Status');
+  const [showModal, setShowModal] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [modalRoomStatus, setModalRoomStatus] = useState('');
+  const [modalRoomBoy, setModalRoomBoy] = useState('Room Attendant');
 
   useEffect(() => {
     fetchRooms();
@@ -164,6 +168,40 @@ const StatusKamarHP = () => {
 
   const statusCounts = getStatusCounts();
 
+  // Handle room click
+  const handleRoomClick = (room) => {
+    setSelectedRoom(room);
+    setModalRoomStatus(getShortStatus(room.status));
+    setModalRoomBoy('Room Attendant');
+    setShowModal(true);
+  };
+
+  // Handle modal close
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedRoom(null);
+    setModalRoomStatus('');
+    setModalRoomBoy('Room Attendant');
+  };
+
+  // Handle process (update room status)
+  const handleProcess = async () => {
+    try {
+      // Add your API call here to update room status
+      console.log('Processing room:', selectedRoom?.room_number, {
+        status: modalRoomStatus,
+        roomBoy: modalRoomBoy
+      });
+      // Close modal after successful update
+      handleCloseModal();
+      // Refresh rooms
+      await fetchRooms();
+    } catch (err) {
+      console.error('Error updating room:', err);
+      alert('Failed to update room status');
+    }
+  };
+
   return (
     <Layout>
       <div className="status-kamar-container">
@@ -247,6 +285,7 @@ const StatusKamarHP = () => {
                     key={room.id}
                     className="room-box"
                     style={{ backgroundColor: getStatusColor(room.status) }}
+                    onClick={() => handleRoomClick(room)}
                   >
                     <div className="room-type">{room.room_type}</div>
                     <div className="room-number">{room.room_number}</div>
@@ -318,6 +357,61 @@ const StatusKamarHP = () => {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal for Room Details */}
+        {showModal && selectedRoom && (
+          <div className="modal-overlay" onClick={handleCloseModal}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>ROOM {selectedRoom.room_number}</h3>
+              </div>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label>Room Status : <span className="required">*</span> Required</label>
+                  <select 
+                    value={modalRoomStatus} 
+                    onChange={(e) => setModalRoomStatus(e.target.value)}
+                    className="modal-select"
+                  >
+                    <option value="">---Room Status--</option>
+                    <option value="CO">Checkout</option>
+                    <option value="GC">General Cleaning</option>
+                    <option value="OO">Out Of Order</option>
+                    <option value="VD">Vacant Dirty</option>
+                    <option value="VC">Vacant Clean</option>
+                    <option value="VR">Vacant Ready</option>
+                    <option value="VU">Vacant Uncheck</option>
+                    <option value="AR">Arrival</option>
+                    <option value="IC">Incognito</option>
+                    <option value="DND">DND (Do Not Disturb)</option>
+                    <option value="OD">Occupied Dirty</option>
+                    <option value="MU">Makeup Room</option>
+                    <option value="OC">Occupied Clean</option>
+                    <option value="OR">Occupied Ready</option>
+                    <option value="HU">House Use</option>
+                    <option value="SO">Sleep Out</option>
+                    <option value="SK">Skipper</option>
+                    <option value="ED">Expected Departure</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Room Boy : <span className="required">*</span> Required</label>
+                  <select 
+                    value={modalRoomBoy} 
+                    onChange={(e) => setModalRoomBoy(e.target.value)}
+                    className="modal-select"
+                  >
+                    <option value="Room Attendant">Room Attendant</option>
+                  </select>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button className="btn-close" onClick={handleCloseModal}>Close</button>
+                <button className="btn-proses" onClick={handleProcess}>Proses</button>
               </div>
             </div>
           </div>
