@@ -278,31 +278,40 @@ const ReservasiPage = () => {
     ]
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!isFormValid()) {
-      alert('Please fill Guest Name, ID Card, Room Number, and Mobile Phone.')
-      return
-    }
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!isFormValid()) {
+      alert('Please fill Guest Name, ID Card, Room Number, and Mobile Phone.')
+      return
+    }
 
-    try {
-      const reservationData = { ...formData, created_by: user?.id || null }
-      const response = await apiService.createHotelReservation(reservationData)
-      if (response.data) {
-        alert('Reservation successful!')
-        loadInitialData() 
-      }
-    } catch (error) {
-      console.error('Error submitting reservation:', error)
-      alert('Error submitting reservation: ' + (error.response?.data?.detail || error.message))
-    }
-  }
+    try {
+      const reservationData = { ...formData, created_by: user?.id || null }
+      const response = await apiService.createHotelReservation(reservationData)
+      if (response.data) {
+        // Update room status to AR (Arrival) after successful reservation
+        try {
+          await apiService.updateHotelRoom(formData.room_number, { status: 'AR' })
+          console.log('Room status updated to AR (Arrival)')
+        } catch (roomError) {
+          console.error('Failed to update room status:', roomError)
+          // Don't fail the reservation if room update fails
+        }
+        
+        alert('Reservation successful!')
+        loadInitialData() 
+      }
+    } catch (error) {
+      console.error('Error submitting reservation:', error)
+      alert('Error submitting reservation: ' + (error.response?.data?.detail || error.message))
+    }
+  }
 
-  const isFormValid = () => {
-    return formData.guest_name && formData.id_card_number && formData.room_number && formData.mobile_phone
-  }
+  const isFormValid = () => {
+    return formData.guest_name && formData.id_card_number && formData.room_number && formData.mobile_phone
+  }
 
-  return (
+  return (
     <Layout>
       <div className="registration-container">
         <div className="registration-header">

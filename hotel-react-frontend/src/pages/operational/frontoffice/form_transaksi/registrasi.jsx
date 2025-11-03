@@ -273,31 +273,40 @@ const RegistrasiPage = () => {
     ]
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!isFormValid()) {
-      alert('Please fill Guest Name, ID Card, Room Number, and Mobile Phone.')
-      return
-    }
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!isFormValid()) {
+      alert('Please fill Guest Name, ID Card, Room Number, and Mobile Phone.')
+      return
+    }
 
-    try {
-      const registrationData = { ...formData, created_by: user?.id || null }
-      const response = await apiService.createHotelRegistration(registrationData)
-      if (response.data) {
-        alert('Registration successful!')
-        loadInitialData() 
-      }
-    } catch (error) {
-      console.error('Error submitting registration:', error)
-      alert('Error submitting registration: ' + (error.response?.data?.detail || error.message))
-    }
-  }
+    try {
+      const registrationData = { ...formData, created_by: user?.id || null }
+      const response = await apiService.createHotelRegistration(registrationData)
+      if (response.data) {
+        // Update room status to OR (Occupied Ready) after successful registration
+        try {
+          await apiService.updateHotelRoom(formData.room_number, { status: 'OR' })
+          console.log('Room status updated to OR (Occupied Ready)')
+        } catch (roomError) {
+          console.error('Failed to update room status:', roomError)
+          // Don't fail the registration if room update fails
+        }
+        
+        alert('Registration successful!')
+        loadInitialData() 
+      }
+    } catch (error) {
+      console.error('Error submitting registration:', error)
+      alert('Error submitting registration: ' + (error.response?.data?.detail || error.message))
+    }
+  }
 
-  const isFormValid = () => {
-    return formData.guest_name && formData.id_card_number && formData.room_number && formData.mobile_phone
-  }
+  const isFormValid = () => {
+    return formData.guest_name && formData.id_card_number && formData.room_number && formData.mobile_phone
+  }
 
-  return (
+  return (
     <Layout>
       <div className="registration-container">
         <div className="registration-header">
