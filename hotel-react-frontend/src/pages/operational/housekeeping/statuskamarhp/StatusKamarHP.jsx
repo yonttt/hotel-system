@@ -67,26 +67,26 @@ const StatusKamarHP = () => {
       'vd': '#ff8c00',      // Vacant Dirty - dark orange
       'vc': '#90ee90',      // Vacant Clean - light green
       'vr': '#008000',      // Vacant Ready - green
-      'v r': '#008000',
+      'v r': '#008000',     // Vacant Ready - green
+      'vacant ready': '#008000',  // Vacant Ready - green
       'vu': '#e6e6fa',      // Vacant Uncheck - lavender
       'ar': '#87ceeb',      // Arrival - sky blue
+      'arrival': '#87ceeb', // Arrival - sky blue
       'ic': '#008080',      // Incognito - teal
       'dnd': '#0000ff',     // DND - blue
       'od': '#9acd32',      // Occupied Dirty - yellow green
       'mu': '#800080',      // Makeup Room - purple
       'oc': '#ff8c00',      // Occupied Clean - dark orange
       'or': '#1e90ff',      // Occupied Ready - dodger blue
+      'occupied ready': '#1e90ff',  // Occupied Ready - dodger blue
       'hu': '#d3d3d3',      // House Use - light gray
       'so': '#ff69b4',      // Sleep Out - hot pink
       'sk': '#ffffff',      // Skipper - white
       'ed': '#ffff00',      // Expected Departure - yellow
-      '1': '#0000ff',       // Number status
-      '2': '#1e90ff',
-      '3': '#008080',
     };
     
     const statusLower = (status || '').toLowerCase().trim();
-    return statusMap[statusLower] || '#808080'; // Default gray
+    return statusMap[statusLower] || '#008000'; // Default to Vacant Ready green
   };
 
   // Get short status code from full status name
