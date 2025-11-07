@@ -302,7 +302,7 @@ const GroupBooking = () => {
       { value: '', label: 'None selected' },
       ...roomsToShow.map(room => ({
         value: room.room_number,
-        label: `${room.room_number} - ${room.room_type}${room.floor_number ? ` (Floor ${room.floor_number})` : ''}${room.hit_count ? ` - Hit: ${room.hit_count}` : ''}`
+        label: `${room.room_number} - ${room.room_type}${room.floor_number ? ` (Floor ${room.floor_number})` : ''}`
       }))
     ]
     console.log('Formatted room options:', formatted)

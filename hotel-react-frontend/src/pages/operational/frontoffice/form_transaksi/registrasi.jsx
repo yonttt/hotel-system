@@ -257,18 +257,18 @@ const RegistrasiPage = () => {
   }
 
   const formatRooms = () => {
-    return [
-      { value: '', label: 'None selected' },
-      ...rooms.map(room => ({ 
-        value: room.room_number, 
-        label: `${room.room_number} - ${room.room_type} (Floor ${room.floor_number}) - Hit: ${room.hit_count}` 
-      }))
-    ]
-  }
+    return [
+      { value: '', label: 'None selected' },
+      ...rooms.map(room => ({ 
+        value: room.room_number, 
+        label: `${room.room_number} - ${room.room_type} (Floor ${room.floor_number})` 
+      }))
+    ]
+  }
 
-  const formatPaymentMethods = () => {
-    return [
-      { value: '', label: 'Debit Bca 446' },
+  const formatPaymentMethods = () => {
+    return [
+      { value: '', label: 'Debit Bca 446' },
       ...paymentMethods.map(pm => ({ value: pm.name, label: pm.name }))
     ]
   }
