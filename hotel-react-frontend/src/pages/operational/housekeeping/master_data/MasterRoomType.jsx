@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../../../../services/api';
 import Layout from '../../../../components/Layout';
+import { useAuth } from '../../../../context/AuthContext';
 
 const MasterRoomType = () => {
+  const { user } = useAuth();
   const [roomTypes, setRoomTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -59,6 +61,11 @@ const MasterRoomType = () => {
       minimumFractionDigits: 3,
       maximumFractionDigits: 3
     }).format(amount);
+  };
+
+  // Check if user has edit permission
+  const canEdit = () => {
+    return ['admin', 'manager', 'housekeeping'].includes(user?.role);
   };
 
   return (
@@ -165,7 +172,9 @@ const MasterRoomType = () => {
                   <td className="align-right">{formatCurrency(item.weekend_rate || 0)}</td>
                   <td className="align-right">-</td>
                   <td>
-                    <button className="btn-table-action">Edit</button>
+                    {canEdit() && (
+                      <button className="btn-table-action">Edit</button>
+                    )}
                   </td>
                 </tr>
               ))

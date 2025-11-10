@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../../../../services/api';
 import Layout from '../../../../components/Layout';
+import { useAuth } from '../../../../context/AuthContext';
 
 const ManagementRoom = () => {
+  const { user } = useAuth();
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -49,6 +51,11 @@ const ManagementRoom = () => {
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
+  };
+
+  // Check if user has edit permission
+  const canEdit = () => {
+    return ['admin', 'manager', 'housekeeping'].includes(user?.role);
   };
 
   return (
@@ -161,7 +168,9 @@ const ManagementRoom = () => {
                   <td>{item.tax_status || 'TIDAK'}</td>
                   <td>{item.hit_count || 0}</td>
                   <td>
-                    <button className="btn-table-action">Edit</button>
+                    {canEdit() && (
+                      <button className="btn-table-action">Edit</button>
+                    )}
                   </td>
                 </tr>
               ))

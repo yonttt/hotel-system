@@ -100,6 +100,18 @@ class ApiService {
     return this.client.get('/auth/me')
   }
 
+  async registerUser(userData) {
+    return this.client.post('/auth/register', userData)
+  }
+
+  async getAllUsers() {
+    return this.client.get('/users/')
+  }
+
+  async deleteUser(userId) {
+    return this.client.delete(`/users/${userId}`)
+  }
+
   // Hotel Rooms endpoints (updated to use new hotel_rooms table)
   async getHotelRooms(skip = 0, limit = 100, room_type = null, floor = null, status = null) {
     let url = `/hotel-rooms/?skip=${skip}&limit=${limit}`

@@ -9,7 +9,7 @@ class User(Base):
     username = Column(String(50), unique=True, index=True)
     password = Column(String(255))
     email = Column(String(100))
-    role = Column(Enum('admin', 'manager', 'staff'), default='staff')
+    role = Column(Enum('admin', 'manager', 'staff', 'frontoffice', 'housekeeping'), default='staff')
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 

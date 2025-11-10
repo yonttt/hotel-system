@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import {
   HomeIcon,
   CalendarIcon,
@@ -17,6 +18,7 @@ import {
 } from '@heroicons/react/24/outline'
 
 const Sidebar = () => {
+  const { user } = useAuth()
   const [expandedMenus, setExpandedMenus] = useState({
     operational: false,
     frontOffice: false,
@@ -225,10 +227,56 @@ const Sidebar = () => {
       children: [
         { title: 'Account Receivable', path: '/hrd/account-receivable' },
         { title: 'Accounting', path: '/hrd/accounting' },
-        { title: 'Administration', path: '/hrd/administration' }
+        { title: 'Administration', path: '/hrd/administration' },
+        { title: 'User Management', path: '/hrd/user-management' }
       ]
     }
   ]
+
+  // Filter sidebar items based on user role
+  const getFilteredSidebarItems = () => {
+    if (!user) return sidebarItems
+
+    const userRole = user.role
+
+    // Admin sees everything
+    if (userRole === 'admin' || userRole === 'manager') {
+      return sidebarItems
+    }
+
+    // Front Office user - only sees Home and Front Office menu
+    if (userRole === 'frontoffice') {
+      return sidebarItems.map(item => {
+        if (item.title === 'HOME') return item
+        if (item.title === 'OPERATIONAL') {
+          return {
+            ...item,
+            children: item.children.filter(child => child.title === 'Front Office')
+          }
+        }
+        return null
+      }).filter(Boolean)
+    }
+
+    // Housekeeping user - only sees Home and Housekeeping menu
+    if (userRole === 'housekeeping') {
+      return sidebarItems.map(item => {
+        if (item.title === 'HOME') return item
+        if (item.title === 'OPERATIONAL') {
+          return {
+            ...item,
+            children: item.children.filter(child => child.title === 'Housekeeping')
+          }
+        }
+        return null
+      }).filter(Boolean)
+    }
+
+    // Default - show all for staff
+    return sidebarItems
+  }
+
+  const filteredSidebarItems = getFilteredSidebarItems()
 
   const renderMenuItem = (item, depth = 0) => {
     const paddingClass = depth === 0 ? 'pl-6' : depth === 1 ? 'pl-10' : depth === 2 ? 'pl-14' : 'pl-18'
@@ -304,7 +352,7 @@ const Sidebar = () => {
     <div className="sidebar translate-x-0">
       {/* Navigation */}
       <div className="sidebar-nav">
-        {sidebarItems.map(item => renderMenuItem(item))}
+        {filteredSidebarItems.map(item => renderMenuItem(item))}
       </div>
     </div>
   )

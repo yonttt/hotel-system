@@ -95,6 +95,7 @@ import StatusKamarFO from './pages/operational/frontoffice/statuskamarfo/StatusK
 import AccountReceivablePage from './pages/hrd/AccountReceivablePage';
 import AccountingPage from './pages/hrd/AccountingPage';
 import AdministrationPage from './pages/hrd/AdministrationPage';
+import UserManagement from './pages/hrd/UserManagement';
 
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -306,6 +307,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <AdministrationPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/hrd/user-management" 
+              element={
+                <ProtectedRoute>
+                  <UserManagement />
                 </ProtectedRoute>
               } 
             />

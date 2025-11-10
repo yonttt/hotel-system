@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import auth, hotel_rooms, room_pricing, guests, hotel_registrations, hotel_reservations, cities, nationalities, category_markets, market_segments, payment_methods, group_bookings
+from app.api import auth, users, hotel_rooms, room_pricing, guests, hotel_registrations, hotel_reservations, cities, nationalities, category_markets, market_segments, payment_methods, group_bookings
 from app.core.config import settings
 
 app = FastAPI(
@@ -25,6 +25,7 @@ def health_check():
 
 # Include routers
 app.include_router(auth.router, prefix="/auth", tags=["authentication"])
+app.include_router(users.router, prefix="/users", tags=["users"])
 app.include_router(hotel_rooms.router, prefix="/hotel-rooms", tags=["hotel-rooms"])
 app.include_router(room_pricing.router, prefix="/room-pricing", tags=["room-pricing"])
 app.include_router(guests.router, prefix="/guests", tags=["guests"])
