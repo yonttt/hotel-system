@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { apiService } from '../../../services/api';
-import Layout from '../../../components/Layout';
-import { useAuth } from '../../../context/AuthContext';
+import { apiService } from '../../services/api';
+import Layout from '../../components/Layout';
+import { useAuth } from '../../context/AuthContext';
 
 const UserManagement = () => {
   const { user } = useAuth();
