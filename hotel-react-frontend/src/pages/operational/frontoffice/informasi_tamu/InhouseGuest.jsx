@@ -71,6 +71,11 @@ const InhouseGuest = () => {
     return charge - deposit
   }
 
+  // Check if user has edit permission
+  const canEdit = () => {
+    return ['admin', 'manager', 'frontoffice'].includes(user?.role);
+  }
+
   return (
     <Layout>
       <div className="unified-reservation-container">
@@ -177,7 +182,9 @@ const InhouseGuest = () => {
                     <td className="align-right">{formatCurrency(calculateBalance(registration.total_amount, registration.deposit))}</td>
                     <td className="align-center">{(registration.guest_count_male || 0) + (registration.guest_count_female || 0) + (registration.guest_count_child || 0)}</td>
                     <td className="align-center">
-                      <button className="btn-table-action" title="View Details">View</button>
+                      {canEdit() && (
+                        <button className="btn-table-action" title="Edit Details">Edit</button>
+                      )}
                     </td>
                   </tr>
                 ))

@@ -67,6 +67,11 @@ const GuestHistory = () => {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
   }
 
+  // Check if user has edit permission
+  const canEdit = () => {
+    return ['admin', 'manager', 'frontoffice'].includes(user?.role);
+  }
+
   return (
     <Layout>
       <div className="unified-reservation-container">
@@ -174,7 +179,9 @@ const GuestHistory = () => {
                     <td>{formatDate(registration.departure_date)}</td>
                     <td className="align-right">{formatCurrency(registration.total_amount || 0)}</td>
                     <td className="align-center">
-                      <button className="btn-table-action" title="View Details">View</button>
+                      {canEdit() && (
+                        <button className="btn-table-action" title="Edit Details">Edit</button>
+                      )}
                     </td>
                   </tr>
                 ))

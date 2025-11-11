@@ -56,6 +56,11 @@ const ReservasiToday = () => {
     return `${date.getDate()} ${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`
   }
 
+  // Check if user has edit permission
+  const canEdit = () => {
+    return ['admin', 'manager', 'frontoffice'].includes(user?.role);
+  }
+
   return (
     <Layout>
       <div className="unified-reservation-container">
@@ -155,7 +160,11 @@ const ReservasiToday = () => {
                     <td>{formatDate(r.departure_date)}</td>
                     <td title={r.payment_method || 'N/A'}>{r.payment_method || 'N/A'}</td>
                     <td className="align-right">{formatCurrency(r.deposit || 0)}</td>
-                    <td className="align-center"><button className="btn-table-action" title="View Details">View</button></td>
+                    <td className="align-center">
+                      {canEdit() && (
+                        <button className="btn-table-action" title="Edit Details">Edit</button>
+                      )}
+                    </td>
                   </tr>
                 ))
               )}

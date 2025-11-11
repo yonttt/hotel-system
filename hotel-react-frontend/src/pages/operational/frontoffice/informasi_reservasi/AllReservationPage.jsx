@@ -61,6 +61,10 @@ const AllReservationPage = () => {
     return `${date.getDate()} ${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`;
   };
 
+  // Check if user has edit permission
+  const canEdit = () => {
+    return ['admin', 'manager', 'frontoffice'].includes(user?.role);
+  };
 
   if (loading && reservations.length === 0) {
     return (
@@ -147,6 +151,7 @@ const AllReservationPage = () => {
               <col style={{ width: '130px' }} />  {/* Deposit By */}
               <col style={{ width: '100px' }} />  {/* Deposit */}
               <col style={{ width: '80px' }} />   {/* Guest */}
+              <col style={{ width: '100px' }} />  {/* Action */}
             </colgroup>
             <thead>
               <tr>
@@ -160,16 +165,17 @@ const AllReservationPage = () => {
                 <th>Deposit By</th>
                 <th>Deposit</th>
                 <th>Guest</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="10" className="no-data">Loading...</td>
+                  <td colSpan="11" className="no-data">Loading...</td>
                 </tr>
               ) : currentReservations.length === 0 ? (
                 <tr>
-                  <td colSpan="10" className="no-data">
+                  <td colSpan="11" className="no-data">
                     No data available in table
                   </td>
                 </tr>
@@ -186,6 +192,11 @@ const AllReservationPage = () => {
                     <td title={reservation.payment_method || 'N/A'}>{reservation.payment_method || 'N/A'}</td>
                     <td className="align-right">{formatCurrency(reservation.deposit || 0)}</td>
                     <td className="align-center">{(reservation.guest_count_male || 0) + (reservation.guest_count_female || 0) + (reservation.guest_count_child || 0)}</td>
+                    <td className="align-center">
+                      {canEdit() && (
+                        <button className="btn-table-action" title="Edit Details">Edit</button>
+                      )}
+                    </td>
                   </tr>
                 ))
               )}

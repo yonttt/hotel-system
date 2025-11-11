@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../../../../services/api';
 import Layout from '../../../../components/Layout';
+import { useAuth } from '../../../../context/AuthContext';
 
 const GroupBookingList = () => {
+  const { user } = useAuth();
   const [groupBookings, setGroupBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -69,6 +71,11 @@ const GroupBookingList = () => {
     const diffTime = Math.abs(end - start);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
+  };
+
+  // Check if user has edit permission
+  const canEdit = () => {
+    return ['admin', 'manager', 'frontoffice'].includes(user?.role);
   };
 
   return (
@@ -185,7 +192,9 @@ const GroupBookingList = () => {
                     <td className="align-right">{formatCurrency(booking.total_amount)}</td>
                     <td>{formatDate(booking.created_at)}</td>
                     <td className="align-center">
-                      <button className="btn-table-action" title="View Details">View</button>
+                      {canEdit() && (
+                        <button className="btn-table-action" title="Edit Details">Edit</button>
+                      )}
                     </td>
                   </tr>
                 ))

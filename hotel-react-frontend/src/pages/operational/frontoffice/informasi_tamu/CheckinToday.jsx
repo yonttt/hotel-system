@@ -57,8 +57,8 @@ const CheckinToday = () => {
 
   const calculateNights = (arrival, departure) => {
     if (!arrival || !departure) return 0
-    const arrivalDate = new Date(arrival)
-    const departureDate = new Date(departure)
+    const arrivalDate = new Date(arrival) 
+    const departureDate = new Date(departure) 
     const diffTime = Math.abs(departureDate - arrivalDate)
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
   }
@@ -67,6 +67,11 @@ const CheckinToday = () => {
     const charge = parseFloat(totalCharge || 0)
     const deposit = parseFloat(totalDeposit || 0)
     return charge - deposit
+  }
+
+  // Check if user has edit permission
+  const canEdit = () => {
+    return ['admin', 'manager', 'frontoffice'].includes(user?.role);
   }
 
   return (
@@ -175,7 +180,9 @@ const CheckinToday = () => {
                     <td className="align-right">{formatCurrency(calculateBalance(registration.total_amount, registration.deposit))}</td>
                     <td className="align-center">{(registration.guest_count_male || 0) + (registration.guest_count_female || 0) + (registration.guest_count_child || 0)}</td>
                     <td className="align-center">
-                      <button className="btn-table-action" title="View Details">View</button>
+                      {canEdit() && (
+                        <button className="btn-table-action" title="Edit Details">Edit</button>
+                      )}
                     </td>
                   </tr>
                 ))
