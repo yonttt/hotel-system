@@ -25,6 +25,7 @@ const Sidebar = () => {
     formTransaksi: false,
     infoReservasi: false,
     informasiTamu: false,
+    informasiGroupBooking: false,
     statusKamarFO: false,
     housekeeping: false,
     statusKamar: false,
@@ -62,6 +63,9 @@ const Sidebar = () => {
         }
         if (path.includes('/informasi-tamu/')) {
           newExpandedMenus.informasiTamu = true
+        }
+        if (path.includes('/informasi-group-booking')) {
+          newExpandedMenus.informasiGroupBooking = true
         }
         if (path.includes('/status-kamar')) {
           newExpandedMenus.statusKamarFO = true
@@ -120,6 +124,7 @@ const Sidebar = () => {
       formTransaksi: false,
       infoReservasi: false,
       informasiTamu: false,
+      informasiGroupBooking: false,
       statusKamarFO: false,
       housekeeping: false,
       statusKamar: false,
@@ -180,6 +185,14 @@ const Sidebar = () => {
                 { title: 'In House Guest ', path: '/operational/frontoffice/informasi-tamu/in-house-guest' },
                 { title: 'Check in Today', path: '/operational/frontoffice/informasi-tamu/check-in-today' },
                 { title: 'Guest History', path: '/operational/frontoffice/informasi-tamu/guest-history' }
+              ]
+            },
+            { 
+              title: 'Informasi Group Booking', 
+              hasSubmenu: true,
+              submenu: 'informasiGroupBooking',
+              children: [
+                { title: 'Group Booking List', path: '/operational/frontoffice/informasi-group-booking' }
               ]
             },
             {
