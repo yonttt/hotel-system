@@ -68,6 +68,7 @@ import RegistrasiPage from './pages/operational/frontoffice/form_transaksi/regis
 import ReservasiPage from './pages/operational/frontoffice/form_transaksi/reservasi';
 import GroupBooking from './pages/operational/frontoffice/form_transaksi/GroupBooking';
 import GroupBookingList from './pages/operational/frontoffice/informasi_group_booking/GroupBookingList';
+import GroupBookingRooms from './pages/operational/frontoffice/informasi_group_booking/GroupBookingRooms';
 
 // Operational - Other
 import AdjustmentPage from './pages/operational/AdjustmentPage';
@@ -157,6 +158,16 @@ function App() {
                 <ProtectedRoute>
                   <ErrorBoundary>
                     <GroupBookingList />
+                  </ErrorBoundary>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/operational/frontoffice/group-booking-rooms" 
+              element={
+                <ProtectedRoute>
+                  <ErrorBoundary>
+                    <GroupBookingRooms />
                   </ErrorBoundary>
                 </ProtectedRoute>
               } 

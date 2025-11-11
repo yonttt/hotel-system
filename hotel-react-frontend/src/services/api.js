@@ -355,6 +355,10 @@ class ApiService {
   async deleteGroupBooking(groupBookingId) {
     return this.client.delete(`/group-bookings/${groupBookingId}`)
   }
+
+  async getGroupBookingRooms() {
+    return this.client.get('/group-bookings/rooms/all')
+  }
 }
 
 export const apiService = new ApiService()

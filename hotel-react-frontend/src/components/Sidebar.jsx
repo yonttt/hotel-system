@@ -192,7 +192,8 @@ const Sidebar = () => {
               hasSubmenu: true,
               submenu: 'informasiGroupBooking',
               children: [
-                { title: 'Group Booking List', path: '/operational/frontoffice/informasi-group-booking' }
+                { title: 'Group Booking List', path: '/operational/frontoffice/informasi-group-booking' },
+                { title: 'Group Booking Rooms', path: '/operational/frontoffice/group-booking-rooms' }
               ]
             },
             {

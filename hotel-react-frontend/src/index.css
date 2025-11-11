@@ -4609,12 +4609,17 @@ select, .form-select {
   background: #ffffff;
   border: 1px solid #dee2e6;
   border-radius: 4px;
+  align-items: center;
 }
 
 .filter-group {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.filter-group:last-child {
+  margin-left: auto;
 }
 
 .filter-group label {
@@ -4638,6 +4643,38 @@ select, .form-select {
   outline: none;
   border-color: #80bdff;
   box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+.btn-refresh-data {
+  padding: 8px 20px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.btn-refresh-data:hover:not(:disabled) {
+  background: #0056b3;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,123,255,.3);
+}
+
+.btn-refresh-data:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-refresh-data:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .room-grid {
