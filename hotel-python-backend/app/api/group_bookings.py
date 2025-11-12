@@ -288,3 +288,58 @@ async def delete_group_booking(
     db.commit()
     
     return {"message": "Group booking cancelled successfully"}
+
+@router.get("/rooms/all", response_model=List[dict])
+async def get_all_group_booking_rooms(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Get all group booking rooms with group booking details
+    """
+    try:
+        # Join GroupBookingRoom with GroupBooking to get complete information
+        rooms = db.query(
+            GroupBookingRoom,
+            GroupBooking
+        ).join(
+            GroupBooking,
+            GroupBookingRoom.group_booking_id == GroupBooking.group_booking_id
+        ).order_by(desc(GroupBookingRoom.created_at)).all()
+        
+        # Format the response
+        result = []
+        for room, booking in rooms:
+            result.append({
+                "id": room.id,
+                "group_booking_id": room.group_booking_id,
+                "group_name": booking.group_name,
+                "reservation_no": room.reservation_no,
+                "room_number": room.room_number,
+                "room_type": room.room_type,
+                "guest_name": room.guest_name,
+                "guest_title": room.guest_title,
+                "id_card_type": room.id_card_type,
+                "id_card_number": room.id_card_number,
+                "mobile_phone": room.mobile_phone,
+                "nationality": room.nationality,
+                "city": room.city,
+                "address": room.address,
+                "guest_count_male": room.guest_count_male,
+                "guest_count_female": room.guest_count_female,
+                "guest_count_child": room.guest_count_child,
+                "extra_bed": room.extra_bed,
+                "rate": float(room.rate) if room.rate else 0,
+                "discount": float(room.discount) if room.discount else 0,
+                "subtotal": float(room.subtotal) if room.subtotal else 0,
+                "room_status": room.room_status,
+                "check_in_date": booking.arrival_date,
+                "check_out_date": booking.departure_date,
+                "nights": booking.nights,
+                "created_at": room.created_at,
+                "updated_at": room.updated_at
+            })
+        
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
