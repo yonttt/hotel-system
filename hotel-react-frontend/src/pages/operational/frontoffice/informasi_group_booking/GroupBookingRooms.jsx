@@ -75,41 +75,47 @@ const GroupBookingRooms = () => {
       <div className="unified-reservation-container">
         {/* Header Controls */}
         <div className="unified-header-controls">
-          <h1>Group Booking Rooms</h1>
-          <div className="header-actions">
-            <div className="search-wrapper">
-              <input
-                type="text"
-                placeholder="Search by group name, guest, room number..."
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="search-input"
-              />
+          <div className="header-row header-row-top">
+            <div className="unified-header-left">
+              <h2 className="header-title">GROUP BOOKING ROOMS</h2>
             </div>
           </div>
-        </div>
 
-        {/* Show entries control */}
-        <div className="show-entries">
-          <label>
-            Show 
-            <select 
-              value={showEntries} 
-              onChange={(e) => {
-                setShowEntries(Number(e.target.value));
-                setCurrentPage(1);
-              }}
-            >
-              <option value="10">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
-            entries
-          </label>
+          <div className="header-row header-row-bottom">
+            <div className="unified-header-left">
+              <div className="search-section">
+                <label>Search:</label>
+                <input
+                  type="text"
+                  className="search-input"
+                  placeholder="Search by group name, guest, room number..."
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                />
+              </div>
+            </div>
+            <div className="unified-header-right">
+              <div className="entries-control">
+                <span className="entries-label">Show entries:</span>
+                <select
+                  className="entries-select"
+                  value={showEntries}
+                  onChange={(e) => {
+                    setShowEntries(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                >
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Table */}

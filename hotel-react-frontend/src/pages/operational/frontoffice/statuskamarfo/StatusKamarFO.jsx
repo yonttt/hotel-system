@@ -220,7 +220,6 @@ const StatusKamarFO = () => {
                 <select value={selectedHotel} onChange={(e) => setSelectedHotel(e.target.value)}>
                   <option value="ALL">ALL</option>
                   <option value="HOTEL NEW IDOLA">HOTEL NEW IDOLA</option>
-                  <option value="HOTEL IDOLA">HOTEL IDOLA</option>
                 </select>
               </div>
               <div className="filter-group">
