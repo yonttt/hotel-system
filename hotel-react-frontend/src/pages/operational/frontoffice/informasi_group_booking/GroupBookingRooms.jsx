@@ -37,7 +37,8 @@ const GroupBookingRooms = () => {
     room.guest_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     room.room_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     room.reservation_no?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    room.room_type?.toLowerCase().includes(searchTerm.toLowerCase())
+    room.room_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    room.group_booking_id?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Pagination
@@ -88,7 +89,7 @@ const GroupBookingRooms = () => {
                 <input
                   type="text"
                   className="search-input"
-                  placeholder="Search by group name, guest, room number..."
+                  placeholder="Search by group, guest, room number..."
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
@@ -118,27 +119,26 @@ const GroupBookingRooms = () => {
           </div>
         </div>
 
-        {/* Table */}
-        <div className="table-container">
-          <table className="unified-table">
+        {/* Table Section */}
+        <div className="unified-table-wrapper">
+          <table className="reservation-table">
             <colgroup>
-              <col style={{ width: '50px' }} /> {/* No */}
-              <col style={{ width: '120px' }} /> {/* Group ID */}
-              <col style={{ width: '180px' }} /> {/* Group Name */}
-              <col style={{ width: '120px' }} /> {/* Reservation No */}
-              <col style={{ width: '100px' }} /> {/* Room Number */}
-              <col style={{ width: '120px' }} /> {/* Room Type */}
-              <col style={{ width: '180px' }} /> {/* Guest Name */}
-              <col style={{ width: '130px' }} /> {/* Mobile Phone */}
-              <col style={{ width: '100px' }} /> {/* Check In */}
-              <col style={{ width: '100px' }} /> {/* Check Out */}
-              <col style={{ width: '70px' }} /> {/* Nights */}
-              <col style={{ width: '80px' }} /> {/* Guests */}
-              <col style={{ width: '130px' }} /> {/* Rate */}
-              <col style={{ width: '130px' }} /> {/* Discount */}
-              <col style={{ width: '130px' }} /> {/* Subtotal */}
-              <col style={{ width: '100px' }} /> {/* Status */}
-              <col style={{ width: '100px' }} /> {/* Action */}
+              <col style={{ width: '60px' }} />   {/* No */}
+              <col style={{ width: '120px' }} />  {/* Group ID */}
+              <col style={{ width: '180px' }} />  {/* Group Name */}
+              <col style={{ width: '110px' }} />  {/* Reservation No */}
+              <col style={{ width: '100px' }} />  {/* Room Number */}
+              <col style={{ width: '130px' }} />  {/* Room Type */}
+              <col style={{ width: '180px' }} />  {/* Guest Name */}
+              <col style={{ width: '130px' }} />  {/* Mobile Phone */}
+              <col style={{ width: '110px' }} />  {/* Check In */}
+              <col style={{ width: '110px' }} />  {/* Check Out */}
+              <col style={{ width: '80px' }} />   {/* Nights */}
+              <col style={{ width: '100px' }} />  {/* Guests */}
+              <col style={{ width: '130px' }} />  {/* Rate */}
+              <col style={{ width: '130px' }} />  {/* Subtotal */}
+              <col style={{ width: '110px' }} />  {/* Status */}
+              <col style={{ width: '100px' }} />  {/* Action */}
             </colgroup>
             <thead>
               <tr>
@@ -154,9 +154,8 @@ const GroupBookingRooms = () => {
                 <th>Check Out</th>
                 <th>Nights</th>
                 <th>Guests</th>
-                <th>Rate</th>
-                <th>Discount</th>
-                <th>Subtotal</th>
+                <th className="align-right">Rate</th>
+                <th className="align-right">Subtotal</th>
                 <th>Status</th>
                 <th>Action</th>
               </tr>
@@ -164,15 +163,15 @@ const GroupBookingRooms = () => {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="17" className="no-data">Loading...</td>
+                  <td colSpan="16" className="no-data">Loading...</td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan="17" className="no-data">{error}</td>
+                  <td colSpan="16" className="no-data">{error}</td>
                 </tr>
               ) : currentRooms.length === 0 ? (
                 <tr>
-                  <td colSpan="17" className="no-data">No group booking rooms found</td>
+                  <td colSpan="16" className="no-data">No group booking rooms found</td>
                 </tr>
               ) : (
                 currentRooms.map((room, index) => (
@@ -192,7 +191,6 @@ const GroupBookingRooms = () => {
                       M:{room.guest_count_male || 0} F:{room.guest_count_female || 0} C:{room.guest_count_child || 0}
                     </td>
                     <td className="align-right">{formatCurrency(room.rate)}</td>
-                    <td className="align-right">{formatCurrency(room.discount)}</td>
                     <td className="align-right">{formatCurrency(room.subtotal)}</td>
                     <td>
                       <span className={`status-badge status-${room.room_status?.toLowerCase().replace(' ', '-')}`}>
