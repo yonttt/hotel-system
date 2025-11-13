@@ -64,7 +64,7 @@ const Sidebar = () => {
         if (path.includes('/informasi-tamu/')) {
           newExpandedMenus.informasiTamu = true
         }
-        if (path.includes('/informasi-group-booking')) {
+        if (path.includes('/informasi-group-booking') || path.includes('/group-booking-rooms')) {
           newExpandedMenus.informasiGroupBooking = true
         }
         if (path.includes('/status-kamar')) {
