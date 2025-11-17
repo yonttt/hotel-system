@@ -252,8 +252,8 @@ const Sidebar = () => {
           hasSubmenu: true,
           submenu: 'userManagement',
           children: [
-            { title: 'User List', path: '/hrd/user-management?tab=users' },
-            { title: 'Otoritas Pengguna', path: '/hrd/user-management?tab=authorities' }
+            { title: 'User List', path: '/hrd/user-list' },
+            { title: 'Otoritas Pengguna', path: '/hrd/user-authority' }
           ]
         }
       ]
