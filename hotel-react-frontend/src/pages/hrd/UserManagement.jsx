@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { apiService } from '../../services/api';
 import Layout from '../../components/Layout';
 import { useAuth } from '../../context/AuthContext';
 
 const UserManagement = () => {
   const { user } = useAuth();
+  const location = useLocation();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -39,6 +41,18 @@ const UserManagement = () => {
       canView: true
     }
   });
+
+  useEffect(() => {
+    // Check URL parameter for tab selection
+    const params = new URLSearchParams(location.search);
+    const tabParam = params.get('tab');
+    if (tabParam === 'users' || tabParam === 'authorities') {
+      setActiveTab(tabParam);
+    } else if (user?.role === 'manager') {
+      // Manager defaults to authorities tab
+      setActiveTab('authorities');
+    }
+  }, [location.search, user]);
 
   useEffect(() => {
     if (user?.role === 'admin' || user?.role === 'manager') {

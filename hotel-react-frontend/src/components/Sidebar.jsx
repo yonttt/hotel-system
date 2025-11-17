@@ -30,7 +30,8 @@ const Sidebar = () => {
     housekeeping: false,
     statusKamar: false,
     masterData: false,
-    hrd: false
+    hrd: false,
+    userManagement: false
   })
   const [scrollPosition, setScrollPosition] = useState(0)
   const location = useLocation()
@@ -82,6 +83,9 @@ const Sidebar = () => {
       }
     } else if (path.includes('/hrd/')) {
       newExpandedMenus.hrd = true
+      if (path.includes('/user-management')) {
+        newExpandedMenus.userManagement = true
+      }
     }
 
     setExpandedMenus(newExpandedMenus)
@@ -129,7 +133,8 @@ const Sidebar = () => {
       housekeeping: false,
       statusKamar: false,
       masterData: false,
-      hrd: false
+      hrd: false,
+      userManagement: false
     })
     setScrollPosition(0)
     const sidebarNav = document.querySelector('.sidebar-nav')
@@ -242,7 +247,15 @@ const Sidebar = () => {
         { title: 'Account Receivable', path: '/hrd/account-receivable' },
         { title: 'Accounting', path: '/hrd/accounting' },
         { title: 'Administration', path: '/hrd/administration' },
-        { title: 'User Management', path: '/hrd/user-management' }
+        { 
+          title: 'User Management',
+          hasSubmenu: true,
+          submenu: 'userManagement',
+          children: [
+            { title: 'User List', path: '/hrd/user-management?tab=users' },
+            { title: 'Otoritas Pengguna', path: '/hrd/user-management?tab=authorities' }
+          ]
+        }
       ]
     }
   ]
