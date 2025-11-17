@@ -269,98 +269,72 @@ const UserManagement = () => {
         {/* Tabs */}
         <div style={{ 
           display: 'flex', 
-          gap: '2px', 
-          marginBottom: '24px',
-          borderBottom: '3px solid #f0f0f0',
-          paddingBottom: '0',
-          background: '#fafafa',
-          borderRadius: '8px 8px 0 0',
-          padding: '4px 4px 0 4px'
+          gap: '8px', 
+          marginBottom: '20px',
+          borderBottom: '2px solid #e0e0e0',
+          paddingBottom: '0'
         }}>
           {user?.role === 'admin' && (
             <button
               onClick={() => setActiveTab('users')}
               style={{
-                padding: '14px 28px',
-                background: activeTab === 'users' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'transparent',
+                padding: '12px 24px',
+                background: activeTab === 'users' ? '#0d6efd' : 'transparent',
                 color: activeTab === 'users' ? 'white' : '#666',
                 border: 'none',
-                borderRadius: '8px 8px 0 0',
+                borderBottom: activeTab === 'users' ? '3px solid #0d6efd' : '3px solid transparent',
                 cursor: 'pointer',
                 fontWeight: '600',
-                fontSize: '15px',
-                transition: 'all 0.3s',
-                boxShadow: activeTab === 'users' ? '0 -2px 10px rgba(102, 126, 234, 0.3)' : 'none',
-                transform: activeTab === 'users' ? 'translateY(-2px)' : 'none',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
+                fontSize: '14px',
+                transition: 'all 0.2s',
+                borderRadius: '4px 4px 0 0'
               }}
             >
-              <span style={{ fontSize: '18px' }}>👥</span> User List
+              👥 User List
             </button>
           )}
           <button
             onClick={() => setActiveTab('authorities')}
             style={{
-              padding: '14px 28px',
-              background: activeTab === 'authorities' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'transparent',
+              padding: '12px 24px',
+              background: activeTab === 'authorities' ? '#0d6efd' : 'transparent',
               color: activeTab === 'authorities' ? 'white' : '#666',
               border: 'none',
-              borderRadius: '8px 8px 0 0',
+              borderBottom: activeTab === 'authorities' ? '3px solid #0d6efd' : '3px solid transparent',
               cursor: 'pointer',
               fontWeight: '600',
-              fontSize: '15px',
-              transition: 'all 0.3s',
-              boxShadow: activeTab === 'authorities' ? '0 -2px 10px rgba(102, 126, 234, 0.3)' : 'none',
-              transform: activeTab === 'authorities' ? 'translateY(-2px)' : 'none',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
+              fontSize: '14px',
+              transition: 'all 0.2s',
+              borderRadius: '4px 4px 0 0'
             }}
           >
-            <span style={{ fontSize: '18px' }}>⚙️</span> Otoritas Pengguna
+            ⚙️ Otoritas Pengguna
           </button>
         </div>
 
         {/* Success/Error Messages */}
         {successMessage && (
           <div style={{
-            background: 'linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%)',
-            border: '2px solid #28a745',
+            background: '#d4edda',
+            border: '1px solid #c3e6cb',
             color: '#155724',
-            padding: '16px 20px',
-            borderRadius: '12px',
-            marginBottom: '24px',
-            boxShadow: '0 4px 12px rgba(40, 167, 69, 0.15)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            fontSize: '15px',
-            fontWeight: '500',
-            animation: 'slideInDown 0.4s ease-out'
+            padding: '12px 16px',
+            borderRadius: '4px',
+            marginBottom: '20px'
           }}>
-            <span style={{ fontSize: '24px' }}>✓</span>
             {successMessage}
           </div>
         )}
 
         {error && (
           <div style={{
-            background: 'linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%)',
-            border: '2px solid #dc3545',
+            background: '#f8d7da',
+            border: '1px solid #f5c6cb',
             color: '#721c24',
-            padding: '16px 20px',
-            borderRadius: '12px',
-            marginBottom: '24px',
-            boxShadow: '0 4px 12px rgba(220, 53, 69, 0.15)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            fontSize: '15px',
-            fontWeight: '500'
+            padding: '12px 16px',
+            borderRadius: '4px',
+            marginBottom: '20px'
           }}>
-            <span style={{ fontSize: '24px' }}>⚠️</span>
             {error}
           </div>
         )}
@@ -375,116 +349,86 @@ const UserManagement = () => {
             border: '1px solid #e8e8e8'
           }}>
           <table className="reservation-table" style={{
-            background: 'white',
-            borderRadius: '8px',
-            overflow: 'hidden'
+            width: '100%',
+            borderCollapse: 'collapse'
           }}>
             <thead>
               <tr style={{
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                background: '#f8f9fa',
+                borderBottom: '2px solid #dee2e6'
               }}>
-                <th style={{ width: '80px', color: 'white', padding: '16px' }}>ID</th>
-                <th style={{ color: 'white', padding: '16px' }}>Username</th>
-                <th style={{ color: 'white', padding: '16px' }}>Email</th>
-                <th style={{ width: '150px', color: 'white', padding: '16px' }}>Role</th>
-                <th style={{ width: '180px', color: 'white', padding: '16px' }}>Created Date</th>
-                <th style={{ width: '120px', color: 'white', padding: '16px', textAlign: 'center' }}>Action</th>
+                <th style={{ padding: '12px', textAlign: 'left' }}>ID</th>
+                <th style={{ padding: '12px', textAlign: 'left' }}>Username</th>
+                <th style={{ padding: '12px', textAlign: 'left' }}>Email</th>
+                <th style={{ padding: '12px', textAlign: 'left' }}>Role</th>
+                <th style={{ padding: '12px', textAlign: 'left' }}>Created Date</th>
+                <th style={{ padding: '12px', textAlign: 'center' }}>Action</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="6" className="loading-spinner" style={{ 
+                  <td colSpan="6" style={{ 
                     padding: '40px', 
-                    textAlign: 'center',
-                    fontSize: '16px',
-                    color: '#667eea'
+                    textAlign: 'center'
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-                      <div style={{ 
-                        border: '3px solid #f3f3f3',
-                        borderTop: '3px solid #667eea',
-                        borderRadius: '50%',
-                        width: '24px',
-                        height: '24px',
-                        animation: 'spin 1s linear infinite'
-                      }}></div>
-                      Loading...
-                    </div>
+                    Loading...
                   </td>
                 </tr>
               ) : users.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="no-data" style={{ 
+                  <td colSpan="6" style={{ 
                     padding: '40px', 
                     textAlign: 'center',
-                    color: '#999',
-                    fontSize: '15px'
+                    color: '#6c757d'
                   }}>
-                    <div style={{ fontSize: '48px', marginBottom: '12px' }}>📋</div>
                     No users found
                   </td>
                 </tr>
               ) : (
                 users.map((usr, index) => (
                   <tr key={usr.id} style={{
-                    background: index % 2 === 0 ? '#fafafa' : 'white',
-                    transition: 'all 0.2s',
-                    ':hover': { background: '#f0f0f0' }
+                    borderBottom: '1px solid #dee2e6'
                   }}>
-                    <td style={{ padding: '16px', fontWeight: '600', color: '#667eea' }}>{usr.id}</td>
-                    <td style={{ padding: '16px', fontWeight: '600', color: '#333' }}>{usr.username}</td>
-                    <td style={{ padding: '16px', color: '#666' }}>{usr.email || 'N/A'}</td>
-                    <td style={{ padding: '16px' }}>
+                    <td style={{ padding: '12px' }}>{usr.id}</td>
+                    <td style={{ padding: '12px', fontWeight: '500' }}>{usr.username}</td>
+                    <td style={{ padding: '12px' }}>{usr.email || 'N/A'}</td>
+                    <td style={{ padding: '12px' }}>
                       <span style={{
                         display: 'inline-block',
-                        padding: '6px 16px',
-                        borderRadius: '20px',
+                        padding: '4px 12px',
+                        borderRadius: '4px',
                         fontSize: '12px',
                         fontWeight: '600',
                         color: 'white',
-                        background: getRoleBadgeColor(usr.role),
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5px',
-                        boxShadow: `0 2px 8px ${getRoleBadgeColor(usr.role)}40`
+                        background: getRoleBadgeColor(usr.role)
                       }}>
                         {usr.role}
                       </span>
                     </td>
-                    <td style={{ padding: '16px', color: '#666', fontSize: '13px' }}>{new Date(usr.created_at).toLocaleDateString('id-ID', {
+                    <td style={{ padding: '12px' }}>{new Date(usr.created_at).toLocaleDateString('id-ID', {
                       year: 'numeric',
                       month: 'short',
                       day: 'numeric',
                       hour: '2-digit',
                       minute: '2-digit'
                     })}</td>
-                    <td style={{ padding: '16px', textAlign: 'center' }}>
+                    <td style={{ padding: '12px', textAlign: 'center' }}>
                       {usr.id !== user.id && (
                         <button 
                           className="btn-table-action"
                           onClick={() => handleDeleteUser(usr.id, usr.username)}
                           style={{ 
-                            background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)', 
+                            background: '#dc3545', 
                             border: 'none',
                             color: 'white',
-                            padding: '8px 20px',
-                            borderRadius: '8px',
+                            padding: '6px 16px',
+                            borderRadius: '4px',
                             cursor: 'pointer',
-                            fontWeight: '600',
-                            fontSize: '13px',
-                            transition: 'all 0.3s',
-                            boxShadow: '0 2px 8px rgba(220, 53, 69, 0.3)'
-                          }}
-                          onMouseOver={(e) => {
-                            e.target.style.transform = 'translateY(-2px)';
-                            e.target.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.4)';
-                          }}
-                          onMouseOut={(e) => {
-                            e.target.style.transform = 'translateY(0)';
-                            e.target.style.boxShadow = '0 2px 8px rgba(220, 53, 69, 0.3)';
+                            fontSize: '13px'
                           }}
                         >
-                          🗑️ Delete
+                          Delete
                         </button>
                       )}
                     </td>
@@ -510,58 +454,44 @@ const UserManagement = () => {
                   key={role}
                   style={{
                     background: 'white',
-                    border: '2px solid #e8e8e8',
-                    borderRadius: '16px',
-                    padding: '28px',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
-                    transition: 'all 0.3s',
-                    animation: `fadeInUp 0.5s ease-out ${index * 0.1}s both`
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-8px)';
-                    e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.12)';
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.08)';
+                    border: '1px solid #dee2e6',
+                    borderRadius: '8px',
+                    padding: '20px',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
                   }}
                 >
                   {/* Role Header */}
                   <div style={{ 
-                    marginBottom: '24px',
-                    paddingBottom: '20px',
-                    borderBottom: '3px solid #f0f0f0'
+                    marginBottom: '16px',
+                    paddingBottom: '12px',
+                    borderBottom: '2px solid #f0f0f0'
                   }}>
                     <div style={{
                       display: 'inline-block',
-                      background: `linear-gradient(135deg, ${getRoleBadgeColor(role)} 0%, ${getRoleBadgeColor(role)}dd 100%)`,
+                      background: getRoleBadgeColor(role),
                       color: 'white',
-                      padding: '12px 24px',
-                      borderRadius: '30px',
+                      padding: '8px 16px',
+                      borderRadius: '4px',
                       fontSize: '14px',
-                      fontWeight: '600',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px'
+                      fontWeight: '600'
                     }}>
                       {roleLabels[role]}
                     </div>
                   </div>
 
                   {/* Permissions */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     {Object.keys(authorities[role]).map(permission => (
                       <label 
                         key={permission}
                         style={{
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '12px',
-                          padding: '10px',
-                          background: authorities[role][permission] ? '#f0f8ff' : '#f8f9fa',
-                          border: `1px solid ${authorities[role][permission] ? '#b3d9ff' : '#dee2e6'}`,
-                          borderRadius: '6px',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s'
+                          gap: '10px',
+                          padding: '8px',
+                          border: '1px solid #dee2e6',
+                          borderRadius: '4px',
+                          cursor: 'pointer'
                         }}
                       >
                         <input
@@ -569,29 +499,17 @@ const UserManagement = () => {
                           checked={authorities[role][permission]}
                           onChange={() => handlePermissionChange(role, permission)}
                           style={{
-                            width: '18px',
-                            height: '18px',
-                            cursor: 'pointer',
-                            accentColor: getRoleBadgeColor(role)
+                            width: '16px',
+                            height: '16px',
+                            cursor: 'pointer'
                           }}
                         />
                         <span style={{ 
                           fontSize: '14px',
-                          fontWeight: authorities[role][permission] ? '500' : '400',
-                          color: authorities[role][permission] ? '#000' : '#666',
                           flex: 1
                         }}>
                           {permissionLabels[permission]}
                         </span>
-                        {authorities[role][permission] && (
-                          <span style={{ 
-                            fontSize: '12px',
-                            color: '#28a745',
-                            fontWeight: '600'
-                          }}>
-                            ✓ Aktif
-                          </span>
-                        )}
                       </label>
                     ))}
                   </div>
@@ -601,39 +519,34 @@ const UserManagement = () => {
 
             {/* Info Box */}
             <div style={{
-              marginTop: '32px',
-              background: 'linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%)',
-              border: '2px solid #ffc107',
-              borderRadius: '16px',
-              padding: '24px 28px',
-              boxShadow: '0 4px 16px rgba(255, 193, 7, 0.15)'
+              marginTop: '24px',
+              background: '#fff3cd',
+              border: '1px solid #ffc107',
+              borderRadius: '4px',
+              padding: '16px'
             }}>
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-                <span style={{ fontSize: '32px', lineHeight: 1 }}>ℹ️</span>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <span>ℹ️</span>
                 <div style={{ flex: 1 }}>
                   <strong style={{ 
                     display: 'block', 
-                    marginBottom: '12px', 
-                    color: '#856404',
-                    fontSize: '18px',
-                    fontWeight: '700'
+                    marginBottom: '8px'
                   }}>
                     Informasi Otoritas
                   </strong>
                   <ul style={{ 
                     margin: 0, 
-                    paddingLeft: '24px', 
-                    color: '#856404', 
-                    fontSize: '15px',
-                    lineHeight: '1.8'
+                    paddingLeft: '20px', 
+                    fontSize: '14px',
+                    lineHeight: '1.6'
                   }}>
-                    <li style={{ marginBottom: '8px' }}>
+                    <li>
                       <strong>Lihat Data:</strong> Dapat melihat/membaca data
                     </li>
-                    <li style={{ marginBottom: '8px' }}>
+                    <li>
                       <strong>Buat Data Baru:</strong> Dapat membuat entry baru
                     </li>
-                    <li style={{ marginBottom: '8px' }}>
+                    <li>
                       <strong>Edit Data:</strong> Dapat mengubah data yang ada
                     </li>
                     <li>
@@ -641,14 +554,9 @@ const UserManagement = () => {
                     </li>
                   </ul>
                   <p style={{ 
-                    margin: '16px 0 0 0', 
-                    fontSize: '14px', 
-                    fontStyle: 'italic',
-                    color: '#856404',
-                    background: 'rgba(255,255,255,0.5)',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    borderLeft: '4px solid #ffc107'
+                    margin: '12px 0 0 0', 
+                    fontSize: '13px', 
+                    fontStyle: 'italic'
                   }}>
                     <strong>⚠️ Catatan:</strong> Perubahan otoritas akan berlaku untuk semua pengguna dengan role tersebut
                   </p>
