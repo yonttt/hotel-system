@@ -30,8 +30,7 @@ const Sidebar = () => {
     housekeeping: false,
     statusKamar: false,
     masterData: false,
-    hrd: false,
-    managerMenu: false
+    hrd: false
   })
   const [scrollPosition, setScrollPosition] = useState(0)
   const location = useLocation()
@@ -83,8 +82,6 @@ const Sidebar = () => {
       }
     } else if (path.includes('/hrd/')) {
       newExpandedMenus.hrd = true
-    } else if (path.includes('/user-authority')) {
-      newExpandedMenus.managerMenu = true
     }
 
     setExpandedMenus(newExpandedMenus)
@@ -370,88 +367,6 @@ const Sidebar = () => {
       {/* Navigation */}
       <div className="sidebar-nav">
         {filteredSidebarItems.map(item => renderMenuItem(item))}
-        
-        {/* HRD Menu - Admin Only */}
-        {user?.role === 'admin' && (
-          <div style={{ marginTop: '10px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '10px' }}>
-            <div
-              className={`sidebar-item pl-6 ${expandedMenus.hrd ? 'bg-blue-700' : ''}`}
-              onClick={() => toggleMenu('hrd')}
-              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span>👥</span>
-                <span className="sidebar-text">HRD</span>
-              </div>
-              <span style={{ transition: 'transform 0.3s', transform: expandedMenus.hrd ? 'rotate(90deg)' : 'rotate(0deg)' }}>▶</span>
-            </div>
-            {expandedMenus.hrd && (
-              <div style={{ background: 'rgba(0,0,0,0.2)' }}>
-                <Link 
-                  to="/hrd/user-management"
-                  className={`sidebar-item pl-10 ${isActiveRoute('/hrd/user-management') ? 'bg-blue-600' : ''}`}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <span style={{ marginRight: '8px' }}>•</span>
-                  <span className="sidebar-text">User Management</span>
-                </Link>
-                <Link 
-                  to="/hrd/accounting"
-                  className={`sidebar-item pl-10 ${isActiveRoute('/hrd/accounting') ? 'bg-blue-600' : ''}`}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <span style={{ marginRight: '8px' }}>•</span>
-                  <span className="sidebar-text">Accounting</span>
-                </Link>
-                <Link 
-                  to="/hrd/account-receivable"
-                  className={`sidebar-item pl-10 ${isActiveRoute('/hrd/account-receivable') ? 'bg-blue-600' : ''}`}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <span style={{ marginRight: '8px' }}>•</span>
-                  <span className="sidebar-text">Account Receivable</span>
-                </Link>
-                <Link 
-                  to="/hrd/administration"
-                  className={`sidebar-item pl-10 ${isActiveRoute('/hrd/administration') ? 'bg-blue-600' : ''}`}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <span style={{ marginRight: '8px' }}>•</span>
-                  <span className="sidebar-text">Administration</span>
-                </Link>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Manager Menu - Manager Only */}
-        {user?.role === 'manager' && (
-          <div style={{ marginTop: '10px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '10px' }}>
-            <div
-              className={`sidebar-item pl-6 ${expandedMenus.managerMenu ? 'bg-blue-700' : ''}`}
-              onClick={() => toggleMenu('managerMenu')}
-              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span>⚙️</span>
-                <span className="sidebar-text">Manager</span>
-              </div>
-              <span style={{ transition: 'transform 0.3s', transform: expandedMenus.managerMenu ? 'rotate(90deg)' : 'rotate(0deg)' }}>▶</span>
-            </div>
-            {expandedMenus.managerMenu && (
-              <div style={{ background: 'rgba(0,0,0,0.2)' }}>
-                <Link 
-                  to="/hrd/user-authority"
-                  className={`sidebar-item pl-10 ${isActiveRoute('/hrd/user-authority') ? 'bg-blue-600' : ''}`}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <span style={{ marginRight: '8px' }}>•</span>
-                  <span className="sidebar-text">Otoritas Pengguna</span>
-                </Link>
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </div>
   )

@@ -9,6 +9,7 @@ const UserManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [activeTab, setActiveTab] = useState('users'); // 'users' or 'authorities'
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -18,12 +19,39 @@ const UserManagement = () => {
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
+  const [authorities, setAuthorities] = useState({
+    frontoffice: {
+      canEdit: true,
+      canDelete: false,
+      canCreate: true,
+      canView: true
+    },
+    housekeeping: {
+      canEdit: true,
+      canDelete: false,
+      canCreate: true,
+      canView: true
+    },
+    staff: {
+      canEdit: false,
+      canDelete: false,
+      canCreate: false,
+      canView: true
+    }
+  });
 
   useEffect(() => {
-    if (user?.role === 'admin') {
-      fetchUsers();
+    if (user?.role === 'admin' || user?.role === 'manager') {
+      if (activeTab === 'users') {
+        fetchUsers();
+      }
     }
-  }, [user]);
+    // Load saved authorities from localStorage
+    const savedAuthorities = localStorage.getItem('userAuthorities');
+    if (savedAuthorities) {
+      setAuthorities(JSON.parse(savedAuthorities));
+    }
+  }, [user, activeTab]);
 
   const fetchUsers = async () => {
     try {
@@ -102,7 +130,52 @@ const UserManagement = () => {
     return colors[role] || '#6c757d';
   };
 
-  if (user?.role !== 'admin') {
+  const handlePermissionChange = (role, permission) => {
+    setAuthorities(prev => ({
+      ...prev,
+      [role]: {
+        ...prev[role],
+        [permission]: !prev[role][permission]
+      }
+    }));
+  };
+
+  const handleSaveAuthorities = () => {
+    localStorage.setItem('userAuthorities', JSON.stringify(authorities));
+    setSuccessMessage('Otoritas pengguna berhasil disimpan!');
+    setTimeout(() => setSuccessMessage(null), 3000);
+  };
+
+  const handleResetAuthorities = () => {
+    if (window.confirm('Apakah Anda yakin ingin mereset semua otoritas ke default?')) {
+      const defaultAuthorities = {
+        frontoffice: {
+          canEdit: true,
+          canDelete: false,
+          canCreate: true,
+          canView: true
+        },
+        housekeeping: {
+          canEdit: true,
+          canDelete: false,
+          canCreate: true,
+          canView: true
+        },
+        staff: {
+          canEdit: false,
+          canDelete: false,
+          canCreate: false,
+          canView: true
+        }
+      };
+      setAuthorities(defaultAuthorities);
+      localStorage.setItem('userAuthorities', JSON.stringify(defaultAuthorities));
+      setSuccessMessage('Otoritas berhasil direset ke default!');
+      setTimeout(() => setSuccessMessage(null), 3000);
+    }
+  };
+
+  if (user?.role !== 'admin' && user?.role !== 'manager') {
     return (
       <Layout>
         <div className="page-container">
@@ -115,6 +188,19 @@ const UserManagement = () => {
     );
   }
 
+  const roleLabels = {
+    frontoffice: 'Front Office',
+    housekeeping: 'Housekeeping',
+    staff: 'Staff'
+  };
+
+  const permissionLabels = {
+    canView: 'Lihat Data',
+    canCreate: 'Buat Data Baru',
+    canEdit: 'Edit Data',
+    canDelete: 'Hapus Data'
+  };
+
   return (
     <Layout>
       <div className="unified-reservation-container">
@@ -125,23 +211,103 @@ const UserManagement = () => {
               <h2 className="header-title">USER MANAGEMENT</h2>
             </div>
             <div className="unified-header-right">
-              <button 
-                className="btn-add-new"
-                onClick={() => setShowAddModal(true)}
-                style={{
-                  background: '#28a745',
-                  color: 'white',
-                  border: 'none',
-                  padding: '10px 20px',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontWeight: '500'
-                }}
-              >
-                + Add New User
-              </button>
+              {activeTab === 'users' && user?.role === 'admin' && (
+                <button 
+                  className="btn-add-new"
+                  onClick={() => setShowAddModal(true)}
+                  style={{
+                    background: '#28a745',
+                    color: 'white',
+                    border: 'none',
+                    padding: '10px 20px',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontWeight: '500'
+                  }}
+                >
+                  + Add New User
+                </button>
+              )}
+              {activeTab === 'authorities' && (
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button 
+                    className="btn-add-new"
+                    onClick={handleResetAuthorities}
+                    style={{
+                      background: '#6c757d',
+                      color: 'white',
+                      border: 'none',
+                      padding: '10px 20px',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontWeight: '500'
+                    }}
+                  >
+                    Reset ke Default
+                  </button>
+                  <button 
+                    className="btn-add-new"
+                    onClick={handleSaveAuthorities}
+                    style={{
+                      background: '#28a745',
+                      color: 'white',
+                      border: 'none',
+                      padding: '10px 20px',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontWeight: '500'
+                    }}
+                  >
+                    💾 Simpan Perubahan
+                  </button>
+                </div>
+              )}
             </div>
           </div>
+        </div>
+
+        {/* Tabs */}
+        <div style={{ 
+          display: 'flex', 
+          gap: '10px', 
+          marginBottom: '20px',
+          borderBottom: '2px solid #e0e0e0',
+          paddingBottom: '0'
+        }}>
+          {user?.role === 'admin' && (
+            <button
+              onClick={() => setActiveTab('users')}
+              style={{
+                padding: '12px 24px',
+                background: activeTab === 'users' ? '#0d6efd' : 'transparent',
+                color: activeTab === 'users' ? 'white' : '#666',
+                border: 'none',
+                borderBottom: activeTab === 'users' ? '3px solid #0d6efd' : 'none',
+                cursor: 'pointer',
+                fontWeight: '600',
+                fontSize: '14px',
+                transition: 'all 0.3s'
+              }}
+            >
+              👥 User List
+            </button>
+          )}
+          <button
+            onClick={() => setActiveTab('authorities')}
+            style={{
+              padding: '12px 24px',
+              background: activeTab === 'authorities' ? '#0d6efd' : 'transparent',
+              color: activeTab === 'authorities' ? 'white' : '#666',
+              border: 'none',
+              borderBottom: activeTab === 'authorities' ? '3px solid #0d6efd' : 'none',
+              cursor: 'pointer',
+              fontWeight: '600',
+              fontSize: '14px',
+              transition: 'all 0.3s'
+            }}
+          >
+            ⚙️ Otoritas Pengguna
+          </button>
         </div>
 
         {/* Success/Error Messages */}
@@ -171,8 +337,9 @@ const UserManagement = () => {
           </div>
         )}
 
-        {/* Table */}
-        <div className="unified-table-wrapper">
+        {/* Users Tab Content */}
+        {activeTab === 'users' && (
+          <div className="unified-table-wrapper">
           <table className="reservation-table">
             <thead>
               <tr>
@@ -237,6 +404,129 @@ const UserManagement = () => {
             </tbody>
           </table>
         </div>
+        )}
+
+        {/* Authorities Tab Content */}
+        {activeTab === 'authorities' && (
+          <div>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+              gap: '20px',
+              marginTop: '20px'
+            }}>
+              {Object.keys(authorities).map(role => (
+                <div 
+                  key={role}
+                  style={{
+                    background: 'white',
+                    border: '1px solid #ddd',
+                    borderRadius: '8px',
+                    padding: '20px',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                  }}
+                >
+                  {/* Role Header */}
+                  <div style={{ 
+                    marginBottom: '20px',
+                    paddingBottom: '15px',
+                    borderBottom: '2px solid #eee'
+                  }}>
+                    <div style={{
+                      display: 'inline-block',
+                      background: getRoleBadgeColor(role),
+                      color: 'white',
+                      padding: '8px 16px',
+                      borderRadius: '20px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px'
+                    }}>
+                      {roleLabels[role]}
+                    </div>
+                  </div>
+
+                  {/* Permissions */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {Object.keys(authorities[role]).map(permission => (
+                      <label 
+                        key={permission}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          padding: '10px',
+                          background: authorities[role][permission] ? '#f0f8ff' : '#f8f9fa',
+                          border: `1px solid ${authorities[role][permission] ? '#b3d9ff' : '#dee2e6'}`,
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={authorities[role][permission]}
+                          onChange={() => handlePermissionChange(role, permission)}
+                          style={{
+                            width: '18px',
+                            height: '18px',
+                            cursor: 'pointer',
+                            accentColor: getRoleBadgeColor(role)
+                          }}
+                        />
+                        <span style={{ 
+                          fontSize: '14px',
+                          fontWeight: authorities[role][permission] ? '500' : '400',
+                          color: authorities[role][permission] ? '#000' : '#666',
+                          flex: 1
+                        }}>
+                          {permissionLabels[permission]}
+                        </span>
+                        {authorities[role][permission] && (
+                          <span style={{ 
+                            fontSize: '12px',
+                            color: '#28a745',
+                            fontWeight: '600'
+                          }}>
+                            ✓ Aktif
+                          </span>
+                        )}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Info Box */}
+            <div style={{
+              marginTop: '30px',
+              background: '#fff3cd',
+              border: '1px solid #ffc107',
+              borderRadius: '8px',
+              padding: '15px 20px'
+            }}>
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                <span style={{ fontSize: '20px' }}>ℹ️</span>
+                <div>
+                  <strong style={{ display: 'block', marginBottom: '5px', color: '#856404' }}>
+                    Informasi Otoritas
+                  </strong>
+                  <ul style={{ margin: 0, paddingLeft: '20px', color: '#856404', fontSize: '14px' }}>
+                    <li><strong>Lihat Data:</strong> Dapat melihat/membaca data</li>
+                    <li><strong>Buat Data Baru:</strong> Dapat membuat entry baru</li>
+                    <li><strong>Edit Data:</strong> Dapat mengubah data yang ada</li>
+                    <li><strong>Hapus Data:</strong> Dapat menghapus data</li>
+                  </ul>
+                  <p style={{ margin: '10px 0 0 0', fontSize: '13px', fontStyle: 'italic' }}>
+                    * Perubahan otoritas akan berlaku untuk semua pengguna dengan role tersebut
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Add User Modal */}
         {showAddModal && (

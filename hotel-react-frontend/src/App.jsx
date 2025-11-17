@@ -98,7 +98,6 @@ import AccountReceivablePage from './pages/hrd/AccountReceivablePage';
 import AccountingPage from './pages/hrd/AccountingPage';
 import AdministrationPage from './pages/hrd/AdministrationPage';
 import UserManagement from './pages/hrd/UserManagement';
-import UserAuthority from './pages/hrd/UserAuthority';
 
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -338,14 +337,6 @@ function App() {
               element={
                 <ProtectedRoute>
                   <UserManagement />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/hrd/user-authority" 
-              element={
-                <ProtectedRoute>
-                  <UserAuthority />
                 </ProtectedRoute>
               } 
             />
