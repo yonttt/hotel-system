@@ -269,132 +269,222 @@ const UserManagement = () => {
         {/* Tabs */}
         <div style={{ 
           display: 'flex', 
-          gap: '10px', 
-          marginBottom: '20px',
-          borderBottom: '2px solid #e0e0e0',
-          paddingBottom: '0'
+          gap: '2px', 
+          marginBottom: '24px',
+          borderBottom: '3px solid #f0f0f0',
+          paddingBottom: '0',
+          background: '#fafafa',
+          borderRadius: '8px 8px 0 0',
+          padding: '4px 4px 0 4px'
         }}>
           {user?.role === 'admin' && (
             <button
               onClick={() => setActiveTab('users')}
               style={{
-                padding: '12px 24px',
-                background: activeTab === 'users' ? '#0d6efd' : 'transparent',
+                padding: '14px 28px',
+                background: activeTab === 'users' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'transparent',
                 color: activeTab === 'users' ? 'white' : '#666',
                 border: 'none',
-                borderBottom: activeTab === 'users' ? '3px solid #0d6efd' : 'none',
+                borderRadius: '8px 8px 0 0',
                 cursor: 'pointer',
                 fontWeight: '600',
-                fontSize: '14px',
-                transition: 'all 0.3s'
+                fontSize: '15px',
+                transition: 'all 0.3s',
+                boxShadow: activeTab === 'users' ? '0 -2px 10px rgba(102, 126, 234, 0.3)' : 'none',
+                transform: activeTab === 'users' ? 'translateY(-2px)' : 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
               }}
             >
-              👥 User List
+              <span style={{ fontSize: '18px' }}>👥</span> User List
             </button>
           )}
           <button
             onClick={() => setActiveTab('authorities')}
             style={{
-              padding: '12px 24px',
-              background: activeTab === 'authorities' ? '#0d6efd' : 'transparent',
+              padding: '14px 28px',
+              background: activeTab === 'authorities' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'transparent',
               color: activeTab === 'authorities' ? 'white' : '#666',
               border: 'none',
-              borderBottom: activeTab === 'authorities' ? '3px solid #0d6efd' : 'none',
+              borderRadius: '8px 8px 0 0',
               cursor: 'pointer',
               fontWeight: '600',
-              fontSize: '14px',
-              transition: 'all 0.3s'
+              fontSize: '15px',
+              transition: 'all 0.3s',
+              boxShadow: activeTab === 'authorities' ? '0 -2px 10px rgba(102, 126, 234, 0.3)' : 'none',
+              transform: activeTab === 'authorities' ? 'translateY(-2px)' : 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
             }}
           >
-            ⚙️ Otoritas Pengguna
+            <span style={{ fontSize: '18px' }}>⚙️</span> Otoritas Pengguna
           </button>
         </div>
 
         {/* Success/Error Messages */}
         {successMessage && (
           <div style={{
-            background: '#d4edda',
-            border: '1px solid #c3e6cb',
+            background: 'linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%)',
+            border: '2px solid #28a745',
             color: '#155724',
-            padding: '12px',
-            borderRadius: '4px',
-            marginBottom: '20px'
+            padding: '16px 20px',
+            borderRadius: '12px',
+            marginBottom: '24px',
+            boxShadow: '0 4px 12px rgba(40, 167, 69, 0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            fontSize: '15px',
+            fontWeight: '500',
+            animation: 'slideInDown 0.4s ease-out'
           }}>
+            <span style={{ fontSize: '24px' }}>✓</span>
             {successMessage}
           </div>
         )}
 
         {error && (
           <div style={{
-            background: '#f8d7da',
-            border: '1px solid #f5c6cb',
+            background: 'linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%)',
+            border: '2px solid #dc3545',
             color: '#721c24',
-            padding: '12px',
-            borderRadius: '4px',
-            marginBottom: '20px'
+            padding: '16px 20px',
+            borderRadius: '12px',
+            marginBottom: '24px',
+            boxShadow: '0 4px 12px rgba(220, 53, 69, 0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            fontSize: '15px',
+            fontWeight: '500'
           }}>
+            <span style={{ fontSize: '24px' }}>⚠️</span>
             {error}
           </div>
         )}
 
         {/* Users Tab Content */}
         {activeTab === 'users' && (
-          <div className="unified-table-wrapper">
-          <table className="reservation-table">
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '24px',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+            border: '1px solid #e8e8e8'
+          }}>
+          <table className="reservation-table" style={{
+            background: 'white',
+            borderRadius: '8px',
+            overflow: 'hidden'
+          }}>
             <thead>
-              <tr>
-                <th style={{ width: '80px' }}>ID</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th style={{ width: '150px' }}>Role</th>
-                <th style={{ width: '180px' }}>Created Date</th>
-                <th style={{ width: '120px' }}>Action</th>
+              <tr style={{
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              }}>
+                <th style={{ width: '80px', color: 'white', padding: '16px' }}>ID</th>
+                <th style={{ color: 'white', padding: '16px' }}>Username</th>
+                <th style={{ color: 'white', padding: '16px' }}>Email</th>
+                <th style={{ width: '150px', color: 'white', padding: '16px' }}>Role</th>
+                <th style={{ width: '180px', color: 'white', padding: '16px' }}>Created Date</th>
+                <th style={{ width: '120px', color: 'white', padding: '16px', textAlign: 'center' }}>Action</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="6" className="loading-spinner">Loading...</td>
+                  <td colSpan="6" className="loading-spinner" style={{ 
+                    padding: '40px', 
+                    textAlign: 'center',
+                    fontSize: '16px',
+                    color: '#667eea'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                      <div style={{ 
+                        border: '3px solid #f3f3f3',
+                        borderTop: '3px solid #667eea',
+                        borderRadius: '50%',
+                        width: '24px',
+                        height: '24px',
+                        animation: 'spin 1s linear infinite'
+                      }}></div>
+                      Loading...
+                    </div>
+                  </td>
                 </tr>
               ) : users.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="no-data">No users found</td>
+                  <td colSpan="6" className="no-data" style={{ 
+                    padding: '40px', 
+                    textAlign: 'center',
+                    color: '#999',
+                    fontSize: '15px'
+                  }}>
+                    <div style={{ fontSize: '48px', marginBottom: '12px' }}>📋</div>
+                    No users found
+                  </td>
                 </tr>
               ) : (
-                users.map((usr) => (
-                  <tr key={usr.id}>
-                    <td>{usr.id}</td>
-                    <td style={{ fontWeight: '500' }}>{usr.username}</td>
-                    <td>{usr.email || 'N/A'}</td>
-                    <td>
+                users.map((usr, index) => (
+                  <tr key={usr.id} style={{
+                    background: index % 2 === 0 ? '#fafafa' : 'white',
+                    transition: 'all 0.2s',
+                    ':hover': { background: '#f0f0f0' }
+                  }}>
+                    <td style={{ padding: '16px', fontWeight: '600', color: '#667eea' }}>{usr.id}</td>
+                    <td style={{ padding: '16px', fontWeight: '600', color: '#333' }}>{usr.username}</td>
+                    <td style={{ padding: '16px', color: '#666' }}>{usr.email || 'N/A'}</td>
+                    <td style={{ padding: '16px' }}>
                       <span style={{
                         display: 'inline-block',
-                        padding: '4px 12px',
-                        borderRadius: '12px',
+                        padding: '6px 16px',
+                        borderRadius: '20px',
                         fontSize: '12px',
-                        fontWeight: '500',
+                        fontWeight: '600',
                         color: 'white',
                         background: getRoleBadgeColor(usr.role),
-                        textTransform: 'uppercase'
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                        boxShadow: `0 2px 8px ${getRoleBadgeColor(usr.role)}40`
                       }}>
                         {usr.role}
                       </span>
                     </td>
-                    <td>{new Date(usr.created_at).toLocaleDateString('id-ID', {
+                    <td style={{ padding: '16px', color: '#666', fontSize: '13px' }}>{new Date(usr.created_at).toLocaleDateString('id-ID', {
                       year: 'numeric',
                       month: 'short',
                       day: 'numeric',
                       hour: '2-digit',
                       minute: '2-digit'
                     })}</td>
-                    <td>
+                    <td style={{ padding: '16px', textAlign: 'center' }}>
                       {usr.id !== user.id && (
                         <button 
                           className="btn-table-action"
                           onClick={() => handleDeleteUser(usr.id, usr.username)}
-                          style={{ background: '#dc3545', borderColor: '#dc3545' }}
+                          style={{ 
+                            background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)', 
+                            border: 'none',
+                            color: 'white',
+                            padding: '8px 20px',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            fontWeight: '600',
+                            fontSize: '13px',
+                            transition: 'all 0.3s',
+                            boxShadow: '0 2px 8px rgba(220, 53, 69, 0.3)'
+                          }}
+                          onMouseOver={(e) => {
+                            e.target.style.transform = 'translateY(-2px)';
+                            e.target.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.4)';
+                          }}
+                          onMouseOut={(e) => {
+                            e.target.style.transform = 'translateY(0)';
+                            e.target.style.boxShadow = '0 2px 8px rgba(220, 53, 69, 0.3)';
+                          }}
                         >
-                          Delete
+                          🗑️ Delete
                         </button>
                       )}
                     </td>
@@ -411,33 +501,43 @@ const UserManagement = () => {
           <div>
             <div style={{ 
               display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-              gap: '20px',
-              marginTop: '20px'
+              gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))',
+              gap: '24px',
+              marginTop: '8px'
             }}>
-              {Object.keys(authorities).map(role => (
+              {Object.keys(authorities).map((role, index) => (
                 <div 
                   key={role}
                   style={{
                     background: 'white',
-                    border: '1px solid #ddd',
-                    borderRadius: '8px',
-                    padding: '20px',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                    border: '2px solid #e8e8e8',
+                    borderRadius: '16px',
+                    padding: '28px',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+                    transition: 'all 0.3s',
+                    animation: `fadeInUp 0.5s ease-out ${index * 0.1}s both`
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-8px)';
+                    e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.12)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.08)';
                   }}
                 >
                   {/* Role Header */}
                   <div style={{ 
-                    marginBottom: '20px',
-                    paddingBottom: '15px',
-                    borderBottom: '2px solid #eee'
+                    marginBottom: '24px',
+                    paddingBottom: '20px',
+                    borderBottom: '3px solid #f0f0f0'
                   }}>
                     <div style={{
                       display: 'inline-block',
-                      background: getRoleBadgeColor(role),
+                      background: `linear-gradient(135deg, ${getRoleBadgeColor(role)} 0%, ${getRoleBadgeColor(role)}dd 100%)`,
                       color: 'white',
-                      padding: '8px 16px',
-                      borderRadius: '20px',
+                      padding: '12px 24px',
+                      borderRadius: '30px',
                       fontSize: '14px',
                       fontWeight: '600',
                       textTransform: 'uppercase',
@@ -501,26 +601,56 @@ const UserManagement = () => {
 
             {/* Info Box */}
             <div style={{
-              marginTop: '30px',
-              background: '#fff3cd',
-              border: '1px solid #ffc107',
-              borderRadius: '8px',
-              padding: '15px 20px'
+              marginTop: '32px',
+              background: 'linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%)',
+              border: '2px solid #ffc107',
+              borderRadius: '16px',
+              padding: '24px 28px',
+              boxShadow: '0 4px 16px rgba(255, 193, 7, 0.15)'
             }}>
-              <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                <span style={{ fontSize: '20px' }}>ℹ️</span>
-                <div>
-                  <strong style={{ display: 'block', marginBottom: '5px', color: '#856404' }}>
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                <span style={{ fontSize: '32px', lineHeight: 1 }}>ℹ️</span>
+                <div style={{ flex: 1 }}>
+                  <strong style={{ 
+                    display: 'block', 
+                    marginBottom: '12px', 
+                    color: '#856404',
+                    fontSize: '18px',
+                    fontWeight: '700'
+                  }}>
                     Informasi Otoritas
                   </strong>
-                  <ul style={{ margin: 0, paddingLeft: '20px', color: '#856404', fontSize: '14px' }}>
-                    <li><strong>Lihat Data:</strong> Dapat melihat/membaca data</li>
-                    <li><strong>Buat Data Baru:</strong> Dapat membuat entry baru</li>
-                    <li><strong>Edit Data:</strong> Dapat mengubah data yang ada</li>
-                    <li><strong>Hapus Data:</strong> Dapat menghapus data</li>
+                  <ul style={{ 
+                    margin: 0, 
+                    paddingLeft: '24px', 
+                    color: '#856404', 
+                    fontSize: '15px',
+                    lineHeight: '1.8'
+                  }}>
+                    <li style={{ marginBottom: '8px' }}>
+                      <strong>Lihat Data:</strong> Dapat melihat/membaca data
+                    </li>
+                    <li style={{ marginBottom: '8px' }}>
+                      <strong>Buat Data Baru:</strong> Dapat membuat entry baru
+                    </li>
+                    <li style={{ marginBottom: '8px' }}>
+                      <strong>Edit Data:</strong> Dapat mengubah data yang ada
+                    </li>
+                    <li>
+                      <strong>Hapus Data:</strong> Dapat menghapus data
+                    </li>
                   </ul>
-                  <p style={{ margin: '10px 0 0 0', fontSize: '13px', fontStyle: 'italic' }}>
-                    * Perubahan otoritas akan berlaku untuk semua pengguna dengan role tersebut
+                  <p style={{ 
+                    margin: '16px 0 0 0', 
+                    fontSize: '14px', 
+                    fontStyle: 'italic',
+                    color: '#856404',
+                    background: 'rgba(255,255,255,0.5)',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    borderLeft: '4px solid #ffc107'
+                  }}>
+                    <strong>⚠️ Catatan:</strong> Perubahan otoritas akan berlaku untuk semua pengguna dengan role tersebut
                   </p>
                 </div>
               </div>
