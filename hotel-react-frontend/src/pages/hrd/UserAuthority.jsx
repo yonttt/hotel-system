@@ -131,8 +131,57 @@ const UserAuthority = () => {
 
   return (
     <Layout>
-      <div className="content-wrapper">
-        <h1 style={{ marginBottom: '24px' }}>Otoritas Pengguna</h1>
+      <div className="unified-reservation-container">
+        {/* Header Controls */}
+        <div className="unified-header-controls">
+          <div className="header-row header-row-top">
+            <div className="unified-header-left">
+              <div className="header-title">
+                <span>OTORITAS PENGGUNA</span>
+              </div>
+            </div>
+            <div className="unified-header-right">
+              <div className="hotel-select">
+                <label>Hotel :</label>
+                <select className="header-hotel-select">
+                  <option>ALL</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div className="header-row header-row-bottom">
+            <div className="unified-header-left">
+              <div style={{ fontSize: '14px', color: '#666' }}>
+                Manage user permissions for each role
+              </div>
+            </div>
+            <div className="unified-header-right">
+              <button
+                onClick={handleResetAuthorities}
+                className="btn-table-action"
+                style={{
+                  background: '#6c757d',
+                  color: 'white',
+                  padding: '8px 16px',
+                  marginRight: '10px'
+                }}
+              >
+                Reset to Default
+              </button>
+              <button
+                onClick={handleSaveAuthorities}
+                className="btn-table-action"
+                style={{
+                  background: '#28a745',
+                  color: 'white',
+                  padding: '8px 16px'
+                }}
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
 
         {/* Success Message */}
         {successMessage && (
@@ -148,160 +197,125 @@ const UserAuthority = () => {
           </div>
         )}
 
-        {/* Action Buttons */}
-        <div style={{ 
-          display: 'flex', 
-          gap: '12px', 
-          marginBottom: '24px',
-          justifyContent: 'flex-end'
-        }}>
-          <button
-            onClick={handleResetAuthorities}
-            style={{
-              padding: '10px 20px',
-              background: '#6c757d',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontWeight: '500'
-            }}
-          >
-            Reset to Default
-          </button>
-          <button
-            onClick={handleSaveAuthorities}
-            style={{
-              padding: '10px 20px',
-              background: '#28a745',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontWeight: '500'
-            }}
-          >
-            Save Changes
-          </button>
-        </div>
-
         {/* Authority Cards */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))',
-          gap: '24px'
-        }}>
-          {Object.keys(authorities).map((role) => (
-            <div 
-              key={role}
-              style={{
-                background: 'white',
-                border: '1px solid #dee2e6',
-                borderRadius: '8px',
-                padding: '20px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-              }}
-            >
-              {/* Role Header */}
-              <div style={{ 
-                marginBottom: '16px',
-                paddingBottom: '12px',
-                borderBottom: '2px solid #f0f0f0'
-              }}>
-                <div style={{
-                  display: 'inline-block',
-                  background: getRoleBadgeColor(role),
-                  color: 'white',
-                  padding: '8px 16px',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  fontWeight: '600'
+        <div className="unified-table-wrapper" style={{ padding: '20px' }}>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))',
+            gap: '24px'
+          }}>
+            {Object.keys(authorities).map((role) => (
+              <div 
+                key={role}
+                style={{
+                  background: 'white',
+                  border: '1px solid #dee2e6',
+                  borderRadius: '8px',
+                  padding: '20px',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                }}
+              >
+                {/* Role Header */}
+                <div style={{ 
+                  marginBottom: '16px',
+                  paddingBottom: '12px',
+                  borderBottom: '2px solid #f0f0f0'
                 }}>
-                  {roleLabels[role]}
+                  <div style={{
+                    display: 'inline-block',
+                    background: getRoleBadgeColor(role),
+                    color: 'white',
+                    padding: '8px 16px',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    fontWeight: '600'
+                  }}>
+                    {roleLabels[role]}
+                  </div>
                 </div>
-              </div>
 
-              {/* Permissions */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {Object.keys(authorities[role]).map(permission => (
-                  <label 
-                    key={permission}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '10px',
-                      padding: '8px',
-                      border: '1px solid #dee2e6',
-                      borderRadius: '4px',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={authorities[role][permission]}
-                      onChange={() => handlePermissionChange(role, permission)}
+                {/* Permissions */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {Object.keys(authorities[role]).map(permission => (
+                    <label 
+                      key={permission}
                       style={{
-                        width: '16px',
-                        height: '16px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '8px',
+                        border: '1px solid #dee2e6',
+                        borderRadius: '4px',
                         cursor: 'pointer'
                       }}
-                    />
-                    <span style={{ 
-                      fontSize: '14px',
-                      flex: 1
-                    }}>
-                      {permissionLabels[permission]}
-                    </span>
-                  </label>
-                ))}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={authorities[role][permission]}
+                        onChange={() => handlePermissionChange(role, permission)}
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          cursor: 'pointer'
+                        }}
+                      />
+                      <span style={{ 
+                        fontSize: '14px',
+                        flex: 1
+                      }}>
+                        {permissionLabels[permission]}
+                      </span>
+                    </label>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        {/* Info Box */}
-        <div style={{
-          marginTop: '24px',
-          background: '#fff3cd',
-          border: '1px solid #ffc107',
-          borderRadius: '4px',
-          padding: '16px'
-        }}>
-          <div style={{ display: 'flex', gap: '12px' }}>
-            <span>ℹ️</span>
-            <div style={{ flex: 1 }}>
-              <strong style={{ 
-                display: 'block', 
-                marginBottom: '8px'
-              }}>
-                Informasi Otoritas
-              </strong>
-              <ul style={{ 
-                margin: 0, 
-                paddingLeft: '20px', 
-                fontSize: '14px',
-                lineHeight: '1.6'
-              }}>
-                <li>
-                  <strong>Lihat Data:</strong> Dapat melihat/membaca data
-                </li>
-                <li>
-                  <strong>Buat Data Baru:</strong> Dapat membuat entry baru
-                </li>
-                <li>
-                  <strong>Edit Data:</strong> Dapat mengubah data yang ada
-                </li>
-                <li>
-                  <strong>Hapus Data:</strong> Dapat menghapus data
-                </li>
-              </ul>
-              <p style={{ 
-                margin: '12px 0 0 0', 
-                fontSize: '13px', 
-                fontStyle: 'italic'
-              }}>
-                <strong>⚠️ Catatan:</strong> Perubahan otoritas akan berlaku untuk semua pengguna dengan role tersebut
-              </p>
+          {/* Info Box */}
+          <div style={{
+            marginTop: '24px',
+            background: '#fff3cd',
+            border: '1px solid #ffc107',
+            borderRadius: '4px',
+            padding: '16px'
+          }}>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <span>ℹ️</span>
+              <div style={{ flex: 1 }}>
+                <strong style={{ 
+                  display: 'block', 
+                  marginBottom: '8px'
+                }}>
+                  Informasi Otoritas
+                </strong>
+                <ul style={{ 
+                  margin: 0, 
+                  paddingLeft: '20px', 
+                  fontSize: '14px',
+                  lineHeight: '1.6'
+                }}>
+                  <li>
+                    <strong>Lihat Data:</strong> Dapat melihat/membaca data
+                  </li>
+                  <li>
+                    <strong>Buat Data Baru:</strong> Dapat membuat entry baru
+                  </li>
+                  <li>
+                    <strong>Edit Data:</strong> Dapat mengubah data yang ada
+                  </li>
+                  <li>
+                    <strong>Hapus Data:</strong> Dapat menghapus data
+                  </li>
+                </ul>
+                <p style={{ 
+                  margin: '12px 0 0 0', 
+                  fontSize: '13px', 
+                  fontStyle: 'italic'
+                }}>
+                  <strong>⚠️ Catatan:</strong> Perubahan otoritas akan berlaku untuk semua pengguna dengan role tersebut
+                </p>
+              </div>
             </div>
           </div>
         </div>
