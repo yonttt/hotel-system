@@ -360,27 +360,41 @@ const UserList = () => {
           </div>
           <div className="unified-pagination-controls">
             <button
+              onClick={() => setCurrentPage(1)}
+              disabled={currentPage === 1}
+              className="unified-pagination-button"
+            >
+              First
+            </button>
+            <button
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className="pagination-btn"
+              className="unified-pagination-button"
             >
               Previous
             </button>
-            {[...Array(totalPages)].map((_, i) => (
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <button
-                key={i + 1}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`pagination-btn ${currentPage === i + 1 ? 'active' : ''}`}
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`unified-pagination-button ${currentPage === page ? 'active' : ''}`}
               >
-                {i + 1}
+                {page}
               </button>
             ))}
             <button
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
-              className="pagination-btn"
+              className="unified-pagination-button"
             >
               Next
+            </button>
+            <button
+              onClick={() => setCurrentPage(totalPages)}
+              disabled={currentPage === totalPages}
+              className="unified-pagination-button"
+            >
+              Last
             </button>
           </div>
         </div>

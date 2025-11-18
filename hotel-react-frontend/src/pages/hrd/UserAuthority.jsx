@@ -156,28 +156,15 @@ const UserAuthority = () => {
             >
               Previous
             </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1)
-              .filter(page => {
-                if (totalPages <= 7) return true;
-                if (page === 1 || page === totalPages) return true;
-                if (page >= currentPage - 1 && page <= currentPage + 1) return true;
-                return false;
-              })
-              .map((page, index, array) => {
-                const showEllipsisBefore = index > 0 && page - array[index - 1] > 1;
-                return (
-                  <div key={page} style={{ display: 'flex', alignItems: 'center' }}>
-                    {showEllipsisBefore && <span style={{ margin: '0 4px' }}>...</span>}
-                    <button
-                      onClick={() => setCurrentPage(page)}
-                      className={`unified-pagination-button ${currentPage === page ? 'active' : ''}`}
-                    >
-                      {page}
-                    </button>
-                  </div>
-                );
-              })
-            }
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`unified-pagination-button ${currentPage === page ? 'active' : ''}`}
+              >
+                {page}
+              </button>
+            ))}
             <button
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
