@@ -136,46 +136,33 @@ const UserAuthority = () => {
         </div>
 
         {/* Pagination */}
-        <div className="unified-pagination">
-          <div className="unified-pagination-info">
+        <div className="unified-footer">
+          <div className="entries-info">
             Showing {startIndex + 1} to {Math.min(endIndex, filteredLevels.length)} of {filteredLevels.length} entries
             {searchTerm && ` (filtered from ${authorityLevels.length} total entries)`}
           </div>
-          <div className="unified-pagination-controls">
+          <div className="pagination">
             <button
               onClick={() => setCurrentPage(1)}
               disabled={currentPage === 1}
-              className="unified-pagination-button"
             >
               First
             </button>
             <button
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className="unified-pagination-button"
             >
               Previous
             </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`unified-pagination-button ${currentPage === page ? 'active' : ''}`}
-              >
-                {page}
-              </button>
-            ))}
             <button
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
-              className="unified-pagination-button"
             >
               Next
             </button>
             <button
               onClick={() => setCurrentPage(totalPages)}
               disabled={currentPage === totalPages}
-              className="unified-pagination-button"
             >
               Last
             </button>
