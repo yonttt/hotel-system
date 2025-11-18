@@ -20,32 +20,32 @@ def create_test_accounts():
     
     test_accounts = [
         {
-            "username": "admin",
-            "email": "admin@hotel.com",
+            "username": "john",
+            "email": "john@hotel.com",
             "password": "admin123",
             "role": "admin"
         },
         {
-            "username": "manager",
-            "email": "manager@hotel.com",
+            "username": "mike",
+            "email": "mike@hotel.com",
             "password": "manager123",
             "role": "manager"
         },
         {
-            "username": "frontoffice",
-            "email": "frontoffice@hotel.com",
+            "username": "sarah",
+            "email": "sarah@hotel.com",
             "password": "frontoffice123",
             "role": "frontoffice"
         },
         {
-            "username": "housekeeping",
-            "email": "housekeeping@hotel.com",
+            "username": "anna",
+            "email": "anna@hotel.com",
             "password": "housekeeping123",
             "role": "housekeeping"
         },
         {
-            "username": "staff",
-            "email": "staff@hotel.com",
+            "username": "david",
+            "email": "david@hotel.com",
             "password": "staff123",
             "role": "staff"
         }

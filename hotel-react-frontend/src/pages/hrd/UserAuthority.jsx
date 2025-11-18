@@ -5,6 +5,12 @@ import { useAuth } from '../../context/AuthContext';
 const UserAuthority = () => {
   const { user } = useAuth();
   const [authorities, setAuthorities] = useState({
+    manager: {
+      canEdit: true,
+      canDelete: true,
+      canCreate: true,
+      canView: true
+    },
     frontoffice: {
       canEdit: true,
       canDelete: false,
@@ -55,6 +61,12 @@ const UserAuthority = () => {
 
   const handleResetAuthorities = () => {
     const defaultAuthorities = {
+      manager: {
+        canEdit: true,
+        canDelete: true,
+        canCreate: true,
+        canView: true
+      },
       frontoffice: {
         canEdit: true,
         canDelete: false,
@@ -85,6 +97,8 @@ const UserAuthority = () => {
 
   const getRoleBadgeColor = (role) => {
     switch (role) {
+      case 'manager':
+        return '#6f42c1'; // purple
       case 'frontoffice':
         return '#007bff'; // blue
       case 'housekeeping':
@@ -97,6 +111,7 @@ const UserAuthority = () => {
   };
 
   const roleLabels = {
+    manager: 'Manager',
     frontoffice: 'Front Office',
     housekeeping: 'Housekeeping',
     staff: 'Staff'
