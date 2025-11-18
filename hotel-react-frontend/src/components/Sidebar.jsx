@@ -31,6 +31,7 @@ const Sidebar = () => {
     statusKamar: false,
     masterData: false,
     hrd: false,
+    administration: false,
     userManagement: false
   })
   const [scrollPosition, setScrollPosition] = useState(0)
@@ -83,7 +84,8 @@ const Sidebar = () => {
       }
     } else if (path.includes('/hrd/')) {
       newExpandedMenus.hrd = true
-      if (path.includes('/user-management')) {
+      if (path.includes('/user-list') || path.includes('/user-authority') || path.includes('/user-management')) {
+        newExpandedMenus.administration = true
         newExpandedMenus.userManagement = true
       }
     }
@@ -134,6 +136,7 @@ const Sidebar = () => {
       statusKamar: false,
       masterData: false,
       hrd: false,
+      administration: false,
       userManagement: false
     })
     setScrollPosition(0)
@@ -246,14 +249,20 @@ const Sidebar = () => {
       children: [
         { title: 'Account Receivable', path: '/hrd/account-receivable' },
         { title: 'Accounting', path: '/hrd/accounting' },
-        { title: 'Administration', path: '/hrd/administration' },
         { 
-          title: 'User Management',
+          title: 'Administration',
           hasSubmenu: true,
-          submenu: 'userManagement',
+          submenu: 'administration',
           children: [
-            { title: 'User List', path: '/hrd/user-list' },
-            { title: 'Otoritas Pengguna', path: '/hrd/user-authority' }
+            { 
+              title: 'User Management',
+              hasSubmenu: true,
+              submenu: 'userManagement',
+              children: [
+                { title: 'User List', path: '/hrd/user-list' },
+                { title: 'Otoritas Pengguna', path: '/hrd/user-authority' }
+              ]
+            }
           ]
         }
       ]

@@ -158,14 +158,42 @@ const UserList = () => {
           <div className="header-row header-row-top">
             <div className="unified-header-left">
               <div className="header-title">
-                <span>USER LIST</span>
+                <span>MASTER USER</span>
               </div>
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="btn-table-action"
+                style={{
+                  background: '#007bff',
+                  color: 'white',
+                  padding: '6px 16px',
+                  marginLeft: '20px',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}
+              >
+                ADD
+              </button>
             </div>
             <div className="unified-header-right">
               <div className="hotel-select">
                 <label>Hotel :</label>
                 <select className="header-hotel-select">
-                  <option>ALL</option>
+                  <option>HOTEL NEW IDOLA</option>
+                </select>
+              </div>
+              <div className="hotel-select" style={{ marginLeft: '10px' }}>
+                <label>Jabatan :</label>
+                <select className="header-hotel-select">
+                  <option>---Semua Jabatan---</option>
+                </select>
+              </div>
+              <div className="hotel-select" style={{ marginLeft: '10px' }}>
+                <label>Level Akses :</label>
+                <select className="header-hotel-select">
+                  <option>---Semua Level---</option>
                 </select>
               </div>
             </div>
@@ -184,18 +212,6 @@ const UserList = () => {
               </div>
             </div>
             <div className="unified-header-right">
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="btn-table-action"
-                style={{
-                  background: '#28a745',
-                  color: 'white',
-                  padding: '8px 16px',
-                  marginRight: '10px'
-                }}
-              >
-                + Add User
-              </button>
               <div className="entries-control">
                 <span className="entries-label">Show entries:</span>
                 <select
@@ -244,31 +260,41 @@ const UserList = () => {
         <div className="unified-table-wrapper">
           <table className="reservation-table">
             <colgroup>
-              <col style={{ width: '80px' }} />   {/* ID */}
-              <col style={{ width: '200px' }} />  {/* Username */}
-              <col style={{ width: '250px' }} />  {/* Email */}
-              <col style={{ width: '150px' }} />  {/* Role */}
-              <col style={{ width: '180px' }} />  {/* Created Date */}
-              <col style={{ width: '120px' }} />  {/* Action */}
+              <col style={{ width: '60px' }} />   {/* No */}
+              <col style={{ width: '150px' }} />  {/* Hotel Name */}
+              <col style={{ width: '100px' }} />  {/* User Code */}
+              <col style={{ width: '150px' }} />  {/* Username */}
+              <col style={{ width: '180px' }} />  {/* Name */}
+              <col style={{ width: '180px' }} />  {/* Title */}
+              <col style={{ width: '150px' }} />  {/* Access */}
+              <col style={{ width: '80px' }} />   {/* Blokir */}
+              <col style={{ width: '180px' }} />  {/* Last Login */}
+              <col style={{ width: '150px' }} />  {/* Account Type */}
+              <col style={{ width: '100px' }} />  {/* Action */}
             </colgroup>
             <thead>
               <tr>
-                <th>ID</th>
+                <th>No</th>
+                <th>Hotel Name</th>
+                <th>User Code</th>
                 <th>Username</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Created Date</th>
+                <th>Name</th>
+                <th>Title</th>
+                <th>Acces</th>
+                <th>Blokir</th>
+                <th>Last Login</th>
+                <th>Account Type</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="6" className="no-data">Loading...</td>
+                  <td colSpan="11" className="no-data">Loading...</td>
                 </tr>
               ) : currentUsers.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="no-data">
+                  <td colSpan="11" className="no-data">
                     No data available in table
                   </td>
                 </tr>
@@ -276,38 +302,48 @@ const UserList = () => {
                 currentUsers.map((usr, index) => (
                   <tr key={usr.id}>
                     <td>{startIndex + index + 1}</td>
+                    <td>HOTEL NEW IDOLA</td>
+                    <td>{usr.id}</td>
                     <td title={usr.username}>{usr.username}</td>
-                    <td title={usr.email || 'N/A'}>{usr.email || 'N/A'}</td>
+                    <td>{usr.username.toUpperCase()}</td>
+                    <td>{usr.role === 'admin' ? 'Admin Hotel' : 
+                        usr.role === 'manager' ? 'Finance Hotel' : 
+                        usr.role === 'frontoffice' ? 'Operational Front Office' :
+                        usr.role === 'housekeeping' ? 'Leader Housekeeping' : 
+                        usr.role}</td>
+                    <td>{usr.role === 'admin' ? 'Admin Hotel' : 
+                        usr.role === 'manager' ? 'hotelaudit' : 
+                        usr.role === 'frontoffice' ? 'RECEPTION' :
+                        usr.role === 'housekeeping' ? 'Leader Housekeeping' : 
+                        'userview'}</td>
+                    <td>N</td>
                     <td>
-                      <span style={{
-                        display: 'inline-block',
-                        padding: '4px 12px',
-                        borderRadius: '4px',
-                        fontSize: '12px',
-                        fontWeight: '600',
-                        color: 'white',
-                        background: getRoleBadgeColor(usr.role)
-                      }}>
-                        {usr.role}
-                      </span>
+                      {usr.updated_at ? 
+                        new Date(usr.updated_at).toLocaleString('en-GB', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit',
+                          hour12: false
+                        }).replace(/\//g, '-').replace(',', '') : 
+                        '0000-00-00 00:00:00'}
                     </td>
-                    <td>{new Date(usr.created_at).toLocaleDateString('id-ID', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}</td>
-                    <td className="align-center">
-                      {usr.id !== user.id && (
-                        <button 
-                          className="btn-table-action"
-                          onClick={() => handleDeleteUser(usr.id, usr.username)}
-                          title="Delete User"
-                        >
-                          Delete
-                        </button>
-                      )}
+                    <td>{usr.role === 'admin' || usr.role === 'manager' ? 'Management' : 'Non Management'}</td>
+                    <td>
+                      <button
+                        onClick={() => handleDeleteUser(usr.id, usr.username)}
+                        className="btn-table-action"
+                        style={{
+                          background: '#dc3545',
+                          color: 'white',
+                          padding: '4px 12px',
+                          fontSize: '12px'
+                        }}
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 ))

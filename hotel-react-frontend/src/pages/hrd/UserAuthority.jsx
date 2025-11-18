@@ -1,132 +1,35 @@
-import { useState, useEffect } from 'react';
-import { apiService } from '../../services/api';
+import { useState } from 'react';
 import Layout from '../../components/Layout';
 import { useAuth } from '../../context/AuthContext';
 
 const UserAuthority = () => {
   const { user } = useAuth();
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showEntries, setShowEntries] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  const [userPermissions, setUserPermissions] = useState({});
-  const [successMessage, setSuccessMessage] = useState(null);
 
-  useEffect(() => {
-    if (user?.role === 'admin' || user?.role === 'manager') {
-      fetchUsers();
-    }
-  }, [user]);
+  // Define authority levels based on roles
+  const authorityLevels = [
+    { id: 1, level: 'RECEPTION RESTO HK' },
+    { id: 10, level: 'Pembangunan Staff' },
+    { id: 11, level: 'Leader Housekeeping' },
+    { id: 12, level: 'Laporan Night Audit' },
+    { id: 13, level: 'RECEPTION RESTO' },
+    { id: 14, level: 'Rekap Bil Kamar Pajak' },
+    { id: 15, level: 'Storekeeper' },
+    { id: 16, level: 'RECEPTION' },
+    { id: 17, level: 'Pajak' },
+    { id: 18, level: 'AdminCctv' }
+  ];
 
-  // Reset to first page when search/filter changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, showEntries]);
-
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      const response = await apiService.getAllUsers();
-      const allUsers = response.data || [];
-      setUsers(allUsers);
-      
-      // Load saved permissions from localStorage
-      const savedPermissions = localStorage.getItem('userPermissions');
-      if (savedPermissions) {
-        setUserPermissions(JSON.parse(savedPermissions));
-      } else {
-        // Initialize default permissions for all users
-        const defaultPerms = {};
-        allUsers.forEach(usr => {
-          defaultPerms[usr.id] = {
-            canView: true,
-            canCreate: usr.role !== 'staff',
-            canEdit: usr.role !== 'staff',
-            canDelete: usr.role === 'admin' || usr.role === 'manager'
-          };
-        });
-        setUserPermissions(defaultPerms);
-      }
-    } catch (err) {
-      console.error('Error fetching users:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handlePermissionChange = (userId, permission) => {
-    setUserPermissions(prev => ({
-      ...prev,
-      [userId]: {
-        ...prev[userId],
-        [permission]: !prev[userId]?.[permission]
-      }
-    }));
-  };
-
-  const handleSavePermissions = () => {
-    localStorage.setItem('userPermissions', JSON.stringify(userPermissions));
-    setSuccessMessage('Permissions berhasil disimpan!');
-    
-    setTimeout(() => {
-      setSuccessMessage(null);
-    }, 3000);
-  };
-
-  const handleResetPermissions = () => {
-    const defaultPerms = {};
-    users.forEach(usr => {
-      defaultPerms[usr.id] = {
-        canView: true,
-        canCreate: usr.role !== 'staff',
-        canEdit: usr.role !== 'staff',
-        canDelete: usr.role === 'admin' || usr.role === 'manager'
-      };
-    });
-    setUserPermissions(defaultPerms);
-    localStorage.setItem('userPermissions', JSON.stringify(defaultPerms));
-    setSuccessMessage('Permissions berhasil direset ke default!');
-    
-    setTimeout(() => {
-      setSuccessMessage(null);
-    }, 3000);
-  };
-
-  const filteredUsers = users.filter(usr =>
-    usr.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    usr.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    usr.role?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredLevels = authorityLevels.filter(lvl =>
+    lvl.level?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / showEntries));
+  const totalPages = Math.max(1, Math.ceil(filteredLevels.length / showEntries));
   const startIndex = (currentPage - 1) * showEntries;
   const endIndex = startIndex + showEntries;
-  const currentUsers = filteredUsers.slice(startIndex, endIndex);
-
-  const getRoleBadgeColor = (role) => {
-    switch (role) {
-      case 'admin':
-        return '#dc3545'; // red
-      case 'manager':
-        return '#6f42c1'; // purple
-      case 'frontoffice':
-        return '#007bff'; // blue
-      case 'housekeeping':
-        return '#28a745'; // green
-      case 'staff':
-        return '#6c757d'; // gray
-      default:
-        return '#6c757d';
-    }
-  };
-
-  const permissionLabels = {
-    canView: 'Lihat Data',
-    canCreate: 'Buat Data Baru',
-    canEdit: 'Edit Data',
-    canDelete: 'Hapus Data'
-  };
+  const currentLevels = filteredLevels.slice(startIndex, endIndex);
 
   // Check if user is admin or manager
   if (!user || (user.role !== 'admin' && user.role !== 'manager')) {
@@ -156,16 +59,10 @@ const UserAuthority = () => {
           <div className="header-row header-row-top">
             <div className="unified-header-left">
               <div className="header-title">
-                <span>OTORITAS PENGGUNA</span>
+                <span>LEVEL AKSES</span>
               </div>
             </div>
             <div className="unified-header-right">
-              <div className="hotel-select">
-                <label>Hotel :</label>
-                <select className="header-hotel-select">
-                  <option>ALL</option>
-                </select>
-              </div>
             </div>
           </div>
           <div className="header-row header-row-bottom">
@@ -182,30 +79,6 @@ const UserAuthority = () => {
               </div>
             </div>
             <div className="unified-header-right">
-              <button
-                onClick={handleResetPermissions}
-                className="btn-table-action"
-                style={{
-                  background: '#6c757d',
-                  color: 'white',
-                  padding: '8px 16px',
-                  marginRight: '10px'
-                }}
-              >
-                Reset to Default
-              </button>
-              <button
-                onClick={handleSavePermissions}
-                className="btn-table-action"
-                style={{
-                  background: '#28a745',
-                  color: 'white',
-                  padding: '8px 16px',
-                  marginRight: '10px'
-                }}
-              >
-                Save Changes
-              </button>
               <div className="entries-control">
                 <span className="entries-label">Show entries:</span>
                 <select
@@ -223,122 +96,37 @@ const UserAuthority = () => {
           </div>
         </div>
 
-        {/* Success Message */}
-        {successMessage && (
-          <div style={{
-            background: '#d4edda',
-            border: '1px solid #c3e6cb',
-            color: '#155724',
-            padding: '12px 16px',
-            borderRadius: '4px',
-            marginBottom: '20px'
-          }}>
-            {successMessage}
-          </div>
-        )}
-
         {/* Table Section */}
         <div className="unified-table-wrapper">
           <table className="reservation-table">
             <colgroup>
-              <col style={{ width: '60px' }} />   {/* No */}
-              <col style={{ width: '180px' }} />  {/* Username */}
-              <col style={{ width: '220px' }} />  {/* Email */}
-              <col style={{ width: '130px' }} />  {/* Role */}
-              <col style={{ width: '100px' }} />  {/* View */}
-              <col style={{ width: '100px' }} />  {/* Create */}
-              <col style={{ width: '100px' }} />  {/* Edit */}
-              <col style={{ width: '100px' }} />  {/* Delete */}
+              <col style={{ width: '100px' }} />  {/* No */}
+              <col style={{ width: 'auto' }} />   {/* Level */}
+              <col style={{ width: '150px' }} />  {/* Action */}
             </colgroup>
             <thead>
               <tr>
                 <th>No</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>View</th>
-                <th>Create</th>
-                <th>Edit</th>
-                <th>Delete</th>
+                <th>Level</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              {loading ? (
+              {currentLevels.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="no-data">Loading...</td>
-                </tr>
-              ) : currentUsers.length === 0 ? (
-                <tr>
-                  <td colSpan="8" className="no-data">
+                  <td colSpan="3" className="no-data">
                     No data available in table
                   </td>
                 </tr>
               ) : (
-                currentUsers.map((usr, index) => (
-                  <tr key={usr.id}>
-                    <td>{startIndex + index + 1}</td>
-                    <td title={usr.username}>{usr.username}</td>
-                    <td title={usr.email || 'N/A'}>{usr.email || 'N/A'}</td>
+                currentLevels.map((level, index) => (
+                  <tr key={level.id}>
+                    <td>{level.id}</td>
+                    <td style={{ color: '#007bff', cursor: 'pointer' }}>
+                      {level.level}
+                    </td>
                     <td>
-                      <span style={{
-                        display: 'inline-block',
-                        padding: '4px 12px',
-                        borderRadius: '4px',
-                        fontSize: '12px',
-                        fontWeight: '600',
-                        color: 'white',
-                        background: getRoleBadgeColor(usr.role)
-                      }}>
-                        {usr.role}
-                      </span>
-                    </td>
-                    <td className="align-center">
-                      <input
-                        type="checkbox"
-                        checked={userPermissions[usr.id]?.canView || false}
-                        onChange={() => handlePermissionChange(usr.id, 'canView')}
-                        style={{
-                          width: '16px',
-                          height: '16px',
-                          cursor: 'pointer'
-                        }}
-                      />
-                    </td>
-                    <td className="align-center">
-                      <input
-                        type="checkbox"
-                        checked={userPermissions[usr.id]?.canCreate || false}
-                        onChange={() => handlePermissionChange(usr.id, 'canCreate')}
-                        style={{
-                          width: '16px',
-                          height: '16px',
-                          cursor: 'pointer'
-                        }}
-                      />
-                    </td>
-                    <td className="align-center">
-                      <input
-                        type="checkbox"
-                        checked={userPermissions[usr.id]?.canEdit || false}
-                        onChange={() => handlePermissionChange(usr.id, 'canEdit')}
-                        style={{
-                          width: '16px',
-                          height: '16px',
-                          cursor: 'pointer'
-                        }}
-                      />
-                    </td>
-                    <td className="align-center">
-                      <input
-                        type="checkbox"
-                        checked={userPermissions[usr.id]?.canDelete || false}
-                        onChange={() => handlePermissionChange(usr.id, 'canDelete')}
-                        style={{
-                          width: '16px',
-                          height: '16px',
-                          cursor: 'pointer'
-                        }}
-                      />
+                      {/* Action buttons can be added here if needed */}
                     </td>
                   </tr>
                 ))
@@ -350,32 +138,59 @@ const UserAuthority = () => {
         {/* Pagination */}
         <div className="unified-pagination">
           <div className="unified-pagination-info">
-            Showing {startIndex + 1} to {Math.min(endIndex, filteredUsers.length)} of {filteredUsers.length} entries
-            {searchTerm && ` (filtered from ${users.length} total entries)`}
+            Showing {startIndex + 1} to {Math.min(endIndex, filteredLevels.length)} of {filteredLevels.length} entries
+            {searchTerm && ` (filtered from ${authorityLevels.length} total entries)`}
           </div>
           <div className="unified-pagination-controls">
             <button
+              onClick={() => setCurrentPage(1)}
+              disabled={currentPage === 1}
+              className="unified-pagination-button"
+            >
+              First
+            </button>
+            <button
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className="pagination-btn"
+              className="unified-pagination-button"
             >
               Previous
             </button>
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i + 1}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`pagination-btn ${currentPage === i + 1 ? 'active' : ''}`}
-              >
-                {i + 1}
-              </button>
-            ))}
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .filter(page => {
+                if (totalPages <= 7) return true;
+                if (page === 1 || page === totalPages) return true;
+                if (page >= currentPage - 1 && page <= currentPage + 1) return true;
+                return false;
+              })
+              .map((page, index, array) => {
+                const showEllipsisBefore = index > 0 && page - array[index - 1] > 1;
+                return (
+                  <div key={page} style={{ display: 'flex', alignItems: 'center' }}>
+                    {showEllipsisBefore && <span style={{ margin: '0 4px' }}>...</span>}
+                    <button
+                      onClick={() => setCurrentPage(page)}
+                      className={`unified-pagination-button ${currentPage === page ? 'active' : ''}`}
+                    >
+                      {page}
+                    </button>
+                  </div>
+                );
+              })
+            }
             <button
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
-              className="pagination-btn"
+              className="unified-pagination-button"
             >
               Next
+            </button>
+            <button
+              onClick={() => setCurrentPage(totalPages)}
+              disabled={currentPage === totalPages}
+              className="unified-pagination-button"
+            >
+              Last
             </button>
           </div>
         </div>
