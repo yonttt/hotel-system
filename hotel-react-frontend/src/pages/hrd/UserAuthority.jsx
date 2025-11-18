@@ -177,10 +177,10 @@ const UserAuthority = () => {
               <tr>
                 <th>No</th>
                 <th>Level</th>
-                <th>View</th>
-                <th>Create</th>
-                <th>Edit</th>
-                <th>Delete</th>
+                <th style={{ textAlign: 'center' }}>View</th>
+                <th style={{ textAlign: 'center' }}>Create</th>
+                <th style={{ textAlign: 'center' }}>Edit</th>
+                <th style={{ textAlign: 'center' }}>Delete</th>
               </tr>
             </thead>
             <tbody>
@@ -195,7 +195,7 @@ const UserAuthority = () => {
                   <tr key={roleItem.id}>
                     <td>{startIndex + index + 1}</td>
                     <td>{roleItem.label}</td>
-                    <td className="align-center">
+                    <td style={{ textAlign: 'center' }}>
                       <input
                         type="checkbox"
                         checked={rolePermissions[roleItem.role]?.canView || false}
@@ -209,7 +209,7 @@ const UserAuthority = () => {
                         }}
                       />
                     </td>
-                    <td className="align-center">
+                    <td style={{ textAlign: 'center' }}>
                       <input
                         type="checkbox"
                         checked={rolePermissions[roleItem.role]?.canCreate || false}
@@ -223,7 +223,7 @@ const UserAuthority = () => {
                         }}
                       />
                     </td>
-                    <td className="align-center">
+                    <td style={{ textAlign: 'center' }}>
                       <input
                         type="checkbox"
                         checked={rolePermissions[roleItem.role]?.canEdit || false}
@@ -237,7 +237,7 @@ const UserAuthority = () => {
                         }}
                       />
                     </td>
-                    <td className="align-center">
+                    <td style={{ textAlign: 'center' }}>
                       <input
                         type="checkbox"
                         checked={rolePermissions[roleItem.role]?.canDelete || false}
