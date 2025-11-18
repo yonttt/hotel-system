@@ -203,7 +203,9 @@ const UserAuthority = () => {
                         style={{
                           width: '16px',
                           height: '16px',
-                          cursor: 'pointer'
+                          cursor: 'pointer',
+                          verticalAlign: 'middle',
+                          margin: '0'
                         }}
                       />
                     </td>
@@ -215,7 +217,9 @@ const UserAuthority = () => {
                         style={{
                           width: '16px',
                           height: '16px',
-                          cursor: 'pointer'
+                          cursor: 'pointer',
+                          verticalAlign: 'middle',
+                          margin: '0'
                         }}
                       />
                     </td>
@@ -227,7 +231,9 @@ const UserAuthority = () => {
                         style={{
                           width: '16px',
                           height: '16px',
-                          cursor: 'pointer'
+                          cursor: 'pointer',
+                          verticalAlign: 'middle',
+                          margin: '0'
                         }}
                       />
                     </td>
@@ -239,7 +245,9 @@ const UserAuthority = () => {
                         style={{
                           width: '16px',
                           height: '16px',
-                          cursor: 'pointer'
+                          cursor: 'pointer',
+                          verticalAlign: 'middle',
+                          margin: '0'
                         }}
                       />
                     </td>
