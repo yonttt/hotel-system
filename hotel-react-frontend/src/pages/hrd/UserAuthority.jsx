@@ -241,18 +241,18 @@ const UserAuthority = () => {
         <div className="unified-table-wrapper">
           <table className="reservation-table">
             <colgroup>
-              <col style={{ width: '80px' }} />   {/* ID */}
+              <col style={{ width: '60px' }} />   {/* No */}
               <col style={{ width: '180px' }} />  {/* Username */}
               <col style={{ width: '220px' }} />  {/* Email */}
               <col style={{ width: '130px' }} />  {/* Role */}
-              <col style={{ width: '120px' }} />  {/* View */}
-              <col style={{ width: '120px' }} />  {/* Create */}
-              <col style={{ width: '120px' }} />  {/* Edit */}
-              <col style={{ width: '120px' }} />  {/* Delete */}
+              <col style={{ width: '100px' }} />  {/* View */}
+              <col style={{ width: '100px' }} />  {/* Create */}
+              <col style={{ width: '100px' }} />  {/* Edit */}
+              <col style={{ width: '100px' }} />  {/* Delete */}
             </colgroup>
             <thead>
               <tr>
-                <th>ID</th>
+                <th>No</th>
                 <th>Username</th>
                 <th>Email</th>
                 <th>Role</th>
@@ -277,7 +277,7 @@ const UserAuthority = () => {
                 currentUsers.map((usr, index) => (
                   <tr key={usr.id}>
                     <td>{startIndex + index + 1}</td>
-                    <td title={usr.username} style={{ fontWeight: '500' }}>{usr.username}</td>
+                    <td title={usr.username}>{usr.username}</td>
                     <td title={usr.email || 'N/A'}>{usr.email || 'N/A'}</td>
                     <td>
                       <span style={{
@@ -298,8 +298,8 @@ const UserAuthority = () => {
                         checked={userPermissions[usr.id]?.canView || false}
                         onChange={() => handlePermissionChange(usr.id, 'canView')}
                         style={{
-                          width: '18px',
-                          height: '18px',
+                          width: '16px',
+                          height: '16px',
                           cursor: 'pointer'
                         }}
                       />
@@ -310,8 +310,8 @@ const UserAuthority = () => {
                         checked={userPermissions[usr.id]?.canCreate || false}
                         onChange={() => handlePermissionChange(usr.id, 'canCreate')}
                         style={{
-                          width: '18px',
-                          height: '18px',
+                          width: '16px',
+                          height: '16px',
                           cursor: 'pointer'
                         }}
                       />
@@ -322,8 +322,8 @@ const UserAuthority = () => {
                         checked={userPermissions[usr.id]?.canEdit || false}
                         onChange={() => handlePermissionChange(usr.id, 'canEdit')}
                         style={{
-                          width: '18px',
-                          height: '18px',
+                          width: '16px',
+                          height: '16px',
                           cursor: 'pointer'
                         }}
                       />
@@ -334,8 +334,8 @@ const UserAuthority = () => {
                         checked={userPermissions[usr.id]?.canDelete || false}
                         onChange={() => handlePermissionChange(usr.id, 'canDelete')}
                         style={{
-                          width: '18px',
-                          height: '18px',
+                          width: '16px',
+                          height: '16px',
                           cursor: 'pointer'
                         }}
                       />
@@ -377,53 +377,6 @@ const UserAuthority = () => {
             >
               Next
             </button>
-          </div>
-        </div>
-
-        {/* Info Box */}
-        <div style={{
-          marginTop: '20px',
-          background: '#fff3cd',
-          border: '1px solid #ffc107',
-          borderRadius: '4px',
-          padding: '16px'
-        }}>
-          <div style={{ display: 'flex', gap: '12px' }}>
-            <span>ℹ️</span>
-            <div style={{ flex: 1 }}>
-              <strong style={{ 
-                display: 'block', 
-                marginBottom: '8px'
-              }}>
-                Informasi Otoritas
-              </strong>
-              <ul style={{ 
-                margin: 0, 
-                paddingLeft: '20px', 
-                fontSize: '14px',
-                lineHeight: '1.6'
-              }}>
-                <li>
-                  <strong>View:</strong> Dapat melihat/membaca data
-                </li>
-                <li>
-                  <strong>Create:</strong> Dapat membuat entry baru
-                </li>
-                <li>
-                  <strong>Edit:</strong> Dapat mengubah data yang ada
-                </li>
-                <li>
-                  <strong>Delete:</strong> Dapat menghapus data
-                </li>
-              </ul>
-              <p style={{ 
-                margin: '12px 0 0 0', 
-                fontSize: '13px', 
-                fontStyle: 'italic'
-              }}>
-                <strong>⚠️ Catatan:</strong> Centang checkbox untuk memberikan permission kepada user tertentu
-              </p>
-            </div>
           </div>
         </div>
       </div>
