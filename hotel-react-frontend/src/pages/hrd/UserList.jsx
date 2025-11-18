@@ -311,11 +311,7 @@ const UserList = () => {
                         usr.role === 'frontoffice' ? 'Operational Front Office' :
                         usr.role === 'housekeeping' ? 'Leader Housekeeping' : 
                         usr.role}</td>
-                    <td>{usr.role === 'admin' ? 'Admin Hotel' : 
-                        usr.role === 'manager' ? 'hotelaudit' : 
-                        usr.role === 'frontoffice' ? 'RECEPTION' :
-                        usr.role === 'housekeeping' ? 'Leader Housekeeping' : 
-                        'userview'}</td>
+                    <td>{usr.role}</td>
                     <td>N</td>
                     <td>
                       {usr.updated_at ? 
