@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Layout from '../../components/Layout';
 import { useAuth } from '../../context/AuthContext';
+import { apiService } from '../../services/api';
 
 const UserAuthority = () => {
   const { user } = useAuth();
@@ -9,6 +10,8 @@ const UserAuthority = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rolePermissions, setRolePermissions] = useState({});
   const [successMessage, setSuccessMessage] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Define roles from the system
   const systemRoles = [
@@ -20,12 +23,29 @@ const UserAuthority = () => {
   ];
 
   useEffect(() => {
-    // Load saved permissions from localStorage
-    const savedPermissions = localStorage.getItem('rolePermissions');
-    if (savedPermissions) {
-      setRolePermissions(JSON.parse(savedPermissions));
-    } else {
-      // Initialize default permissions for all roles
+    fetchPermissions();
+  }, []);
+
+  const fetchPermissions = async () => {
+    try {
+      setLoading(true);
+      const response = await apiService.getUserPermissions();
+      const permissions = {};
+      response.data.forEach(perm => {
+        permissions[perm.role] = {
+          canView: perm.can_view,
+          canCreate: perm.can_create,
+          canEdit: perm.can_edit,
+          canDelete: perm.can_delete
+        };
+      });
+      setRolePermissions(permissions);
+      setError(null);
+    } catch (err) {
+      setError('Failed to fetch permissions: ' + (err.response?.data?.detail || err.message));
+      console.error('Error fetching permissions:', err);
+      
+      // Fallback to default permissions if fetch fails
       const defaultPerms = {};
       systemRoles.forEach(r => {
         defaultPerms[r.role] = {
@@ -36,8 +56,10 @@ const UserAuthority = () => {
         };
       });
       setRolePermissions(defaultPerms);
+    } finally {
+      setLoading(false);
     }
-  }, []);
+  };
 
   const handlePermissionChange = (role, permission) => {
     setRolePermissions(prev => ({
@@ -49,13 +71,33 @@ const UserAuthority = () => {
     }));
   };
 
-  const handleSavePermissions = () => {
-    localStorage.setItem('rolePermissions', JSON.stringify(rolePermissions));
-    setSuccessMessage('Permissions berhasil disimpan!');
-    
-    setTimeout(() => {
-      setSuccessMessage(null);
-    }, 3000);
+  const handleSavePermissions = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Update permissions for each role
+      const updatePromises = Object.entries(rolePermissions).map(([role, perms]) => 
+        apiService.updateUserPermission(role, {
+          can_view: perms.canView,
+          can_create: perms.canCreate,
+          can_edit: perms.canEdit,
+          can_delete: perms.canDelete
+        })
+      );
+      
+      await Promise.all(updatePromises);
+      
+      setSuccessMessage('Permissions berhasil disimpan!');
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 3000);
+    } catch (err) {
+      setError('Failed to save permissions: ' + (err.response?.data?.detail || err.message));
+      console.error('Error saving permissions:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const filteredRoles = systemRoles.filter(r =>

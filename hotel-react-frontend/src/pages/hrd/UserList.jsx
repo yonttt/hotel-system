@@ -12,6 +12,8 @@ const UserList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showEntries, setShowEntries] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [filterJabatan, setFilterJabatan] = useState('');
+  const [filterLevelAkses, setFilterLevelAkses] = useState('');
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -31,13 +33,35 @@ const UserList = () => {
   // Reset to first page when search/filter changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, showEntries]);
+  }, [searchTerm, showEntries, filterJabatan, filterLevelAkses]);
 
-  const filteredUsers = users.filter(usr =>
-    usr.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    usr.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    usr.role?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Get unique jabatan (titles) and level akses (roles) from users
+  const uniqueJabatan = [...new Set(users.map(usr => {
+    if (usr.role === 'admin') return 'Admin Hotel';
+    if (usr.role === 'manager') return 'Finance Hotel';
+    if (usr.role === 'frontoffice') return 'Operational Front Office';
+    if (usr.role === 'housekeeping') return 'Leader Housekeeping';
+    return usr.role;
+  }))].sort();
+  
+  const uniqueLevelAkses = [...new Set(users.map(usr => usr.role))].sort();
+
+  const filteredUsers = users.filter(usr => {
+    const matchesSearch = usr.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      usr.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      usr.role?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const jabatanTitle = usr.role === 'admin' ? 'Admin Hotel' : 
+                        usr.role === 'manager' ? 'Finance Hotel' : 
+                        usr.role === 'frontoffice' ? 'Operational Front Office' :
+                        usr.role === 'housekeeping' ? 'Leader Housekeeping' : 
+                        usr.role;
+    
+    const matchesJabatan = !filterJabatan || jabatanTitle === filterJabatan;
+    const matchesLevel = !filterLevelAkses || usr.role === filterLevelAkses;
+    
+    return matchesSearch && matchesJabatan && matchesLevel;
+  });
 
   const totalPages = Math.max(1, Math.ceil(filteredUsers.length / showEntries));
   const startIndex = (currentPage - 1) * showEntries;
@@ -186,14 +210,28 @@ const UserList = () => {
               </div>
               <div className="hotel-select" style={{ marginLeft: '10px' }}>
                 <label>Jabatan :</label>
-                <select className="header-hotel-select">
-                  <option>---Semua Jabatan---</option>
+                <select 
+                  className="header-hotel-select"
+                  value={filterJabatan}
+                  onChange={(e) => setFilterJabatan(e.target.value)}
+                >
+                  <option value="">---Semua Jabatan---</option>
+                  {uniqueJabatan.map((jabatan, idx) => (
+                    <option key={idx} value={jabatan}>{jabatan}</option>
+                  ))}
                 </select>
               </div>
               <div className="hotel-select" style={{ marginLeft: '10px' }}>
                 <label>Level Akses :</label>
-                <select className="header-hotel-select">
-                  <option>---Semua Level---</option>
+                <select 
+                  className="header-hotel-select"
+                  value={filterLevelAkses}
+                  onChange={(e) => setFilterLevelAkses(e.target.value)}
+                >
+                  <option value="">---Semua Level---</option>
+                  {uniqueLevelAkses.map((level, idx) => (
+                    <option key={idx} value={level}>{level}</option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -302,20 +340,20 @@ const UserList = () => {
                 currentUsers.map((usr, index) => (
                   <tr key={usr.id}>
                     <td>{startIndex + index + 1}</td>
-                    <td>HOTEL NEW IDOLA</td>
+                    <td>{usr.hotel_name || 'HOTEL NEW IDOLA'}</td>
                     <td>{usr.id}</td>
                     <td title={usr.username}>{usr.username}</td>
-                    <td>{usr.username.toUpperCase()}</td>
-                    <td>{usr.role === 'admin' ? 'Admin Hotel' : 
+                    <td>{usr.full_name || usr.username.toUpperCase()}</td>
+                    <td>{usr.title || (usr.role === 'admin' ? 'Admin Hotel' : 
                         usr.role === 'manager' ? 'Finance Hotel' : 
                         usr.role === 'frontoffice' ? 'Operational Front Office' :
                         usr.role === 'housekeeping' ? 'Leader Housekeeping' : 
-                        usr.role}</td>
+                        usr.role)}</td>
                     <td>{usr.role}</td>
-                    <td>N</td>
+                    <td>{usr.is_blocked ? 'Y' : 'N'}</td>
                     <td>
-                      {usr.updated_at ? 
-                        new Date(usr.updated_at).toLocaleString('en-GB', {
+                      {usr.last_login ? 
+                        new Date(usr.last_login).toLocaleString('en-GB', {
                           year: 'numeric',
                           month: '2-digit',
                           day: '2-digit',
@@ -326,7 +364,7 @@ const UserList = () => {
                         }).replace(/\//g, '-').replace(',', '') : 
                         '0000-00-00 00:00:00'}
                     </td>
-                    <td>{usr.role === 'admin' || usr.role === 'manager' ? 'Management' : 'Non Management'}</td>
+                    <td>{usr.account_type || (usr.role === 'admin' || usr.role === 'manager' ? 'Management' : 'Non Management')}</td>
                     <td>
                       <button
                         onClick={() => handleDeleteUser(usr.id, usr.username)}

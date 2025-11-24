@@ -112,6 +112,14 @@ class ApiService {
     return this.client.delete(`/users/${userId}`)
   }
 
+  async getUserPermissions() {
+    return this.client.get('/users/permissions')
+  }
+
+  async updateUserPermission(role, permissionData) {
+    return this.client.put(`/users/permissions/${role}`, permissionData)
+  }
+
   // Hotel Rooms endpoints (updated to use new hotel_rooms table)
   async getHotelRooms(skip = 0, limit = 100, room_type = null, floor = null, status = null) {
     let url = `/hotel-rooms/?skip=${skip}&limit=${limit}`

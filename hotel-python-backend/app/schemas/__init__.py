@@ -19,14 +19,53 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
+    full_name: Optional[str] = None
+    title: Optional[str] = None
+    hotel_name: Optional[str] = "HOTEL NEW IDOLA"
 
 class UserUpdate(BaseModel):
     username: Optional[str] = None
     email: Optional[str] = None
     role: Optional[UserRole] = None
     password: Optional[str] = None
+    full_name: Optional[str] = None
+    title: Optional[str] = None
+    hotel_name: Optional[str] = None
+    is_blocked: Optional[bool] = None
+    account_type: Optional[str] = None
 
 class UserResponse(UserBase):
+    id: int
+    full_name: Optional[str] = None
+    title: Optional[str] = None
+    hotel_name: Optional[str] = None
+    is_blocked: Optional[bool] = None
+    last_login: Optional[datetime] = None
+    account_type: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+# User Permission Schemas
+class UserPermissionBase(BaseModel):
+    role: UserRole
+    can_view: bool = True
+    can_create: bool = False
+    can_edit: bool = False
+    can_delete: bool = False
+
+class UserPermissionCreate(UserPermissionBase):
+    pass
+
+class UserPermissionUpdate(BaseModel):
+    can_view: Optional[bool] = None
+    can_create: Optional[bool] = None
+    can_edit: Optional[bool] = None
+    can_delete: Optional[bool] = None
+
+class UserPermissionResponse(UserPermissionBase):
     id: int
     created_at: datetime
     updated_at: datetime

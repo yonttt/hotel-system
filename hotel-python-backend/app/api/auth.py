@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from datetime import timedelta
+from datetime import timedelta, datetime
 from app.core.database import get_db
 from app.core.security import verify_password, create_access_token, get_password_hash
 from app.core.auth import get_current_user, get_current_admin_user
@@ -25,6 +25,10 @@ def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
     
+    # Update last login
+    user.last_login = datetime.now()
+    db.commit()
+    
     access_token = create_access_token(data={"sub": user.username})
     return {"access_token": access_token, "token_type": "bearer"}
 
@@ -43,11 +47,31 @@ def register(
         )
     
     hashed_password = get_password_hash(user.password)
+    
+    # Determine account type based on role
+    account_type = "Management" if user.role in ["admin", "manager"] else "Non Management"
+    
+    # Set title based on role if not provided
+    title = user.title
+    if not title:
+        title_map = {
+            "admin": "Admin Hotel",
+            "manager": "Finance Hotel",
+            "frontoffice": "Operational Front Office",
+            "housekeeping": "Leader Housekeeping",
+            "staff": "Staff"
+        }
+        title = title_map.get(user.role, user.role)
+    
     db_user = User(
         username=user.username,
         email=user.email,
         role=user.role,
-        password=hashed_password
+        password=hashed_password,
+        full_name=user.full_name or user.username.upper(),
+        title=title,
+        hotel_name=user.hotel_name or "HOTEL NEW IDOLA",
+        account_type=account_type
     )
     db.add(db_user)
     db.commit()

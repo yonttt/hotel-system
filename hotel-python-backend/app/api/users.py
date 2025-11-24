@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 from typing import List
 from app.core.database import get_db
 from app.core.auth import get_current_user, get_current_admin_user
-from app.models import User
-from app.schemas import UserResponse
+from app.models import User, UserPermission
+from app.schemas import UserResponse, UserPermissionResponse, UserPermissionUpdate
 
 router = APIRouter()
 
@@ -40,3 +40,40 @@ def delete_user(
     db.delete(user)
     db.commit()
     return {"message": "User deleted successfully"}
+
+@router.get("/permissions", response_model=List[UserPermissionResponse])
+def get_all_permissions(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Get all user permissions."""
+    permissions = db.query(UserPermission).order_by(UserPermission.role).all()
+    return permissions
+
+@router.put("/permissions/{role}", response_model=UserPermissionResponse)
+def update_permission(
+    role: str,
+    permission_update: UserPermissionUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user)
+):
+    """Update permissions for a specific role (admin only)."""
+    permission = db.query(UserPermission).filter(UserPermission.role == role).first()
+    if not permission:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Permission for role {role} not found"
+        )
+    
+    if permission_update.can_view is not None:
+        permission.can_view = permission_update.can_view
+    if permission_update.can_create is not None:
+        permission.can_create = permission_update.can_create
+    if permission_update.can_edit is not None:
+        permission.can_edit = permission_update.can_edit
+    if permission_update.can_delete is not None:
+        permission.can_delete = permission_update.can_delete
+    
+    db.commit()
+    db.refresh(permission)
+    return permission

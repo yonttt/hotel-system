@@ -9,7 +9,25 @@ class User(Base):
     username = Column(String(50), unique=True, index=True)
     password = Column(String(255))
     email = Column(String(100))
+    full_name = Column(String(100))
+    title = Column(String(100))
+    hotel_name = Column(String(100), default='HOTEL NEW IDOLA')
+    is_blocked = Column(Boolean, default=False)
+    last_login = Column(DateTime, nullable=True)
+    account_type = Column(Enum('Management', 'Non Management'))
     role = Column(Enum('admin', 'manager', 'staff', 'frontoffice', 'housekeeping'), default='staff')
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+class UserPermission(Base):
+    __tablename__ = "user_permissions"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    role = Column(Enum('admin', 'manager', 'staff', 'frontoffice', 'housekeeping'), unique=True, nullable=False)
+    can_view = Column(Boolean, default=True)
+    can_create = Column(Boolean, default=False)
+    can_edit = Column(Boolean, default=False)
+    can_delete = Column(Boolean, default=False)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
