@@ -25,7 +25,6 @@ const Sidebar = () => {
     formTransaksi: false,
     infoReservasi: false,
     informasiTamu: false,
-    informasiGroupBooking: false,
     statusKamarFO: false,
     housekeeping: false,
     statusKamar: false,
@@ -65,9 +64,6 @@ const Sidebar = () => {
         }
         if (path.includes('/informasi-tamu/')) {
           newExpandedMenus.informasiTamu = true
-        }
-        if (path.includes('/informasi-group-booking') || path.includes('/group-booking-rooms')) {
-          newExpandedMenus.informasiGroupBooking = true
         }
         if (path.includes('/status-kamar')) {
           newExpandedMenus.statusKamarFO = true
@@ -130,7 +126,6 @@ const Sidebar = () => {
       formTransaksi: false,
       infoReservasi: false,
       informasiTamu: false,
-      informasiGroupBooking: false,
       statusKamarFO: false,
       housekeeping: false,
       statusKamar: false,
@@ -172,7 +167,8 @@ const Sidebar = () => {
               submenu: 'formTransaksi',
               children: [
                 { title: 'Registrasi', path: '/operational/frontoffice/form-transaksi/registrasi' },
-                { title: 'Reservasi', path: '/operational/frontoffice/form-transaksi/reservasi' }
+                { title: 'Reservasi', path: '/operational/frontoffice/form-transaksi/reservasi' },
+                { title: 'Group Booking', path: '/operational/frontoffice/form-transaksi/group-booking' }
               ]
             },
             { 
@@ -193,15 +189,6 @@ const Sidebar = () => {
                 { title: 'In House Guest ', path: '/operational/frontoffice/informasi-tamu/in-house-guest' },
                 { title: 'Check in Today', path: '/operational/frontoffice/informasi-tamu/check-in-today' },
                 { title: 'Guest History', path: '/operational/frontoffice/informasi-tamu/guest-history' }
-              ]
-            },
-            { 
-              title: 'Informasi Group Booking', 
-              hasSubmenu: true,
-              submenu: 'informasiGroupBooking',
-              children: [
-                { title: 'Group Booking List', path: '/operational/frontoffice/informasi-group-booking' },
-                { title: 'Group Booking Rooms', path: '/operational/frontoffice/group-booking-rooms' }
               ]
             },
             {
