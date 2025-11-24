@@ -313,14 +313,6 @@ const RegistrasiPage = () => {
           <h1 className="registration-title">REGISTRATION FORM</h1>
           <div style={{ display: 'flex', gap: '10px' }}>
             <button type="button" className="tab-button active blue-button">Single Registration</button>
-            <button 
-              type="button" 
-              className="tab-button blue-button"
-              onClick={() => navigate('/operational/frontoffice/form-transaksi/group-booking')}
-              style={{ background: '#28a745' }}
-            >
-              Group Booking
-            </button>
           </div>
         </div>        <div className="registration-form-container">
           <form onSubmit={handleSubmit} className="registration-form">

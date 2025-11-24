@@ -423,22 +423,6 @@ const GroupBooking = () => {
         <div className="registration-header">
           <h1 className="registration-title">GROUP BOOKING FORM</h1>
           <div style={{ display: 'flex', gap: '10px' }}>
-            <button 
-              type="button" 
-              className="tab-button blue-button"
-              onClick={() => navigate('/operational/frontoffice/form-transaksi/registrasi')}
-              style={{ background: '#6c757d' }}
-            >
-              ← Back to Registration
-            </button>
-            <button 
-              type="button" 
-              className="tab-button blue-button"
-              onClick={() => navigate('/operational/frontoffice/form-transaksi/reservasi')}
-              style={{ background: '#6c757d' }}
-            >
-              ← Back to Reservation
-            </button>
             <button type="button" className="tab-button active blue-button">Group Reservation</button>
           </div>
         </div>
