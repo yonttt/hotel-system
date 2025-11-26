@@ -31,6 +31,7 @@ const Sidebar = () => {
     statusKamar: false,
     masterData: false,
     hrd: false,
+    accounting: false,
     administration: false,
     userManagement: false
   })
@@ -88,6 +89,9 @@ const Sidebar = () => {
         newExpandedMenus.administration = true
         newExpandedMenus.userManagement = true
       }
+      if (path.includes('/laporan-global')) {
+        newExpandedMenus.accounting = true
+      }
     }
 
     setExpandedMenus(newExpandedMenus)
@@ -136,6 +140,7 @@ const Sidebar = () => {
       statusKamar: false,
       masterData: false,
       hrd: false,
+      accounting: false,
       administration: false,
       userManagement: false
     })
@@ -249,7 +254,14 @@ const Sidebar = () => {
       submenu: 'hrd',
       children: [
         { title: 'Account Receivable', path: '/hrd/account-receivable' },
-        { title: 'Accounting', path: '/hrd/accounting' },
+        { 
+          title: 'Accounting',
+          hasSubmenu: true,
+          submenu: 'accounting',
+          children: [
+            { title: 'Laporan Global', path: '/hrd/laporan-global' }
+          ]
+        },
         { 
           title: 'Administration',
           hasSubmenu: true,

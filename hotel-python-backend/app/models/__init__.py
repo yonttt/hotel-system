@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Enum, Text, Boolean, DECIMAL
+from sqlalchemy import Column, Integer, String, DateTime, Enum, Text, Boolean, DECIMAL, Date
 from sqlalchemy.sql import func
 from app.core.database import Base
 
@@ -214,5 +214,49 @@ class GroupBookingRoom(Base):
     discount = Column(DECIMAL(15, 3), default=0.000)
     subtotal = Column(DECIMAL(15, 3), default=0.000)
     room_status = Column(String(50), default='Reserved')
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+class HotelRevenueSummary(Base):
+    __tablename__ = "hotel_revenue_summary"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    hotel_id = Column(Integer, nullable=False, index=True)
+    hotel_name = Column(String(255), nullable=False)
+    report_date = Column(Date, nullable=False, index=True)
+    available_rooms = Column(Integer, default=0)
+    room_sales = Column(Integer, default=0)
+    occupancy_rate = Column(String(10), default='0%')
+    arr = Column(DECIMAL(15, 2), default=0)
+    revenue_from_na = Column(DECIMAL(15, 2), default=0)
+    total_cash = Column(DECIMAL(15, 2), default=0)
+    collection = Column(DECIMAL(15, 2), default=0)
+    bank_distribution = Column(DECIMAL(15, 2), default=0)
+    balance = Column(DECIMAL(15, 2), default=0)
+    operational_expense = Column(DECIMAL(15, 2), default=0)
+    non_operational_expense = Column(DECIMAL(15, 2), default=0)
+    owner_receive_expense = Column(DECIMAL(15, 2), default=0)
+    total_expense = Column(DECIMAL(15, 2), default=0)
+    net_income = Column(DECIMAL(15, 2), default=0)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+class NonHotelRevenueSummary(Base):
+    __tablename__ = "non_hotel_revenue_summary"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    unit_id = Column(Integer, nullable=False, index=True)
+    unit_name = Column(String(255), nullable=False)
+    report_date = Column(Date, nullable=False, index=True)
+    revenue_from_na = Column(DECIMAL(15, 2), default=0)
+    total_cash = Column(DECIMAL(15, 2), default=0)
+    collection = Column(DECIMAL(15, 2), default=0)
+    bank_distribution = Column(DECIMAL(15, 2), default=0)
+    balance = Column(DECIMAL(15, 2), default=0)
+    operational_expense = Column(DECIMAL(15, 2), default=0)
+    non_operational_expense = Column(DECIMAL(15, 2), default=0)
+    owner_receive_expense = Column(DECIMAL(15, 2), default=0)
+    total_expense = Column(DECIMAL(15, 2), default=0)
+    net_income = Column(DECIMAL(15, 2), default=0)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())

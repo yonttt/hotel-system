@@ -367,6 +367,25 @@ class ApiService {
   async getGroupBookingRooms() {
     return this.client.get('/group-bookings/rooms/all')
   }
+
+  // Revenue Reports APIs
+  async getHotelRevenue(startDate, endDate) {
+    let url = '/revenue-reports/hotel-revenue'
+    const params = []
+    if (startDate) params.push(`start_date=${startDate}`)
+    if (endDate) params.push(`end_date=${endDate}`)
+    if (params.length > 0) url += `?${params.join('&')}`
+    return this.client.get(url)
+  }
+
+  async getNonHotelRevenue(startDate, endDate) {
+    let url = '/revenue-reports/non-hotel-revenue'
+    const params = []
+    if (startDate) params.push(`start_date=${startDate}`)
+    if (endDate) params.push(`end_date=${endDate}`)
+    if (params.length > 0) url += `?${params.join('&')}`
+    return this.client.get(url)
+  }
 }
 
 export const apiService = new ApiService()

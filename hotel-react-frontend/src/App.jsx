@@ -100,6 +100,7 @@ import AdministrationPage from './pages/hrd/AdministrationPage';
 import UserManagement from './pages/hrd/UserManagement';
 import UserList from './pages/hrd/UserList';
 import UserAuthority from './pages/hrd/UserAuthority';
+import LaporanGlobal from './pages/hrd/LaporanGlobal';
 
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -355,6 +356,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <UserAuthority />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/hrd/laporan-global" 
+              element={
+                <ProtectedRoute>
+                  <LaporanGlobal />
                 </ProtectedRoute>
               } 
             />
