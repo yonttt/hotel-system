@@ -56,6 +56,9 @@ const StatusKamarHP = () => {
     { no: 18, status: 'Expected Departure', statusCode: 'ED', color: '#ffff00', description: 'Kamar yang akan checkout' }
   ];
 
+  // All available room status codes from room status descriptions
+  const allStatusCodes = ['CO', 'GC', 'OO', 'VD', 'VC', 'VR', 'VU', 'AR', 'IC', 'DND', 'OD', 'MU', 'OC', 'OR', 'HU', 'SO', 'SK', 'ED'];
+
   // Get room status color based on status code
   const getStatusColor = (status) => {
     const statusMap = {
@@ -72,6 +75,7 @@ const StatusKamarHP = () => {
       'vu': '#e6e6fa',      // Vacant Uncheck - lavender
       'ar': '#87ceeb',      // Arrival - sky blue
       'arrival': '#87ceeb', // Arrival - sky blue
+      'available': '#008000', // Available - treated as Vacant Ready - green
       'ic': '#008080',      // Incognito - teal
       'dnd': '#0000ff',     // DND - blue
       'od': '#9acd32',      // Occupied Dirty - yellow green
@@ -110,6 +114,7 @@ const StatusKamarHP = () => {
       'vacant ready': 'VR',
       'vacant uncheck': 'VU',
       'arrival': 'AR',
+      'available': 'VR',  // Map available to Vacant Ready
       'incognito': 'IC',
       'do not disturb': 'DND',
       'occupied dirty': 'OD',
@@ -128,29 +133,10 @@ const StatusKamarHP = () => {
   // Get unique room types for filter
   const roomTypes = ['All Type', ...new Set(rooms.map(r => r.room_type).filter(Boolean))];
   
-  // Get unique statuses for filter - show short codes
-  const roomStatuses = ['All Status', ...new Set(rooms.map(r => getShortStatus(r.status)).filter(Boolean))];
+  // Get room statuses for filter - use all available status codes
+  const roomStatuses = ['All Status', ...allStatusCodes];
   
-  // Get room type counts by status
-  const getStatusCounts = () => {
-    const counts = {
-      VD: 0, VC: 0, VR: 0, OR: 0, BO: 0, OD: 0, MU: 0, OC: 0,
-      HU: 0, SO: 0, DND: 0, Checkout: 0, VU: 0, Maintanece: 0, OO: 0
-    };
-    
-    filteredRooms.forEach(room => {
-      const status = (room.status || '').toUpperCase().trim();
-      if (status === 'CO' || status === 'C O') {
-        counts.Checkout++;
-      } else if (counts.hasOwnProperty(status)) {
-        counts[status]++;
-      }
-    });
-    
-    return counts;
-  };
-
-  // Filter rooms
+  // Filter rooms first
   const filteredRooms = rooms.filter(room => {
     const matchesHotel = selectedHotel === 'ALL' || room.hotel_name === selectedHotel;
     const matchesType = selectedType === 'All Type' || room.room_type === selectedType;
@@ -165,6 +151,25 @@ const StatusKamarHP = () => {
     
     return matchesHotel && matchesType && matchesStatus;
   });
+
+  // Get room type counts by status - using only status codes from room status descriptions
+  const getStatusCounts = () => {
+    const counts = {
+      CO: 0, GC: 0, OO: 0, VD: 0, VC: 0, VR: 0, VU: 0, AR: 0, IC: 0,
+      DND: 0, OD: 0, MU: 0, OC: 0, OR: 0, HU: 0, SO: 0, SK: 0, ED: 0
+    };
+    
+    filteredRooms.forEach(room => {
+      // Use getShortStatus to normalize all status variations
+      const normalizedStatus = getShortStatus(room.status);
+      
+      if (counts.hasOwnProperty(normalizedStatus)) {
+        counts[normalizedStatus]++;
+      }
+    });
+    
+    return counts;
+  };
 
   const statusCounts = getStatusCounts();
 
@@ -211,7 +216,7 @@ const StatusKamarHP = () => {
             className={`status-tab ${activeTab === 'all' ? 'active' : ''}`}
             onClick={() => setActiveTab('all')}
           >
-            📊 ALL ROOM STATUS
+           ALL ROOM STATUS
           </button>
           <button 
             className={`status-tab ${activeTab === 'description' ? 'active' : ''}`}
@@ -225,21 +230,24 @@ const StatusKamarHP = () => {
           <>
             {/* Status Summary Bar */}
             <div className="status-summary-bar">
+              <span><strong>{statusCounts.CO} : CO</strong></span>
+              <span><strong>{statusCounts.GC} : GC</strong></span>
+              <span><strong>{statusCounts.OO} : OO</strong></span>
               <span><strong>{statusCounts.VD} : VD</strong></span>
               <span><strong>{statusCounts.VC} : VC</strong></span>
               <span><strong>{statusCounts.VR} : VR</strong></span>
-              <span><strong>{statusCounts.OR} : OR</strong></span>
-              <span><strong>{statusCounts.BO} : BO</strong></span>
+              <span><strong>{statusCounts.VU} : VU</strong></span>
+              <span><strong>{statusCounts.AR} : AR</strong></span>
+              <span><strong>{statusCounts.IC} : IC</strong></span>
+              <span><strong>{statusCounts.DND} : DND</strong></span>
               <span><strong>{statusCounts.OD} : OD</strong></span>
               <span><strong>{statusCounts.MU} : MU</strong></span>
               <span><strong>{statusCounts.OC} : OC</strong></span>
+              <span><strong>{statusCounts.OR} : OR</strong></span>
               <span><strong>{statusCounts.HU} : HU</strong></span>
               <span><strong>{statusCounts.SO} : SO</strong></span>
-              <span><strong>{statusCounts.DND} : DND</strong></span>
-              <span><strong>{statusCounts.Checkout} : Checkout</strong></span>
-              <span><strong>{statusCounts.VU} : VU</strong></span>
-              <span><strong>{statusCounts.Maintanece} : Maintanece</strong></span>
-              <span><strong>{statusCounts.OO} : OO</strong></span>
+              <span><strong>{statusCounts.SK} : SK</strong></span>
+              <span><strong>{statusCounts.ED} : ED</strong></span>
               <span><strong>Total: {filteredRooms.length} Kamar</strong></span>
             </div>
 
