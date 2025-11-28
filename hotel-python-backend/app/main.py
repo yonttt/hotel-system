@@ -39,10 +39,6 @@ app.include_router(market_segments.router, prefix="", tags=["market-segments"])
 app.include_router(payment_methods.router, prefix="", tags=["payment-methods"])
 app.include_router(revenue_reports.router, prefix="/revenue-reports", tags=["revenue-reports"])
 
-@app.get("/")
-def read_root():
-    return {"message": "Hotel Management System API is running!"}
-
 @app.on_event("startup")
 async def startup_event():
     """Initialize database tables on startup"""
@@ -62,7 +58,3 @@ async def root():
         "version": "2.0.0",
         "status": "running"
     }
-
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy"}
