@@ -79,8 +79,6 @@ def get_guest_registrations(
         return registrations
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-    registrations = db.query(HotelRegistration).offset(skip).limit(limit).all()
-    return registrations
 
 @router.get("/{registration_id}", response_model=GuestRegistrationResponse)
 def get_guest_registration(

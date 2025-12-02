@@ -74,8 +74,6 @@ def get_hotel_reservations(
         return reservations
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-    reservations = db.query(HotelReservation).offset(skip).limit(limit).all()
-    return reservations
 
 @router.get("/{reservation_id}", response_model=ReservationResponse)
 def get_hotel_reservation(
