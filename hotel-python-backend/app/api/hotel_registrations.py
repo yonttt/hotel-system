@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from typing import List
 from app.core.database import get_db
 from app.core.auth import get_current_user, get_current_manager_or_admin_user
@@ -11,6 +12,16 @@ from app.schemas import (
 )
 
 router = APIRouter()
+
+def update_room_status(db: Session, room_number: str, new_status: str):
+    """Update room status in hotel_rooms table."""
+    try:
+        db.execute(
+            text("UPDATE hotel_rooms SET status = :status WHERE room_number = :room_number"),
+            {"status": new_status, "room_number": room_number}
+        )
+    except Exception as e:
+        print(f"Warning: Could not update room status: {e}")
 
 @router.post("/", response_model=GuestRegistrationResponse)
 def create_guest_registration(
@@ -37,6 +48,16 @@ def create_guest_registration(
         
         db_registration = HotelRegistration(**registration_data)
         db.add(db_registration)
+        
+        # Update room status based on transaction_status
+        if registration.room_number:
+            if registration.transaction_status == 'Check-in':
+                # OR = Occupied Ready (guest has checked in)
+                update_room_status(db, registration.room_number, 'OR')
+            elif registration.transaction_status == 'Registration':
+                # AR = Arrival (registered but not yet checked in)
+                update_room_status(db, registration.room_number, 'AR')
+        
         db.commit()
         db.refresh(db_registration)
         return db_registration
@@ -99,6 +120,17 @@ def update_guest_registration(
     
     # Update only provided fields
     update_data = registration_update.dict(exclude_unset=True)
+    
+    # Check if transaction_status is being updated
+    if 'transaction_status' in update_data and registration.room_number:
+        new_status = update_data['transaction_status']
+        if new_status == 'Check-in':
+            update_room_status(db, registration.room_number, 'OR')  # Occupied Ready
+        elif new_status == 'Check-out':
+            update_room_status(db, registration.room_number, 'CO')  # Checkout
+        elif new_status == 'Cancelled':
+            update_room_status(db, registration.room_number, 'VR')  # Vacant Ready
+    
     for field, value in update_data.items():
         setattr(registration, field, value)
     
@@ -116,6 +148,10 @@ def delete_guest_registration(
     registration = db.query(HotelRegistration).filter(HotelRegistration.id == registration_id).first()
     if not registration:
         raise HTTPException(status_code=404, detail="Guest registration not found")
+    
+    # Update room status back to VR (Vacant Ready) when registration is deleted
+    if registration.room_number:
+        update_room_status(db, registration.room_number, 'VR')
     
     db.delete(registration)
     db.commit()

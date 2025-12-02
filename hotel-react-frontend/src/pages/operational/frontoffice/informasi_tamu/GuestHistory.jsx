@@ -11,8 +11,12 @@ const GuestHistory = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [showEntries, setShowEntries] = useState(10)
   const [currentPage, setCurrentPage] = useState(1)
-  const [dateFrom, setDateFrom] = useState('2025-09-22')
-  const [dateTo, setDateTo] = useState('2025-09-22')
+  
+  // Default date range: last 30 days to today
+  const today = new Date().toISOString().split('T')[0]
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+  const [dateFrom, setDateFrom] = useState(thirtyDaysAgo)
+  const [dateTo, setDateTo] = useState(today)
 
   useEffect(() => { loadRegistrations() }, [dateFrom, dateTo])
   useEffect(() => { setCurrentPage(1) }, [searchTerm, showEntries, dateFrom, dateTo])
@@ -22,13 +26,17 @@ const GuestHistory = () => {
       setLoading(true)
       setError(null)
       const response = await apiService.getHotelRegistrations(0, 100)
-      // Filter by date range and completed registrations
+      // Filter registrations within date range (by arrival or departure date)
       const historyRegistrations = (response.data || []).filter(r => {
+        const arrival = r.arrival_date?.split('T')[0]
         const departure = r.departure_date?.split('T')[0]
-        if (!departure) return false
+        if (!arrival && !departure) return false
         
-        // Check if departure date is within the selected range
-        return departure >= dateFrom && departure <= dateTo
+        // Include if arrival OR departure falls within the selected range
+        const arrivalInRange = arrival && arrival >= dateFrom && arrival <= dateTo
+        const departureInRange = departure && departure >= dateFrom && departure <= dateTo
+        
+        return arrivalInRange || departureInRange
       })
       setRegistrations(historyRegistrations)
     } catch (e) {
@@ -174,13 +182,13 @@ const GuestHistory = () => {
                     <td title={registration.id_card_number || 'N/A'}>{registration.id_card_number || 'N/A'}</td>
                     <td title={registration.guest_name || 'N/A'}>{registration.guest_name || 'N/A'}</td>
                     <td title={registration.category_market || 'N/A'}>{registration.category_market || 'N/A'}</td>
-                    <td className="align-center">{calculateNights(registration.arrival_date, registration.departure_date)}</td>
+                    <td className="align-center">{registration.nights || calculateNights(registration.arrival_date, registration.departure_date)}</td>
                     <td>{formatDate(registration.arrival_date)}</td>
                     <td>{formatDate(registration.departure_date)}</td>
-                    <td className="align-right">{formatCurrency(registration.total_amount || 0)}</td>
+                    <td className="align-right">{formatCurrency(registration.payment_amount || 0)}</td>
                     <td className="align-center">
                       {canEdit() && (
-                        <button className="btn-table-action" title="Edit Details">Edit</button>
+                        <button className="btn-table-action" title="View Details">Detail</button>
                       )}
                     </td>
                   </tr>

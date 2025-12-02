@@ -21,10 +21,30 @@ class RoomTypeEnum(str, Enum):
     APT = "APT"
 
 class StatusEnum(str, Enum):
+    # Legacy statuses
     available = "available"
     occupied = "occupied"
     maintenance = "maintenance"
     out_of_order = "out_of_order"
+    # Room status codes
+    CO = "CO"   # Checkout
+    GC = "GC"   # General Cleaning
+    OO = "OO"   # Out of Order
+    VD = "VD"   # Vacant Dirty
+    VC = "VC"   # Vacant Clean
+    VR = "VR"   # Vacant Ready
+    VU = "VU"   # Vacant Uncheck
+    AR = "AR"   # Arrival
+    IC = "IC"   # Incognito
+    DND = "DND" # Do Not Disturb
+    OD = "OD"   # Occupied Dirty
+    MU = "MU"   # Makeup Room
+    OC = "OC"   # Occupied Clean
+    OR = "OR"   # Occupied Ready
+    HU = "HU"   # House Use
+    SO = "SO"   # Sleep Out
+    SK = "SK"   # Skipper
+    ED = "ED"   # Expected Departure
 
 class VIPStatusEnum(str, Enum):
     YES = "YES"
@@ -50,7 +70,7 @@ class HotelRoomBase(BaseModel):
     room_size: Optional[str] = None
     bed_type: str = "Double"
     max_occupancy: int = 2
-    status: StatusEnum = StatusEnum.available
+    status: StatusEnum = StatusEnum.VR
 
 class HotelRoomCreate(HotelRoomBase):
     pass
@@ -288,9 +308,9 @@ def get_room_statistics(
                 SELECT 
                     room_type,
                     COUNT(*) as total_rooms,
-                    SUM(CASE WHEN status = 'available' THEN 1 ELSE 0 END) as available_rooms,
-                    SUM(CASE WHEN status = 'occupied' THEN 1 ELSE 0 END) as occupied_rooms,
-                    SUM(CASE WHEN status = 'maintenance' THEN 1 ELSE 0 END) as maintenance_rooms,
+                    SUM(CASE WHEN status IN ('available', 'VR', 'VC', 'VU', 'VD') THEN 1 ELSE 0 END) as available_rooms,
+                    SUM(CASE WHEN status IN ('occupied', 'OR', 'OC', 'OD', 'IC', 'DND', 'MU', 'HU', 'SO') THEN 1 ELSE 0 END) as occupied_rooms,
+                    SUM(CASE WHEN status IN ('maintenance', 'out_of_order', 'OO', 'GC') THEN 1 ELSE 0 END) as maintenance_rooms,
                     ROUND(AVG(hit_count), 2) as avg_hit_count,
                     MAX(hit_count) as max_hit_count,
                     MIN(hit_count) as min_hit_count
@@ -564,7 +584,7 @@ def get_underutilized_rooms(
             text("""
                 SELECT room_number, room_type, floor_number, hit_count, status
                 FROM hotel_rooms 
-                WHERE is_active = 1 AND status = 'available'
+                WHERE is_active = 1 AND status IN ('available', 'VR', 'VC', 'VU', 'VD')
                 ORDER BY hit_count ASC, room_number
                 LIMIT :limit
             """),

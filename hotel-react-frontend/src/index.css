@@ -960,6 +960,7 @@ body {
 .reservations-table {
   width: 100%;
   border-collapse: collapse;
+  border: 1px solid #e5e7eb;
 }
 
 .table-header {
@@ -968,12 +969,13 @@ body {
 
 .table-th {
   text-align: left;
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1rem;
   font-size: 0.75rem;
   font-weight: 600;
   color: #374151;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  border: 1px solid #e5e7eb;
 }
 
 .table-row {
@@ -989,8 +991,10 @@ body {
 }
 
 .table-cell {
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1rem;
   font-size: 0.875rem;
+  border: 1px solid #e5e7eb;
+  vertical-align: middle;
 }
 
 .reservation-no {
@@ -1785,6 +1789,7 @@ body {
 .reservations-table {
   width: 100%;
   border-collapse: collapse;
+  border: 1px solid #e2e8f0;
 }
 
 .table-header {
@@ -1792,14 +1797,14 @@ body {
 }
 
 .table-th {
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1rem;
   text-align: left;
   font-size: 0.75rem;
   font-weight: 600;
   color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  border-bottom: 1px solid #e2e8f0;
+  border: 1px solid #e2e8f0;
 }
 
 .table-body {
@@ -1807,7 +1812,7 @@ body {
 }
 
 .table-row {
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid #e2e8f0;
   transition: background-color 0.2s ease;
 }
 
@@ -1816,10 +1821,12 @@ body {
 }
 
 .table-cell {
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1rem;
   font-size: 0.875rem;
   color: #475569;
   white-space: nowrap;
+  border: 1px solid #e2e8f0;
+  vertical-align: middle;
 }
 
 .table-cell.font-medium {
@@ -2260,14 +2267,16 @@ body {
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
+  border: 1px solid #dee2e6;
+  border-collapse: collapse;
 }
 
 .data-table th,
 .data-table td {
-  padding: 1rem;
+  padding: 0.75rem 1rem;
   text-align: left;
-  border-bottom: 1px solid #f1f5f9;
+  border: 1px solid #dee2e6;
+  vertical-align: middle;
 }
 
 .data-table th {
@@ -4321,13 +4330,15 @@ select, .form-select {
   font-size: 14px;
   margin: 0;
   background: #ffffff;
+  border: 1px solid #dee2e6;
 }
 
-/* Table Header - Simple black & white */
+/* Table Header - Simple black & white with borders */
 .unified-reservation-container .reservation-table th {
   background: #343a40;
+  border: 1px solid #495057;
   border-bottom: 2px solid #dee2e6;
-  padding: 12px 16px;
+  padding: 10px 12px;
   text-align: left;
   font-weight: 600;
   color: #ffffff;
@@ -4340,17 +4351,18 @@ select, .form-select {
 }
 
 .unified-reservation-container .reservation-table th:first-child { 
-  padding-left: 20px;
+  padding-left: 12px;
+  border-left: 1px solid #dee2e6;
 }
 .unified-reservation-container .reservation-table th:last-child { 
-  padding-right: 20px;
+  padding-right: 12px;
+  border-right: 1px solid #dee2e6;
 }
 
-/* Table Body - Clean simple rows */
+/* Table Body - Clean rows with dividing lines */
 .unified-reservation-container .reservation-table td {
-  padding: 12px 16px;
-  border-bottom: 1px solid #dee2e6;
-  border-right: none;
+  padding: 10px 12px;
+  border: 1px solid #dee2e6;
   color: #495057;
   vertical-align: middle;
   font-size: 14px;
@@ -4361,10 +4373,10 @@ select, .form-select {
 .unified-reservation-container .reservation-table td:first-child { 
   font-weight: 600;
   color: #212529;
-  padding-left: 20px;
+  padding-left: 12px;
 }
 .unified-reservation-container .reservation-table td:last-child { 
-  padding-right: 20px;
+  padding-right: 12px;
 }
 
 /* Table Rows - Simple hover */
@@ -4765,14 +4777,14 @@ select, .form-select {
 .description-table th {
   background: #343a40;
   color: #ffffff;
-  padding: 12px;
+  padding: 10px 12px;
   text-align: left;
   font-weight: 600;
   border: 1px solid #dee2e6;
 }
 
 .description-table td {
-  padding: 12px;
+  padding: 10px 12px;
   border: 1px solid #dee2e6;
   vertical-align: middle;
 }
@@ -4790,24 +4802,26 @@ select, .form-select {
   border-collapse: collapse;
   font-size: 13px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border: 1px solid #dee2e6;
 }
 
 .description-table-single th {
   background: #343a40;
   color: #ffffff;
-  padding: 12px 12px;
+  padding: 10px 12px;
   text-align: left;
   font-weight: 600;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  border: 1px solid #495057;
   border-bottom: 2px solid #dee2e6;
   white-space: nowrap;
 }
 
 .description-table-single td {
   padding: 10px 12px;
-  border-bottom: 1px solid #dee2e6;
+  border: 1px solid #dee2e6;
   vertical-align: middle;
   color: #495057;
   font-size: 13px;
