@@ -229,22 +229,6 @@ const UbahStatusKamar = () => {
                   <option value={100}>100</option>
                 </select>
               </div>
-              <button 
-                className="btn-table-action"
-                onClick={() => window.print()}
-                style={{
-                  background: '#17a2b8',
-                  color: 'white',
-                  padding: '6px 16px',
-                  marginLeft: '10px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}
-              >
-                Print
-              </button>
             </div>
           </div>
         </div>
@@ -332,15 +316,6 @@ const UbahStatusKamar = () => {
                       <button
                         onClick={() => handleEditClick(room)}
                         className="btn-table-action"
-                        style={{
-                          background: '#ffc107',
-                          color: '#212529',
-                          padding: '4px 12px',
-                          fontSize: '12px',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer'
-                        }}
                         title="Edit Status"
                       >
                         Edit
