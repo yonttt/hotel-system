@@ -4,7 +4,7 @@ from sqlalchemy import func as sql_func, text, case
 from typing import List, Optional
 from datetime import date, datetime
 from app.core.database import get_db
-from app.models import HotelRegistration, HotelReservation, GroupBooking, NonHotelRevenueSummary
+from app.models import HotelRegistration, HotelReservation, GroupBooking, HotelRevenueSummary, NonHotelRevenueSummary
 from decimal import Decimal
 
 router = APIRouter()
@@ -23,7 +23,7 @@ async def get_hotel_revenue(
 ):
     """
     Get hotel revenue summary data calculated from actual registrations, reservations, and group bookings.
-    Groups data by hotel_name and calculates revenue metrics.
+    Groups data by hotel_name and calculates revenue metrics. Also saves to hotel_revenue_summary table.
     """
     try:
         # Get total available rooms per hotel using raw SQL
@@ -143,17 +143,20 @@ async def get_hotel_revenue(
             hotel_data[hotel_name]['total_deposit'] += gb.total_deposit or Decimal('0')
             hotel_data[hotel_name]['total_balance'] += gb.total_balance or Decimal('0')
         
-        # Format response data
+        # Format response data and save to database
         data = []
+        report_date = date.today()
+        
         for idx, (hotel_name, metrics) in enumerate(sorted(hotel_data.items()), 1):
             available_rooms = hotel_rooms.get(hotel_name, 0)
-            room_sales = metrics['room_sales']
+            room_sales = int(metrics['room_sales']) if isinstance(metrics['room_sales'], Decimal) else metrics['room_sales']
             total_revenue = metrics['total_revenue']
             total_deposit = metrics['total_deposit']
             total_balance = metrics['total_balance']
             
             # Calculate occupancy rate
-            occ_rate = f"{round((room_sales / available_rooms * 100) if available_rooms > 0 else 0)}%"
+            occ_percentage = round((room_sales / available_rooms * 100) if available_rooms > 0 else 0)
+            occ_rate = f"{occ_percentage}%"
             
             # Calculate ARR (Average Room Rate)
             arr = total_revenue / room_sales if room_sales > 0 else Decimal('0')
@@ -164,6 +167,47 @@ async def get_hotel_revenue(
             # Net income = collection (paid amount)
             net_income = collection
             
+            # Save or update in hotel_revenue_summary table
+            existing_summary = db.query(HotelRevenueSummary).filter(
+                HotelRevenueSummary.hotel_name == hotel_name,
+                HotelRevenueSummary.report_date == report_date
+            ).first()
+            
+            if existing_summary:
+                # Update existing record
+                existing_summary.available_rooms = available_rooms
+                existing_summary.room_sales = room_sales
+                existing_summary.occupancy_rate = occ_rate
+                existing_summary.arr = arr
+                existing_summary.revenue_from_na = total_revenue
+                existing_summary.total_cash = total_revenue
+                existing_summary.collection = collection
+                existing_summary.bank_distribution = total_deposit
+                existing_summary.balance = total_balance
+                existing_summary.net_income = net_income
+            else:
+                # Create new record
+                new_summary = HotelRevenueSummary(
+                    hotel_id=idx,
+                    hotel_name=hotel_name,
+                    report_date=report_date,
+                    available_rooms=available_rooms,
+                    room_sales=room_sales,
+                    occupancy_rate=occ_rate,
+                    arr=arr,
+                    revenue_from_na=total_revenue,
+                    total_cash=total_revenue,
+                    collection=collection,
+                    bank_distribution=total_deposit,
+                    balance=total_balance,
+                    operational_expense=Decimal('0'),
+                    non_operational_expense=Decimal('0'),
+                    owner_receive_expense=Decimal('0'),
+                    total_expense=Decimal('0'),
+                    net_income=net_income
+                )
+                db.add(new_summary)
+            
             data.append({
                 "no": idx,
                 "hotelName": hotel_name,
@@ -172,9 +216,9 @@ async def get_hotel_revenue(
                 "occ": occ_rate,
                 "arr": decimal_to_float(arr),
                 "revFromNA": decimal_to_float(total_revenue),
-                "totalCash": decimal_to_float(total_revenue),  # Total cash summary = total revenue
+                "totalCash": decimal_to_float(total_revenue),
                 "colection": decimal_to_float(collection),
-                "bankDist": decimal_to_float(total_deposit),  # Bank distribution = deposits
+                "bankDist": decimal_to_float(total_deposit),
                 "balance": decimal_to_float(total_balance),
                 "operationalExp": 0,
                 "nonOperationalExp": 0,
@@ -183,9 +227,13 @@ async def get_hotel_revenue(
                 "netIncome": decimal_to_float(net_income),
             })
         
+        # Commit the changes to database
+        db.commit()
+        
         return {"success": True, "data": data}
     
     except Exception as e:
+        db.rollback()
         raise HTTPException(status_code=500, detail=f"Error fetching hotel revenue: {str(e)}")
 
 @router.get("/non-hotel-revenue")
