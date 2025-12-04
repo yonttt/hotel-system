@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import func as sql_func, and_, or_, text
+from sqlalchemy import func as sql_func, text, case
 from typing import List, Optional
 from datetime import date, datetime
 from app.core.database import get_db
@@ -35,23 +35,11 @@ async def get_hotel_revenue(
         
         hotel_rooms = {r[0]: r[1] for r in rooms_result if r[0]}
         
-        # Build registration query with date filters
+        # Build registration query with date filters (simplified - no cash/bank split)
         reg_query = db.query(
             HotelRegistration.hotel_name,
             sql_func.count(HotelRegistration.id).label('room_sales'),
             sql_func.sum(HotelRegistration.payment_amount).label('total_revenue'),
-            sql_func.sum(
-                sql_func.case(
-                    (HotelRegistration.payment_method.like('%Cash%'), HotelRegistration.payment_amount),
-                    else_=0
-                )
-            ).label('cash_revenue'),
-            sql_func.sum(
-                sql_func.case(
-                    (HotelRegistration.payment_method.not_like('%Cash%'), HotelRegistration.payment_amount),
-                    else_=0
-                )
-            ).label('bank_revenue'),
             sql_func.sum(HotelRegistration.deposit).label('total_deposit'),
             sql_func.sum(HotelRegistration.balance).label('total_balance')
         )
@@ -72,18 +60,6 @@ async def get_hotel_revenue(
             HotelReservation.hotel_name,
             sql_func.count(HotelReservation.id).label('room_sales'),
             sql_func.sum(HotelReservation.payment_amount).label('total_revenue'),
-            sql_func.sum(
-                sql_func.case(
-                    (HotelReservation.payment_method.like('%Cash%'), HotelReservation.payment_amount),
-                    else_=0
-                )
-            ).label('cash_revenue'),
-            sql_func.sum(
-                sql_func.case(
-                    (HotelReservation.payment_method.not_like('%Cash%'), HotelReservation.payment_amount),
-                    else_=0
-                )
-            ).label('bank_revenue'),
             sql_func.sum(HotelReservation.deposit).label('total_deposit'),
             sql_func.sum(HotelReservation.balance).label('total_balance')
         )
@@ -104,18 +80,6 @@ async def get_hotel_revenue(
             GroupBooking.hotel_name,
             sql_func.sum(GroupBooking.total_rooms).label('room_sales'),
             sql_func.sum(GroupBooking.total_amount).label('total_revenue'),
-            sql_func.sum(
-                sql_func.case(
-                    (GroupBooking.payment_method.like('%Cash%'), GroupBooking.total_amount),
-                    else_=0
-                )
-            ).label('cash_revenue'),
-            sql_func.sum(
-                sql_func.case(
-                    (GroupBooking.payment_method.not_like('%Cash%'), GroupBooking.total_amount),
-                    else_=0
-                )
-            ).label('bank_revenue'),
             sql_func.sum(GroupBooking.total_deposit).label('total_deposit'),
             sql_func.sum(GroupBooking.total_balance).label('total_balance')
         )
@@ -141,15 +105,11 @@ async def get_hotel_revenue(
                 hotel_data[hotel_name] = {
                     'room_sales': 0,
                     'total_revenue': Decimal('0'),
-                    'cash_revenue': Decimal('0'),
-                    'bank_revenue': Decimal('0'),
                     'total_deposit': Decimal('0'),
                     'total_balance': Decimal('0')
                 }
             hotel_data[hotel_name]['room_sales'] += reg.room_sales or 0
             hotel_data[hotel_name]['total_revenue'] += reg.total_revenue or Decimal('0')
-            hotel_data[hotel_name]['cash_revenue'] += reg.cash_revenue or Decimal('0')
-            hotel_data[hotel_name]['bank_revenue'] += reg.bank_revenue or Decimal('0')
             hotel_data[hotel_name]['total_deposit'] += reg.total_deposit or Decimal('0')
             hotel_data[hotel_name]['total_balance'] += reg.total_balance or Decimal('0')
         
@@ -160,15 +120,11 @@ async def get_hotel_revenue(
                 hotel_data[hotel_name] = {
                     'room_sales': 0,
                     'total_revenue': Decimal('0'),
-                    'cash_revenue': Decimal('0'),
-                    'bank_revenue': Decimal('0'),
                     'total_deposit': Decimal('0'),
                     'total_balance': Decimal('0')
                 }
             hotel_data[hotel_name]['room_sales'] += res.room_sales or 0
             hotel_data[hotel_name]['total_revenue'] += res.total_revenue or Decimal('0')
-            hotel_data[hotel_name]['cash_revenue'] += res.cash_revenue or Decimal('0')
-            hotel_data[hotel_name]['bank_revenue'] += res.bank_revenue or Decimal('0')
             hotel_data[hotel_name]['total_deposit'] += res.total_deposit or Decimal('0')
             hotel_data[hotel_name]['total_balance'] += res.total_balance or Decimal('0')
         
@@ -179,15 +135,11 @@ async def get_hotel_revenue(
                 hotel_data[hotel_name] = {
                     'room_sales': 0,
                     'total_revenue': Decimal('0'),
-                    'cash_revenue': Decimal('0'),
-                    'bank_revenue': Decimal('0'),
                     'total_deposit': Decimal('0'),
                     'total_balance': Decimal('0')
                 }
             hotel_data[hotel_name]['room_sales'] += gb.room_sales or 0
             hotel_data[hotel_name]['total_revenue'] += gb.total_revenue or Decimal('0')
-            hotel_data[hotel_name]['cash_revenue'] += gb.cash_revenue or Decimal('0')
-            hotel_data[hotel_name]['bank_revenue'] += gb.bank_revenue or Decimal('0')
             hotel_data[hotel_name]['total_deposit'] += gb.total_deposit or Decimal('0')
             hotel_data[hotel_name]['total_balance'] += gb.total_balance or Decimal('0')
         
@@ -197,8 +149,7 @@ async def get_hotel_revenue(
             available_rooms = hotel_rooms.get(hotel_name, 0)
             room_sales = metrics['room_sales']
             total_revenue = metrics['total_revenue']
-            cash_revenue = metrics['cash_revenue']
-            bank_revenue = metrics['bank_revenue']
+            total_deposit = metrics['total_deposit']
             total_balance = metrics['total_balance']
             
             # Calculate occupancy rate
@@ -207,8 +158,11 @@ async def get_hotel_revenue(
             # Calculate ARR (Average Room Rate)
             arr = total_revenue / room_sales if room_sales > 0 else Decimal('0')
             
-            # Net income = total revenue - balance (unpaid)
-            net_income = total_revenue - total_balance
+            # Collection = total revenue - balance (unpaid)
+            collection = total_revenue - total_balance
+            
+            # Net income = collection (paid amount)
+            net_income = collection
             
             data.append({
                 "no": idx,
@@ -218,11 +172,11 @@ async def get_hotel_revenue(
                 "occ": occ_rate,
                 "arr": decimal_to_float(arr),
                 "revFromNA": decimal_to_float(total_revenue),
-                "totalCash": decimal_to_float(cash_revenue),
-                "colection": decimal_to_float(total_revenue - total_balance),
-                "bankDist": decimal_to_float(bank_revenue),
+                "totalCash": decimal_to_float(total_revenue),  # Total cash summary = total revenue
+                "colection": decimal_to_float(collection),
+                "bankDist": decimal_to_float(total_deposit),  # Bank distribution = deposits
                 "balance": decimal_to_float(total_balance),
-                "operationalExp": 0,  # Can be added from expense tracking system
+                "operationalExp": 0,
                 "nonOperationalExp": 0,
                 "ownerReceive": 0,
                 "totalExpense": 0,
