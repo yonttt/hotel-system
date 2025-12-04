@@ -93,6 +93,9 @@ import StatusKamarHP from './pages/operational/housekeeping/statuskamarhp/Status
 // Operational - Front Office - Status Kamar FO
 import StatusKamarFO from './pages/operational/frontoffice/statuskamarfo/StatusKamarFO';
 
+// Operational - Front Office - Master Data
+import UbahStatusKamar from './pages/operational/frontoffice/master_data/UbahStatusKamar';
+
 // HRD
 import AccountReceivablePage from './pages/hrd/AccountReceivablePage';
 import AccountingPage from './pages/hrd/AccountingPage';
@@ -209,6 +212,18 @@ function App() {
                 <ProtectedRoute>
                   <ErrorBoundary>
                     <StatusKamarFO />
+                  </ErrorBoundary>
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Front Office - Master Data */}
+            <Route 
+              path="/operational/frontoffice/master-data-fo/ubah-status-kamar" 
+              element={
+                <ProtectedRoute>
+                  <ErrorBoundary>
+                    <UbahStatusKamar />
                   </ErrorBoundary>
                 </ProtectedRoute>
               } 

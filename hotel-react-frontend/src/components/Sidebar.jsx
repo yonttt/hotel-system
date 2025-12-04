@@ -27,6 +27,7 @@ const Sidebar = () => {
     informasiTamu: false,
     groupBookingInfo: false,
     statusKamarFO: false,
+    masterDataFO: false,
     housekeeping: false,
     statusKamar: false,
     masterData: false,
@@ -72,6 +73,9 @@ const Sidebar = () => {
         }
         if (path.includes('/status-kamar')) {
           newExpandedMenus.statusKamarFO = true
+        }
+        if (path.includes('/master-data-fo/')) {
+          newExpandedMenus.masterDataFO = true
         }
       }
       if (path.includes('/housekeeping/')) {
@@ -136,6 +140,7 @@ const Sidebar = () => {
       informasiTamu: false,
       groupBookingInfo: false,
       statusKamarFO: false,
+      masterDataFO: false,
       housekeeping: false,
       statusKamar: false,
       masterData: false,
@@ -216,6 +221,14 @@ const Sidebar = () => {
               submenu: 'statusKamarFO',
               children: [
                 { title: 'Status Kamar FO', path: '/operational/frontoffice/status-kamar-fo' }
+              ]
+            },
+            {
+              title: 'Master Data',
+              hasSubmenu: true,
+              submenu: 'masterDataFO',
+              children: [
+                { title: 'Ubah Status Kamar', path: '/operational/frontoffice/master-data-fo/ubah-status-kamar' }
               ]
             },
           ]
