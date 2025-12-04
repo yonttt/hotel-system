@@ -13,10 +13,13 @@ const StatusKamarHP = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [modalRoomStatus, setModalRoomStatus] = useState('');
-  const [modalRoomBoy, setModalRoomBoy] = useState('Room Attendant');
+  const [modalRoomBoy, setModalRoomBoy] = useState('');
+  const [roomBoys, setRoomBoys] = useState([]);
+  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     fetchRooms();
+    fetchRoomBoys();
   }, []);
 
   const fetchRooms = async () => {
@@ -31,6 +34,18 @@ const StatusKamarHP = () => {
       console.error('Error fetching rooms:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRoomBoys = async () => {
+    try {
+      const response = await apiService.getUsersByRole('housekeeping');
+      console.log('Room Boys Response:', response.data);
+      setRoomBoys(response.data || []);
+    } catch (err) {
+      console.error('Error fetching room boys:', err);
+      // Set default if fetch fails
+      setRoomBoys([]);
     }
   };
 
@@ -177,7 +192,7 @@ const StatusKamarHP = () => {
   const handleRoomClick = (room) => {
     setSelectedRoom(room);
     setModalRoomStatus(getShortStatus(room.status));
-    setModalRoomBoy('Room Attendant');
+    setModalRoomBoy('');
     setShowModal(true);
   };
 
@@ -186,24 +201,43 @@ const StatusKamarHP = () => {
     setShowModal(false);
     setSelectedRoom(null);
     setModalRoomStatus('');
-    setModalRoomBoy('Room Attendant');
+    setModalRoomBoy('');
   };
 
   // Handle process (update room status)
   const handleProcess = async () => {
+    if (!modalRoomStatus) {
+      alert('Please select a room status');
+      return;
+    }
+    if (!modalRoomBoy) {
+      alert('Please select a room boy');
+      return;
+    }
+    
     try {
-      // Add your API call here to update room status
-      console.log('Processing room:', selectedRoom?.room_number, {
+      setProcessing(true);
+      // Update room status via API
+      await apiService.updateHotelRoom(selectedRoom.room_number, {
+        status: modalRoomStatus
+      });
+      
+      console.log('Room status updated:', selectedRoom?.room_number, {
         status: modalRoomStatus,
         roomBoy: modalRoomBoy
       });
+      
+      alert(`Room ${selectedRoom.room_number} status updated to ${modalRoomStatus} by ${modalRoomBoy}`);
+      
       // Close modal after successful update
       handleCloseModal();
       // Refresh rooms
       await fetchRooms();
     } catch (err) {
       console.error('Error updating room:', err);
-      alert('Failed to update room status');
+      alert('Failed to update room status: ' + (err.response?.data?.detail || err.message));
+    } finally {
+      setProcessing(false);
     }
   };
 
@@ -422,13 +456,24 @@ const StatusKamarHP = () => {
                     onChange={(e) => setModalRoomBoy(e.target.value)}
                     className="modal-select"
                   >
-                    <option value="Room Attendant">Room Attendant</option>
+                    <option value="">---Select Room Boy---</option>
+                    {roomBoys.length > 0 ? (
+                      roomBoys.map((user) => (
+                        <option key={user.id} value={user.full_name || user.username}>
+                          {user.full_name || user.username}
+                        </option>
+                      ))
+                    ) : (
+                      <option value="Room Attendant">Room Attendant (Default)</option>
+                    )}
                   </select>
                 </div>
               </div>
               <div className="modal-footer">
                 <button className="btn-close" onClick={handleCloseModal}>Close</button>
-                <button className="btn-proses" onClick={handleProcess}>Proses</button>
+                <button className="btn-proses" onClick={handleProcess} disabled={processing}>
+                  {processing ? 'Processing...' : 'Proses'}
+                </button>
               </div>
             </div>
           </div>

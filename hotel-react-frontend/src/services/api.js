@@ -116,6 +116,10 @@ class ApiService {
     return this.client.get('/users/permissions')
   }
 
+  async getUsersByRole(role) {
+    return this.client.get(`/users/by-role/${role}`)
+  }
+
   async updateUserPermission(role, permissionData) {
     return this.client.put(`/users/permissions/${role}`, permissionData)
   }

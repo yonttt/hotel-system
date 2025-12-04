@@ -17,6 +17,16 @@ def get_all_users(
     users = db.query(User).order_by(User.id).all()
     return users
 
+@router.get("/by-role/{role}", response_model=List[UserResponse])
+def get_users_by_role(
+    role: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Get users by role (accessible by authenticated users)."""
+    users = db.query(User).filter(User.role == role).order_by(User.username).all()
+    return users
+
 @router.delete("/{user_id}")
 def delete_user(
     user_id: int,
