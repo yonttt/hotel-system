@@ -4,7 +4,7 @@ from sqlalchemy import func as sql_func, and_, or_, text
 from typing import List, Optional
 from datetime import date, datetime
 from app.core.database import get_db
-from app.models import HotelRegistration, HotelReservation, NonHotelRevenueSummary
+from app.models import HotelRegistration, HotelReservation, GroupBooking, NonHotelRevenueSummary
 from decimal import Decimal
 
 router = APIRouter()
@@ -22,7 +22,7 @@ async def get_hotel_revenue(
     db: Session = Depends(get_db)
 ):
     """
-    Get hotel revenue summary data calculated from actual registrations and reservations.
+    Get hotel revenue summary data calculated from actual registrations, reservations, and group bookings.
     Groups data by hotel_name and calculates revenue metrics.
     """
     try:
@@ -99,7 +99,39 @@ async def get_hotel_revenue(
         
         res_results = res_query.group_by(HotelReservation.hotel_name).all()
         
-        # Combine results from registrations and reservations
+        # Build group booking query with date filters
+        gb_query = db.query(
+            GroupBooking.hotel_name,
+            sql_func.sum(GroupBooking.total_rooms).label('room_sales'),
+            sql_func.sum(GroupBooking.total_amount).label('total_revenue'),
+            sql_func.sum(
+                sql_func.case(
+                    (GroupBooking.payment_method.like('%Cash%'), GroupBooking.total_amount),
+                    else_=0
+                )
+            ).label('cash_revenue'),
+            sql_func.sum(
+                sql_func.case(
+                    (GroupBooking.payment_method.not_like('%Cash%'), GroupBooking.total_amount),
+                    else_=0
+                )
+            ).label('bank_revenue'),
+            sql_func.sum(GroupBooking.total_deposit).label('total_deposit'),
+            sql_func.sum(GroupBooking.total_balance).label('total_balance')
+        )
+        
+        if start_date:
+            gb_query = gb_query.filter(GroupBooking.arrival_date >= start_date)
+        if end_date:
+            gb_query = gb_query.filter(GroupBooking.arrival_date <= end_date)
+        
+        gb_query = gb_query.filter(
+            GroupBooking.status.in_(['Active', 'Confirmed', 'Checked-in', 'Checked-out'])
+        )
+        
+        gb_results = gb_query.group_by(GroupBooking.hotel_name).all()
+        
+        # Combine results from registrations, reservations, and group bookings
         hotel_data = {}
         
         # Process registration data
@@ -139,6 +171,25 @@ async def get_hotel_revenue(
             hotel_data[hotel_name]['bank_revenue'] += res.bank_revenue or Decimal('0')
             hotel_data[hotel_name]['total_deposit'] += res.total_deposit or Decimal('0')
             hotel_data[hotel_name]['total_balance'] += res.total_balance or Decimal('0')
+        
+        # Process group booking data
+        for gb in gb_results:
+            hotel_name = gb.hotel_name or 'Hotel New Idola'
+            if hotel_name not in hotel_data:
+                hotel_data[hotel_name] = {
+                    'room_sales': 0,
+                    'total_revenue': Decimal('0'),
+                    'cash_revenue': Decimal('0'),
+                    'bank_revenue': Decimal('0'),
+                    'total_deposit': Decimal('0'),
+                    'total_balance': Decimal('0')
+                }
+            hotel_data[hotel_name]['room_sales'] += gb.room_sales or 0
+            hotel_data[hotel_name]['total_revenue'] += gb.total_revenue or Decimal('0')
+            hotel_data[hotel_name]['cash_revenue'] += gb.cash_revenue or Decimal('0')
+            hotel_data[hotel_name]['bank_revenue'] += gb.bank_revenue or Decimal('0')
+            hotel_data[hotel_name]['total_deposit'] += gb.total_deposit or Decimal('0')
+            hotel_data[hotel_name]['total_balance'] += gb.total_balance or Decimal('0')
         
         # Format response data
         data = []
