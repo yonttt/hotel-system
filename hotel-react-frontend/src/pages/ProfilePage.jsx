@@ -100,9 +100,9 @@ const ProfilePage = () => {
             border: `1px solid ${message.type === 'success' ? '#c3e6cb' : '#f5c6cb'}`
           }}>
             {message.type === 'success' ? (
-              <CheckCircleIcon className="w-5 h-5" />
+              <CheckCircleIcon className="w-4 h-4" />
             ) : (
-              <ExclamationCircleIcon className="w-5 h-5" />
+              <ExclamationCircleIcon className="w-4 h-4" />
             )}
             {message.text}
           </div>
@@ -126,8 +126,8 @@ const ProfilePage = () => {
             </h3>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <UserIcon className="w-5 h-5" style={{ color: '#6c757d' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <UserIcon className="w-4 h-4" style={{ color: '#6c757d' }} />
                 <div>
                   <div style={{ fontSize: '12px', color: '#6c757d' }}>Username</div>
                   <div style={{ fontSize: '16px', fontWeight: '600', color: '#343a40' }}>
@@ -136,8 +136,8 @@ const ProfilePage = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <EnvelopeIcon className="w-5 h-5" style={{ color: '#6c757d' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <EnvelopeIcon className="w-4 h-4" style={{ color: '#6c757d' }} />
                 <div>
                   <div style={{ fontSize: '12px', color: '#6c757d' }}>Email</div>
                   <div style={{ fontSize: '16px', fontWeight: '600', color: '#343a40' }}>
@@ -146,8 +146,8 @@ const ProfilePage = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <ShieldCheckIcon className="w-5 h-5" style={{ color: '#6c757d' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <ShieldCheckIcon className="w-4 h-4" style={{ color: '#6c757d' }} />
                 <div>
                   <div style={{ fontSize: '12px', color: '#6c757d' }}>Role</div>
                   <div style={{ fontSize: '16px', fontWeight: '600', color: '#343a40' }}>
@@ -156,8 +156,8 @@ const ProfilePage = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <BuildingOfficeIcon className="w-5 h-5" style={{ color: '#6c757d' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <BuildingOfficeIcon className="w-4 h-4" style={{ color: '#6c757d' }} />
                 <div>
                   <div style={{ fontSize: '12px', color: '#6c757d' }}>Hotel</div>
                   <div style={{ fontSize: '16px', fontWeight: '600', color: '#343a40' }}>
@@ -166,8 +166,8 @@ const ProfilePage = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <UserIcon className="w-5 h-5" style={{ color: '#6c757d' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <UserIcon className="w-4 h-4" style={{ color: '#6c757d' }} />
                 <div>
                   <div style={{ fontSize: '12px', color: '#6c757d' }}>Nama Lengkap</div>
                   <div style={{ fontSize: '16px', fontWeight: '600', color: '#343a40' }}>
