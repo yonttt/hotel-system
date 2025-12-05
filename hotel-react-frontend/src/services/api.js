@@ -100,6 +100,10 @@ class ApiService {
     return this.client.get('/auth/me')
   }
 
+  async updateCurrentUser(userData) {
+    return this.client.put('/auth/me', userData)
+  }
+
   async registerUser(userData) {
     return this.client.post('/auth/register', userData)
   }

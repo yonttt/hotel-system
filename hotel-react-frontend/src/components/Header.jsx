@@ -19,6 +19,11 @@ const Header = () => {
     navigate('/login')
   }
 
+  const handleViewProfile = () => {
+    setShowUserMenu(false)
+    navigate('/profile')
+  }
+
   return (
     <header className="header-bar">
       {/* Left side - Complete branding */}
@@ -47,7 +52,7 @@ const Header = () => {
               <div className="user-dropdown-header-new">
                 <div className="login-status-text">ANDA LOGIN SEBAGAI</div>
                 <div className="user-name-large">{user?.username?.toUpperCase()}</div>
-                <a href="#" className="account-link">Lihat Akun</a>
+                <a href="#" onClick={(e) => { e.preventDefault(); handleViewProfile(); }} className="account-link">Lihat Profil</a>
               </div>
             </div>
           )}

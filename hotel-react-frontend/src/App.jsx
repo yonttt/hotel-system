@@ -105,6 +105,9 @@ import UserList from './pages/hrd/UserList';
 import UserAuthority from './pages/hrd/UserAuthority';
 import LaporanGlobal from './pages/hrd/LaporanGlobal';
 
+// Profile Page
+import ProfilePage from './pages/ProfilePage';
+
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -120,6 +123,16 @@ function App() {
               element={
                 <ProtectedRoute>
                   <DashboardPage />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Profile Page */}
+            <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
                 </ProtectedRoute>
               } 
             />
