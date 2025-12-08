@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     # JWT settings
     SECRET_KEY: str = "hotel-management-secret-key-change-in-production"
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 480  # 8 hours
     
     # API settings
     API_V1_STR: str = "/api"
