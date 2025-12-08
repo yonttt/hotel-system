@@ -165,54 +165,7 @@ class ApiService {
     return this.client.get(`/hotel-rooms/floor/${floorNumber}`)
   }
 
-  async getRoomAvailability(room_type = null, floor = null, status = null, min_price = null, max_price = null) {
-    let url = `/hotel-rooms/availability?`
-    const params = []
-    if (room_type) params.push(`room_type=${room_type}`)
-    if (floor) params.push(`floor=${floor}`)
-    if (status) params.push(`status=${status}`)
-    if (min_price) params.push(`min_price=${min_price}`)
-    if (max_price) params.push(`max_price=${max_price}`)
-    return this.client.get(url + params.join('&'))
-  }
-
-  async getRoomStatistics() {
-    return this.client.get('/hotel-rooms/stats')
-  }
-
-  async incrementRoomHitCount(roomNumber) {
-    return this.client.post(`/hotel-rooms/${roomNumber}/increment-hit`)
-  }
-
-  async getPopularRooms(limit = 10) {
-    return this.client.get(`/hotel-rooms/analytics/popular?limit=${limit}`)
-  }
-
-  async getUnderutilizedRooms(limit = 10) {
-    return this.client.get(`/hotel-rooms/analytics/underutilized?limit=${limit}`)
-  }
-
-  // Legacy compatibility methods (redirects to new hotel-rooms endpoints)
-  async getRooms(skip = 0, limit = 100) {
-    return this.getHotelRooms(skip, limit)
-  }
-
-  async getRoom(roomNumber) {
-    return this.getHotelRoom(roomNumber)
-  }
-
-  async createRoom(roomData) {
-    return this.createHotelRoom(roomData)
-  }
-
-  async updateRoom(roomNumber, roomData) {
-    return this.updateHotelRoom(roomNumber, roomData)
-  }
-
-  async deleteRoom(roomNumber) {
-    return this.deleteHotelRoom(roomNumber)
-  }
-
+  // Legacy compatibility method (used in forms)
   async getRoomsByStatus(status) {
     return this.getHotelRoomsByStatus(status)
   }
@@ -226,10 +179,6 @@ class ApiService {
     return this.client.get(url)
   }
 
-  async getAllRoomPricing() {
-    return this.client.get('/room-pricing/pricing')
-  }
-
   async getRoomCategories() {
     return this.client.get('/room-pricing/categories')
   }
@@ -237,26 +186,6 @@ class ApiService {
   // Guests endpoints
   async getGuests(skip = 0, limit = 100) {
     return this.client.get(`/guests/?skip=${skip}&limit=${limit}`)
-  }
-
-  async getGuest(id) {
-    return this.client.get(`/guests/${id}`)
-  }
-
-  async createGuest(guestData) {
-    return this.client.post('/guests/', guestData)
-  }
-
-  async updateGuest(id, guestData) {
-    return this.client.put(`/guests/${id}`, guestData)
-  }
-
-  async deleteGuest(id) {
-    return this.client.delete(`/guests/${id}`)
-  }
-
-  async searchGuests(query) {
-    return this.client.get(`/guests/search/${query}`)
   }
 
   // Hotel Registration endpoints
