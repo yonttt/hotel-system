@@ -124,48 +124,6 @@ class HotelRegistration(Base):
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
-class GuestRegistration(Base):
-    __tablename__ = "guest_registrations"
-    
-    id = Column(Integer, primary_key=True, index=True)
-    registration_no = Column(String(20), unique=True)
-    category_market_id = Column(Integer)
-    market_segment = Column(String(100), default='Normal')
-    member_id = Column(String(50))
-    transaction_by = Column(String(100))
-    id_card_type = Column(String(10), default='KTP')
-    id_card_number = Column(String(50))
-    guest_name = Column(String(200))
-    guest_title = Column(String(10), default='MR')
-    mobile_phone = Column(String(20))
-    address = Column(Text)
-    nationality_id = Column(Integer)
-    city_id = Column(Integer)
-    email = Column(String(100))
-    arrival_date = Column(DateTime)
-    arrival_time = Column(String(10))
-    nights = Column(Integer, default=1)
-    departure_date = Column(DateTime)
-    guest_type = Column(String(50), default='Normal')
-    guest_count_male = Column(Integer, default=0)
-    guest_count_female = Column(Integer, default=0)
-    guest_count_child = Column(Integer, default=0)
-    extra_bed_nights = Column(Integer, default=0)
-    extra_bed_qty = Column(Integer, default=0)
-    room_number = Column(String(20))
-    transaction_status = Column(String(50), default='Registration')
-    payment_method_id = Column(Integer)
-    notes = Column(Text)
-    payment_amount = Column(DECIMAL(12, 2), default=0.00)
-    discount = Column(DECIMAL(12, 2), default=0.00)
-    payment_diskon = Column(DECIMAL(12, 2), default=0.00)
-    deposit = Column(DECIMAL(12, 2), default=0.00)
-    balance = Column(DECIMAL(12, 2), default=0.00)
-    created_by = Column(Integer)
-    hotel_name = Column(String(100), default='New Idola Hotel')
-    created_at = Column(DateTime, server_default=func.now())
-    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
-
 class GroupBooking(Base):
     __tablename__ = "group_bookings"
     
