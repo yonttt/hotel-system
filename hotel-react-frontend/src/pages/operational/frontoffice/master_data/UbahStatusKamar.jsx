@@ -19,29 +19,12 @@ const UbahStatusKamar = () => {
   const [processing, setProcessing] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
 
-  // Room status options
-  const statusOptions = [
-    { code: 'VR', name: 'Vacant Ready' },
-    { code: 'VC', name: 'Vacant Clean' },
-    { code: 'VD', name: 'Vacant Dirty' },
-    { code: 'VU', name: 'Vacant Uncheck' },
-    { code: 'OR', name: 'Occupied Ready' },
-    { code: 'OC', name: 'Occupied Clean' },
-    { code: 'OD', name: 'Occupied Dirty' },
-    { code: 'CO', name: 'Checkout' },
-    { code: 'GC', name: 'General Cleaning' },
-    { code: 'OO', name: 'Out Of Order' },
-    { code: 'AR', name: 'Arrival' },
-    { code: 'IC', name: 'Incognito' },
-    { code: 'DND', name: 'DND (Do Not Disturb)' },
-    { code: 'MU', name: 'Makeup Room' },
-    { code: 'HU', name: 'House Use' },
-    { code: 'SO', name: 'Sleep Out' },
-    { code: 'SK', name: 'Skipper' },
-    { code: 'ED', name: 'Expected Departure' }
-  ];
+  // Master data from database
+  const [statusOptions, setStatusOptions] = useState([]);
+  const [hotelOptions, setHotelOptions] = useState([]);
 
   useEffect(() => {
+    fetchMasterData();
     fetchRooms();
   }, []);
 
@@ -53,6 +36,21 @@ const UbahStatusKamar = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, showEntries, selectedHotel]);
+
+  const fetchMasterData = async () => {
+    try {
+      // Fetch room statuses from database
+      const statusResponse = await apiService.getRoomStatuses();
+      setStatusOptions(statusResponse.data || []);
+      
+      // Fetch hotels from database
+      const hotelResponse = await apiService.getHotels();
+      setHotelOptions(hotelResponse.data || []);
+    } catch (err) {
+      console.error('Error fetching master data:', err);
+      // Fallback to empty arrays - will show "No data" message
+    }
+  };
 
   const fetchRooms = async () => {
     try {
@@ -197,7 +195,9 @@ const UbahStatusKamar = () => {
                   onChange={(e) => setSelectedHotel(e.target.value)}
                 >
                   <option value="ALL">ALL HOTELS</option>
-                  <option value="HOTEL NEW IDOLA">HOTEL NEW IDOLA</option>
+                  {hotelOptions.map(hotel => (
+                    <option key={hotel.id} value={hotel.name}>{hotel.name}</option>
+                  ))}
                 </select>
               </div>
             </div>

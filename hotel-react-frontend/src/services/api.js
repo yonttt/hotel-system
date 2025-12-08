@@ -394,6 +394,35 @@ class ApiService {
     if (params.length > 0) url += `?${params.join('&')}`
     return this.client.get(url)
   }
+
+  // ============================================================================
+  // MASTER DATA APIs - Dynamic lookups from database
+  // ============================================================================
+
+  // Hotels
+  async getHotels(activeOnly = true) {
+    return this.client.get(`/master-data/hotels?active_only=${activeOnly}`)
+  }
+
+  // Room Statuses
+  async getRoomStatuses(activeOnly = true) {
+    return this.client.get(`/master-data/room-statuses?active_only=${activeOnly}`)
+  }
+
+  // ID Card Types
+  async getIdCardTypes(activeOnly = true) {
+    return this.client.get(`/master-data/id-card-types?active_only=${activeOnly}`)
+  }
+
+  // Guest Titles
+  async getGuestTitles(activeOnly = true) {
+    return this.client.get(`/master-data/guest-titles?active_only=${activeOnly}`)
+  }
+
+  // Guest Types
+  async getGuestTypes(activeOnly = true) {
+    return this.client.get(`/master-data/guest-types?active_only=${activeOnly}`)
+  }
 }
 
 export const apiService = new ApiService()
