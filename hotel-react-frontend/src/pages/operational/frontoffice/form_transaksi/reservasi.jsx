@@ -248,10 +248,12 @@ const ReservasiPage = () => {
       console.error('Error fetching room pricing:', error)
       setPricingInfo(null)
     }
-  }  const formatCategoryMarkets = () => {
-    return [
-      { value: 'Walkin', label: 'Walkin' },
-      ...categoryMarkets.map(cm => ({ value: cm.name, label: cm.name }))
+  }
+
+  const formatCategoryMarkets = () => {
+    return [
+      { value: 'Walkin', label: 'Walkin' },
+      ...categoryMarkets.map(cm => ({ value: cm.name, label: cm.name }))
     ]
   }
 
