@@ -228,7 +228,8 @@ const Sidebar = () => {
               hasSubmenu: true,
               submenu: 'masterDataFO',
               children: [
-                { title: 'Ubah Status Kamar', path: '/operational/frontoffice/master-data-fo/ubah-status-kamar' }
+                { title: 'Ubah Status Kamar', path: '/operational/frontoffice/master-data-fo/ubah-status-kamar' },
+                { title: 'Master Harga Kamar', path: '/operational/frontoffice/master-data-fo/master-harga-kamar' }
               ]
             },
           ]

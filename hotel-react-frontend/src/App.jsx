@@ -95,6 +95,7 @@ import StatusKamarFO from './pages/operational/frontoffice/statuskamarfo/StatusK
 
 // Operational - Front Office - Master Data
 import UbahStatusKamar from './pages/operational/frontoffice/master_data/UbahStatusKamar';
+import MasterHargaKamar from './pages/operational/frontoffice/master_data/MasterHargaKamar';
 
 // HRD
 import AccountReceivablePage from './pages/hrd/AccountReceivablePage';
@@ -237,6 +238,16 @@ function App() {
                 <ProtectedRoute>
                   <ErrorBoundary>
                     <UbahStatusKamar />
+                  </ErrorBoundary>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/operational/frontoffice/master-data-fo/master-harga-kamar" 
+              element={
+                <ProtectedRoute>
+                  <ErrorBoundary>
+                    <MasterHargaKamar />
                   </ErrorBoundary>
                 </ProtectedRoute>
               } 

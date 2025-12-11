@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import auth, users, hotel_rooms, room_pricing, guests, hotel_registrations, hotel_reservations, cities, nationalities, category_markets, market_segments, payment_methods, group_bookings, revenue_reports, master_data
+from app.api import auth, users, hotel_rooms, room_pricing, guests, hotel_registrations, hotel_reservations, cities, nationalities, category_markets, market_segments, payment_methods, group_bookings, revenue_reports, master_data, room_rates
 from app.core.config import settings
 
 app = FastAPI(
@@ -39,6 +39,7 @@ app.include_router(market_segments.router, prefix="", tags=["market-segments"])
 app.include_router(payment_methods.router, prefix="", tags=["payment-methods"])
 app.include_router(revenue_reports.router, prefix="/revenue-reports", tags=["revenue-reports"])
 app.include_router(master_data.router, prefix="/master-data", tags=["master-data"])
+app.include_router(room_rates.router, prefix="/room-rates", tags=["room-rates"])
 
 @app.on_event("startup")
 async def startup_event():

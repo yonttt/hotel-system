@@ -352,6 +352,49 @@ class ApiService {
   async getGuestTypes(activeOnly = true) {
     return this.client.get(`/master-data/guest-types?active_only=${activeOnly}`)
   }
+
+  // ============================================================================
+  // ROOM RATES APIs - Master Harga Kamar
+  // ============================================================================
+
+  // Get all room rates
+  async getRoomRates(skip = 0, limit = 100, hotelName = null, rateName = null, roomType = null) {
+    let url = `/room-rates/?skip=${skip}&limit=${limit}`
+    if (hotelName) url += `&hotel_name=${encodeURIComponent(hotelName)}`
+    if (rateName) url += `&rate_name=${encodeURIComponent(rateName)}`
+    if (roomType) url += `&room_type=${encodeURIComponent(roomType)}`
+    return this.client.get(url)
+  }
+
+  // Get room rate by ID
+  async getRoomRate(rateId) {
+    return this.client.get(`/room-rates/${rateId}`)
+  }
+
+  // Create new room rate
+  async createRoomRate(rateData) {
+    return this.client.post('/room-rates/', rateData)
+  }
+
+  // Update room rate
+  async updateRoomRate(rateId, rateData) {
+    return this.client.put(`/room-rates/${rateId}`, rateData)
+  }
+
+  // Delete room rate
+  async deleteRoomRate(rateId) {
+    return this.client.delete(`/room-rates/${rateId}`)
+  }
+
+  // Get rate names for dropdown
+  async getRateNames() {
+    return this.client.get('/room-rates/lookup/rate-names')
+  }
+
+  // Get room types for dropdown
+  async getRoomTypesLookup() {
+    return this.client.get('/room-rates/lookup/room-types')
+  }
 }
 
 export const apiService = new ApiService()
