@@ -204,30 +204,65 @@ const RegistrasiPage = () => {
     return (timestamp + random.toString().padStart(4, '0')).slice(0, 10).padStart(10, '0');
   }
 
-  const handleInputChange = async (e) => {
-    const { name, value } = e.target
-    
-    setFormData(prev => ({ ...prev, [name]: value }))
-    
-    if (name === 'room_number' && value) {
-      try {
-        const selectedRoom = rooms.find(room => room.room_number === value)
-        if (selectedRoom && selectedRoom.room_type) {
-          const pricingResponse = await apiService.getRoomPricing(selectedRoom.room_type)
-          if (pricingResponse.data && pricingResponse.data.current_rate) {
-            setPricingInfo(pricingResponse.data)
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching room pricing:', error)
-        setPricingInfo(null)
-      }
-    } else if (name === 'room_number' && !value) {
-      setPricingInfo(null)
-    }
-  }
-
-  // Helper functions to format data for SearchableSelect
+  const handleInputChange = async (e) => {
+    const { name, value } = e.target
+    
+    setFormData(prev => ({ ...prev, [name]: value }))
+    
+    if (name === 'room_number' && value) {
+      try {
+        const selectedRoom = rooms.find(room => room.room_number === value)
+        if (selectedRoom && selectedRoom.room_type) {
+          // Try new room_rates API first (auto-pricing based on date)
+          try {
+            const rateResponse = await apiService.getRateForDate(selectedRoom.room_type, formData.arrival_date)
+            if (rateResponse.data && rateResponse.data.room_rate) {
+              setPricingInfo({
+                current_rate: rateResponse.data.room_rate,
+                extrabed_rate: rateResponse.data.extrabed,
+                rate_name: rateResponse.data.rate_name,
+                effective_date: rateResponse.data.effective_date
+              })
+              return
+            }
+          } catch (rateError) {
+            console.log('Room rates API not available, falling back to room_pricing')
+          }
+          
+          // Fallback to old room_pricing API
+          const pricingResponse = await apiService.getRoomPricing(selectedRoom.room_type)
+          if (pricingResponse.data && pricingResponse.data.current_rate) {
+            setPricingInfo(pricingResponse.data)
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching room pricing:', error)
+        setPricingInfo(null)
+      }
+    } else if (name === 'room_number' && !value) {
+      setPricingInfo(null)
+    }
+    
+    // Also update pricing when arrival_date changes
+    if (name === 'arrival_date' && value && formData.room_number) {
+      try {
+        const selectedRoom = rooms.find(room => room.room_number === formData.room_number)
+        if (selectedRoom && selectedRoom.room_type) {
+          const rateResponse = await apiService.getRateForDate(selectedRoom.room_type, value)
+          if (rateResponse.data && rateResponse.data.room_rate) {
+            setPricingInfo({
+              current_rate: rateResponse.data.room_rate,
+              extrabed_rate: rateResponse.data.extrabed,
+              rate_name: rateResponse.data.rate_name,
+              effective_date: rateResponse.data.effective_date
+            })
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching room pricing for date change:', error)
+      }
+    }
+  }  // Helper functions to format data for SearchableSelect
   const formatCategoryMarkets = () => {
     return [
       { value: 'Walkin', label: 'Walkin' },

@@ -87,6 +87,41 @@ const GroupBooking = () => {
     filterAvailableRooms();
   }, [rooms, groupInfo.arrival_date, groupInfo.departure_date, roomBookings]);
 
+  // Recalculate room rates when arrival date changes
+  useEffect(() => {
+    const updateRoomRates = async () => {
+      if (!groupInfo.arrival_date || roomBookings.length === 0) return
+      
+      const updatedBookings = await Promise.all(roomBookings.map(async (rb) => {
+        if (!rb.room_type) return rb
+        
+        try {
+          const rateResponse = await apiService.getRateForDate(
+            rb.room_type,
+            groupInfo.arrival_date,
+            groupInfo.hotel_name
+          )
+          if (rateResponse.data?.room_rate) {
+            const rate = parseFloat(rateResponse.data.room_rate)
+            const discount = parseFloat(rb.discount) || 0
+            return {
+              ...rb,
+              rate: rate,
+              subtotal: (rate - discount) * groupInfo.nights
+            }
+          }
+        } catch (error) {
+          console.log('No rate found for', rb.room_type, 'on', groupInfo.arrival_date)
+        }
+        return rb
+      }))
+      
+      setRoomBookings(updatedBookings)
+    }
+    
+    updateRoomRates()
+  }, [groupInfo.arrival_date, groupInfo.hotel_name])
+
   const loadReferenceData = async () => {
     setError('')
     try {
@@ -170,11 +205,30 @@ const GroupBooking = () => {
       
       if (selectedRoom) {
         try {
-          // Fetch room pricing from database
-          const pricingResponse = await apiService.getRoomPricing(selectedRoom.room_type)
-          const rate = pricingResponse.data?.current_rate 
-            ? parseFloat(pricingResponse.data.current_rate)
-            : parseFloat(selectedRoom.rate) || 0
+          // Try auto-pricing based on arrival date first
+          let rate = 0
+          if (groupInfo.arrival_date) {
+            try {
+              const rateResponse = await apiService.getRateForDate(
+                selectedRoom.room_type,
+                groupInfo.arrival_date,
+                groupInfo.hotel_name
+              )
+              if (rateResponse.data?.room_rate) {
+                rate = parseFloat(rateResponse.data.room_rate)
+              }
+            } catch (rateError) {
+              console.log('No rate found for date, falling back to room pricing')
+            }
+          }
+          
+          // Fallback to room pricing if no rate found
+          if (rate === 0) {
+            const pricingResponse = await apiService.getRoomPricing(selectedRoom.room_type)
+            rate = pricingResponse.data?.current_rate 
+              ? parseFloat(pricingResponse.data.current_rate)
+              : parseFloat(selectedRoom.rate) || 0
+          }
           
           setRoomBookings(roomBookings.map(rb => {
             if (rb.id === id) {

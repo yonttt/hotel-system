@@ -395,6 +395,16 @@ class ApiService {
   async getRoomTypesLookup() {
     return this.client.get('/room-rates/lookup/room-types')
   }
+
+  // Get applicable rate for a specific room type and date (AUTO-PRICING)
+  async getRateForDate(roomType, checkDate = null, hotelName = 'HOTEL NEW IDOLA') {
+    let url = `/room-rates/pricing/${encodeURIComponent(roomType)}`
+    const params = []
+    if (checkDate) params.push(`check_date=${checkDate}`)
+    if (hotelName) params.push(`hotel_name=${encodeURIComponent(hotelName)}`)
+    if (params.length > 0) url += `?${params.join('&')}`
+    return this.client.get(url)
+  }
 }
 
 export const apiService = new ApiService()

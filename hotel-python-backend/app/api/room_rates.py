@@ -221,3 +221,92 @@ def get_room_types(db: Session = Depends(get_db)):
         text("SELECT DISTINCT room_type FROM room_rates WHERE is_active = 1 ORDER BY room_type")
     )
     return [row[0] for row in result.fetchall()]
+
+# Get applicable rate for a specific room type and date
+@router.get("/pricing/{room_type}")
+def get_rate_for_date(
+    room_type: str,
+    check_date: Optional[str] = None,
+    hotel_name: str = "HOTEL NEW IDOLA",
+    db: Session = Depends(get_db)
+):
+    """
+    Get the applicable room rate for a specific room type and date.
+    Logic: Find the rate with effective_date <= check_date, ordered by most recent first.
+    If no rate found for exact date, returns the most recent rate before that date.
+    """
+    from datetime import datetime
+    
+    # Use today if no date provided
+    if check_date:
+        try:
+            target_date = datetime.strptime(check_date, "%Y-%m-%d").date()
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
+    else:
+        target_date = datetime.now().date()
+    
+    # Find the most recent rate that is effective on or before the target date
+    result = db.execute(
+        text("""
+            SELECT id, hotel_name, rate_name, room_type, room_rate, extrabed, effective_date
+            FROM room_rates 
+            WHERE room_type = :room_type 
+              AND hotel_name = :hotel_name
+              AND is_active = 1
+              AND effective_date <= :target_date
+            ORDER BY effective_date DESC
+            LIMIT 1
+        """),
+        {"room_type": room_type, "hotel_name": hotel_name, "target_date": target_date}
+    )
+    row = result.fetchone()
+    
+    if row:
+        return {
+            "id": row[0],
+            "hotel_name": row[1],
+            "rate_name": row[2],
+            "room_type": row[3],
+            "room_rate": float(row[4]) if row[4] else 0,
+            "extrabed": float(row[5]) if row[5] else 0,
+            "effective_date": str(row[6]) if row[6] else None,
+            "applied_for_date": str(target_date)
+        }
+    
+    # If no rate found before the date, try to get any rate for this room type
+    result = db.execute(
+        text("""
+            SELECT id, hotel_name, rate_name, room_type, room_rate, extrabed, effective_date
+            FROM room_rates 
+            WHERE room_type = :room_type 
+              AND hotel_name = :hotel_name
+              AND is_active = 1
+            ORDER BY effective_date ASC
+            LIMIT 1
+        """),
+        {"room_type": room_type, "hotel_name": hotel_name}
+    )
+    row = result.fetchone()
+    
+    if row:
+        return {
+            "id": row[0],
+            "hotel_name": row[1],
+            "rate_name": row[2],
+            "room_type": row[3],
+            "room_rate": float(row[4]) if row[4] else 0,
+            "extrabed": float(row[5]) if row[5] else 0,
+            "effective_date": str(row[6]) if row[6] else None,
+            "applied_for_date": str(target_date),
+            "note": "No rate found for this date, using earliest available rate"
+        }
+    
+    # No rate found at all for this room type
+    return {
+        "room_type": room_type,
+        "room_rate": 0,
+        "extrabed": 0,
+        "applied_for_date": str(target_date),
+        "note": "No rate configured for this room type"
+    }
