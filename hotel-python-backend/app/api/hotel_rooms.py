@@ -76,6 +76,12 @@ class HotelRoomCreate(HotelRoomBase):
     pass
 
 class HotelRoomUpdate(BaseModel):
+    hotel_name: Optional[str] = None
+    room_type: Optional[str] = None
+    floor_number: Optional[int] = None
+    vip_status: Optional[str] = None
+    smoking_allowed: Optional[str] = None
+    tax_status: Optional[str] = None
     status: Optional[StatusEnum] = None
     hit_count: Optional[int] = None
     room_size: Optional[str] = None
@@ -371,9 +377,33 @@ def update_room(
         update_fields = []
         params = {"room_number": room_number}
         
+        if room_update.hotel_name is not None:
+            update_fields.append("hotel_name = :hotel_name")
+            params["hotel_name"] = room_update.hotel_name
+            
+        if room_update.room_type is not None:
+            update_fields.append("room_type = :room_type")
+            params["room_type"] = room_update.room_type
+            
+        if room_update.floor_number is not None:
+            update_fields.append("floor_number = :floor_number")
+            params["floor_number"] = room_update.floor_number
+            
+        if room_update.vip_status is not None:
+            update_fields.append("vip_status = :vip_status")
+            params["vip_status"] = room_update.vip_status
+            
+        if room_update.smoking_allowed is not None:
+            update_fields.append("smoking_allowed = :smoking_allowed")
+            params["smoking_allowed"] = room_update.smoking_allowed
+            
+        if room_update.tax_status is not None:
+            update_fields.append("tax_status = :tax_status")
+            params["tax_status"] = room_update.tax_status
+        
         if room_update.status is not None:
             update_fields.append("status = :status")
-            params["status"] = room_update.status.value
+            params["status"] = room_update.status.value if hasattr(room_update.status, 'value') else room_update.status
             
         if room_update.hit_count is not None:
             update_fields.append("hit_count = :hit_count")

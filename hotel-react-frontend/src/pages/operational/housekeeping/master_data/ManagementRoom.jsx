@@ -12,6 +12,23 @@ const ManagementRoom = () => {
   const [showEntries, setShowEntries] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedHotel, setSelectedHotel] = useState('ALL');
+  const [successMessage, setSuccessMessage] = useState(null);
+
+  // Edit modal state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    hotel_name: '',
+    room_type: '',
+    floor_number: '',
+    vip_status: '',
+    smoking_allowed: '',
+    tax_status: ''
+  });
+  const [processing, setProcessing] = useState(false);
+
+  // Room type options
+  const roomTypeOptions = ['STD', 'SPR', 'DLX', 'EXE', 'BIS', 'APT'];
 
   useEffect(() => {
     fetchRooms();
@@ -55,12 +72,89 @@ const ManagementRoom = () => {
 
   // Check if user has edit permission
   const canEdit = () => {
-    return ['admin', 'manager', 'housekeeping'].includes(user?.role);
+    return ['admin', 'manager'].includes(user?.role?.toLowerCase());
+  };
+
+  // Handle edit click
+  const handleEditClick = (item) => {
+    if (!canEdit()) return;
+    setEditingItem(item);
+    setEditFormData({
+      hotel_name: item.hotel_name || 'HOTEL NEW IDOLA',
+      room_type: item.room_type || '',
+      floor_number: item.floor_number || item.floor || '',
+      vip_status: item.vip_status || (item.is_vip ? 'YES' : 'NO'),
+      smoking_allowed: item.smoking_allowed || (item.smoking_allowed ? 'Yes' : 'No'),
+      tax_status: item.tax_status || 'TIDAK'
+    });
+    setShowEditModal(true);
+  };
+
+  // Handle save edit
+  const handleSaveEdit = async () => {
+    if (!editFormData.room_type) {
+      alert('Please select a room type');
+      return;
+    }
+
+    try {
+      setProcessing(true);
+      await apiService.updateHotelRoom(editingItem.room_number, {
+        hotel_name: editFormData.hotel_name,
+        room_type: editFormData.room_type,
+        floor_number: parseInt(editFormData.floor_number) || editingItem.floor_number,
+        vip_status: editFormData.vip_status,
+        smoking_allowed: editFormData.smoking_allowed,
+        tax_status: editFormData.tax_status
+      });
+      
+      setSuccessMessage(`Room "${editingItem.room_number}" updated successfully`);
+      setShowEditModal(false);
+      setEditingItem(null);
+      await fetchRooms();
+      
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 3000);
+    } catch (err) {
+      console.error('Error updating room:', err);
+      alert('Failed to update room: ' + (err.response?.data?.detail || err.message));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  // Handle close modal
+  const handleCloseModal = () => {
+    setShowEditModal(false);
+    setEditingItem(null);
+    setEditFormData({
+      hotel_name: '',
+      room_type: '',
+      floor_number: '',
+      vip_status: '',
+      smoking_allowed: '',
+      tax_status: ''
+    });
   };
 
   return (
     <Layout>
       <div className="unified-reservation-container">
+      {/* Success Message */}
+      {successMessage && (
+        <div style={{
+          background: '#d4edda',
+          border: '1px solid #c3e6cb',
+          color: '#155724',
+          padding: '12px 16px',
+          borderRadius: '4px',
+          marginBottom: '20px'
+        }}>
+          {successMessage}
+        </div>
+      )}
+
       {/* Header Controls */}
       <div className="unified-header-controls">
         {/* Top Row - Title and Hotel Filter */}
@@ -169,7 +263,12 @@ const ManagementRoom = () => {
                   <td>{item.hit_count || 0}</td>
                   <td>
                     {canEdit() && (
-                      <button className="btn-table-action">Edit</button>
+                      <button 
+                        className="btn-table-action"
+                        onClick={() => handleEditClick(item)}
+                      >
+                        Edit
+                      </button>
                     )}
                   </td>
                 </tr>
@@ -221,7 +320,139 @@ const ManagementRoom = () => {
         </div>
       </div>
       </div>
-    </Layout>
+
+      {/* Edit Modal */}
+      {showEditModal && (
+        <div className="modal-overlay" style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000
+        }}>
+          <div className="modal-content" style={{
+            backgroundColor: 'white',
+            padding: '20px',
+            borderRadius: '8px',
+            width: '500px',
+            maxWidth: '90%',
+            maxHeight: '90vh',
+            overflow: 'auto'
+          }}>
+            <h3 style={{ marginBottom: '20px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
+              Edit Room: {editingItem?.room_number}
+            </h3>
+            
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Hotel</label>
+              <select
+                value={editFormData.hotel_name}
+                onChange={(e) => setEditFormData({...editFormData, hotel_name: e.target.value})}
+                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+              >
+                <option value="HOTEL NEW IDOLA">HOTEL NEW IDOLA</option>
+                <option value="HOTEL IDOLA">HOTEL IDOLA</option>
+              </select>
+            </div>
+
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Room Type <span style={{color: 'red'}}>*</span></label>
+              <select
+                value={editFormData.room_type}
+                onChange={(e) => setEditFormData({...editFormData, room_type: e.target.value})}
+                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+              >
+                <option value="">Select Room Type</option>
+                {roomTypeOptions.map(type => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+            </div>
+
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Floor</label>
+              <input
+                type="number"
+                value={editFormData.floor_number}
+                onChange={(e) => setEditFormData({...editFormData, floor_number: e.target.value})}
+                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>VIP Status</label>
+                <select
+                  value={editFormData.vip_status}
+                  onChange={(e) => setEditFormData({...editFormData, vip_status: e.target.value})}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                >
+                  <option value="NO">NO</option>
+                  <option value="YES">YES</option>
+                </select>
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Smoking</label>
+                <select
+                  value={editFormData.smoking_allowed}
+                  onChange={(e) => setEditFormData({...editFormData, smoking_allowed: e.target.value})}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                >
+                  <option value="No">No</option>
+                  <option value="Yes">Yes</option>
+                </select>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Status Pajak</label>
+              <select
+                value={editFormData.tax_status}
+                onChange={(e) => setEditFormData({...editFormData, tax_status: e.target.value})}
+                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+              >
+                <option value="TIDAK">TIDAK</option>
+                <option value="YA">YA</option>
+              </select>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #ddd', paddingTop: '15px' }}>
+              <button
+                onClick={handleCloseModal}
+                style={{
+                  padding: '8px 20px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  backgroundColor: '#f5f5f5',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                disabled={processing}
+                style={{
+                  padding: '8px 20px',
+                  border: 'none',
+                  borderRadius: '4px',
+                  backgroundColor: '#4CAF50',
+                  color: 'white',
+                  cursor: processing ? 'not-allowed' : 'pointer',
+                  opacity: processing ? 0.7 : 1
+                }}
+              >
+                {processing ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}    </Layout>
   );
 };
 

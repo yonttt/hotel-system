@@ -183,6 +183,11 @@ class ApiService {
     return this.client.get('/room-pricing/categories')
   }
 
+  // Update room category
+  async updateRoomCategory(categoryId, categoryData) {
+    return this.client.put(`/room-pricing/categories/${categoryId}`, categoryData)
+  }
+
   // Guests endpoints
   async getGuests(skip = 0, limit = 100) {
     return this.client.get(`/guests/?skip=${skip}&limit=${limit}`)

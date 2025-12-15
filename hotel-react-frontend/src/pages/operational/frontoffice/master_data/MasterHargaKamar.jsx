@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../../../../services/api';
 import Layout from '../../../../components/Layout';
+import { useAuth } from '../../../../context/AuthContext';
 
 const MasterHargaKamar = () => {
+  const { user } = useAuth();
   const [rates, setRates] = useState([]);
   const [filteredRates, setFilteredRates] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,8 +15,22 @@ const MasterHargaKamar = () => {
   const [showEntries, setShowEntries] = useState(10);
   const [successMessage, setSuccessMessage] = useState(null);
 
+  // Edit modal state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingRate, setEditingRate] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    hotel_name: '',
+    rate_name: '',
+    room_type: '',
+    room_rate: 0,
+    extrabed: 0,
+    effective_date: ''
+  });
+  const [processing, setProcessing] = useState(false);
+
   // Master data
   const [hotelOptions, setHotelOptions] = useState([]);
+  const [roomTypes, setRoomTypes] = useState([]);
 
   useEffect(() => {
     fetchMasterData();
@@ -34,6 +50,9 @@ const MasterHargaKamar = () => {
     try {
       const hotelResponse = await apiService.getHotels();
       setHotelOptions(hotelResponse.data || []);
+      
+      const roomTypesResponse = await apiService.getRoomTypesLookup();
+      setRoomTypes(roomTypesResponse.data || []);
     } catch (err) {
       console.error('Error fetching master data:', err);
     }
@@ -101,6 +120,71 @@ const MasterHargaKamar = () => {
   const startIndex = (currentPage - 1) * showEntries;
   const endIndex = startIndex + showEntries;
   const currentRates = filteredRates.slice(startIndex, endIndex);
+
+  // Check if user has edit permission (admin and manager only)
+  const canEdit = () => {
+    return ['admin', 'manager'].includes(user?.role?.toLowerCase());
+  };
+
+  // Handle edit click
+  const handleEditClick = (rate) => {
+    if (!canEdit()) return;
+    setEditingRate(rate);
+    setEditFormData({
+      hotel_name: rate.hotel_name || 'HOTEL NEW IDOLA',
+      rate_name: rate.rate_name || '',
+      room_type: rate.room_type || '',
+      room_rate: rate.room_rate || 0,
+      extrabed: rate.extrabed || 0,
+      effective_date: rate.effective_date || ''
+    });
+    setShowEditModal(true);
+  };
+
+  // Handle save edit
+  const handleSaveEdit = async () => {
+    if (!editFormData.rate_name || !editFormData.room_type) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    try {
+      setProcessing(true);
+      await apiService.updateRoomRate(editingRate.id, {
+        ...editFormData,
+        room_rate: parseFloat(editFormData.room_rate) || 0,
+        extrabed: parseFloat(editFormData.extrabed) || 0
+      });
+      
+      setSuccessMessage(`Rate "${editFormData.rate_name}" updated successfully`);
+      setShowEditModal(false);
+      setEditingRate(null);
+      await fetchRates();
+      
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 3000);
+    } catch (err) {
+      console.error('Error updating rate:', err);
+      alert('Failed to update rate: ' + (err.response?.data?.detail || err.message));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  // Handle close modal
+  const handleCloseModal = () => {
+    setShowEditModal(false);
+    setEditingRate(null);
+    setEditFormData({
+      hotel_name: '',
+      rate_name: '',
+      room_type: '',
+      room_rate: 0,
+      extrabed: 0,
+      effective_date: ''
+    });
+  };
 
   return (
     <Layout>
@@ -234,12 +318,15 @@ const MasterHargaKamar = () => {
                     <td style={{ textAlign: 'right' }}>{formatCurrency(rate.extrabed)}</td>
                     <td>{formatDate(rate.effective_date)}</td>
                     <td style={{ textAlign: 'center' }}>
-                      <button
-                        className="btn-table-action"
-                        title="Edit Rate"
-                      >
-                        Edit
-                      </button>
+                      {canEdit() && (
+                        <button
+                          className="btn-table-action"
+                          title="Edit Rate"
+                          onClick={() => handleEditClick(rate)}
+                        >
+                          Edit
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))
@@ -304,6 +391,135 @@ const MasterHargaKamar = () => {
           </div>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {showEditModal && (
+        <div className="modal-overlay" style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000
+        }}>
+          <div className="modal-content" style={{
+            backgroundColor: 'white',
+            padding: '20px',
+            borderRadius: '8px',
+            width: '500px',
+            maxWidth: '90%',
+            maxHeight: '90vh',
+            overflow: 'auto'
+          }}>
+            <h3 style={{ marginBottom: '20px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
+              Edit Room Rate
+            </h3>
+            
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Hotel</label>
+              <select
+                value={editFormData.hotel_name}
+                onChange={(e) => setEditFormData({...editFormData, hotel_name: e.target.value})}
+                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+              >
+                {hotelOptions.map(hotel => (
+                  <option key={hotel.id} value={hotel.name}>{hotel.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Rate Name <span style={{color: 'red'}}>*</span></label>
+              <input
+                type="text"
+                value={editFormData.rate_name}
+                onChange={(e) => setEditFormData({...editFormData, rate_name: e.target.value})}
+                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                placeholder="e.g., Libur Keagamaan 2025"
+              />
+            </div>
+
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Room Type <span style={{color: 'red'}}>*</span></label>
+              <select
+                value={editFormData.room_type}
+                onChange={(e) => setEditFormData({...editFormData, room_type: e.target.value})}
+                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+              >
+                <option value="">Select Room Type</option>
+                {roomTypes.map(rt => (
+                  <option key={rt} value={rt}>{rt}</option>
+                ))}
+              </select>
+            </div>
+
+            <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Room Rate</label>
+                <input
+                  type="number"
+                  value={editFormData.room_rate}
+                  onChange={(e) => setEditFormData({...editFormData, room_rate: e.target.value})}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Extrabed</label>
+                <input
+                  type="number"
+                  value={editFormData.extrabed}
+                  onChange={(e) => setEditFormData({...editFormData, extrabed: e.target.value})}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                />
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Effective Date</label>
+              <input
+                type="date"
+                value={editFormData.effective_date}
+                onChange={(e) => setEditFormData({...editFormData, effective_date: e.target.value})}
+                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #ddd', paddingTop: '15px' }}>
+              <button
+                onClick={handleCloseModal}
+                style={{
+                  padding: '8px 20px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  backgroundColor: '#f5f5f5',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                disabled={processing}
+                style={{
+                  padding: '8px 20px',
+                  border: 'none',
+                  borderRadius: '4px',
+                  backgroundColor: '#4CAF50',
+                  color: 'white',
+                  cursor: processing ? 'not-allowed' : 'pointer',
+                  opacity: processing ? 0.7 : 1
+                }}
+              >
+                {processing ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 };

@@ -22,6 +22,14 @@ class RoomCategoryResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class RoomCategoryUpdate(BaseModel):
+    category_code: Optional[str] = None
+    category_name: Optional[str] = None
+    description: Optional[str] = None
+    normal_rate: Optional[float] = None
+    weekend_rate: Optional[float] = None
+    is_active: Optional[bool] = None
+
 class RoomPricingResponse(BaseModel):
     room_type: str
     category_name: str
@@ -143,4 +151,85 @@ def get_all_room_pricing(
         ]
         
     except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+@router.put("/categories/{category_id}", response_model=RoomCategoryResponse)
+def update_room_category(
+    category_id: int,
+    category_update: RoomCategoryUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Update a room category (admin/manager only)."""
+    try:
+        # Check user role
+        if current_user.role not in ['admin', 'manager']:
+            raise HTTPException(status_code=403, detail="Only admin or manager can update room categories")
+        
+        # Check if category exists
+        existing = db.execute(
+            text("SELECT id FROM room_categories WHERE id = :id"),
+            {"id": category_id}
+        ).first()
+        
+        if not existing:
+            raise HTTPException(status_code=404, detail="Room category not found")
+        
+        # Build update query
+        update_fields = []
+        params = {"id": category_id}
+        
+        if category_update.category_code is not None:
+            update_fields.append("category_code = :category_code")
+            params["category_code"] = category_update.category_code
+            
+        if category_update.category_name is not None:
+            update_fields.append("category_name = :category_name")
+            params["category_name"] = category_update.category_name
+            
+        if category_update.description is not None:
+            update_fields.append("description = :description")
+            params["description"] = category_update.description
+            
+        if category_update.normal_rate is not None:
+            update_fields.append("normal_rate = :normal_rate")
+            params["normal_rate"] = category_update.normal_rate
+            
+        if category_update.weekend_rate is not None:
+            update_fields.append("weekend_rate = :weekend_rate")
+            params["weekend_rate"] = category_update.weekend_rate
+            
+        if category_update.is_active is not None:
+            update_fields.append("is_active = :is_active")
+            params["is_active"] = category_update.is_active
+        
+        if not update_fields:
+            raise HTTPException(status_code=400, detail="No fields to update")
+        
+        update_query = f"""
+            UPDATE room_categories 
+            SET {', '.join(update_fields)}
+            WHERE id = :id
+        """
+        
+        db.execute(text(update_query), params)
+        db.commit()
+        
+        # Get the updated category
+        updated = db.execute(
+            text("""
+                SELECT id, category_code, category_name, description, 
+                       normal_rate, weekend_rate, is_active
+                FROM room_categories 
+                WHERE id = :id
+            """),
+            {"id": category_id}
+        ).first()
+        
+        return dict(updated._mapping)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

@@ -11,6 +11,20 @@ const CheckinToday = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [showEntries, setShowEntries] = useState(10)
   const [currentPage, setCurrentPage] = useState(1)
+  const [successMessage, setSuccessMessage] = useState(null)
+
+  // Edit modal state
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editingItem, setEditingItem] = useState(null)
+  const [editFormData, setEditFormData] = useState({
+    guest_name: '',
+    room_number: '',
+    departure_date: '',
+    total_amount: 0,
+    deposit: 0,
+    notes: ''
+  })
+  const [processing, setProcessing] = useState(false)
 
   useEffect(() => { loadRegistrations() }, [])
   useEffect(() => { setCurrentPage(1) }, [searchTerm, showEntries])
@@ -71,12 +85,89 @@ const CheckinToday = () => {
 
   // Check if user has edit permission
   const canEdit = () => {
-    return ['admin', 'manager', 'frontoffice'].includes(user?.role);
+    return ['admin', 'manager'].includes(user?.role?.toLowerCase());
+  }
+
+  // Handle edit click
+  const handleEditClick = (item) => {
+    if (!canEdit()) return
+    setEditingItem(item)
+    setEditFormData({
+      guest_name: item.guest_name || '',
+      room_number: item.room_number || '',
+      departure_date: item.departure_date?.split('T')[0] || '',
+      total_amount: item.total_amount || 0,
+      deposit: item.deposit || 0,
+      notes: item.notes || ''
+    })
+    setShowEditModal(true)
+  }
+
+  // Handle save edit
+  const handleSaveEdit = async () => {
+    if (!editFormData.guest_name) {
+      alert('Please fill in guest name')
+      return
+    }
+
+    try {
+      setProcessing(true)
+      await apiService.updateHotelRegistration(editingItem.id, {
+        guest_name: editFormData.guest_name,
+        room_number: editFormData.room_number,
+        departure_date: editFormData.departure_date,
+        total_amount: parseFloat(editFormData.total_amount) || 0,
+        deposit: parseFloat(editFormData.deposit) || 0,
+        notes: editFormData.notes
+      })
+      
+      setSuccessMessage(`Guest "${editFormData.guest_name}" updated successfully`)
+      setShowEditModal(false)
+      setEditingItem(null)
+      await loadRegistrations()
+      
+      setTimeout(() => {
+        setSuccessMessage(null)
+      }, 3000)
+    } catch (err) {
+      console.error('Error updating registration:', err)
+      alert('Failed to update: ' + (err.response?.data?.detail || err.message))
+    } finally {
+      setProcessing(false)
+    }
+  }
+
+  // Handle close modal
+  const handleCloseModal = () => {
+    setShowEditModal(false)
+    setEditingItem(null)
+    setEditFormData({
+      guest_name: '',
+      room_number: '',
+      departure_date: '',
+      total_amount: 0,
+      deposit: 0,
+      notes: ''
+    })
   }
 
   return (
     <Layout>
       <div className="unified-reservation-container">
+        {/* Success Message */}
+        {successMessage && (
+          <div style={{
+            background: '#d4edda',
+            border: '1px solid #c3e6cb',
+            color: '#155724',
+            padding: '12px 16px',
+            borderRadius: '4px',
+            marginBottom: '20px'
+          }}>
+            {successMessage}
+          </div>
+        )}
+
         <div className="unified-header-controls">
           <div className="header-row header-row-top">
             <div className="unified-header-left">
@@ -181,7 +272,13 @@ const CheckinToday = () => {
                     <td className="align-center">{(registration.guest_count_male || 0) + (registration.guest_count_female || 0) + (registration.guest_count_child || 0)}</td>
                     <td className="align-center">
                       {canEdit() && (
-                        <button className="btn-table-action" title="Edit Details">Edit</button>
+                        <button 
+                          className="btn-table-action" 
+                          title="Edit Details"
+                          onClick={() => handleEditClick(registration)}
+                        >
+                          Edit
+                        </button>
                       )}
                     </td>
                   </tr>
@@ -201,8 +298,128 @@ const CheckinToday = () => {
           </div>
         </div>
       </div>
-    </Layout>
-  )
-}
 
-export default CheckinToday
+      {/* Edit Modal */}
+      {showEditModal && (
+        <div className="modal-overlay" style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000
+        }}>
+          <div className="modal-content" style={{
+            backgroundColor: 'white',
+            padding: '20px',
+            borderRadius: '8px',
+            width: '500px',
+            maxWidth: '90%',
+            maxHeight: '90vh',
+            overflow: 'auto'
+          }}>
+            <h3 style={{ marginBottom: '20px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
+              Edit Check-in: {editingItem?.registration_no}
+            </h3>
+            
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Guest Name <span style={{color: 'red'}}>*</span></label>
+              <input
+                type="text"
+                value={editFormData.guest_name}
+                onChange={(e) => setEditFormData({...editFormData, guest_name: e.target.value})}
+                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Room Number</label>
+              <input
+                type="text"
+                value={editFormData.room_number}
+                onChange={(e) => setEditFormData({...editFormData, room_number: e.target.value})}
+                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Departure Date</label>
+              <input
+                type="date"
+                value={editFormData.departure_date}
+                onChange={(e) => setEditFormData({...editFormData, departure_date: e.target.value})}
+                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Total Amount</label>
+                <input
+                  type="number"
+                  value={editFormData.total_amount}
+                  onChange={(e) => setEditFormData({...editFormData, total_amount: e.target.value})}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Deposit</label>
+                <input
+                  type="number"
+                  value={editFormData.deposit}
+                  onChange={(e) => setEditFormData({...editFormData, deposit: e.target.value})}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                />
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Notes</label>
+              <textarea
+                value={editFormData.notes}
+                onChange={(e) => setEditFormData({...editFormData, notes: e.target.value})}
+                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', minHeight: '80px' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #ddd', paddingTop: '15px' }}>
+              <button
+                onClick={handleCloseModal}
+                style={{
+                  padding: '8px 20px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  backgroundColor: '#f5f5f5',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                disabled={processing}
+                style={{
+                  padding: '8px 20px',
+                  border: 'none',
+                  borderRadius: '4px',
+                  backgroundColor: '#4CAF50',
+                  color: 'white',
+                  cursor: processing ? 'not-allowed' : 'pointer',
+                  opacity: processing ? 0.7 : 1
+                }}
+              >
+                {processing ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </Layout>
+  );
+};
+
+export default CheckinToday;

@@ -12,6 +12,19 @@ const MasterRoomType = () => {
   const [showEntries, setShowEntries] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedHotel, setSelectedHotel] = useState('ALL');
+  const [successMessage, setSuccessMessage] = useState(null);
+
+  // Edit modal state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    category_code: '',
+    category_name: '',
+    normal_rate: 0,
+    weekend_rate: 0,
+    description: ''
+  });
+  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     fetchRoomTypes();
@@ -65,12 +78,84 @@ const MasterRoomType = () => {
 
   // Check if user has edit permission
   const canEdit = () => {
-    return ['admin', 'manager', 'housekeeping'].includes(user?.role);
+    return ['admin', 'manager'].includes(user?.role?.toLowerCase());
+  };
+
+  // Handle edit click
+  const handleEditClick = (item) => {
+    if (!canEdit()) return;
+    setEditingItem(item);
+    setEditFormData({
+      category_code: item.category_code || '',
+      category_name: item.category_name || '',
+      normal_rate: item.normal_rate || 0,
+      weekend_rate: item.weekend_rate || 0,
+      description: item.description || ''
+    });
+    setShowEditModal(true);
+  };
+
+  // Handle save edit
+  const handleSaveEdit = async () => {
+    if (!editFormData.category_code || !editFormData.category_name) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    try {
+      setProcessing(true);
+      await apiService.updateRoomCategory(editingItem.id, {
+        ...editFormData,
+        normal_rate: parseFloat(editFormData.normal_rate) || 0,
+        weekend_rate: parseFloat(editFormData.weekend_rate) || 0
+      });
+      
+      setSuccessMessage(`Room type "${editFormData.category_name}" updated successfully`);
+      setShowEditModal(false);
+      setEditingItem(null);
+      await fetchRoomTypes();
+      
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 3000);
+    } catch (err) {
+      console.error('Error updating room type:', err);
+      alert('Failed to update room type: ' + (err.response?.data?.detail || err.message));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  // Handle close modal
+  const handleCloseModal = () => {
+    setShowEditModal(false);
+    setEditingItem(null);
+    setEditFormData({
+      category_code: '',
+      category_name: '',
+      normal_rate: 0,
+      weekend_rate: 0,
+      description: ''
+    });
   };
 
   return (
     <Layout>
       <div className="unified-reservation-container">
+      {/* Success Message */}
+      {successMessage && (
+        <div style={{
+          background: '#d4edda',
+          border: '1px solid #c3e6cb',
+          color: '#155724',
+          padding: '12px 16px',
+          borderRadius: '4px',
+          marginBottom: '20px'
+        }}>
+          {successMessage}
+        </div>
+      )}
+
       {/* Header Controls */}
       <div className="unified-header-controls">
         {/* Top Row - Title and Hotel Filter */}
@@ -173,7 +258,12 @@ const MasterRoomType = () => {
                   <td className="align-right">-</td>
                   <td>
                     {canEdit() && (
-                      <button className="btn-table-action">Edit</button>
+                      <button 
+                        className="btn-table-action"
+                        onClick={() => handleEditClick(item)}
+                      >
+                        Edit
+                      </button>
                     )}
                   </td>
                 </tr>
@@ -225,7 +315,116 @@ const MasterRoomType = () => {
         </div>
       </div>
       </div>
-    </Layout>
+
+      {/* Edit Modal */}
+      {showEditModal && (
+        <div className="modal-overlay" style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000
+        }}>
+          <div className="modal-content" style={{
+            backgroundColor: 'white',
+            padding: '20px',
+            borderRadius: '8px',
+            width: '500px',
+            maxWidth: '90%',
+            maxHeight: '90vh',
+            overflow: 'auto'
+          }}>
+            <h3 style={{ marginBottom: '20px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
+              Edit Room Type
+            </h3>
+            
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Code <span style={{color: 'red'}}>*</span></label>
+              <input
+                type="text"
+                value={editFormData.category_code}
+                onChange={(e) => setEditFormData({...editFormData, category_code: e.target.value})}
+                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Type Name <span style={{color: 'red'}}>*</span></label>
+              <input
+                type="text"
+                value={editFormData.category_name}
+                onChange={(e) => setEditFormData({...editFormData, category_name: e.target.value})}
+                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Normal Rate</label>
+                <input
+                  type="number"
+                  value={editFormData.normal_rate}
+                  onChange={(e) => setEditFormData({...editFormData, normal_rate: e.target.value})}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Weekend Rate</label>
+                <input
+                  type="number"
+                  value={editFormData.weekend_rate}
+                  onChange={(e) => setEditFormData({...editFormData, weekend_rate: e.target.value})}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                />
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Description</label>
+              <textarea
+                value={editFormData.description}
+                onChange={(e) => setEditFormData({...editFormData, description: e.target.value})}
+                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', minHeight: '80px' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #ddd', paddingTop: '15px' }}>
+              <button
+                onClick={handleCloseModal}
+                style={{
+                  padding: '8px 20px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  backgroundColor: '#f5f5f5',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                disabled={processing}
+                style={{
+                  padding: '8px 20px',
+                  border: 'none',
+                  borderRadius: '4px',
+                  backgroundColor: '#4CAF50',
+                  color: 'white',
+                  cursor: processing ? 'not-allowed' : 'pointer',
+                  opacity: processing ? 0.7 : 1
+                }}
+              >
+                {processing ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}    </Layout>
   );
 };
 
