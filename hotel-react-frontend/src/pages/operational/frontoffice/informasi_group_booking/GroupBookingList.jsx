@@ -12,6 +12,23 @@ const GroupBookingList = () => {
   const [showEntries, setShowEntries] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Edit modal state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    group_name: '',
+    pic_name: '',
+    pic_phone: '',
+    check_in_date: '',
+    check_out_date: '',
+    total_rooms: '',
+    payment_method: '',
+    total_amount: '',
+    notes: ''
+  });
+  const [processing, setProcessing] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+
   useEffect(() => {
     fetchGroupBookings();
   }, []);
@@ -76,6 +93,61 @@ const GroupBookingList = () => {
   // Check if user has edit permission
   const canEdit = () => {
     return ['admin', 'manager', 'frontoffice'].includes(user?.role);
+  };
+
+  // Handle edit click
+  const handleEditClick = (booking) => {
+    if (!canEdit()) return;
+    setEditingItem(booking);
+    setEditFormData({
+      group_name: booking.group_name || '',
+      pic_name: booking.pic_name || '',
+      pic_phone: booking.pic_phone || '',
+      check_in_date: booking.check_in_date ? booking.check_in_date.split('T')[0] : '',
+      check_out_date: booking.check_out_date ? booking.check_out_date.split('T')[0] : '',
+      total_rooms: booking.total_rooms || '',
+      payment_method: booking.payment_method || '',
+      total_amount: booking.total_amount || '',
+      notes: booking.notes || ''
+    });
+    setShowEditModal(true);
+  };
+
+  // Handle save edit
+  const handleSaveEdit = async () => {
+    if (!editFormData.group_name) {
+      alert('Group name is required');
+      return;
+    }
+    setProcessing(true);
+    try {
+      await apiService.updateGroupBooking(editingItem.id, {
+        group_name: editFormData.group_name,
+        pic_name: editFormData.pic_name,
+        pic_phone: editFormData.pic_phone,
+        check_in_date: editFormData.check_in_date,
+        check_out_date: editFormData.check_out_date,
+        total_rooms: parseInt(editFormData.total_rooms) || 0,
+        payment_method: editFormData.payment_method,
+        total_amount: parseFloat(editFormData.total_amount) || 0,
+        notes: editFormData.notes
+      });
+      setSuccessMessage('Group booking updated successfully!');
+      setShowEditModal(false);
+      setEditingItem(null);
+      fetchGroupBookings();
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (err) {
+      alert('Failed to update: ' + (err.response?.data?.detail || err.message));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  // Handle close modal
+  const handleCloseModal = () => {
+    setShowEditModal(false);
+    setEditingItem(null);
   };
 
   return (
@@ -193,7 +265,7 @@ const GroupBookingList = () => {
                     <td>{formatDate(booking.created_at)}</td>
                     <td className="align-center">
                       {canEdit() && (
-                        <button className="btn-table-action" title="Edit Details">Edit</button>
+                        <button className="btn-table-action" title="Edit Details" onClick={() => handleEditClick(booking)}>Edit</button>
                       )}
                     </td>
                   </tr>
@@ -259,6 +331,174 @@ const GroupBookingList = () => {
           </div>
         </div>
       </div>
+
+      {/* Success Message */}
+      {successMessage && (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          backgroundColor: '#4CAF50',
+          color: 'white',
+          padding: '15px 25px',
+          borderRadius: '4px',
+          zIndex: 1001,
+          boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
+        }}>
+          {successMessage}
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {showEditModal && editingItem && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            padding: '25px',
+            width: '500px',
+            maxHeight: '90vh',
+            overflow: 'auto'
+          }}>
+            <h3 style={{ marginBottom: '20px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
+              Edit Group Booking: GB-{editingItem.id}
+            </h3>
+
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Group Name *</label>
+              <input
+                type="text"
+                value={editFormData.group_name}
+                onChange={(e) => setEditFormData({...editFormData, group_name: e.target.value})}
+                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>PIC Name</label>
+                <input
+                  type="text"
+                  value={editFormData.pic_name}
+                  onChange={(e) => setEditFormData({...editFormData, pic_name: e.target.value})}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>PIC Phone</label>
+                <input
+                  type="text"
+                  value={editFormData.pic_phone}
+                  onChange={(e) => setEditFormData({...editFormData, pic_phone: e.target.value})}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Check-in Date</label>
+                <input
+                  type="date"
+                  value={editFormData.check_in_date}
+                  onChange={(e) => setEditFormData({...editFormData, check_in_date: e.target.value})}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Check-out Date</label>
+                <input
+                  type="date"
+                  value={editFormData.check_out_date}
+                  onChange={(e) => setEditFormData({...editFormData, check_out_date: e.target.value})}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Total Rooms</label>
+                <input
+                  type="number"
+                  value={editFormData.total_rooms}
+                  onChange={(e) => setEditFormData({...editFormData, total_rooms: e.target.value})}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Payment Method</label>
+                <input
+                  type="text"
+                  value={editFormData.payment_method}
+                  onChange={(e) => setEditFormData({...editFormData, payment_method: e.target.value})}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                />
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Total Amount</label>
+              <input
+                type="number"
+                value={editFormData.total_amount}
+                onChange={(e) => setEditFormData({...editFormData, total_amount: e.target.value})}
+                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Notes</label>
+              <textarea
+                value={editFormData.notes}
+                onChange={(e) => setEditFormData({...editFormData, notes: e.target.value})}
+                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', minHeight: '60px' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #ddd', paddingTop: '15px' }}>
+              <button
+                onClick={handleCloseModal}
+                style={{
+                  padding: '8px 20px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  backgroundColor: '#f5f5f5',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                disabled={processing}
+                style={{
+                  padding: '8px 20px',
+                  border: 'none',
+                  borderRadius: '4px',
+                  backgroundColor: '#4CAF50',
+                  color: 'white',
+                  cursor: processing ? 'not-allowed' : 'pointer',
+                  opacity: processing ? 0.7 : 1
+                }}
+              >
+                {processing ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 };

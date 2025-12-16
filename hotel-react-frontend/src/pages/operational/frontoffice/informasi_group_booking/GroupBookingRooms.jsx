@@ -12,6 +12,23 @@ const GroupBookingRooms = () => {
   const [showEntries, setShowEntries] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Edit modal state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    guest_name: '',
+    room_number: '',
+    room_type: '',
+    mobile_phone: '',
+    check_in_date: '',
+    check_out_date: '',
+    rate: '',
+    room_status: '',
+    notes: ''
+  });
+  const [processing, setProcessing] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+
   useEffect(() => {
     fetchGroupBookingRooms();
   }, []);
@@ -69,6 +86,61 @@ const GroupBookingRooms = () => {
   // Check if user has edit permission
   const canEdit = () => {
     return ['admin', 'manager', 'frontoffice'].includes(user?.role);
+  };
+
+  // Handle edit click
+  const handleEditClick = (room) => {
+    if (!canEdit()) return;
+    setEditingItem(room);
+    setEditFormData({
+      guest_name: room.guest_name || '',
+      room_number: room.room_number || '',
+      room_type: room.room_type || '',
+      mobile_phone: room.mobile_phone || '',
+      check_in_date: room.check_in_date ? room.check_in_date.split('T')[0] : '',
+      check_out_date: room.check_out_date ? room.check_out_date.split('T')[0] : '',
+      rate: room.rate || '',
+      room_status: room.room_status || 'Reserved',
+      notes: room.notes || ''
+    });
+    setShowEditModal(true);
+  };
+
+  // Handle save edit
+  const handleSaveEdit = async () => {
+    if (!editFormData.guest_name) {
+      alert('Guest name is required');
+      return;
+    }
+    setProcessing(true);
+    try {
+      // Update via reservation API if reservation_no exists
+      if (editingItem.reservation_no) {
+        await apiService.updateHotelReservation(editingItem.reservation_id || editingItem.id, {
+          guest_name: editFormData.guest_name,
+          room_number: editFormData.room_number,
+          mobile_phone: editFormData.mobile_phone,
+          arrival_date: editFormData.check_in_date,
+          departure_date: editFormData.check_out_date,
+          notes: editFormData.notes
+        });
+      }
+      setSuccessMessage('Room booking updated successfully!');
+      setShowEditModal(false);
+      setEditingItem(null);
+      fetchGroupBookingRooms();
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (err) {
+      alert('Failed to update: ' + (err.response?.data?.detail || err.message));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  // Handle close modal
+  const handleCloseModal = () => {
+    setShowEditModal(false);
+    setEditingItem(null);
   };
 
   return (
@@ -199,7 +271,7 @@ const GroupBookingRooms = () => {
                     </td>
                     <td className="align-center">
                       {canEdit() && (
-                        <button className="btn-table-action" title="Edit Details">Edit</button>
+                        <button className="btn-table-action" title="Edit Details" onClick={() => handleEditClick(room)}>Edit</button>
                       )}
                     </td>
                   </tr>
@@ -265,6 +337,180 @@ const GroupBookingRooms = () => {
           </div>
         </div>
       </div>
+
+      {/* Success Message */}
+      {successMessage && (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          backgroundColor: '#4CAF50',
+          color: 'white',
+          padding: '15px 25px',
+          borderRadius: '4px',
+          zIndex: 1001,
+          boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
+        }}>
+          {successMessage}
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {showEditModal && editingItem && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            padding: '25px',
+            width: '500px',
+            maxHeight: '90vh',
+            overflow: 'auto'
+          }}>
+            <h3 style={{ marginBottom: '20px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
+              Edit Room Booking: {editingItem.reservation_no || editingItem.id}
+            </h3>
+
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Guest Name *</label>
+              <input
+                type="text"
+                value={editFormData.guest_name}
+                onChange={(e) => setEditFormData({...editFormData, guest_name: e.target.value})}
+                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Room Number</label>
+                <input
+                  type="text"
+                  value={editFormData.room_number}
+                  onChange={(e) => setEditFormData({...editFormData, room_number: e.target.value})}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Room Type</label>
+                <input
+                  type="text"
+                  value={editFormData.room_type}
+                  onChange={(e) => setEditFormData({...editFormData, room_type: e.target.value})}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  disabled
+                />
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Mobile Phone</label>
+              <input
+                type="text"
+                value={editFormData.mobile_phone}
+                onChange={(e) => setEditFormData({...editFormData, mobile_phone: e.target.value})}
+                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Check-in Date</label>
+                <input
+                  type="date"
+                  value={editFormData.check_in_date}
+                  onChange={(e) => setEditFormData({...editFormData, check_in_date: e.target.value})}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Check-out Date</label>
+                <input
+                  type="date"
+                  value={editFormData.check_out_date}
+                  onChange={(e) => setEditFormData({...editFormData, check_out_date: e.target.value})}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Rate</label>
+                <input
+                  type="number"
+                  value={editFormData.rate}
+                  onChange={(e) => setEditFormData({...editFormData, rate: e.target.value})}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  disabled
+                />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Status</label>
+                <select
+                  value={editFormData.room_status}
+                  onChange={(e) => setEditFormData({...editFormData, room_status: e.target.value})}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                >
+                  <option value="Reserved">Reserved</option>
+                  <option value="Checked In">Checked In</option>
+                  <option value="Checked Out">Checked Out</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Notes</label>
+              <textarea
+                value={editFormData.notes}
+                onChange={(e) => setEditFormData({...editFormData, notes: e.target.value})}
+                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', minHeight: '60px' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #ddd', paddingTop: '15px' }}>
+              <button
+                onClick={handleCloseModal}
+                style={{
+                  padding: '8px 20px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  backgroundColor: '#f5f5f5',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                disabled={processing}
+                style={{
+                  padding: '8px 20px',
+                  border: 'none',
+                  borderRadius: '4px',
+                  backgroundColor: '#4CAF50',
+                  color: 'white',
+                  cursor: processing ? 'not-allowed' : 'pointer',
+                  opacity: processing ? 0.7 : 1
+                }}
+              >
+                {processing ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 };
