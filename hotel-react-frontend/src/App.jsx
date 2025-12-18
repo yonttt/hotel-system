@@ -75,6 +75,9 @@ import AdjustmentPage from './pages/operational/AdjustmentPage';
 import FoodBeveragePage from './pages/operational/FoodBeveragePage';
 import LaundryPage from './pages/operational/LaundryPage';
 
+// Operational - Food & Beverage - Master Data
+import MasterMeja from './pages/operational/foodbeverage/master_data/MasterMeja';
+
 // Operational - Front Office - Informasi Reservasi
 import AllReservationPage from './pages/operational/frontoffice/informasi_reservasi/AllReservationPage';
 import ReservasiDeposit from './pages/operational/frontoffice/informasi_reservasi/ReservasiDeposit';
@@ -210,6 +213,19 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+            
+            {/* Food & Beverage - Master Data */}
+            <Route 
+              path="/operational/foodbeverage/master-data-fb/master-meja" 
+              element={
+                <ProtectedRoute>
+                  <ErrorBoundary>
+                    <MasterMeja />
+                  </ErrorBoundary>
+                </ProtectedRoute>
+              } 
+            />
+            
             <Route 
               path="/operational/laundry" 
               element={

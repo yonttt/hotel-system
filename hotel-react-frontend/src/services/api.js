@@ -410,6 +410,41 @@ class ApiService {
     if (params.length > 0) url += `?${params.join('&')}`
     return this.client.get(url)
   }
+
+  // ==================== MASTER MEJA (F&B Table Management) ====================
+  
+  // Get all tables
+  async getMasterMeja(skip = 0, limit = 100, hotelId = null, status = null) {
+    let url = `/master-meja/?skip=${skip}&limit=${limit}`
+    if (hotelId) url += `&hotel_id=${hotelId}`
+    if (status) url += `&status=${encodeURIComponent(status)}`
+    return this.client.get(url)
+  }
+
+  // Get table by ID
+  async getMasterMejaById(tableId) {
+    return this.client.get(`/master-meja/${tableId}`)
+  }
+
+  // Create new table
+  async createMasterMeja(tableData) {
+    return this.client.post('/master-meja/', tableData)
+  }
+
+  // Update table
+  async updateMasterMeja(tableId, tableData) {
+    return this.client.put(`/master-meja/${tableId}`, tableData)
+  }
+
+  // Delete table
+  async deleteMasterMeja(tableId) {
+    return this.client.delete(`/master-meja/${tableId}`)
+  }
+
+  // Get hotels list for filter
+  async getMasterMejaHotels() {
+    return this.client.get('/master-meja/hotels/list')
+  }
 }
 
 export const apiService = new ApiService()

@@ -31,6 +31,8 @@ const Sidebar = () => {
     housekeeping: false,
     statusKamar: false,
     masterData: false,
+    foodBeverage: false,
+    masterDataFB: false,
     hrd: false,
     accounting: false,
     administration: false,
@@ -85,6 +87,12 @@ const Sidebar = () => {
         }
         if (path.includes('/master-data/')) {
           newExpandedMenus.masterData = true
+        }
+      }
+      if (path.includes('/foodbeverage/')) {
+        newExpandedMenus.foodBeverage = true
+        if (path.includes('/master-data-fb/')) {
+          newExpandedMenus.masterDataFB = true
         }
       }
     } else if (path.includes('/hrd/')) {
@@ -144,6 +152,8 @@ const Sidebar = () => {
       housekeeping: false,
       statusKamar: false,
       masterData: false,
+      foodBeverage: false,
+      masterDataFB: false,
       hrd: false,
       accounting: false,
       administration: false,
@@ -170,7 +180,21 @@ const Sidebar = () => {
       submenu: 'operational',
       children: [
         { title: 'Adjustment', path: '/operational/adjustment' },
-        { title: 'Food & Beverage', path: '/operational/foodbeverage' },
+        {
+          title: 'Food & Beverage',
+          hasSubmenu: true,
+          submenu: 'foodBeverage',
+          children: [
+            {
+              title: 'Master Data',
+              hasSubmenu: true,
+              submenu: 'masterDataFB',
+              children: [
+                { title: 'Master Meja', path: '/operational/foodbeverage/master-data-fb/master-meja' }
+              ]
+            }
+          ]
+        },
         {
           title: 'Front Office',
           hasSubmenu: true,
