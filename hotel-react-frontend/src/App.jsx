@@ -77,6 +77,7 @@ import LaundryPage from './pages/operational/LaundryPage';
 
 // Operational - Food & Beverage - Master Data
 import MasterMeja from './pages/operational/foodbeverage/master_data/MasterMeja';
+import KategoriMenuResto from './pages/operational/foodbeverage/master_data/KategoriMenuResto';
 
 // Operational - Front Office - Informasi Reservasi
 import AllReservationPage from './pages/operational/frontoffice/informasi_reservasi/AllReservationPage';
@@ -221,6 +222,16 @@ function App() {
                 <ProtectedRoute>
                   <ErrorBoundary>
                     <MasterMeja />
+                  </ErrorBoundary>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/operational/foodbeverage/master-data-fb/kategori-menu-resto" 
+              element={
+                <ProtectedRoute>
+                  <ErrorBoundary>
+                    <KategoriMenuResto />
                   </ErrorBoundary>
                 </ProtectedRoute>
               } 

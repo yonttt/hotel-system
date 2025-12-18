@@ -190,7 +190,8 @@ const Sidebar = () => {
               hasSubmenu: true,
               submenu: 'masterDataFB',
               children: [
-                { title: 'Master Meja', path: '/operational/foodbeverage/master-data-fb/master-meja' }
+                { title: 'Master Meja', path: '/operational/foodbeverage/master-data-fb/master-meja' },
+                { title: 'Kategori Menu Resto', path: '/operational/foodbeverage/master-data-fb/kategori-menu-resto' }
               ]
             }
           ]

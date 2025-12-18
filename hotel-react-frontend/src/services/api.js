@@ -445,6 +445,40 @@ class ApiService {
   async getMasterMejaHotels() {
     return this.client.get('/master-meja/hotels/list')
   }
+
+  // ==================== KATEGORI MENU RESTO (F&B Menu Categories) ====================
+  
+  // Get all menu categories
+  async getKategoriMenuResto(skip = 0, limit = 100, hotelId = null) {
+    let url = `/kategori-menu-resto/?skip=${skip}&limit=${limit}`
+    if (hotelId) url += `&hotel_id=${hotelId}`
+    return this.client.get(url)
+  }
+
+  // Get category by ID
+  async getKategoriMenuRestoById(categoryId) {
+    return this.client.get(`/kategori-menu-resto/${categoryId}`)
+  }
+
+  // Create new category
+  async createKategoriMenuResto(categoryData) {
+    return this.client.post('/kategori-menu-resto/', categoryData)
+  }
+
+  // Update category
+  async updateKategoriMenuResto(categoryId, categoryData) {
+    return this.client.put(`/kategori-menu-resto/${categoryId}`, categoryData)
+  }
+
+  // Delete category
+  async deleteKategoriMenuResto(categoryId) {
+    return this.client.delete(`/kategori-menu-resto/${categoryId}`)
+  }
+
+  // Get hotels list for filter
+  async getKategoriMenuRestoHotels() {
+    return this.client.get('/kategori-menu-resto/hotels/list')
+  }
 }
 
 export const apiService = new ApiService()
