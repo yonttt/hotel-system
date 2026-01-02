@@ -249,16 +249,20 @@ const NightAudit = () => {
                 <button
                   onClick={handleAddNew}
                   style={{
-                    padding: '6px 16px',
-                    backgroundColor: '#337ab7',
+                    padding: '8px 20px',
+                    backgroundColor: '#3498db',
                     color: 'white',
                     border: 'none',
                     borderRadius: '4px',
                     cursor: 'pointer',
-                    fontSize: '13px'
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    boxShadow: '0 2px 4px rgba(52, 152, 219, 0.3)'
                   }}
+                  onMouseOver={(e) => e.target.style.backgroundColor = '#2980b9'}
+                  onMouseOut={(e) => e.target.style.backgroundColor = '#3498db'}
                 >
-                  Tambah Data
+                  + Tambah Data
                 </button>
               </div>
             </div>
@@ -433,210 +437,256 @@ const NightAudit = () => {
 
         {/* Add/Edit Modal */}
         {showModal && (
-          <div className="modal-overlay">
-            <div className="modal-content" style={{ maxWidth: '800px', maxHeight: '90vh', overflow: 'auto' }}>
-              <div className="modal-header">
-                <h3>{editingItem ? 'Edit Night Audit' : 'Add Night Audit'}</h3>
-                <button className="modal-close" onClick={() => setShowModal(false)}>×</button>
+          <div className="modal-overlay" style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000
+          }}>
+            <div className="modal-content" style={{
+              backgroundColor: 'white',
+              padding: '20px',
+              borderRadius: '8px',
+              width: '700px',
+              maxWidth: '90%',
+              maxHeight: '90vh',
+              overflow: 'auto'
+            }}>
+              <h3 style={{ marginBottom: '20px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
+                {editingItem ? 'Edit Night Audit' : 'Tambah Data Night Audit'}
+              </h3>
+
+              {/* Basic Info */}
+              <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Date <span style={{color: 'red'}}>*</span></label>
+                  <input
+                    type="date"
+                    value={formData.audit_date}
+                    onChange={(e) => handleFormChange('audit_date', e.target.value)}
+                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Hotel <span style={{color: 'red'}}>*</span></label>
+                  <select
+                    value={formData.hotel_name}
+                    onChange={(e) => handleFormChange('hotel_name', e.target.value)}
+                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  >
+                    {hotelOptions.map((hotel, index) => (
+                      <option key={index} value={hotel.name || hotel}>
+                        {hotel.name || hotel}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              <div className="modal-body">
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                  <div className="form-group">
-                    <label>Date</label>
-                    <input
-                      type="date"
-                      value={formData.audit_date}
-                      onChange={(e) => handleFormChange('audit_date', e.target.value)}
-                      className="form-control"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Hotel</label>
-                    <select
-                      value={formData.hotel_name}
-                      onChange={(e) => handleFormChange('hotel_name', e.target.value)}
-                      className="form-control"
-                    >
-                      {hotelOptions.map((hotel, index) => (
-                        <option key={index} value={hotel.name || hotel}>
-                          {hotel.name || hotel}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label>Room Number *</label>
-                    <input
-                      type="text"
-                      value={formData.room_number}
-                      onChange={(e) => handleFormChange('room_number', e.target.value)}
-                      className="form-control"
-                      placeholder="Enter room number"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Guest Name</label>
-                    <input
-                      type="text"
-                      value={formData.guest_name}
-                      onChange={(e) => handleFormChange('guest_name', e.target.value)}
-                      className="form-control"
-                      placeholder="Enter guest name"
-                    />
-                  </div>
-                </div>
 
-                <h4 style={{ marginTop: '20px', marginBottom: '15px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>Revenue Items</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px' }}>
-                  <div className="form-group">
-                    <label>Extra Bed</label>
-                    <input
-                      type="number"
-                      value={formData.extra_bed}
-                      onChange={(e) => handleFormChange('extra_bed', parseFloat(e.target.value) || 0)}
-                      className="form-control"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Extra Bill</label>
-                    <input
-                      type="number"
-                      value={formData.extra_bill}
-                      onChange={(e) => handleFormChange('extra_bill', parseFloat(e.target.value) || 0)}
-                      className="form-control"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Late Charge</label>
-                    <input
-                      type="number"
-                      value={formData.late_charge}
-                      onChange={(e) => handleFormChange('late_charge', parseFloat(e.target.value) || 0)}
-                      className="form-control"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Discount</label>
-                    <input
-                      type="number"
-                      value={formData.discount}
-                      onChange={(e) => handleFormChange('discount', parseFloat(e.target.value) || 0)}
-                      className="form-control"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Meeting Room</label>
-                    <input
-                      type="number"
-                      value={formData.meeting_room}
-                      onChange={(e) => handleFormChange('meeting_room', parseFloat(e.target.value) || 0)}
-                      className="form-control"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Add. Meeting Room</label>
-                    <input
-                      type="number"
-                      value={formData.add_meeting_room}
-                      onChange={(e) => handleFormChange('add_meeting_room', parseFloat(e.target.value) || 0)}
-                      className="form-control"
-                    />
-                  </div>
+              <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Room Number <span style={{color: 'red'}}>*</span></label>
+                  <input
+                    type="text"
+                    value={formData.room_number}
+                    onChange={(e) => handleFormChange('room_number', e.target.value)}
+                    placeholder="Enter room number"
+                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
                 </div>
-
-                <h4 style={{ marginTop: '20px', marginBottom: '15px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>Payment Methods</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px' }}>
-                  <div className="form-group">
-                    <label>Cash</label>
-                    <input
-                      type="number"
-                      value={formData.cash}
-                      onChange={(e) => handleFormChange('cash', parseFloat(e.target.value) || 0)}
-                      className="form-control"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Debet</label>
-                    <input
-                      type="number"
-                      value={formData.debet}
-                      onChange={(e) => handleFormChange('debet', parseFloat(e.target.value) || 0)}
-                      className="form-control"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Transfer</label>
-                    <input
-                      type="number"
-                      value={formData.transfer}
-                      onChange={(e) => handleFormChange('transfer', parseFloat(e.target.value) || 0)}
-                      className="form-control"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Voucher</label>
-                    <input
-                      type="number"
-                      value={formData.voucher}
-                      onChange={(e) => handleFormChange('voucher', parseFloat(e.target.value) || 0)}
-                      className="form-control"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Creditcard</label>
-                    <input
-                      type="number"
-                      value={formData.creditcard}
-                      onChange={(e) => handleFormChange('creditcard', parseFloat(e.target.value) || 0)}
-                      className="form-control"
-                    />
-                  </div>
-                </div>
-
-                <h4 style={{ marginTop: '20px', marginBottom: '15px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>Guest Ledger</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                  <div className="form-group">
-                    <label>Guest Ledger - (Minus)</label>
-                    <input
-                      type="number"
-                      value={formData.guest_ledger_minus}
-                      onChange={(e) => handleFormChange('guest_ledger_minus', parseFloat(e.target.value) || 0)}
-                      className="form-control"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Guest Ledger + (Plus)</label>
-                    <input
-                      type="number"
-                      value={formData.guest_ledger_plus}
-                      onChange={(e) => handleFormChange('guest_ledger_plus', parseFloat(e.target.value) || 0)}
-                      className="form-control"
-                    />
-                  </div>
-                </div>
-
-                <div className="form-group" style={{ marginTop: '15px' }}>
-                  <label>Notes</label>
-                  <textarea
-                    value={formData.notes}
-                    onChange={(e) => handleFormChange('notes', e.target.value)}
-                    className="form-control"
-                    rows="3"
-                    placeholder="Enter notes..."
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Guest Name</label>
+                  <input
+                    type="text"
+                    value={formData.guest_name}
+                    onChange={(e) => handleFormChange('guest_name', e.target.value)}
+                    placeholder="Enter guest name"
+                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                   />
                 </div>
               </div>
-              <div className="modal-footer">
-                <button 
-                  className="btn-secondary"
+
+              {/* Revenue Items Section */}
+              <h4 style={{ marginTop: '20px', marginBottom: '15px', borderBottom: '1px solid #ddd', paddingBottom: '10px', color: '#333' }}>Revenue Items</h4>
+              <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Extra Bed</label>
+                  <input
+                    type="number"
+                    value={formData.extra_bed}
+                    onChange={(e) => handleFormChange('extra_bed', parseFloat(e.target.value) || 0)}
+                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Extra Bill</label>
+                  <input
+                    type="number"
+                    value={formData.extra_bill}
+                    onChange={(e) => handleFormChange('extra_bill', parseFloat(e.target.value) || 0)}
+                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Late Charge</label>
+                  <input
+                    type="number"
+                    value={formData.late_charge}
+                    onChange={(e) => handleFormChange('late_charge', parseFloat(e.target.value) || 0)}
+                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Discount</label>
+                  <input
+                    type="number"
+                    value={formData.discount}
+                    onChange={(e) => handleFormChange('discount', parseFloat(e.target.value) || 0)}
+                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Meeting Room</label>
+                  <input
+                    type="number"
+                    value={formData.meeting_room}
+                    onChange={(e) => handleFormChange('meeting_room', parseFloat(e.target.value) || 0)}
+                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Add. Meeting Room</label>
+                  <input
+                    type="number"
+                    value={formData.add_meeting_room}
+                    onChange={(e) => handleFormChange('add_meeting_room', parseFloat(e.target.value) || 0)}
+                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
+                </div>
+              </div>
+
+              {/* Payment Methods Section */}
+              <h4 style={{ marginTop: '20px', marginBottom: '15px', borderBottom: '1px solid #ddd', paddingBottom: '10px', color: '#333' }}>Payment Methods</h4>
+              <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Cash</label>
+                  <input
+                    type="number"
+                    value={formData.cash}
+                    onChange={(e) => handleFormChange('cash', parseFloat(e.target.value) || 0)}
+                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Debet</label>
+                  <input
+                    type="number"
+                    value={formData.debet}
+                    onChange={(e) => handleFormChange('debet', parseFloat(e.target.value) || 0)}
+                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Transfer</label>
+                  <input
+                    type="number"
+                    value={formData.transfer}
+                    onChange={(e) => handleFormChange('transfer', parseFloat(e.target.value) || 0)}
+                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Voucher</label>
+                  <input
+                    type="number"
+                    value={formData.voucher}
+                    onChange={(e) => handleFormChange('voucher', parseFloat(e.target.value) || 0)}
+                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Creditcard</label>
+                  <input
+                    type="number"
+                    value={formData.creditcard}
+                    onChange={(e) => handleFormChange('creditcard', parseFloat(e.target.value) || 0)}
+                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
+                </div>
+                <div style={{ flex: 1 }}></div>
+              </div>
+
+              {/* Guest Ledger Section */}
+              <h4 style={{ marginTop: '20px', marginBottom: '15px', borderBottom: '1px solid #ddd', paddingBottom: '10px', color: '#333' }}>Guest Ledger</h4>
+              <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Guest Ledger - (Minus)</label>
+                  <input
+                    type="number"
+                    value={formData.guest_ledger_minus}
+                    onChange={(e) => handleFormChange('guest_ledger_minus', parseFloat(e.target.value) || 0)}
+                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Guest Ledger + (Plus)</label>
+                  <input
+                    type="number"
+                    value={formData.guest_ledger_plus}
+                    onChange={(e) => handleFormChange('guest_ledger_plus', parseFloat(e.target.value) || 0)}
+                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
+                </div>
+              </div>
+
+              {/* Notes */}
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Notes</label>
+                <textarea
+                  value={formData.notes}
+                  onChange={(e) => handleFormChange('notes', e.target.value)}
+                  rows="3"
+                  placeholder="Enter notes..."
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', resize: 'vertical' }}
+                />
+              </div>
+
+              {/* Buttons */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #ddd', paddingTop: '15px' }}>
+                <button
                   onClick={() => setShowModal(false)}
+                  style={{
+                    padding: '8px 20px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    backgroundColor: '#f5f5f5',
+                    cursor: 'pointer'
+                  }}
                 >
                   Cancel
                 </button>
-                <button 
-                  className="btn-primary"
+                <button
                   onClick={handleSave}
                   disabled={processing}
+                  style={{
+                    padding: '8px 20px',
+                    border: 'none',
+                    borderRadius: '4px',
+                    backgroundColor: '#4CAF50',
+                    color: 'white',
+                    cursor: processing ? 'not-allowed' : 'pointer',
+                    opacity: processing ? 0.7 : 1
+                  }}
                 >
                   {processing ? 'Saving...' : 'Save'}
                 </button>
