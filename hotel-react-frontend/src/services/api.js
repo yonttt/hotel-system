@@ -479,6 +479,63 @@ class ApiService {
   async getKategoriMenuRestoHotels() {
     return this.client.get('/kategori-menu-resto/hotels/list')
   }
+
+  // ==================== CHECKOUT APIs ====================
+  
+  // Get guests due for checkout today
+  async getCheckoutToday(hotelName = null) {
+    let url = '/checkout/today'
+    if (hotelName && hotelName !== 'ALL') {
+      url += `?hotel_name=${encodeURIComponent(hotelName)}`
+    }
+    return this.client.get(url)
+  }
+
+  // Process checkout for a registration
+  async processCheckout(registrationId, checkoutData = null) {
+    return this.client.post(`/checkout/${registrationId}`, checkoutData || {})
+  }
+
+  // Get checkout history
+  async getCheckoutHistory(skip = 0, limit = 100, hotelName = null, startDate = null, endDate = null) {
+    let url = `/checkout/history?skip=${skip}&limit=${limit}`
+    if (hotelName && hotelName !== 'ALL') url += `&hotel_name=${encodeURIComponent(hotelName)}`
+    if (startDate) url += `&start_date=${startDate}`
+    if (endDate) url += `&end_date=${endDate}`
+    return this.client.get(url)
+  }
+
+  // ==================== NIGHT AUDIT APIs ====================
+  
+  // Get night audits with optional filters
+  async getNightAudits(auditDate = null, hotelName = null) {
+    let url = '/night-audit/'
+    const params = []
+    if (auditDate) params.push(`audit_date=${auditDate}`)
+    if (hotelName && hotelName !== 'ALL') params.push(`hotel_name=${encodeURIComponent(hotelName)}`)
+    if (params.length > 0) url += `?${params.join('&')}`
+    return this.client.get(url)
+  }
+
+  // Get single night audit by ID
+  async getNightAuditById(id) {
+    return this.client.get(`/night-audit/${id}`)
+  }
+
+  // Create new night audit
+  async createNightAudit(auditData) {
+    return this.client.post('/night-audit/', auditData)
+  }
+
+  // Update night audit
+  async updateNightAudit(id, auditData) {
+    return this.client.put(`/night-audit/${id}`, auditData)
+  }
+
+  // Delete night audit
+  async deleteNightAudit(id) {
+    return this.client.delete(`/night-audit/${id}`)
+  }
 }
 
 export const apiService = new ApiService()

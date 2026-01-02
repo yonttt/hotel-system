@@ -75,6 +75,16 @@ import AdjustmentPage from './pages/operational/AdjustmentPage';
 import FoodBeveragePage from './pages/operational/FoodBeveragePage';
 import LaundryPage from './pages/operational/LaundryPage';
 
+// Operational - Adjustment
+import CheckOutToday from './pages/operational/adjustment/CheckOutToday';
+import NightAudit from './pages/operational/adjustment/NightAudit';
+import AdjFoodBeverage from './pages/operational/adjustment/AdjFoodBeverage';
+import AdjInventory from './pages/operational/adjustment/AdjInventory';
+import AdjKos from './pages/operational/adjustment/AdjKos';
+import AdjLaundry from './pages/operational/adjustment/AdjLaundry';
+import AdjMeetingRoom from './pages/operational/adjustment/AdjMeetingRoom';
+import AdjPettyCash from './pages/operational/adjustment/AdjPettyCash';
+
 // Operational - Food & Beverage - Master Data
 import MasterMeja from './pages/operational/foodbeverage/master_data/MasterMeja';
 import KategoriMenuResto from './pages/operational/foodbeverage/master_data/KategoriMenuResto';
@@ -206,6 +216,91 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+            
+            {/* Adjustment - Front Office - Checkout */}
+            <Route 
+              path="/operational/adjustment/front-office/checkout" 
+              element={
+                <ProtectedRoute>
+                  <ErrorBoundary>
+                    <CheckOutToday />
+                  </ErrorBoundary>
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Adjustment - Front Office - Night Audit */}
+            <Route 
+              path="/operational/adjustment/front-office/night-audit" 
+              element={
+                <ProtectedRoute>
+                  <ErrorBoundary>
+                    <NightAudit />
+                  </ErrorBoundary>
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Adjustment - Food & Beverage */}
+            <Route 
+              path="/operational/adjustment/food-beverage" 
+              element={
+                <ProtectedRoute>
+                  <AdjFoodBeverage />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Adjustment - Inventory */}
+            <Route 
+              path="/operational/adjustment/inventory" 
+              element={
+                <ProtectedRoute>
+                  <AdjInventory />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Adjustment - Kos */}
+            <Route 
+              path="/operational/adjustment/kos" 
+              element={
+                <ProtectedRoute>
+                  <AdjKos />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Adjustment - Laundry */}
+            <Route 
+              path="/operational/adjustment/laundry" 
+              element={
+                <ProtectedRoute>
+                  <AdjLaundry />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Adjustment - Meeting Room */}
+            <Route 
+              path="/operational/adjustment/meeting-room" 
+              element={
+                <ProtectedRoute>
+                  <AdjMeetingRoom />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Adjustment - Petty Cash */}
+            <Route 
+              path="/operational/adjustment/petty-cash" 
+              element={
+                <ProtectedRoute>
+                  <AdjPettyCash />
+                </ProtectedRoute>
+              } 
+            />
+            
             <Route 
               path="/operational/foodbeverage" 
               element={

@@ -21,6 +21,8 @@ const Sidebar = () => {
   const { user } = useAuth()
   const [expandedMenus, setExpandedMenus] = useState({
     operational: false,
+    adjustment: false,
+    adjFrontOffice: false,
     frontOffice: false,
     formTransaksi: false,
     infoReservasi: false,
@@ -59,6 +61,12 @@ const Sidebar = () => {
 
     if (path.includes('/operational/')) {
       newExpandedMenus.operational = true
+      if (path.includes('/adjustment/')) {
+        newExpandedMenus.adjustment = true
+        if (path.includes('/front-office/')) {
+          newExpandedMenus.adjFrontOffice = true
+        }
+      }
       if (path.includes('/frontoffice/')) {
         newExpandedMenus.frontOffice = true
         if (path.includes('/form-transaksi/')) {
@@ -142,6 +150,8 @@ const Sidebar = () => {
   const resetAllMenus = () => {
     setExpandedMenus({
       operational: false,
+      adjustment: false,
+      adjFrontOffice: false,
       frontOffice: false,
       formTransaksi: false,
       infoReservasi: false,
@@ -179,7 +189,28 @@ const Sidebar = () => {
       hasSubmenu: true,
       submenu: 'operational',
       children: [
-        { title: 'Adjustment', path: '/operational/adjustment' },
+        {
+          title: 'Adjustment',
+          hasSubmenu: true,
+          submenu: 'adjustment',
+          children: [
+            { title: 'Food & Beverage', path: '/operational/adjustment/food-beverage' },
+            {
+              title: 'Front Office',
+              hasSubmenu: true,
+              submenu: 'adjFrontOffice',
+              children: [
+                { title: 'Check Out Today', path: '/operational/adjustment/front-office/checkout' },
+                { title: 'Night Audit', path: '/operational/adjustment/front-office/night-audit' }
+              ]
+            },
+            { title: 'Inventory', path: '/operational/adjustment/inventory' },
+            { title: 'Kos', path: '/operational/adjustment/kos' },
+            { title: 'Laundry', path: '/operational/adjustment/laundry' },
+            { title: 'Meeting Room', path: '/operational/adjustment/meeting-room' },
+            { title: 'Petty Cash', path: '/operational/adjustment/petty-cash' }
+          ]
+        },
         {
           title: 'Food & Beverage',
           hasSubmenu: true,
