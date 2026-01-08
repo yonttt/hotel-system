@@ -4,6 +4,7 @@ from sqlalchemy import text
 from typing import List
 from app.core.database import get_db
 from app.core.auth import get_current_user, get_current_manager_or_admin_user
+from app.core.room_utils import update_room_status
 from app.models import User, HotelRegistration
 from app.schemas import (
     GuestRegistrationCreate, 
@@ -12,16 +13,6 @@ from app.schemas import (
 )
 
 router = APIRouter()
-
-def update_room_status(db: Session, room_number: str, new_status: str):
-    """Update room status in hotel_rooms table."""
-    try:
-        db.execute(
-            text("UPDATE hotel_rooms SET status = :status WHERE room_number = :room_number"),
-            {"status": new_status, "room_number": room_number}
-        )
-    except Exception as e:
-        print(f"Warning: Could not update room status: {e}")
 
 @router.post("/", response_model=GuestRegistrationResponse)
 def create_guest_registration(
