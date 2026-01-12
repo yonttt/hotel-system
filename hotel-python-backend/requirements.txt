@@ -1,0 +1,28 @@
+# Hotel Management System - Python Backend Requirements
+# Install with: pip install -r requirements.txt
+
+# Web Framework
+fastapi>=0.100.0
+uvicorn[standard]>=0.22.0
+
+# Database
+SQLAlchemy>=2.0.0
+PyMySQL>=1.0.2
+mysql-connector-python>=8.0.33
+
+# Security & Authentication
+python-jose[cryptography]>=3.3.0
+passlib>=1.7.4
+bcrypt==4.0.1
+python-multipart>=0.0.6
+
+# Configuration
+pydantic-settings>=2.0.0
+python-dotenv>=1.0.0
+
+# Rate Limiting & Security Middleware
+slowapi>=0.1.9
+secure>=0.3.0
+
+# Development/Optional
+httpx>=0.24.0

@@ -1,21 +1,50 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 from app.api import auth, users, hotel_rooms, room_pricing, guests, hotel_registrations, hotel_reservations, cities, nationalities, category_markets, market_segments, payment_methods, group_bookings, revenue_reports, master_data, room_rates, master_meja, kategori_menu_resto, checkout, night_audit
 from app.core.config import settings
+from app.core.security_middleware import (
+    limiter, 
+    SecurityHeadersMiddleware, 
+    LoginProtectionMiddleware,
+    rate_limit_exceeded_handler
+)
 
 app = FastAPI(
     title="Hotel Management System API",
     description="Modern Python API for Eva Group Hotel Management System",
-    version="2.0.0"
+    version="2.0.0",
+    docs_url="/docs",  # Swagger UI
+    redoc_url="/redoc"  # ReDoc
 )
 
-# Configure CORS
+# Add rate limiter state
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
+
+# Add Security Middlewares (order matters - first added = last executed)
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(LoginProtectionMiddleware)
+
+# Configure CORS with more specific settings
+# For production, replace with your actual domain(s)
+ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+    # Add production domains here:
+    # "https://your-hotel-domain.com",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:5174"],  # React dev server (prioritize 5173)
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"],
+    expose_headers=["X-RateLimit-Limit", "X-RateLimit-Remaining", "X-RateLimit-Reset"],
 )
 
 # Health check endpoint
