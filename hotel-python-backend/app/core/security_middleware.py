@@ -2,12 +2,11 @@
 Security Middleware for Hotel Management System
 Implements rate limiting, security headers, and other protections
 """
-from fastapi import Request, Response
+from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
-from slowapi.middleware import SlowAPIMiddleware
 import time
 import logging
 

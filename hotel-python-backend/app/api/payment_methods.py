@@ -1,5 +1,4 @@
 from fastapi import APIRouter, HTTPException
-from typing import List
 import logging
 from ..core.database import get_db_connection
 

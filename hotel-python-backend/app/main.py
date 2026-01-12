@@ -1,9 +1,7 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from app.api import auth, users, hotel_rooms, room_pricing, guests, hotel_registrations, hotel_reservations, cities, nationalities, category_markets, market_segments, payment_methods, group_bookings, revenue_reports, master_data, room_rates, master_meja, kategori_menu_resto, checkout, night_audit
-from app.core.config import settings
 from app.core.security_middleware import (
     limiter, 
     SecurityHeadersMiddleware, 

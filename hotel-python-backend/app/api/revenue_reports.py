@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import func as sql_func, text, case
+from sqlalchemy import func as sql_func, text
 from typing import List, Optional
-from datetime import date, datetime
+from datetime import date
 from app.core.database import get_db
 from app.models import HotelRegistration, HotelReservation, GroupBooking, HotelRevenueSummary, NonHotelRevenueSummary
 from decimal import Decimal
