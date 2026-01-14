@@ -24,19 +24,20 @@ const DashboardPage = () => {
   const fetchDashboardData = async () => {
     try {
       // Fetch reservations
-      const reservationsResponse = await apiService.getReservations(0, 10)
-      const reservations = reservationsResponse.data
+      const reservationsResponse = await apiService.getHotelReservations(0, 10)
+      const reservations = reservationsResponse.data || []
       setRecentReservations(reservations.slice(0, 5))
       
       // Fetch rooms
-      const roomsResponse = await apiService.getRooms()
-      const rooms = roomsResponse.data
-      const availableRooms = rooms.filter(room => room.status === 'available').length
-      const occupiedRooms = rooms.filter(room => room.status === 'occupied').length
+      const roomsResponse = await apiService.getHotelRooms()
+      const rooms = roomsResponse.data || []
+      // VR = Vacant Ready (available), OR = Occupied Ready (occupied)
+      const availableRooms = rooms.filter(room => room.status === 'VR').length
+      const occupiedRooms = rooms.filter(room => ['OR', 'OC', 'OD'].includes(room.status)).length
       
       // Fetch guests
       const guestsResponse = await apiService.getGuests()
-      const guests = guestsResponse.data
+      const guests = guestsResponse.data || []
       
       setStats({
         totalReservations: reservations.length,

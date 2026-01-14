@@ -126,7 +126,7 @@ const GroupBooking = () => {
     setError('')
     try {
       const results = await Promise.allSettled([
-        apiService.getRoomsByStatus('available'),
+        apiService.getRoomsByStatus('VR'),
         apiService.getPaymentMethods(),
         apiService.getCities(),
         apiService.getCountries()

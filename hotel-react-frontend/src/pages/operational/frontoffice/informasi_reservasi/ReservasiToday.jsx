@@ -11,6 +11,8 @@ const ReservasiToday = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [showEntries, setShowEntries] = useState(10)
   const [currentPage, setCurrentPage] = useState(1)
+  const [selectedHotel, setSelectedHotel] = useState('ALL')
+  const [hotelOptions, setHotelOptions] = useState([])
 
   // Edit modal state
   const [showEditModal, setShowEditModal] = useState(false)
@@ -29,8 +31,20 @@ const ReservasiToday = () => {
   const [processing, setProcessing] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
 
-  useEffect(() => { loadReservations() }, [])
+  useEffect(() => { 
+    fetchMasterData()
+    loadReservations() 
+  }, [])
   useEffect(() => { setCurrentPage(1) }, [searchTerm, showEntries])
+
+  const fetchMasterData = async () => {
+    try {
+      const hotelResponse = await apiService.getHotels()
+      setHotelOptions(hotelResponse.data || [])
+    } catch (err) {
+      console.error('Error fetching master data:', err)
+    }
+  }
 
   const loadReservations = async () => {
     try {
@@ -146,8 +160,15 @@ const ReservasiToday = () => {
             <div className="unified-header-right">
               <div className="hotel-select">
                 <label>Hotel :</label>
-                <select className="header-hotel-select">
-                  <option>ALL</option>
+                <select 
+                  className="header-hotel-select"
+                  value={selectedHotel}
+                  onChange={(e) => setSelectedHotel(e.target.value)}
+                >
+                  <option value="ALL">ALL</option>
+                  {hotelOptions.map((hotel, index) => (
+                    <option key={index} value={hotel.name || hotel}>{hotel.name || hotel}</option>
+                  ))}
                 </select>
               </div>
             </div>

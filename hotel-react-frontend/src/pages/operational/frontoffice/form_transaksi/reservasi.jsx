@@ -165,7 +165,7 @@ const ReservasiPage = () => {
     try {
       const results = await Promise.allSettled([
         apiService.getNextReservationNumber(),
-        apiService.getRoomsByStatus('available'),
+        apiService.getRoomsByStatus('VR'),
         apiService.getCities(),
         apiService.getCountries(),
         apiService.getCategoryMarkets(),

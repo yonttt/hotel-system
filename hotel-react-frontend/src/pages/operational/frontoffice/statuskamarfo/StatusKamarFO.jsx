@@ -7,13 +7,32 @@ const StatusKamarFO = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('all'); // 'all' or 'description'
-  const [selectedHotel, setSelectedHotel] = useState('HOTEL NEW IDOLA');
+  const [selectedHotel, setSelectedHotel] = useState('ALL');
   const [selectedType, setSelectedType] = useState('All Type');
   const [selectedStatus, setSelectedStatus] = useState('All Status');
 
+  // Master data from database
+  const [statusOptions, setStatusOptions] = useState([]);
+  const [hotelOptions, setHotelOptions] = useState([]);
+
   useEffect(() => {
+    fetchMasterData();
     fetchRooms();
   }, []);
+
+  const fetchMasterData = async () => {
+    try {
+      // Fetch room statuses from database
+      const statusResponse = await apiService.getRoomStatuses();
+      setStatusOptions(statusResponse.data || []);
+      
+      // Fetch hotels from database
+      const hotelResponse = await apiService.getHotels();
+      setHotelOptions(hotelResponse.data || []);
+    } catch (err) {
+      console.error('Error fetching master data:', err);
+    }
+  };
 
   const fetchRooms = async () => {
     try {
@@ -30,27 +49,14 @@ const StatusKamarFO = () => {
     }
   };
 
-  // Room status descriptions
-  const roomStatusDescriptions = [
-    { no: 1, status: 'Checkout', statusCode: 'CO', color: '#000000', description: 'Tamu baru saja checkout' },
-    { no: 2, status: 'General Cleaning', statusCode: 'GC', color: '#808080', description: 'Kamar dalam tahap pembersihan global / Pesto Control' },
-    { no: 3, status: 'Out Of Order', statusCode: 'OO', color: '#ff0000', description: 'Kamar rusak (Tidak dapat dijual)' },
-    { no: 4, status: 'Vacant Dirty', statusCode: 'VD', color: '#ff8c00', description: 'Kamar checkout yang sudah diassign room attendant untuk membersihkan kamar' },
-    { no: 5, status: 'Vacant Clean', statusCode: 'VC', color: '#90ee90', description: 'Kamar yang sudah dibersihkan room attendant namun belum dicek oleh Leader HK' },
-    { no: 6, status: 'Vacant Ready', statusCode: 'VR', color: '#008000', description: 'Kamar yang sudah dicek kelengkapannya dan siap untuk dijual' },
-    { no: 7, status: 'Vacant Uncheck', statusCode: 'VU', color: '#e6e6fa', description: 'Kamar yang harus dibersihkan/dicek kelengkapannya jika kamar blm terjual setelah melalui night audit' },
-    { no: 8, status: 'Arrival', statusCode: 'AR', color: '#87ceeb', description: 'Kamar reservasi yang akan menginap pada H-0' },
-    { no: 9, status: 'Incognito', statusCode: 'IC', color: '#008080', description: 'Tamu yang ingin dirahasiakan keberadaannya' },
-    { no: 10, status: 'DND (Do Not Disturb)', statusCode: 'DND', color: '#0000ff', description: 'Kamar terisi dan tamu meminta untuk tidak diganggu' },
-    { no: 11, status: 'Occupied Dirty', statusCode: 'OD', color: '#9acd32', description: 'Kamar terisi (extend) yang akan diassign room attendant untuk membersihkan kamar' },
-    { no: 12, status: 'Makeup Room', statusCode: 'MU', color: '#800080', description: 'Kamar terisi yang telah di assign room attendant untuk membersihkan kamar' },
-    { no: 13, status: 'Occupied Clean', statusCode: 'OC', color: '#ff8c00', description: 'Kamar terisi dan telah selesai dibersihkan oleh room attendant' },
-    { no: 14, status: 'Occupied Ready', statusCode: 'OR', color: '#1e90ff', description: 'Kamar terisi dan sudah dibersihkan/tamu baru saja checkin' },
-    { no: 15, status: 'House Use', statusCode: 'HU', color: '#d3d3d3', description: 'Kamar yang digunakan oleh staff hotel' },
-    { no: 16, status: 'Sleep Out', statusCode: 'SO', color: '#ff69b4', description: 'Kamar yang sudah dibayar oleh tamu dan tidak ditempati' },
-    { no: 17, status: 'Skipper', statusCode: 'SK', color: '#ffffff', description: 'Tamu yang meninggalkan kamar tanpa ada informasi dari Front Office' },
-    { no: 18, status: 'Expected Departure', statusCode: 'ED', color: '#ffff00', description: 'Kamar yang akan checkout' }
-  ];
+  // Room status descriptions - derived from database statusOptions
+  const roomStatusDescriptions = statusOptions.map((status, index) => ({
+    no: index + 1,
+    status: status.name,
+    statusCode: status.code,
+    color: status.color || '#6c757d',
+    description: status.description || ''
+  }));
 
   // Get room status color based on status code
   const getStatusColor = (status) => {
@@ -227,7 +233,9 @@ const StatusKamarFO = () => {
                 <label>Hotel :</label>
                 <select value={selectedHotel} onChange={(e) => setSelectedHotel(e.target.value)}>
                   <option value="ALL">ALL</option>
-                  <option value="HOTEL NEW IDOLA">HOTEL NEW IDOLA</option>
+                  {hotelOptions.map((hotel, index) => (
+                    <option key={index} value={hotel.name || hotel}>{hotel.name || hotel}</option>
+                  ))}
                 </select>
               </div>
               <div className="filter-group">
