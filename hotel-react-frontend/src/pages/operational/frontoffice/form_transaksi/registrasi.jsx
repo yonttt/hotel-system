@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { useAuth } from '../../../../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { apiService } from '../../../../services/api'
@@ -530,7 +530,7 @@ const RegistrasiPage = () => {
                       name="transaction_status" 
                       value="Registration" 
                       className="form-input" 
-      _SESSION               readOnly 
+                      readOnly
                     />
                   </div>
                   <div className="form-group">

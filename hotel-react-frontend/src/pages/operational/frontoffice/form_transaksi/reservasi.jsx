@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { useAuth } from '../../../../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { apiService } from '../../../../services/api'
@@ -440,7 +440,7 @@ const ReservasiPage = () => {
                     placeholder="Select City"
                     className="form-select"
                   />
-                </div>w
+                </div>
                 <div className="form-group">
                   <label>Email</label>
                   <input type="email" name="email" value={formData.email} onChange={handleInputChange} className="form-input" />

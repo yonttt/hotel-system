@@ -38,7 +38,7 @@ def get_secret_key() -> str:
 
 class Settings(BaseSettings):
     # Database settings - loaded from environment variable
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "mysql+pymysql://system:yont29921@localhost/hotel_system")
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "mysql+pymysql://user:password@localhost/hotel_system")
     
     # JWT settings - loaded from environment variable
     SECRET_KEY: str = get_secret_key()
