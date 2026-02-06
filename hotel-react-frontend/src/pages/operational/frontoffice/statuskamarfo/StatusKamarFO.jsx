@@ -10,6 +10,12 @@ const StatusKamarFO = () => {
   const [selectedHotel, setSelectedHotel] = useState('ALL');
   const [selectedType, setSelectedType] = useState('All Type');
   const [selectedStatus, setSelectedStatus] = useState('All Status');
+  const [showModal, setShowModal] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [modalRoomStatus, setModalRoomStatus] = useState('');
+  const [modalRoomBoy, setModalRoomBoy] = useState('');
+  const [roomBoys, setRoomBoys] = useState([]);
+  const [processing, setProcessing] = useState(false);
 
   // Master data from database
   const [statusOptions, setStatusOptions] = useState([]);
@@ -18,6 +24,7 @@ const StatusKamarFO = () => {
   useEffect(() => {
     fetchMasterData();
     fetchRooms();
+    fetchRoomBoys();
   }, []);
 
   const fetchMasterData = async () => {
@@ -46,6 +53,18 @@ const StatusKamarFO = () => {
       console.error('Error fetching rooms:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRoomBoys = async () => {
+    try {
+      const response = await apiService.getUsersByRole('frontoffice');
+      console.log('Front Office Room Boys Response:', response.data);
+      setRoomBoys(response.data || []);
+    } catch (err) {
+      console.error('Error fetching front office room boys:', err);
+      // Set default if fetch fails
+      setRoomBoys([]);
     }
   };
 
@@ -175,6 +194,59 @@ const StatusKamarFO = () => {
 
   const statusCounts = getStatusCounts();
 
+  // Handle room click
+  const handleRoomClick = (room) => {
+    setSelectedRoom(room);
+    setModalRoomStatus(getShortStatus(room.status));
+    setModalRoomBoy('');
+    setShowModal(true);
+  };
+
+  // Handle modal close
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedRoom(null);
+    setModalRoomStatus('');
+    setModalRoomBoy('');
+  };
+
+  // Handle process (update room status)
+  const handleProcess = async () => {
+    if (!modalRoomStatus) {
+      alert('Please select a room status');
+      return;
+    }
+    if (!modalRoomBoy) {
+      alert('Please select a Front Office Room Boy');
+      return;
+    }
+    
+    try {
+      setProcessing(true);
+      // Update room status via API
+      await apiService.updateHotelRoom(selectedRoom.room_number, {
+        status: modalRoomStatus
+      });
+      
+      console.log('Room status updated:', selectedRoom?.room_number, {
+        status: modalRoomStatus,
+        roomBoy: modalRoomBoy
+      });
+      
+      alert(`Room ${selectedRoom.room_number} status updated to ${modalRoomStatus} by ${modalRoomBoy}`);
+      
+      // Close modal after successful update
+      handleCloseModal();
+      // Refresh rooms
+      await fetchRooms();
+    } catch (err) {
+      console.error('Error updating room:', err);
+      alert('Failed to update room status: ' + (err.response?.data?.detail || err.message));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   return (
     <Layout>
       <div className="status-kamar-container">
@@ -272,6 +344,7 @@ const StatusKamarFO = () => {
                     key={room.id}
                     className="room-box"
                     style={{ backgroundColor: getStatusColor(room.status) }}
+                    onClick={() => handleRoomClick(room)}
                   >
                     <div className="room-type">{room.room_type}</div>
                     <div className="room-number">{room.room_number}</div>
@@ -343,6 +416,72 @@ const StatusKamarFO = () => {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal for Room Details - Front Office */}
+        {showModal && selectedRoom && (
+          <div className="modal-overlay" onClick={handleCloseModal}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>ROOM {selectedRoom.room_number}</h3>
+              </div>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label>Room Status : <span className="required">*</span> Required</label>
+                  <select 
+                    value={modalRoomStatus} 
+                    onChange={(e) => setModalRoomStatus(e.target.value)}
+                    className="modal-select"
+                  >
+                    <option value="">---Room Status--</option>
+                    <option value="CO">Checkout</option>
+                    <option value="GC">General Cleaning</option>
+                    <option value="OO">Out Of Order</option>
+                    <option value="VD">Vacant Dirty</option>
+                    <option value="VC">Vacant Clean</option>
+                    <option value="VR">Vacant Ready</option>
+                    <option value="VU">Vacant Uncheck</option>
+                    <option value="AR">Arrival</option>
+                    <option value="IC">Incognito</option>
+                    <option value="DND">DND (Do Not Disturb)</option>
+                    <option value="OD">Occupied Dirty</option>
+                    <option value="MU">Makeup Room</option>
+                    <option value="OC">Occupied Clean</option>
+                    <option value="OR">Occupied Ready</option>
+                    <option value="HU">House Use</option>
+                    <option value="SO">Sleep Out</option>
+                    <option value="SK">Skipper</option>
+                    <option value="ED">Expected Departure</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Front Office Room Boy : <span className="required">*</span> Required</label>
+                  <select 
+                    value={modalRoomBoy} 
+                    onChange={(e) => setModalRoomBoy(e.target.value)}
+                    className="modal-select"
+                  >
+                    <option value="">---Select Front Office Room Boy---</option>
+                    {roomBoys.length > 0 ? (
+                      roomBoys.map((user) => (
+                        <option key={user.id} value={user.full_name || user.username}>
+                          {user.full_name || user.username}
+                        </option>
+                      ))
+                    ) : (
+                      <option value="Front Office Staff">Front Office Staff (Default)</option>
+                    )}
+                  </select>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button className="btn-close" onClick={handleCloseModal}>Close</button>
+                <button className="btn-proses" onClick={handleProcess} disabled={processing}>
+                  {processing ? 'Processing...' : 'Proses'}
+                </button>
               </div>
             </div>
           </div>
