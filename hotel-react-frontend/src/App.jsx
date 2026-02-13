@@ -76,6 +76,7 @@ import FoodBeveragePage from './pages/operational/FoodBeveragePage';
 import LaundryPage from './pages/operational/LaundryPage';
 
 // Operational - Adjustment
+import CheckInToday from './pages/operational/adjustment/CheckInToday';
 import CheckOutToday from './pages/operational/adjustment/CheckOutToday';
 import NightAudit from './pages/operational/adjustment/NightAudit';
 import AdjFoodBeverage from './pages/operational/adjustment/AdjFoodBeverage';
@@ -213,6 +214,18 @@ function App() {
               element={
                 <ProtectedRoute>
                   <AdjustmentPage />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Adjustment - Front Office - Check In */}
+            <Route 
+              path="/operational/adjustment/front-office/checkin" 
+              element={
+                <ProtectedRoute>
+                  <ErrorBoundary>
+                    <CheckInToday />
+                  </ErrorBoundary>
                 </ProtectedRoute>
               } 
             />

@@ -200,6 +200,7 @@ const Sidebar = () => {
               hasSubmenu: true,
               submenu: 'adjFrontOffice',
               children: [
+                { title: 'Check In Today', path: '/operational/adjustment/front-office/checkin' },
                 { title: 'Check Out Today', path: '/operational/adjustment/front-office/checkout' },
                 { title: 'Night Audit', path: '/operational/adjustment/front-office/night-audit' }
               ]

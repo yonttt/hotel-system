@@ -480,6 +480,22 @@ class ApiService {
     return this.client.get('/kategori-menu-resto/hotels/list')
   }
 
+  // ==================== CHECK-IN APIs ====================
+  
+  // Get guests due for check-in today
+  async getCheckinToday(hotelName = null) {
+    let url = '/checkin/today'
+    if (hotelName && hotelName !== 'ALL') {
+      url += `?hotel_name=${encodeURIComponent(hotelName)}`
+    }
+    return this.client.get(url)
+  }
+
+  // Process check-in for a registration
+  async processCheckin(registrationId, checkinData = null) {
+    return this.client.post(`/checkin/${registrationId}`, checkinData || {})
+  }
+
   // ==================== CHECKOUT APIs ====================
   
   // Get guests due for checkout today
