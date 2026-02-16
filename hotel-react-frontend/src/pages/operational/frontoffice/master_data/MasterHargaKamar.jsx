@@ -15,11 +15,12 @@ const MasterHargaKamar = () => {
   const [showEntries, setShowEntries] = useState(10);
   const [successMessage, setSuccessMessage] = useState(null);
 
-  // Edit modal state
+  // Modal states
+  const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingRate, setEditingRate] = useState(null);
-  const [editFormData, setEditFormData] = useState({
-    hotel_name: '',
+  const [formData, setFormData] = useState({
+    hotel_name: 'HOTEL NEW IDOLA',
     rate_name: '',
     room_type: '',
     room_rate: 0,
@@ -126,11 +127,54 @@ const MasterHargaKamar = () => {
     return ['admin', 'manager'].includes(user?.role?.toLowerCase());
   };
 
+  const resetForm = () => {
+    setFormData({
+      hotel_name: 'HOTEL NEW IDOLA',
+      rate_name: '',
+      room_type: '',
+      room_rate: 0,
+      extrabed: 0,
+      effective_date: ''
+    });
+  };
+
+  // Handle add click
+  const handleAddClick = () => {
+    resetForm();
+    setShowAddModal(true);
+  };
+
+  // Handle add save
+  const handleAddSave = async () => {
+    if (!formData.rate_name || !formData.room_type) {
+      alert('Please fill in Rate Name and Room Type');
+      return;
+    }
+    try {
+      setProcessing(true);
+      await apiService.createRoomRate({
+        ...formData,
+        room_rate: parseFloat(formData.room_rate) || 0,
+        extrabed: parseFloat(formData.extrabed) || 0
+      });
+      setSuccessMessage(`Rate "${formData.rate_name}" added successfully`);
+      setShowAddModal(false);
+      resetForm();
+      await fetchRates();
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      console.error('Error adding rate:', err);
+      alert('Failed to add rate: ' + (err.response?.data?.detail || err.message));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   // Handle edit click
   const handleEditClick = (rate) => {
     if (!canEdit()) return;
     setEditingRate(rate);
-    setEditFormData({
+    setFormData({
       hotel_name: rate.hotel_name || 'HOTEL NEW IDOLA',
       rate_name: rate.rate_name || '',
       room_type: rate.room_type || '',
@@ -143,27 +187,22 @@ const MasterHargaKamar = () => {
 
   // Handle save edit
   const handleSaveEdit = async () => {
-    if (!editFormData.rate_name || !editFormData.room_type) {
+    if (!formData.rate_name || !formData.room_type) {
       alert('Please fill in all required fields');
       return;
     }
-
     try {
       setProcessing(true);
       await apiService.updateRoomRate(editingRate.id, {
-        ...editFormData,
-        room_rate: parseFloat(editFormData.room_rate) || 0,
-        extrabed: parseFloat(editFormData.extrabed) || 0
+        ...formData,
+        room_rate: parseFloat(formData.room_rate) || 0,
+        extrabed: parseFloat(formData.extrabed) || 0
       });
-      
-      setSuccessMessage(`Rate "${editFormData.rate_name}" updated successfully`);
+      setSuccessMessage(`Rate "${formData.rate_name}" updated successfully`);
       setShowEditModal(false);
       setEditingRate(null);
       await fetchRates();
-      
-      setTimeout(() => {
-        setSuccessMessage(null);
-      }, 3000);
+      setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
       console.error('Error updating rate:', err);
       alert('Failed to update rate: ' + (err.response?.data?.detail || err.message));
@@ -172,18 +211,26 @@ const MasterHargaKamar = () => {
     }
   };
 
+  // Handle delete
+  const handleDelete = async (rate) => {
+    if (!window.confirm(`Are you sure you want to delete rate "${rate.rate_name}"?`)) return;
+    try {
+      await apiService.deleteRoomRate(rate.id);
+      setSuccessMessage(`Rate "${rate.rate_name}" deleted successfully`);
+      await fetchRates();
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      console.error('Error deleting rate:', err);
+      alert('Failed to delete rate: ' + (err.response?.data?.detail || err.message));
+    }
+  };
+
   // Handle close modal
   const handleCloseModal = () => {
+    setShowAddModal(false);
     setShowEditModal(false);
     setEditingRate(null);
-    setEditFormData({
-      hotel_name: '',
-      rate_name: '',
-      room_type: '',
-      room_rate: 0,
-      extrabed: 0,
-      effective_date: ''
-    });
+    resetForm();
   };
 
   return (
@@ -196,6 +243,24 @@ const MasterHargaKamar = () => {
               <div className="header-title">
                 <span>MASTER HARGA KAMAR</span>
               </div>
+              {canEdit() && (
+                <button
+                  onClick={handleAddClick}
+                  className="btn-table-action"
+                  style={{
+                    background: '#007bff',
+                    color: 'white',
+                    padding: '6px 16px',
+                    marginLeft: '20px',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}
+                >
+                  ADD
+                </button>
+              )}
             </div>
             <div className="unified-header-right">
               <div className="hotel-select">
@@ -319,13 +384,22 @@ const MasterHargaKamar = () => {
                     <td>{formatDate(rate.effective_date)}</td>
                     <td style={{ textAlign: 'center' }}>
                       {canEdit() && (
-                        <button
-                          className="btn-table-action"
-                          title="Edit Rate"
-                          onClick={() => handleEditClick(rate)}
-                        >
-                          Edit
-                        </button>
+                        <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                          <button
+                            className="btn-table-action"
+                            style={{ background: '#ffc107', color: '#212529', padding: '4px 10px', fontSize: '12px' }}
+                            onClick={() => handleEditClick(rate)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="btn-table-action"
+                            style={{ background: '#dc3545', color: 'white', padding: '4px 10px', fontSize: '12px' }}
+                            onClick={() => handleDelete(rate)}
+                          >
+                            Delete
+                          </button>
+                        </div>
                       )}
                     </td>
                   </tr>
@@ -392,9 +466,9 @@ const MasterHargaKamar = () => {
         </div>
       </div>
 
-      {/* Edit Modal */}
-      {showEditModal && (
-        <div className="modal-overlay" style={{
+      {/* Add/Edit Modal */}
+      {(showAddModal || showEditModal) && (
+        <div style={{
           position: 'fixed',
           top: 0,
           left: 0,
@@ -406,7 +480,7 @@ const MasterHargaKamar = () => {
           alignItems: 'center',
           zIndex: 1000
         }}>
-          <div className="modal-content" style={{
+          <div style={{
             backgroundColor: 'white',
             padding: '20px',
             borderRadius: '8px',
@@ -416,14 +490,14 @@ const MasterHargaKamar = () => {
             overflow: 'auto'
           }}>
             <h3 style={{ marginBottom: '20px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
-              Edit Room Rate
+              {showEditModal ? 'Edit Room Rate' : 'Add New Room Rate'}
             </h3>
             
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Hotel</label>
               <select
-                value={editFormData.hotel_name}
-                onChange={(e) => setEditFormData({...editFormData, hotel_name: e.target.value})}
+                value={formData.hotel_name}
+                onChange={(e) => setFormData({...formData, hotel_name: e.target.value})}
                 style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
               >
                 {hotelOptions.map(hotel => (
@@ -436,8 +510,8 @@ const MasterHargaKamar = () => {
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Rate Name <span style={{color: 'red'}}>*</span></label>
               <input
                 type="text"
-                value={editFormData.rate_name}
-                onChange={(e) => setEditFormData({...editFormData, rate_name: e.target.value})}
+                value={formData.rate_name}
+                onChange={(e) => setFormData({...formData, rate_name: e.target.value})}
                 style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                 placeholder="e.g., Libur Keagamaan 2025"
               />
@@ -446,8 +520,8 @@ const MasterHargaKamar = () => {
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Room Type <span style={{color: 'red'}}>*</span></label>
               <select
-                value={editFormData.room_type}
-                onChange={(e) => setEditFormData({...editFormData, room_type: e.target.value})}
+                value={formData.room_type}
+                onChange={(e) => setFormData({...formData, room_type: e.target.value})}
                 style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
               >
                 <option value="">Select Room Type</option>
@@ -462,8 +536,8 @@ const MasterHargaKamar = () => {
                 <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Room Rate</label>
                 <input
                   type="number"
-                  value={editFormData.room_rate}
-                  onChange={(e) => setEditFormData({...editFormData, room_rate: e.target.value})}
+                  value={formData.room_rate}
+                  onChange={(e) => setFormData({...formData, room_rate: e.target.value})}
                   style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                 />
               </div>
@@ -471,8 +545,8 @@ const MasterHargaKamar = () => {
                 <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Extrabed</label>
                 <input
                   type="number"
-                  value={editFormData.extrabed}
-                  onChange={(e) => setEditFormData({...editFormData, extrabed: e.target.value})}
+                  value={formData.extrabed}
+                  onChange={(e) => setFormData({...formData, extrabed: e.target.value})}
                   style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                 />
               </div>
@@ -482,8 +556,8 @@ const MasterHargaKamar = () => {
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Effective Date</label>
               <input
                 type="date"
-                value={editFormData.effective_date}
-                onChange={(e) => setEditFormData({...editFormData, effective_date: e.target.value})}
+                value={formData.effective_date}
+                onChange={(e) => setFormData({...formData, effective_date: e.target.value})}
                 style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
               />
             </div>
@@ -502,19 +576,19 @@ const MasterHargaKamar = () => {
                 Cancel
               </button>
               <button
-                onClick={handleSaveEdit}
+                onClick={showEditModal ? handleSaveEdit : handleAddSave}
                 disabled={processing}
                 style={{
                   padding: '8px 20px',
                   border: 'none',
                   borderRadius: '4px',
-                  backgroundColor: '#4CAF50',
+                  backgroundColor: showEditModal ? '#4CAF50' : '#007bff',
                   color: 'white',
                   cursor: processing ? 'not-allowed' : 'pointer',
                   opacity: processing ? 0.7 : 1
                 }}
               >
-                {processing ? 'Saving...' : 'Save Changes'}
+                {processing ? 'Saving...' : (showEditModal ? 'Save Changes' : 'Add Rate')}
               </button>
             </div>
           </div>

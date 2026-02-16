@@ -188,6 +188,16 @@ class ApiService {
     return this.client.put(`/room-pricing/categories/${categoryId}`, categoryData)
   }
 
+  // Create room category
+  async createRoomCategory(categoryData) {
+    return this.client.post('/room-pricing/categories', categoryData)
+  }
+
+  // Delete room category
+  async deleteRoomCategory(categoryId) {
+    return this.client.delete(`/room-pricing/categories/${categoryId}`)
+  }
+
   // Guests endpoints
   async getGuests(skip = 0, limit = 100) {
     return this.client.get(`/guests/?skip=${skip}&limit=${limit}`)
@@ -198,7 +208,7 @@ class ApiService {
     return this.client.get(`/hotel-registrations/?skip=${skip}&limit=${limit}`)
   }
 
-  async getHotelRegistration(id) {
+  async getHotelRegistration( wid) {
     return this.client.get(`/hotel-registrations/${id}`)
   }
 
@@ -551,6 +561,35 @@ class ApiService {
   // Delete night audit
   async deleteNightAudit(id) {
     return this.client.delete(`/night-audit/${id}`)
+  }
+
+  // ==================== PROPERTIES (Property List) ====================
+  
+  // Get all properties
+  async getProperties(activeOnly = false, category = null) {
+    let url = `/properties/?active_only=${activeOnly}`
+    if (category) url += `&category=${encodeURIComponent(category)}`
+    return this.client.get(url)
+  }
+
+  // Get property by ID
+  async getPropertyById(propertyId) {
+    return this.client.get(`/properties/${propertyId}`)
+  }
+
+  // Create new property
+  async createProperty(propertyData) {
+    return this.client.post('/properties/', propertyData)
+  }
+
+  // Update property
+  async updateProperty(propertyId, propertyData) {
+    return this.client.put(`/properties/${propertyId}`, propertyData)
+  }
+
+  // Delete property
+  async deleteProperty(propertyId) {
+    return this.client.delete(`/properties/${propertyId}`)
   }
 }
 

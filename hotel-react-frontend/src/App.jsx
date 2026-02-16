@@ -120,6 +120,7 @@ import UserManagement from './pages/hrd/UserManagement';
 import UserList from './pages/hrd/UserList';
 import UserAuthority from './pages/hrd/UserAuthority';
 import LaporanGlobal from './pages/hrd/LaporanGlobal';
+import PropertyList from './pages/hrd/master_data/PropertyList';
 
 // Profile Page
 import ProfilePage from './pages/ProfilePage';
@@ -538,6 +539,16 @@ function App() {
               element={
                 <ProtectedRoute>
                   <LaporanGlobal />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/hrd/property-list" 
+              element={
+                <ProtectedRoute>
+                  <ErrorBoundary>
+                    <PropertyList />
+                  </ErrorBoundary>
                 </ProtectedRoute>
               } 
             />

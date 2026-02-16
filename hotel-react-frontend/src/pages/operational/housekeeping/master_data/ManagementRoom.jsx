@@ -14,16 +14,18 @@ const ManagementRoom = () => {
   const [selectedHotel, setSelectedHotel] = useState('ALL');
   const [successMessage, setSuccessMessage] = useState(null);
 
-  // Edit modal state
+  // Modal state
+  const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
-  const [editFormData, setEditFormData] = useState({
-    hotel_name: '',
+  const [formData, setFormData] = useState({
+    hotel_name: 'HOTEL NEW IDOLA',
+    room_number: '',
     room_type: '',
     floor_number: '',
-    vip_status: '',
-    smoking_allowed: '',
-    tax_status: ''
+    vip_status: 'NO',
+    smoking_allowed: 'No',
+    tax_status: 'TIDAK'
   });
   const [processing, setProcessing] = useState(false);
 
@@ -75,16 +77,65 @@ const ManagementRoom = () => {
     return ['admin', 'manager'].includes(user?.role?.toLowerCase());
   };
 
+  const resetForm = () => {
+    setFormData({
+      hotel_name: 'HOTEL NEW IDOLA',
+      room_number: '',
+      room_type: '',
+      floor_number: '',
+      vip_status: 'NO',
+      smoking_allowed: 'No',
+      tax_status: 'TIDAK'
+    });
+  };
+
+  // Handle add click
+  const handleAddClick = () => {
+    resetForm();
+    setShowAddModal(true);
+  };
+
+  // Handle add save
+  const handleAddSave = async () => {
+    if (!formData.room_number || !formData.room_type) {
+      alert('Please fill in Room Number and Room Type');
+      return;
+    }
+    try {
+      setProcessing(true);
+      await apiService.createHotelRoom({
+        hotel_name: formData.hotel_name,
+        room_number: formData.room_number,
+        room_type: formData.room_type,
+        floor_number: parseInt(formData.floor_number) || 1,
+        is_vip: formData.vip_status === 'YES',
+        smoking_allowed: formData.smoking_allowed === 'Yes',
+        tax_status: formData.tax_status
+      });
+      setSuccessMessage(`Room "${formData.room_number}" added successfully`);
+      setShowAddModal(false);
+      resetForm();
+      await fetchRooms();
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      console.error('Error adding room:', err);
+      alert('Failed to add room: ' + (err.response?.data?.detail || err.message));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   // Handle edit click
   const handleEditClick = (item) => {
     if (!canEdit()) return;
     setEditingItem(item);
-    setEditFormData({
+    setFormData({
       hotel_name: item.hotel_name || 'HOTEL NEW IDOLA',
+      room_number: item.room_number || '',
       room_type: item.room_type || '',
       floor_number: item.floor_number || item.floor || '',
       vip_status: item.vip_status || (item.is_vip ? 'YES' : 'NO'),
-      smoking_allowed: item.smoking_allowed || (item.smoking_allowed ? 'Yes' : 'No'),
+      smoking_allowed: item.smoking_allowed ? 'Yes' : 'No',
       tax_status: item.tax_status || 'TIDAK'
     });
     setShowEditModal(true);
@@ -92,30 +143,25 @@ const ManagementRoom = () => {
 
   // Handle save edit
   const handleSaveEdit = async () => {
-    if (!editFormData.room_type) {
+    if (!formData.room_type) {
       alert('Please select a room type');
       return;
     }
-
     try {
       setProcessing(true);
       await apiService.updateHotelRoom(editingItem.room_number, {
-        hotel_name: editFormData.hotel_name,
-        room_type: editFormData.room_type,
-        floor_number: parseInt(editFormData.floor_number) || editingItem.floor_number,
-        vip_status: editFormData.vip_status,
-        smoking_allowed: editFormData.smoking_allowed,
-        tax_status: editFormData.tax_status
+        hotel_name: formData.hotel_name,
+        room_type: formData.room_type,
+        floor_number: parseInt(formData.floor_number) || editingItem.floor_number,
+        vip_status: formData.vip_status,
+        smoking_allowed: formData.smoking_allowed,
+        tax_status: formData.tax_status
       });
-      
       setSuccessMessage(`Room "${editingItem.room_number}" updated successfully`);
       setShowEditModal(false);
       setEditingItem(null);
       await fetchRooms();
-      
-      setTimeout(() => {
-        setSuccessMessage(null);
-      }, 3000);
+      setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
       console.error('Error updating room:', err);
       alert('Failed to update room: ' + (err.response?.data?.detail || err.message));
@@ -124,18 +170,26 @@ const ManagementRoom = () => {
     }
   };
 
+  // Handle delete
+  const handleDelete = async (item) => {
+    if (!window.confirm(`Are you sure you want to delete room "${item.room_number}"?`)) return;
+    try {
+      await apiService.deleteHotelRoom(item.room_number);
+      setSuccessMessage(`Room "${item.room_number}" deleted successfully`);
+      await fetchRooms();
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      console.error('Error deleting room:', err);
+      alert('Failed to delete room: ' + (err.response?.data?.detail || err.message));
+    }
+  };
+
   // Handle close modal
   const handleCloseModal = () => {
+    setShowAddModal(false);
     setShowEditModal(false);
     setEditingItem(null);
-    setEditFormData({
-      hotel_name: '',
-      room_type: '',
-      floor_number: '',
-      vip_status: '',
-      smoking_allowed: '',
-      tax_status: ''
-    });
+    resetForm();
   };
 
   return (
@@ -161,6 +215,24 @@ const ManagementRoom = () => {
         <div className="header-row header-row-top">
           <div className="unified-header-left">
             <h2 className="header-title">MANAGEMENT ROOM</h2>
+            {canEdit() && (
+              <button
+                onClick={handleAddClick}
+                className="btn-table-action"
+                style={{
+                  background: '#007bff',
+                  color: 'white',
+                  padding: '6px 16px',
+                  marginLeft: '20px',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}
+              >
+                ADD
+              </button>
+            )}
           </div>
           <div className="unified-header-right">
             <div className="hotel-select">
@@ -263,12 +335,22 @@ const ManagementRoom = () => {
                   <td>{item.hit_count || 0}</td>
                   <td>
                     {canEdit() && (
-                      <button 
-                        className="btn-table-action"
-                        onClick={() => handleEditClick(item)}
-                      >
-                        Edit
-                      </button>
+                      <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                        <button 
+                          className="btn-table-action"
+                          style={{ background: '#ffc107', color: '#212529', padding: '4px 10px', fontSize: '12px' }}
+                          onClick={() => handleEditClick(item)}
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          className="btn-table-action"
+                          style={{ background: '#dc3545', color: 'white', padding: '4px 10px', fontSize: '12px' }}
+                          onClick={() => handleDelete(item)}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     )}
                   </td>
                 </tr>
@@ -321,9 +403,9 @@ const ManagementRoom = () => {
       </div>
       </div>
 
-      {/* Edit Modal */}
-      {showEditModal && (
-        <div className="modal-overlay" style={{
+      {/* Add/Edit Modal */}
+      {(showAddModal || showEditModal) && (
+        <div style={{
           position: 'fixed',
           top: 0,
           left: 0,
@@ -335,7 +417,7 @@ const ManagementRoom = () => {
           alignItems: 'center',
           zIndex: 1000
         }}>
-          <div className="modal-content" style={{
+          <div style={{
             backgroundColor: 'white',
             padding: '20px',
             borderRadius: '8px',
@@ -345,14 +427,14 @@ const ManagementRoom = () => {
             overflow: 'auto'
           }}>
             <h3 style={{ marginBottom: '20px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
-              Edit Room: {editingItem?.room_number}
+              {showEditModal ? `Edit Room: ${editingItem?.room_number}` : 'Add New Room'}
             </h3>
             
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Hotel</label>
               <select
-                value={editFormData.hotel_name}
-                onChange={(e) => setEditFormData({...editFormData, hotel_name: e.target.value})}
+                value={formData.hotel_name}
+                onChange={(e) => setFormData({...formData, hotel_name: e.target.value})}
                 style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
               >
                 <option value="HOTEL NEW IDOLA">HOTEL NEW IDOLA</option>
@@ -360,11 +442,24 @@ const ManagementRoom = () => {
               </select>
             </div>
 
+            {showAddModal && (
+              <div style={{ marginBottom: '15px' }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Room Number <span style={{color: 'red'}}>*</span></label>
+                <input
+                  type="text"
+                  value={formData.room_number}
+                  onChange={(e) => setFormData({...formData, room_number: e.target.value})}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  placeholder="e.g., 101"
+                />
+              </div>
+            )}
+
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Room Type <span style={{color: 'red'}}>*</span></label>
               <select
-                value={editFormData.room_type}
-                onChange={(e) => setEditFormData({...editFormData, room_type: e.target.value})}
+                value={formData.room_type}
+                onChange={(e) => setFormData({...formData, room_type: e.target.value})}
                 style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
               >
                 <option value="">Select Room Type</option>
@@ -378,8 +473,8 @@ const ManagementRoom = () => {
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Floor</label>
               <input
                 type="number"
-                value={editFormData.floor_number}
-                onChange={(e) => setEditFormData({...editFormData, floor_number: e.target.value})}
+                value={formData.floor_number}
+                onChange={(e) => setFormData({...formData, floor_number: e.target.value})}
                 style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
               />
             </div>
@@ -388,8 +483,8 @@ const ManagementRoom = () => {
               <div style={{ flex: 1 }}>
                 <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>VIP Status</label>
                 <select
-                  value={editFormData.vip_status}
-                  onChange={(e) => setEditFormData({...editFormData, vip_status: e.target.value})}
+                  value={formData.vip_status}
+                  onChange={(e) => setFormData({...formData, vip_status: e.target.value})}
                   style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                 >
                   <option value="NO">NO</option>
@@ -399,8 +494,8 @@ const ManagementRoom = () => {
               <div style={{ flex: 1 }}>
                 <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Smoking</label>
                 <select
-                  value={editFormData.smoking_allowed}
-                  onChange={(e) => setEditFormData({...editFormData, smoking_allowed: e.target.value})}
+                  value={formData.smoking_allowed}
+                  onChange={(e) => setFormData({...formData, smoking_allowed: e.target.value})}
                   style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                 >
                   <option value="No">No</option>
@@ -412,8 +507,8 @@ const ManagementRoom = () => {
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Status Pajak</label>
               <select
-                value={editFormData.tax_status}
-                onChange={(e) => setEditFormData({...editFormData, tax_status: e.target.value})}
+                value={formData.tax_status}
+                onChange={(e) => setFormData({...formData, tax_status: e.target.value})}
                 style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
               >
                 <option value="TIDAK">TIDAK</option>
@@ -435,19 +530,19 @@ const ManagementRoom = () => {
                 Cancel
               </button>
               <button
-                onClick={handleSaveEdit}
+                onClick={showEditModal ? handleSaveEdit : handleAddSave}
                 disabled={processing}
                 style={{
                   padding: '8px 20px',
                   border: 'none',
                   borderRadius: '4px',
-                  backgroundColor: '#4CAF50',
+                  backgroundColor: showEditModal ? '#4CAF50' : '#007bff',
                   color: 'white',
                   cursor: processing ? 'not-allowed' : 'pointer',
                   opacity: processing ? 0.7 : 1
                 }}
               >
-                {processing ? 'Saving...' : 'Save Changes'}
+                {processing ? 'Saving...' : (showEditModal ? 'Save Changes' : 'Add Room')}
               </button>
             </div>
           </div>

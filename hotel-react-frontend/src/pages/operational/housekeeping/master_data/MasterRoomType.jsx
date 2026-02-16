@@ -14,10 +14,11 @@ const MasterRoomType = () => {
   const [selectedHotel, setSelectedHotel] = useState('ALL');
   const [successMessage, setSuccessMessage] = useState(null);
 
-  // Edit modal state
+  // Modal state
+  const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
-  const [editFormData, setEditFormData] = useState({
+  const [formData, setFormData] = useState({
     category_code: '',
     category_name: '',
     normal_rate: 0,
@@ -81,11 +82,53 @@ const MasterRoomType = () => {
     return ['admin', 'manager'].includes(user?.role?.toLowerCase());
   };
 
+  const resetForm = () => {
+    setFormData({
+      category_code: '',
+      category_name: '',
+      normal_rate: 0,
+      weekend_rate: 0,
+      description: ''
+    });
+  };
+
+  // Handle add click
+  const handleAddClick = () => {
+    resetForm();
+    setShowAddModal(true);
+  };
+
+  // Handle add save
+  const handleAddSave = async () => {
+    if (!formData.category_code || !formData.category_name) {
+      alert('Please fill in Code and Type Name');
+      return;
+    }
+    try {
+      setProcessing(true);
+      await apiService.createRoomCategory({
+        ...formData,
+        normal_rate: parseFloat(formData.normal_rate) || 0,
+        weekend_rate: parseFloat(formData.weekend_rate) || 0
+      });
+      setSuccessMessage(`Room type "${formData.category_name}" added successfully`);
+      setShowAddModal(false);
+      resetForm();
+      await fetchRoomTypes();
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      console.error('Error adding room type:', err);
+      alert('Failed to add room type: ' + (err.response?.data?.detail || err.message));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   // Handle edit click
   const handleEditClick = (item) => {
     if (!canEdit()) return;
     setEditingItem(item);
-    setEditFormData({
+    setFormData({
       category_code: item.category_code || '',
       category_name: item.category_name || '',
       normal_rate: item.normal_rate || 0,
@@ -97,27 +140,22 @@ const MasterRoomType = () => {
 
   // Handle save edit
   const handleSaveEdit = async () => {
-    if (!editFormData.category_code || !editFormData.category_name) {
+    if (!formData.category_code || !formData.category_name) {
       alert('Please fill in all required fields');
       return;
     }
-
     try {
       setProcessing(true);
       await apiService.updateRoomCategory(editingItem.id, {
-        ...editFormData,
-        normal_rate: parseFloat(editFormData.normal_rate) || 0,
-        weekend_rate: parseFloat(editFormData.weekend_rate) || 0
+        ...formData,
+        normal_rate: parseFloat(formData.normal_rate) || 0,
+        weekend_rate: parseFloat(formData.weekend_rate) || 0
       });
-      
-      setSuccessMessage(`Room type "${editFormData.category_name}" updated successfully`);
+      setSuccessMessage(`Room type "${formData.category_name}" updated successfully`);
       setShowEditModal(false);
       setEditingItem(null);
       await fetchRoomTypes();
-      
-      setTimeout(() => {
-        setSuccessMessage(null);
-      }, 3000);
+      setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
       console.error('Error updating room type:', err);
       alert('Failed to update room type: ' + (err.response?.data?.detail || err.message));
@@ -126,17 +164,26 @@ const MasterRoomType = () => {
     }
   };
 
+  // Handle delete
+  const handleDelete = async (item) => {
+    if (!window.confirm(`Are you sure you want to delete room type "${item.category_name}"?`)) return;
+    try {
+      await apiService.deleteRoomCategory(item.id);
+      setSuccessMessage(`Room type "${item.category_name}" deleted successfully`);
+      await fetchRoomTypes();
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      console.error('Error deleting room type:', err);
+      alert('Failed to delete room type: ' + (err.response?.data?.detail || err.message));
+    }
+  };
+
   // Handle close modal
   const handleCloseModal = () => {
+    setShowAddModal(false);
     setShowEditModal(false);
     setEditingItem(null);
-    setEditFormData({
-      category_code: '',
-      category_name: '',
-      normal_rate: 0,
-      weekend_rate: 0,
-      description: ''
-    });
+    resetForm();
   };
 
   return (
@@ -162,6 +209,24 @@ const MasterRoomType = () => {
         <div className="header-row header-row-top">
           <div className="unified-header-left">
             <h2 className="header-title">MASTER ROOM TYPE</h2>
+            {canEdit() && (
+              <button
+                onClick={handleAddClick}
+                className="btn-table-action"
+                style={{
+                  background: '#007bff',
+                  color: 'white',
+                  padding: '6px 16px',
+                  marginLeft: '20px',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}
+              >
+                ADD
+              </button>
+            )}
           </div>
           <div className="unified-header-right">
             <div className="hotel-select">
@@ -258,12 +323,22 @@ const MasterRoomType = () => {
                   <td className="align-right">-</td>
                   <td>
                     {canEdit() && (
-                      <button 
-                        className="btn-table-action"
-                        onClick={() => handleEditClick(item)}
-                      >
-                        Edit
-                      </button>
+                      <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                        <button 
+                          className="btn-table-action"
+                          style={{ background: '#ffc107', color: '#212529', padding: '4px 10px', fontSize: '12px' }}
+                          onClick={() => handleEditClick(item)}
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          className="btn-table-action"
+                          style={{ background: '#dc3545', color: 'white', padding: '4px 10px', fontSize: '12px' }}
+                          onClick={() => handleDelete(item)}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     )}
                   </td>
                 </tr>
@@ -316,9 +391,9 @@ const MasterRoomType = () => {
       </div>
       </div>
 
-      {/* Edit Modal */}
-      {showEditModal && (
-        <div className="modal-overlay" style={{
+      {/* Add/Edit Modal */}
+      {(showAddModal || showEditModal) && (
+        <div style={{
           position: 'fixed',
           top: 0,
           left: 0,
@@ -330,7 +405,7 @@ const MasterRoomType = () => {
           alignItems: 'center',
           zIndex: 1000
         }}>
-          <div className="modal-content" style={{
+          <div style={{
             backgroundColor: 'white',
             padding: '20px',
             borderRadius: '8px',
@@ -340,15 +415,15 @@ const MasterRoomType = () => {
             overflow: 'auto'
           }}>
             <h3 style={{ marginBottom: '20px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
-              Edit Room Type
+              {showEditModal ? 'Edit Room Type' : 'Add New Room Type'}
             </h3>
             
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Code <span style={{color: 'red'}}>*</span></label>
               <input
                 type="text"
-                value={editFormData.category_code}
-                onChange={(e) => setEditFormData({...editFormData, category_code: e.target.value})}
+                value={formData.category_code}
+                onChange={(e) => setFormData({...formData, category_code: e.target.value})}
                 style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
               />
             </div>
@@ -357,8 +432,8 @@ const MasterRoomType = () => {
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Type Name <span style={{color: 'red'}}>*</span></label>
               <input
                 type="text"
-                value={editFormData.category_name}
-                onChange={(e) => setEditFormData({...editFormData, category_name: e.target.value})}
+                value={formData.category_name}
+                onChange={(e) => setFormData({...formData, category_name: e.target.value})}
                 style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
               />
             </div>
@@ -368,8 +443,8 @@ const MasterRoomType = () => {
                 <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Normal Rate</label>
                 <input
                   type="number"
-                  value={editFormData.normal_rate}
-                  onChange={(e) => setEditFormData({...editFormData, normal_rate: e.target.value})}
+                  value={formData.normal_rate}
+                  onChange={(e) => setFormData({...formData, normal_rate: e.target.value})}
                   style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                 />
               </div>
@@ -377,8 +452,8 @@ const MasterRoomType = () => {
                 <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Weekend Rate</label>
                 <input
                   type="number"
-                  value={editFormData.weekend_rate}
-                  onChange={(e) => setEditFormData({...editFormData, weekend_rate: e.target.value})}
+                  value={formData.weekend_rate}
+                  onChange={(e) => setFormData({...formData, weekend_rate: e.target.value})}
                   style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                 />
               </div>
@@ -387,8 +462,8 @@ const MasterRoomType = () => {
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Description</label>
               <textarea
-                value={editFormData.description}
-                onChange={(e) => setEditFormData({...editFormData, description: e.target.value})}
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
                 style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', minHeight: '80px' }}
               />
             </div>
@@ -407,19 +482,19 @@ const MasterRoomType = () => {
                 Cancel
               </button>
               <button
-                onClick={handleSaveEdit}
+                onClick={showEditModal ? handleSaveEdit : handleAddSave}
                 disabled={processing}
                 style={{
                   padding: '8px 20px',
                   border: 'none',
                   borderRadius: '4px',
-                  backgroundColor: '#4CAF50',
+                  backgroundColor: showEditModal ? '#4CAF50' : '#007bff',
                   color: 'white',
                   cursor: processing ? 'not-allowed' : 'pointer',
                   opacity: processing ? 0.7 : 1
                 }}
               >
-                {processing ? 'Saving...' : 'Save Changes'}
+                {processing ? 'Saving...' : (showEditModal ? 'Save Changes' : 'Add Room Type')}
               </button>
             </div>
           </div>

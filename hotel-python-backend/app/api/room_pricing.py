@@ -153,6 +153,96 @@ def get_all_room_pricing(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
+class RoomCategoryCreate(BaseModel):
+    category_code: str
+    category_name: str
+    description: Optional[str] = None
+    normal_rate: float = 0
+    weekend_rate: float = 0
+    is_active: bool = True
+
+@router.post("/categories", response_model=RoomCategoryResponse)
+def create_room_category(
+    category: RoomCategoryCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Create a new room category (admin/manager only)."""
+    try:
+        if current_user.role not in ['admin', 'manager']:
+            raise HTTPException(status_code=403, detail="Only admin or manager can create room categories")
+        
+        # Check if code already exists
+        existing = db.execute(
+            text("SELECT id FROM room_categories WHERE category_code = :code"),
+            {"code": category.category_code}
+        ).first()
+        
+        if existing:
+            raise HTTPException(status_code=400, detail=f"Category code '{category.category_code}' already exists")
+        
+        db.execute(
+            text("""
+                INSERT INTO room_categories (category_code, category_name, description, normal_rate, weekend_rate, is_active)
+                VALUES (:code, :name, :desc, :normal, :weekend, :active)
+            """),
+            {
+                "code": category.category_code,
+                "name": category.category_name,
+                "desc": category.description,
+                "normal": category.normal_rate,
+                "weekend": category.weekend_rate,
+                "active": category.is_active
+            }
+        )
+        db.commit()
+        
+        created = db.execute(
+            text("""
+                SELECT id, category_code, category_name, description, normal_rate, weekend_rate, is_active
+                FROM room_categories WHERE category_code = :code
+            """),
+            {"code": category.category_code}
+        ).first()
+        
+        return dict(created._mapping)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+@router.delete("/categories/{category_id}")
+def delete_room_category(
+    category_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Delete a room category (admin/manager only)."""
+    try:
+        if current_user.role not in ['admin', 'manager']:
+            raise HTTPException(status_code=403, detail="Only admin or manager can delete room categories")
+        
+        existing = db.execute(
+            text("SELECT id, category_code FROM room_categories WHERE id = :id"),
+            {"id": category_id}
+        ).first()
+        
+        if not existing:
+            raise HTTPException(status_code=404, detail="Room category not found")
+        
+        db.execute(text("DELETE FROM room_categories WHERE id = :id"), {"id": category_id})
+        db.commit()
+        
+        return {"message": f"Room category '{existing.category_code}' deleted successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
 @router.put("/categories/{category_id}", response_model=RoomCategoryResponse)
 def update_room_category(
     category_id: int,

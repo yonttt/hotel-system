@@ -38,6 +38,7 @@ const Sidebar = () => {
     hrd: false,
     accounting: false,
     administration: false,
+    masterDataHRD: false,
     userManagement: false
   })
   const [scrollPosition, setScrollPosition] = useState(0)
@@ -105,9 +106,12 @@ const Sidebar = () => {
       }
     } else if (path.includes('/hrd/')) {
       newExpandedMenus.hrd = true
-      if (path.includes('/user-list') || path.includes('/user-authority') || path.includes('/user-management')) {
+      if (path.includes('/user-list') || path.includes('/user-authority') || path.includes('/user-management') || path.includes('/property-list')) {
         newExpandedMenus.administration = true
-        newExpandedMenus.userManagement = true
+        newExpandedMenus.masterDataHRD = true
+        if (path.includes('/user-list') || path.includes('/user-authority') || path.includes('/user-management')) {
+          newExpandedMenus.userManagement = true
+        }
       }
       if (path.includes('/laporan-global')) {
         newExpandedMenus.accounting = true
@@ -167,6 +171,7 @@ const Sidebar = () => {
       hrd: false,
       accounting: false,
       administration: false,
+      masterDataHRD: false,
       userManagement: false
     })
     setScrollPosition(0)
@@ -338,13 +343,21 @@ const Sidebar = () => {
           hasSubmenu: true,
           submenu: 'administration',
           children: [
-            { 
-              title: 'User Management',
+            {
+              title: 'Master Data',
               hasSubmenu: true,
-              submenu: 'userManagement',
+              submenu: 'masterDataHRD',
               children: [
-                { title: 'User List', path: '/hrd/user-list' },
-                { title: 'Otoritas Pengguna', path: '/hrd/user-authority' }
+                { title: 'Property List', path: '/hrd/property-list' },
+                { 
+                  title: 'User Management',
+                  hasSubmenu: true,
+                  submenu: 'userManagement',
+                  children: [
+                    { title: 'User List', path: '/hrd/user-list' },
+                    { title: 'Otoritas Pengguna', path: '/hrd/user-authority' }
+                  ]
+                }
               ]
             }
           ]
