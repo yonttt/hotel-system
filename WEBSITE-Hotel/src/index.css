@@ -1,0 +1,223 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== Base Styles ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  color: #2d2d2d;
+  background-color: #ffffff;
+  overflow-x: hidden;
+}
+
+/* ===== Custom Scrollbar ===== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c9940f;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a0730a;
+}
+
+/* ===== Typography ===== */
+.heading-display {
+  font-family: 'Playfair Display', serif;
+}
+
+.heading-elegant {
+  font-family: 'Cormorant Garamond', serif;
+}
+
+/* ===== Hero Slider ===== */
+.hero-slide {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-slide::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.1) 40%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+}
+
+/* ===== Glass Effect ===== */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ===== Animations ===== */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== Golden Divider ===== */
+.gold-divider {
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, #c9940f, #e5ae1b, #c9940f);
+  margin: 0 auto;
+}
+
+.gold-divider-left {
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, #c9940f, #e5ae1b, #c9940f);
+}
+
+/* ===== Overlay Card ===== */
+.card-overlay {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.7) 0%,
+    rgba(0, 0, 0, 0) 50%
+  );
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+.card-overlay:hover::before {
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.2) 60%
+  );
+}
+
+.card-overlay img {
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-overlay:hover img {
+  transform: scale(1.08);
+}
+
+/* ===== Button Styles ===== */
+.btn-gold {
+  @apply bg-gold-500 text-white px-8 py-3 font-semibold tracking-wider
+    hover:bg-gold-600 transition-all duration-300 uppercase text-sm;
+}
+
+.btn-outline-gold {
+  @apply border-2 border-gold-500 text-gold-500 px-8 py-3 font-semibold tracking-wider
+    hover:bg-gold-500 hover:text-white transition-all duration-300 uppercase text-sm;
+}
+
+.btn-outline-white {
+  @apply border-2 border-white text-white px-8 py-3 font-semibold tracking-wider
+    hover:bg-white hover:text-hotel-dark transition-all duration-300 uppercase text-sm;
+}
+
+/* ===== Section Styles ===== */
+.section-title {
+  @apply text-3xl md:text-4xl lg:text-5xl font-display font-bold text-hotel-dark;
+}
+
+.section-subtitle {
+  @apply text-gold-500 uppercase tracking-[0.3em] text-sm font-semibold mb-3;
+}
+
+/* ===== Swiper Custom ===== */
+.swiper-pagination-bullet {
+  background: rgba(255, 255, 255, 0.5) !important;
+  width: 12px !important;
+  height: 12px !important;
+  opacity: 1 !important;
+}
+
+.swiper-pagination-bullet-active {
+  background: #c9940f !important;
+  width: 30px !important;
+  border-radius: 6px !important;
+}
+
+/* ===== Booking Bar ===== */
+.booking-bar {
+  background: rgba(26, 26, 46, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+/* ===== Navigation ===== */
+.nav-link {
+  position: relative;
+  @apply text-white/90 hover:text-white transition-colors duration-300;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #c9940f;
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 100%;
+}
+
+/* ===== Parallax ===== */
+.parallax-bg {
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+@media (max-width: 768px) {
+  .parallax-bg {
+    background-attachment: scroll;
+  }
+}
