@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { MapPin, Phone, Mail, Clock, ChevronRight, ArrowUp } from 'lucide-react'
 
@@ -20,6 +21,18 @@ const services = [
 ]
 
 export default function Footer() {
+  const [email, setEmail] = useState('')
+  const [subscribed, setSubscribed] = useState(false)
+
+  const handleNewsletter = (e) => {
+    e.preventDefault()
+    if (email) {
+      setSubscribed(true)
+      setEmail('')
+      setTimeout(() => setSubscribed(false), 4000)
+    }
+  }
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -34,17 +47,23 @@ export default function Footer() {
               <h3 className="text-2xl font-display font-bold mb-1">Dapatkan Penawaran Eksklusif</h3>
               <p className="text-white/50 text-sm">Daftar newsletter dan dapatkan promo spesial langsung di inbox Anda</p>
             </div>
-            <form className="flex w-full md:w-auto gap-2" onSubmit={(e) => e.preventDefault()}>
+            <form className="flex w-full md:w-auto gap-2" onSubmit={handleNewsletter}>
               <input
                 type="email"
                 placeholder="Alamat email Anda"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
                 className="w-full md:w-80 bg-white/10 border border-white/20 rounded-lg px-5 py-3 text-sm 
                   text-white placeholder-white/40 focus:outline-none focus:border-gold-400 focus:ring-1 focus:ring-gold-400/50 transition-all"
               />
               <button className="bg-gold-500 hover:bg-gold-400 text-white px-6 py-3 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap">
-                Daftar
+                {subscribed ? '✓ Terdaftar!' : 'Daftar'}
               </button>
             </form>
+            {subscribed && (
+              <p className="text-green-400 text-sm mt-2 md:mt-0">Terima kasih! Anda akan menerima penawaran eksklusif.</p>
+            )}
           </div>
         </div>
       </div>
@@ -69,17 +88,22 @@ export default function Footer() {
             </p>
             {/* Social */}
             <div className="flex gap-3">
-              {['facebook', 'instagram', 'twitter', 'youtube'].map((social) => (
-                <a
-                  key={social}
-                  href="#"
-                  className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center 
-                    hover:bg-gold-500 transition-colors duration-300"
-                  aria-label={social}
-                >
-                  <span className="text-xs uppercase font-bold">{social[0].toUpperCase()}</span>
-                </a>
-              ))}
+              <a href="https://facebook.com/hotelresort" target="_blank" rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-gold-500 transition-colors duration-300" aria-label="facebook">
+                <span className="text-xs uppercase font-bold">F</span>
+              </a>
+              <a href="https://instagram.com/hotelresort" target="_blank" rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-gold-500 transition-colors duration-300" aria-label="instagram">
+                <span className="text-xs uppercase font-bold">I</span>
+              </a>
+              <a href="https://twitter.com/hotelresort" target="_blank" rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-gold-500 transition-colors duration-300" aria-label="twitter">
+                <span className="text-xs uppercase font-bold">T</span>
+              </a>
+              <a href="https://youtube.com/hotelresort" target="_blank" rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-gold-500 transition-colors duration-300" aria-label="youtube">
+                <span className="text-xs uppercase font-bold">Y</span>
+              </a>
             </div>
           </div>
 
@@ -176,9 +200,9 @@ export default function Footer() {
               Copyright {new Date().getFullYear()} © Hotel & Resort. All rights reserved.
             </p>
             <div className="flex items-center gap-6 text-xs text-white/40">
-              <a href="#" className="hover:text-gold-400 transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-gold-400 transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-gold-400 transition-colors">Cookie Policy</a>
+              <Link to="/about" className="hover:text-gold-400 transition-colors">Privacy Policy</Link>
+              <Link to="/about" className="hover:text-gold-400 transition-colors">Terms of Service</Link>
+              <Link to="/contact" className="hover:text-gold-400 transition-colors">Cookie Policy</Link>
             </div>
           </div>
         </div>

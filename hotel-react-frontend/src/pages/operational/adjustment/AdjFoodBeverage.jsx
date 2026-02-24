@@ -1,17 +1,19 @@
-import ComingSoonPage from '../../../components/ComingSoonPage'
+import AdjustmentPageTemplate from '../../../components/AdjustmentPageTemplate'
 
 const AdjFoodBeverage = () => {
   return (
-    <ComingSoonPage
+    <AdjustmentPageTemplate
+      category="food_beverage"
       title="Adjustment - Food & Beverage"
       subtitle="F&B adjustment and corrections"
       icon="🍽️"
-      features={[
-        'F&B price adjustments',
-        'Menu corrections',
-        'Order modifications',
-        'Bill adjustments',
-        'Void transactions'
+      adjTypes={[
+        'Price Correction',
+        'Void Transaction',
+        'Order Modification',
+        'Bill Adjustment',
+        'Discount',
+        'Refund'
       ]}
     />
   )

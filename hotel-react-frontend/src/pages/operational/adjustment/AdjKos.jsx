@@ -1,17 +1,19 @@
-import ComingSoonPage from '../../../components/ComingSoonPage'
+import AdjustmentPageTemplate from '../../../components/AdjustmentPageTemplate'
 
 const AdjKos = () => {
   return (
-    <ComingSoonPage
+    <AdjustmentPageTemplate
+      category="kos"
       title="Adjustment - Kos"
       subtitle="Kos/boarding house adjustment and corrections"
       icon="🏠"
-      features={[
-        'Rent adjustments',
-        'Payment corrections',
-        'Deposit modifications',
-        'Tenant billing adjustments',
-        'Utility corrections'
+      adjTypes={[
+        'Rent Adjustment',
+        'Payment Correction',
+        'Deposit Modification',
+        'Utility Correction',
+        'Refund',
+        'Late Fee'
       ]}
     />
   )

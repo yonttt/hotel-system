@@ -19,8 +19,8 @@ const KategoriMenuResto = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({
-    hotel_id: 1,
-    hotel_name: 'HOTEL NEW IDOLA',
+    hotel_id: '',
+    hotel_name: '',
     nama_kategori: '',
     description: ''
   });
@@ -80,8 +80,8 @@ const KategoriMenuResto = () => {
   // Handle add new category
   const handleAddClick = () => {
     setFormData({
-      hotel_id: 1,
-      hotel_name: 'HOTEL NEW IDOLA',
+      hotel_id: hotels.length > 0 ? hotels[0].id : '',
+      hotel_name: hotels.length > 0 ? hotels[0].name : '',
       nama_kategori: '',
       description: ''
     });
@@ -112,8 +112,8 @@ const KategoriMenuResto = () => {
     if (!canEdit()) return;
     setEditingItem(category);
     setFormData({
-      hotel_id: category.hotel_id || 1,
-      hotel_name: category.hotel_name || 'HOTEL NEW IDOLA',
+      hotel_id: category.hotel_id || '',
+      hotel_name: category.hotel_name || '',
       nama_kategori: category.nama_kategori || '',
       description: category.description || ''
     });

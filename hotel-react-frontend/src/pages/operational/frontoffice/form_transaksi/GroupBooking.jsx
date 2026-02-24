@@ -4,10 +4,12 @@ import { useNavigate } from 'react-router-dom'
 import { apiService } from '../../../../services/api'
 import Layout from '../../../../components/Layout'
 import SearchableSelect from '../../../../components/SearchableSelect'
+import useHotels from '../../../../hooks/useHotels'
 
 const GroupBooking = () => {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const { defaultHotel } = useHotels()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -401,7 +403,7 @@ const GroupBooking = () => {
         total_deposit: parseFloat(groupInfo.total_deposit) || 0,
         notes: groupInfo.notes,
         created_by: user?.username || 'ADMIN',
-        hotel_name: 'New Idola Hotel',
+        hotel_name: defaultHotel || 'New Idola Hotel',
         rooms: roomBookings.map(room => ({
           room_number: room.room_number,
           room_type: room.room_type,

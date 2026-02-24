@@ -2,6 +2,33 @@ from sqlalchemy import Column, Integer, String, DateTime, Enum, Text, Boolean, D
 from sqlalchemy.sql import func
 from app.core.database import Base
 
+
+class Hotel(Base):
+    __tablename__ = "hotels"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    code = Column(String(50), nullable=True)
+    name = Column(String(255), nullable=False)
+    category = Column(String(50), default='HOTEL')
+    address = Column(Text, nullable=True)
+    phone = Column(String(50), nullable=True)
+    fax = Column(String(50), nullable=True)
+    email = Column(String(100), nullable=True)
+    photo_url = Column(String(500), nullable=True)
+    logo_url = Column(String(500), nullable=True)
+    umh = Column(DECIMAL(15, 0), default=0)
+    umk = Column(DECIMAL(15, 0), default=0)
+    plafon_covid = Column(String(20), default='100%')
+    sub_cabang = Column(DECIMAL(15, 0), default=0)
+    t_tetap = Column(DECIMAL(15, 0), default=0)
+    t_jabatan = Column(DECIMAL(15, 0), default=0)
+    t_penempatan = Column(DECIMAL(15, 0), default=0)
+    extrabed = Column(Integer, default=0)
+    active = Column(Boolean, default=True)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+
 class User(Base):
     __tablename__ = "users"
     
@@ -11,7 +38,7 @@ class User(Base):
     email = Column(String(100))
     full_name = Column(String(100))
     title = Column(String(100))
-    hotel_name = Column(String(100), default='HOTEL NEW IDOLA')
+    hotel_name = Column(String(100), nullable=True)
     is_blocked = Column(Boolean, default=False)
     last_login = Column(DateTime, nullable=True)
     account_type = Column(Enum('Management', 'Non Management'))

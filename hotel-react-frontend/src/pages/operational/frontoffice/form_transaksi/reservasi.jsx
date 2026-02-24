@@ -4,10 +4,12 @@ import { useNavigate } from 'react-router-dom'
 import { apiService } from '../../../../services/api'
 import Layout from '../../../../components/Layout'
 import SearchableSelect from '../../../../components/SearchableSelect'
+import useHotels from '../../../../hooks/useHotels'
 
 const ReservasiPage = () => {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const { hotelNames, defaultHotel } = useHotels()
   const [apiError, setApiError] = useState(null)
   const [rooms, setRooms] = useState([])
   const [cities, setCities] = useState([])
@@ -56,9 +58,12 @@ const ReservasiPage = () => {
 
   const [formData, setFormData] = useState(initialFormState)
 
-  useEffect(() => {
-    loadInitialData()
-  }, [])
+  // Update hotel_name when defaultHotel loads
+  useEffect(() => {
+    if (defaultHotel) {
+      setFormData(prev => ({ ...prev, hotel_name: defaultHotel }))
+    }
+  }, [defaultHotel])
 
   useEffect(() => {
     if (formData.arrival_date && formData.nights > 0) {

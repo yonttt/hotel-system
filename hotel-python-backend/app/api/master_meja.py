@@ -11,7 +11,7 @@ router = APIRouter(prefix="/master-meja", tags=["Master Meja"])
 # Pydantic models
 class MasterMejaBase(BaseModel):
     hotel_id: Optional[int] = 1
-    hotel_name: Optional[str] = "HOTEL NEW IDOLA"
+    hotel_name: Optional[str] = None
     no_meja: str
     lantai: Optional[int] = 1
     kursi: Optional[int] = 4

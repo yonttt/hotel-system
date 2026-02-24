@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { apiService } from '../../services/api';
 import Layout from '../../components/Layout';
 import { useAuth } from '../../context/AuthContext';
+import useHotels from '../../hooks/useHotels';
 
 const UserList = () => {
   const { user } = useAuth();
+  const { hotelNames } = useHotels();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -205,7 +207,10 @@ const UserList = () => {
               <div className="hotel-select">
                 <label>Hotel :</label>
                 <select className="header-hotel-select">
-                  <option>HOTEL NEW IDOLA</option>
+                  <option value="ALL">ALL</option>
+                  {hotelNames.map(name => (
+                    <option key={name} value={name}>{name}</option>
+                  ))}
                 </select>
               </div>
               <div className="hotel-select" style={{ marginLeft: '10px' }}>
@@ -340,7 +345,7 @@ const UserList = () => {
                 currentUsers.map((usr, index) => (
                   <tr key={usr.id}>
                     <td>{startIndex + index + 1}</td>
-                    <td>{usr.hotel_name || 'HOTEL NEW IDOLA'}</td>
+                    <td>{usr.hotel_name || '-'}</td>
                     <td>{usr.id}</td>
                     <td title={usr.username}>{usr.username}</td>
                     <td>{usr.full_name || usr.username.toUpperCase()}</td>

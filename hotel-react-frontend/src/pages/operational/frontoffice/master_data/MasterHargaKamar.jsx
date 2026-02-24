@@ -2,14 +2,16 @@ import { useState, useEffect } from 'react';
 import { apiService } from '../../../../services/api';
 import Layout from '../../../../components/Layout';
 import { useAuth } from '../../../../context/AuthContext';
+import useHotels from '../../../../hooks/useHotels';
 
 const MasterHargaKamar = () => {
   const { user } = useAuth();
+  const { hotelNames, defaultHotel } = useHotels();
   const [rates, setRates] = useState([]);
   const [filteredRates, setFilteredRates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedHotel, setSelectedHotel] = useState('HOTEL NEW IDOLA');
+  const [selectedHotel, setSelectedHotel] = useState('ALL');
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [showEntries, setShowEntries] = useState(10);
@@ -20,7 +22,7 @@ const MasterHargaKamar = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingRate, setEditingRate] = useState(null);
   const [formData, setFormData] = useState({
-    hotel_name: 'HOTEL NEW IDOLA',
+    hotel_name: '',
     rate_name: '',
     room_type: '',
     room_rate: 0,
@@ -129,7 +131,7 @@ const MasterHargaKamar = () => {
 
   const resetForm = () => {
     setFormData({
-      hotel_name: 'HOTEL NEW IDOLA',
+      hotel_name: defaultHotel,
       rate_name: '',
       room_type: '',
       room_rate: 0,
@@ -175,7 +177,7 @@ const MasterHargaKamar = () => {
     if (!canEdit()) return;
     setEditingRate(rate);
     setFormData({
-      hotel_name: rate.hotel_name || 'HOTEL NEW IDOLA',
+      hotel_name: rate.hotel_name || defaultHotel,
       rate_name: rate.rate_name || '',
       room_type: rate.room_type || '',
       room_rate: rate.room_rate || 0,
@@ -376,7 +378,7 @@ const MasterHargaKamar = () => {
                 currentRates.map((rate, index) => (
                   <tr key={rate.id}>
                     <td style={{ textAlign: 'center' }}>{startIndex + index + 1}</td>
-                    <td>{rate.hotel_name || 'HOTEL NEW IDOLA'}</td>
+                    <td>{rate.hotel_name || '-'}</td>
                     <td>{rate.rate_name}</td>
                     <td>{rate.room_type}</td>
                     <td style={{ textAlign: 'right' }}>{formatCurrency(rate.room_rate)}</td>

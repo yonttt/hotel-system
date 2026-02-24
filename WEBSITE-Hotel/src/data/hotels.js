@@ -32,6 +32,7 @@ export const featuredRooms = [
   {
     id: 1,
     name: 'Deluxe Room',
+    type: 'standard',
     description: 'Kamar luas dengan pemandangan kota yang menakjubkan, dilengkapi fasilitas premium.',
     price: 1500000,
     image: 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=800&q=80',
@@ -43,6 +44,7 @@ export const featuredRooms = [
   {
     id: 2,
     name: 'Executive Suite',
+    type: 'suite',
     description: 'Suite mewah dengan ruang tamu terpisah dan akses lounge eksklusif.',
     price: 2800000,
     image: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800&q=80',
@@ -54,6 +56,7 @@ export const featuredRooms = [
   {
     id: 3,
     name: 'Presidential Suite',
+    type: 'suite',
     description: 'Pengalaman menginap tertinggi dengan kemewahan dan privasi maksimal.',
     price: 5500000,
     image: 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=800&q=80',
@@ -65,6 +68,7 @@ export const featuredRooms = [
   {
     id: 4,
     name: 'Family Room',
+    type: 'family',
     description: 'Kamar keluarga yang nyaman dengan ruang bermain anak.',
     price: 2200000,
     image: 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800&q=80',

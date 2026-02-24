@@ -8,6 +8,8 @@ import AboutPage from './pages/AboutPage'
 import ContactPage from './pages/ContactPage'
 import OffersPage from './pages/OffersPage'
 import GalleryPage from './pages/GalleryPage'
+import BookingPage from './pages/BookingPage'
+import HotelDetailPage from './pages/HotelDetailPage'
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
           <Route path="/offers" element={<OffersPage />} />
           <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/booking" element={<BookingPage />} />
+          <Route path="/hotels/:id" element={<HotelDetailPage />} />
         </Routes>
       </main>
       <Footer />

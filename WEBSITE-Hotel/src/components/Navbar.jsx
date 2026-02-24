@@ -53,9 +53,9 @@ export default function Navbar() {
                   <span>ID</span>
                   <ChevronDown size={12} />
                 </button>
-                <Link to="/contact" className="hover:text-gold-400 transition-colors hidden sm:block">
+                <a href="/booking" className="hover:text-gold-400 transition-colors hidden sm:block">
                   Member Login
-                </Link>
+                </a>
               </div>
             </div>
           </div>

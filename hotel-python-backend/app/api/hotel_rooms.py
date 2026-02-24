@@ -59,7 +59,7 @@ class TaxStatusEnum(str, Enum):
     TIDAK = "TIDAK"
 
 class HotelRoomBase(BaseModel):
-    hotel_name: str = "HOTEL NEW IDOLA"
+    hotel_name: str = ""
     room_number: str
     room_type: RoomTypeEnum
     floor_number: int

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import { Star, Quote } from 'lucide-react'
 import { testimonials } from '../data/hotels'
 
@@ -85,9 +86,9 @@ export default function TestimonialsSection() {
               <h3 className="text-xl font-display font-bold text-white">Best Rate Guarantee</h3>
               <p className="text-white/60 text-sm">Temukan harga terbaik langsung di website kami</p>
             </div>
-            <button className="bg-gold-500 text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-gold-400 transition-colors whitespace-nowrap">
+            <Link to="/contact" className="bg-gold-500 text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-gold-400 transition-colors whitespace-nowrap">
               Menjadi Member
-            </button>
+            </Link>
           </div>
         </div>
       </div>

@@ -2,14 +2,16 @@ import { useState, useEffect } from 'react';
 import { apiService } from '../../../../services/api';
 import Layout from '../../../../components/Layout';
 import { useAuth } from '../../../../context/AuthContext';
+import useHotels from '../../../../hooks/useHotels';
 
 const UbahStatusKamar = () => {
   const { user } = useAuth();
+  const { hotelNames, defaultHotel } = useHotels();
   const [rooms, setRooms] = useState([]);
   const [filteredRooms, setFilteredRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedHotel, setSelectedHotel] = useState('HOTEL NEW IDOLA');
+  const [selectedHotel, setSelectedHotel] = useState('ALL');
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [showEntries, setShowEntries] = useState(10);
@@ -22,7 +24,7 @@ const UbahStatusKamar = () => {
   const [processing, setProcessing] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
   const [addFormData, setAddFormData] = useState({
-    hotel_name: 'HOTEL NEW IDOLA',
+    hotel_name: '',
     room_number: '',
     room_type: '',
     floor_number: 1,
@@ -156,7 +158,7 @@ const UbahStatusKamar = () => {
   // Handle add click
   const handleAddClick = () => {
     setAddFormData({
-      hotel_name: selectedHotel !== 'ALL' ? selectedHotel : 'HOTEL NEW IDOLA',
+      hotel_name: selectedHotel !== 'ALL' ? selectedHotel : defaultHotel,
       room_number: '',
       room_type: '',
       floor_number: 1,
@@ -397,7 +399,7 @@ const UbahStatusKamar = () => {
                 currentRooms.map((room, index) => (
                   <tr key={room.id}>
                     <td style={{ textAlign: 'center' }}>{startIndex + index + 1}</td>
-                    <td>{room.hotel_name || 'HOTEL NEW IDOLA'}</td>
+                    <td>{room.hotel_name || '-'}</td>
                     <td>{room.room_type}</td>
                     <td>{room.room_number}</td>
                     <td style={{ textAlign: 'center' }}>{room.floor_number}</td>
@@ -523,7 +525,7 @@ const UbahStatusKamar = () => {
                 </label>
                 <input
                   type="text"
-                  value={editingRoom.hotel_name || 'HOTEL NEW IDOLA'}
+                  value={editingRoom.hotel_name || defaultHotel}
                   disabled
                   style={{ 
                     width: '100%', 

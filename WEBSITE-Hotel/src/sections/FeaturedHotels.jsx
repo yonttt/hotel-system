@@ -70,7 +70,7 @@ export default function FeaturedHotels() {
                   {/* Hover CTA */}
                   <div className="absolute inset-0 z-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <Link
-                      to="/rooms"
+                      to={`/hotels/${hotel.id}`}
                       className="bg-gold-500 text-white px-6 py-2.5 rounded-full text-sm font-semibold
                         flex items-center gap-2 hover:bg-gold-400 transition-colors transform
                         translate-y-4 group-hover:translate-y-0 transition-transform duration-300"
@@ -88,7 +88,7 @@ export default function FeaturedHotels() {
         {/* CTA */}
         <div className="text-center mt-12 animate-on-scroll">
           <Link
-            to="/about"
+            to="/rooms"
             className="btn-outline-gold rounded-full inline-flex items-center gap-2"
           >
             Lihat Semua Hotel

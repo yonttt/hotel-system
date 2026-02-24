@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { apiService } from '../../../../services/api';
 import Layout from '../../../../components/Layout';
 import { useAuth } from '../../../../context/AuthContext';
+import useHotels from '../../../../hooks/useHotels';
 
 const MasterRoomType = () => {
   const { user } = useAuth();
+  const { hotelNames } = useHotels();
   const [roomTypes, setRoomTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -240,8 +242,9 @@ const MasterRoomType = () => {
                 }}
               >
                 <option value="ALL">ALL</option>
-                <option value="HOTEL NEW IDOLA">HOTEL NEW IDOLA</option>
-                <option value="HOTEL IDOLA">HOTEL IDOLA</option>
+                {hotelNames.map(name => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
               </select>
             </div>
           </div>

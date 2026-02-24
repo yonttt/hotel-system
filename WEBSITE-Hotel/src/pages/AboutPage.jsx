@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { Sparkles, ShieldCheck, Heart, Leaf, Award, Users, Building2, Globe } from 'lucide-react'
 
 const milestones = [
@@ -159,9 +160,9 @@ export default function AboutPage() {
             Kami selalu mencari talenta terbaik untuk bergabung dalam tim kami. 
             Jadilah bagian dari perjalanan kami menghadirkan hospitalitas terbaik.
           </p>
-          <button className="btn-gold rounded-lg">
+          <Link to="/contact?subject=careers" className="btn-gold rounded-lg">
             Lihat Karir
-          </button>
+          </Link>
         </div>
       </section>
     </>

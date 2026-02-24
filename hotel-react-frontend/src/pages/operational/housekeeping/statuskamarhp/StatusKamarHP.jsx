@@ -7,7 +7,7 @@ const StatusKamarHP = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('all'); // 'all' or 'description'
-  const [selectedHotel, setSelectedHotel] = useState('HOTEL NEW IDOLA');
+  const [selectedHotel, setSelectedHotel] = useState('ALL');
   const [selectedType, setSelectedType] = useState('All Type');
   const [selectedStatus, setSelectedStatus] = useState('All Status');
   const [showModal, setShowModal] = useState(false);

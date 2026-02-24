@@ -208,7 +208,7 @@ class ApiService {
     return this.client.get(`/hotel-registrations/?skip=${skip}&limit=${limit}`)
   }
 
-  async getHotelRegistration( wid) {
+  async getHotelRegistration(id) {
     return this.client.get(`/hotel-registrations/${id}`)
   }
 
@@ -412,7 +412,7 @@ class ApiService {
   }
 
   // Get applicable rate for a specific room type and date (AUTO-PRICING)
-  async getRateForDate(roomType, checkDate = null, hotelName = 'HOTEL NEW IDOLA') {
+  async getRateForDate(roomType, checkDate = null, hotelName = null) {
     let url = `/room-rates/pricing/${encodeURIComponent(roomType)}`
     const params = []
     if (checkDate) params.push(`check_date=${checkDate}`)
@@ -590,6 +590,114 @@ class ApiService {
   // Delete property
   async deleteProperty(propertyId) {
     return this.client.delete(`/properties/${propertyId}`)
+  }
+
+  // ==================== LAUNDRY APIs ====================
+
+  // Get all laundry orders
+  async getLaundryOrders(skip = 0, limit = 100, hotelName = null, status = null, startDate = null, endDate = null) {
+    let url = `/laundry/?skip=${skip}&limit=${limit}`
+    if (hotelName && hotelName !== 'ALL') url += `&hotel_name=${encodeURIComponent(hotelName)}`
+    if (status) url += `&status=${encodeURIComponent(status)}`
+    if (startDate) url += `&start_date=${startDate}`
+    if (endDate) url += `&end_date=${endDate}`
+    return this.client.get(url)
+  }
+
+  // Get laundry order by ID
+  async getLaundryOrderById(orderId) {
+    return this.client.get(`/laundry/${orderId}`)
+  }
+
+  // Create laundry order
+  async createLaundryOrder(orderData) {
+    return this.client.post('/laundry/', orderData)
+  }
+
+  // Update laundry order
+  async updateLaundryOrder(orderId, orderData) {
+    return this.client.put(`/laundry/${orderId}`, orderData)
+  }
+
+  // Delete laundry order
+  async deleteLaundryOrder(orderId) {
+    return this.client.delete(`/laundry/${orderId}`)
+  }
+
+  // ==================== ACCOUNT RECEIVABLE APIs ====================
+
+  // Get all account receivables
+  async getAccountReceivables(skip = 0, limit = 100, hotelName = null, status = null, startDate = null, endDate = null) {
+    let url = `/account-receivable/?skip=${skip}&limit=${limit}`
+    if (hotelName && hotelName !== 'ALL') url += `&hotel_name=${encodeURIComponent(hotelName)}`
+    if (status) url += `&status=${encodeURIComponent(status)}`
+    if (startDate) url += `&start_date=${startDate}`
+    if (endDate) url += `&end_date=${endDate}`
+    return this.client.get(url)
+  }
+
+  // Get account receivable by ID
+  async getAccountReceivableById(arId) {
+    return this.client.get(`/account-receivable/${arId}`)
+  }
+
+  // Get next invoice number
+  async getNextInvoiceNumber() {
+    return this.client.get('/account-receivable/next-invoice')
+  }
+
+  // Create account receivable
+  async createAccountReceivable(arData) {
+    return this.client.post('/account-receivable/', arData)
+  }
+
+  // Update account receivable
+  async updateAccountReceivable(arId, arData) {
+    return this.client.put(`/account-receivable/${arId}`, arData)
+  }
+
+  // Delete account receivable
+  async deleteAccountReceivable(arId) {
+    return this.client.delete(`/account-receivable/${arId}`)
+  }
+
+  // ==================== ADJUSTMENTS APIs ====================
+
+  // Get adjustments (optionally filtered by category)
+  async getAdjustments(category = null, skip = 0, limit = 100, hotelName = null, status = null) {
+    let url = `/adjustments/?skip=${skip}&limit=${limit}`
+    if (category) url += `&category=${encodeURIComponent(category)}`
+    if (hotelName && hotelName !== 'ALL') url += `&hotel_name=${encodeURIComponent(hotelName)}`
+    if (status) url += `&status=${encodeURIComponent(status)}`
+    return this.client.get(url)
+  }
+
+  // Get adjustment by ID
+  async getAdjustmentById(adjId) {
+    return this.client.get(`/adjustments/${adjId}`)
+  }
+
+  // Create adjustment
+  async createAdjustment(adjData) {
+    return this.client.post('/adjustments/', adjData)
+  }
+
+  // Update adjustment
+  async updateAdjustment(adjId, adjData) {
+    return this.client.put(`/adjustments/${adjId}`, adjData)
+  }
+
+  // Delete adjustment
+  async deleteAdjustment(adjId) {
+    return this.client.delete(`/adjustments/${adjId}`)
+  }
+
+  // Get adjustments by specific category
+  async getAdjustmentsByCategory(category, skip = 0, limit = 100, hotelName = null, status = null) {
+    let url = `/adjustments/category/${encodeURIComponent(category)}?skip=${skip}&limit=${limit}`
+    if (hotelName && hotelName !== 'ALL') url += `&hotel_name=${encodeURIComponent(hotelName)}`
+    if (status) url += `&status=${encodeURIComponent(status)}`
+    return this.client.get(url)
   }
 }
 

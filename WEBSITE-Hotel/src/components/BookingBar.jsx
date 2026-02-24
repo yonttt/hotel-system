@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { CalendarDays, Users, Search, MapPin } from 'lucide-react'
 
 export default function BookingBar() {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     destination: '',
     checkIn: '',
@@ -9,15 +11,42 @@ export default function BookingBar() {
     guests: '2',
     rooms: '1',
   })
+  const [error, setError] = useState('')
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
+    setError('')
   }
 
   const handleSearch = (e) => {
     e.preventDefault()
-    // Future: Connect to backend availability check
-    alert('Fitur pencarian akan segera tersedia! Hubungi kami untuk reservasi.')
+
+    // Date validation
+    if (formData.checkIn && formData.checkOut) {
+      const checkInDate = new Date(formData.checkIn)
+      const checkOutDate = new Date(formData.checkOut)
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+
+      if (checkInDate < today) {
+        setError('Tanggal check-in tidak boleh di masa lalu')
+        return
+      }
+      if (checkOutDate <= checkInDate) {
+        setError('Tanggal check-out harus setelah check-in')
+        return
+      }
+    }
+
+    // Build query params and navigate to booking page
+    const params = new URLSearchParams()
+    if (formData.destination) params.set('destination', formData.destination)
+    if (formData.checkIn) params.set('checkIn', formData.checkIn)
+    if (formData.checkOut) params.set('checkOut', formData.checkOut)
+    if (formData.guests) params.set('guests', formData.guests)
+    if (formData.rooms) params.set('rooms', formData.rooms)
+
+    navigate(`/booking?${params.toString()}`)
   }
 
   return (
@@ -121,15 +150,20 @@ export default function BookingBar() {
             </div>
 
             {/* Search Button */}
-            <button
-              type="submit"
-              className="bg-gold-500 hover:bg-gold-400 text-white font-semibold py-3 px-6 rounded-lg 
-                transition-all duration-300 flex items-center justify-center gap-2 
-                uppercase tracking-wider text-sm shadow-lg hover:shadow-gold-500/30"
-            >
-              <Search size={18} />
-              <span>Cari</span>
-            </button>
+            <div className="space-y-2">
+              {error && (
+                <p className="text-red-400 text-xs">{error}</p>
+              )}
+              <button
+                type="submit"
+                className="w-full bg-gold-500 hover:bg-gold-400 text-white font-semibold py-3 px-6 rounded-lg 
+                  transition-all duration-300 flex items-center justify-center gap-2 
+                  uppercase tracking-wider text-sm shadow-lg hover:shadow-gold-500/30"
+              >
+                <Search size={18} />
+                <span>Cari</span>
+              </button>
+            </div>
           </div>
         </form>
       </div>

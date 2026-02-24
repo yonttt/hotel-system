@@ -1,17 +1,19 @@
-import ComingSoonPage from '../../../components/ComingSoonPage'
+import AdjustmentPageTemplate from '../../../components/AdjustmentPageTemplate'
 
 const AdjLaundry = () => {
   return (
-    <ComingSoonPage
+    <AdjustmentPageTemplate
+      category="laundry"
       title="Adjustment - Laundry"
       subtitle="Laundry adjustment and corrections"
       icon="🧺"
-      features={[
-        'Laundry price adjustments',
-        'Order corrections',
-        'Bill modifications',
-        'Void laundry transactions',
-        'Refund processing'
+      adjTypes={[
+        'Price Correction',
+        'Order Correction',
+        'Void Transaction',
+        'Bill Modification',
+        'Refund',
+        'Discount'
       ]}
     />
   )

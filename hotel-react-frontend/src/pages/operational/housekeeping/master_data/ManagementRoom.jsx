@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { apiService } from '../../../../services/api';
 import Layout from '../../../../components/Layout';
 import { useAuth } from '../../../../context/AuthContext';
+import useHotels from '../../../../hooks/useHotels';
 
 const ManagementRoom = () => {
   const { user } = useAuth();
+  const { hotelNames, defaultHotel, loading: hotelsLoading } = useHotels();
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,7 +21,7 @@ const ManagementRoom = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({
-    hotel_name: 'HOTEL NEW IDOLA',
+    hotel_name: '',
     room_number: '',
     room_type: '',
     floor_number: '',
@@ -79,7 +81,7 @@ const ManagementRoom = () => {
 
   const resetForm = () => {
     setFormData({
-      hotel_name: 'HOTEL NEW IDOLA',
+      hotel_name: defaultHotel,
       room_number: '',
       room_type: '',
       floor_number: '',
@@ -130,7 +132,7 @@ const ManagementRoom = () => {
     if (!canEdit()) return;
     setEditingItem(item);
     setFormData({
-      hotel_name: item.hotel_name || 'HOTEL NEW IDOLA',
+      hotel_name: item.hotel_name || defaultHotel,
       room_number: item.room_number || '',
       room_type: item.room_type || '',
       floor_number: item.floor_number || item.floor || '',
@@ -246,8 +248,9 @@ const ManagementRoom = () => {
                 }}
               >
                 <option value="ALL">ALL</option>
-                <option value="HOTEL NEW IDOLA">HOTEL NEW IDOLA</option>
-                <option value="HOTEL IDOLA">HOTEL IDOLA</option>
+                {hotelNames.map(name => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
               </select>
             </div>
           </div>
@@ -437,8 +440,10 @@ const ManagementRoom = () => {
                 onChange={(e) => setFormData({...formData, hotel_name: e.target.value})}
                 style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
               >
-                <option value="HOTEL NEW IDOLA">HOTEL NEW IDOLA</option>
-                <option value="HOTEL IDOLA">HOTEL IDOLA</option>
+                <option value="">Select Hotel</option>
+                {hotelNames.map(name => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
               </select>
             </div>
 

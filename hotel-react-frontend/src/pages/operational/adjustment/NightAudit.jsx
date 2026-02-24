@@ -26,7 +26,7 @@ const NightAudit = () => {
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({
     audit_date: '',
-    hotel_name: 'HOTEL NEW IDOLA',
+    hotel_name: '',
     room_number: '',
     guest_name: '',
     extra_bed: 0,
@@ -112,7 +112,7 @@ const NightAudit = () => {
     setEditingItem(null);
     setFormData({
       audit_date: selectedDate,
-      hotel_name: selectedHotel !== 'ALL' ? selectedHotel : 'HOTEL NEW IDOLA',
+      hotel_name: selectedHotel !== 'ALL' ? selectedHotel : (hotelOptions.length > 0 ? hotelOptions[0].name : ''),
       room_number: '',
       guest_name: '',
       extra_bed: 0,
@@ -138,7 +138,7 @@ const NightAudit = () => {
     setEditingItem(item);
     setFormData({
       audit_date: item.audit_date,
-      hotel_name: item.hotel_name || 'HOTEL NEW IDOLA',
+      hotel_name: item.hotel_name || '',
       room_number: item.room_number || '',
       guest_name: item.guest_name || '',
       extra_bed: item.extra_bed || 0,

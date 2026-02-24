@@ -1,9 +1,18 @@
 import { useState, useEffect } from 'react';
-import { apiService } from '../../services/api';
-import Layout from '../../components/Layout';
-import { useAuth } from '../../context/AuthContext';
+import { apiService } from '../../../services/api';
+import Layout from '../../../components/Layout';
+import { useAuth } from '../../../context/AuthContext';
 
-const AccountReceivablePage = () => {
+/**
+ * Reusable Adjustment Page component for all adjustment categories.
+ * Props:
+ *  - category: string (food_beverage, inventory, kos, laundry, meeting_room, petty_cash)
+ *  - title: string
+ *  - subtitle: string
+ *  - icon: string (emoji)
+ *  - adjTypes: string[] (list of adjustment types for dropdown)
+ */
+const AdjustmentPageTemplate = ({ category, title, subtitle, icon, adjTypes = [] }) => {
   const { user } = useAuth();
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,17 +30,19 @@ const AccountReceivablePage = () => {
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({
     hotel_name: '',
-    invoice_no: '',
+    adj_date: new Date().toISOString().split('T')[0],
+    adj_type: adjTypes.length > 0 ? adjTypes[0] : '',
+    category: category,
+    reference_no: '',
+    description: '',
     guest_name: '',
     room_number: '',
-    registration_no: '',
-    description: '',
-    amount: 0,
-    paid_amount: 0,
-    balance: 0,
-    due_date: '',
-    status: 'Outstanding',
-    payment_method: '',
+    item_name: '',
+    original_amount: 0,
+    adjusted_amount: 0,
+    difference: 0,
+    reason: '',
+    status: 'Pending',
     notes: ''
   });
   const [processing, setProcessing] = useState(false);
@@ -49,11 +60,11 @@ const AccountReceivablePage = () => {
   const fetchRecords = async () => {
     try {
       setLoading(true);
-      const response = await apiService.getAccountReceivables();
+      const response = await apiService.getAdjustmentsByCategory(category);
       setRecords(response.data || []);
       setError(null);
     } catch (err) {
-      setError('Failed to fetch records: ' + (err.response?.data?.detail || err.message));
+      setError('Failed to fetch adjustments: ' + (err.response?.data?.detail || err.message));
     } finally {
       setLoading(false);
     }
@@ -71,10 +82,11 @@ const AccountReceivablePage = () => {
   // Filter data
   const filteredRecords = records.filter(record => {
     const matchesSearch =
+      record.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      record.reference_no?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.guest_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      record.invoice_no?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      record.room_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      record.description?.toLowerCase().includes(searchTerm.toLowerCase());
+      record.item_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      record.reason?.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesHotel = selectedHotel === 'ALL' || record.hotel_name === selectedHotel;
     const matchesStatus = selectedStatus === 'ALL' || record.status === selectedStatus;
@@ -103,59 +115,47 @@ const AccountReceivablePage = () => {
 
   const handleFormChange = (field, value) => {
     const updated = { ...formData, [field]: value };
-    if (field === 'amount' || field === 'paid_amount') {
-      updated.balance = (parseFloat(updated.amount) || 0) - (parseFloat(updated.paid_amount) || 0);
-      if (updated.balance <= 0) {
-        updated.status = 'Paid';
-      } else if (parseFloat(updated.paid_amount) > 0) {
-        updated.status = 'Partial';
-      } else {
-        updated.status = 'Outstanding';
-      }
+    if (field === 'original_amount' || field === 'adjusted_amount') {
+      updated.difference = (parseFloat(updated.adjusted_amount) || 0) - (parseFloat(updated.original_amount) || 0);
     }
     setFormData(updated);
   };
 
-  const handleAddClick = async () => {
-    let nextInvoice = '';
-    try {
-      const res = await apiService.getNextInvoiceNumber();
-      nextInvoice = res.data?.next_invoice_no || '';
-    } catch (err) {
-      console.error('Error getting next invoice:', err);
-    }
+  const handleAddClick = () => {
     setFormData({
       hotel_name: hotels.length > 0 ? hotels[0].name : '',
-      invoice_no: nextInvoice,
+      adj_date: new Date().toISOString().split('T')[0],
+      adj_type: adjTypes.length > 0 ? adjTypes[0] : '',
+      category: category,
+      reference_no: '',
+      description: '',
       guest_name: '',
       room_number: '',
-      registration_no: '',
-      description: '',
-      amount: 0,
-      paid_amount: 0,
-      balance: 0,
-      due_date: '',
-      status: 'Outstanding',
-      payment_method: '',
+      item_name: '',
+      original_amount: 0,
+      adjusted_amount: 0,
+      difference: 0,
+      reason: '',
+      status: 'Pending',
       notes: ''
     });
     setShowAddModal(true);
   };
 
   const handleAddSave = async () => {
-    if (!formData.guest_name) {
-      alert('Guest name is required');
+    if (!formData.description && !formData.item_name) {
+      alert('Description or item name is required');
       return;
     }
     try {
       setProcessing(true);
-      await apiService.createAccountReceivable(formData);
+      await apiService.createAdjustment({ ...formData, category });
       setShowAddModal(false);
-      setSuccessMessage('Account receivable created successfully!');
+      setSuccessMessage('Adjustment created successfully!');
       fetchRecords();
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
-      alert('Error creating record: ' + (err.response?.data?.detail || err.message));
+      alert('Error creating adjustment: ' + (err.response?.data?.detail || err.message));
     } finally {
       setProcessing(false);
     }
@@ -165,17 +165,19 @@ const AccountReceivablePage = () => {
     setEditingItem(item);
     setFormData({
       hotel_name: item.hotel_name || '',
-      invoice_no: item.invoice_no || '',
+      adj_date: item.adj_date ? new Date(item.adj_date).toISOString().split('T')[0] : '',
+      adj_type: item.adj_type || '',
+      category: category,
+      reference_no: item.reference_no || '',
+      description: item.description || '',
       guest_name: item.guest_name || '',
       room_number: item.room_number || '',
-      registration_no: item.registration_no || '',
-      description: item.description || '',
-      amount: item.amount || 0,
-      paid_amount: item.paid_amount || 0,
-      balance: item.balance || 0,
-      due_date: item.due_date ? new Date(item.due_date).toISOString().split('T')[0] : '',
-      status: item.status || 'Outstanding',
-      payment_method: item.payment_method || '',
+      item_name: item.item_name || '',
+      original_amount: item.original_amount || 0,
+      adjusted_amount: item.adjusted_amount || 0,
+      difference: item.difference || 0,
+      reason: item.reason || '',
+      status: item.status || 'Pending',
       notes: item.notes || ''
     });
     setShowEditModal(true);
@@ -185,52 +187,47 @@ const AccountReceivablePage = () => {
     if (!editingItem) return;
     try {
       setProcessing(true);
-      await apiService.updateAccountReceivable(editingItem.id, formData);
+      await apiService.updateAdjustment(editingItem.id, formData);
       setShowEditModal(false);
       setEditingItem(null);
-      setSuccessMessage('Account receivable updated successfully!');
+      setSuccessMessage('Adjustment updated successfully!');
       fetchRecords();
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
-      alert('Error updating record: ' + (err.response?.data?.detail || err.message));
+      alert('Error updating adjustment: ' + (err.response?.data?.detail || err.message));
     } finally {
       setProcessing(false);
     }
   };
 
   const handleDelete = async (item) => {
-    if (!window.confirm(`Delete invoice "${item.invoice_no}" for "${item.guest_name}"?`)) return;
+    if (!window.confirm(`Delete adjustment "${item.reference_no || item.description}"?`)) return;
     try {
-      await apiService.deleteAccountReceivable(item.id);
-      setSuccessMessage('Account receivable deleted successfully!');
+      await apiService.deleteAdjustment(item.id);
+      setSuccessMessage('Adjustment deleted successfully!');
       fetchRecords();
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
-      alert('Error deleting record: ' + (err.response?.data?.detail || err.message));
+      alert('Error deleting adjustment: ' + (err.response?.data?.detail || err.message));
     }
   };
 
   const getStatusBadge = (status) => {
     const styles = {
-      'Outstanding': 'bg-red-100 text-red-800',
-      'Partial': 'bg-yellow-100 text-yellow-800',
-      'Paid': 'bg-green-100 text-green-800',
-      'Overdue': 'bg-red-200 text-red-900'
+      'Pending': 'bg-yellow-100 text-yellow-800',
+      'Approved': 'bg-green-100 text-green-800',
+      'Rejected': 'bg-red-100 text-red-800',
+      'Completed': 'bg-blue-100 text-blue-800'
     };
     return styles[status] || 'bg-gray-100 text-gray-800';
   };
 
-  // Summary calculations
-  const totalAmount = filteredRecords.reduce((sum, r) => sum + parseFloat(r.amount || 0), 0);
-  const totalPaid = filteredRecords.reduce((sum, r) => sum + parseFloat(r.paid_amount || 0), 0);
-  const totalBalance = filteredRecords.reduce((sum, r) => sum + parseFloat(r.balance || 0), 0);
-
-  const renderFormModal = (title, onSave, onClose) => (
+  const renderFormModal = (modalTitle, onSave, onClose) => (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-gray-800">{title}</h2>
+            <h2 className="text-xl font-bold text-gray-800">{modalTitle}</h2>
             <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
           </div>
 
@@ -250,23 +247,46 @@ const AccountReceivablePage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Invoice No</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
               <input
-                type="text"
+                type="date"
                 className="w-full border border-gray-300 rounded px-3 py-2"
-                value={formData.invoice_no}
-                onChange={(e) => handleFormChange('invoice_no', e.target.value)}
+                value={formData.adj_date}
+                onChange={(e) => handleFormChange('adj_date', e.target.value)}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Guest Name *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Adjustment Type</label>
+              <select
+                className="w-full border border-gray-300 rounded px-3 py-2"
+                value={formData.adj_type}
+                onChange={(e) => handleFormChange('adj_type', e.target.value)}
+              >
+                <option value="">Select Type</option>
+                {adjTypes.map(t => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Reference No</label>
+              <input
+                type="text"
+                className="w-full border border-gray-300 rounded px-3 py-2"
+                value={formData.reference_no}
+                onChange={(e) => handleFormChange('reference_no', e.target.value)}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Guest Name</label>
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded px-3 py-2"
                 value={formData.guest_name}
                 onChange={(e) => handleFormChange('guest_name', e.target.value)}
-                required
               />
             </div>
 
@@ -281,23 +301,27 @@ const AccountReceivablePage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Registration No</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Item Name</label>
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded px-3 py-2"
-                value={formData.registration_no}
-                onChange={(e) => handleFormChange('registration_no', e.target.value)}
+                value={formData.item_name}
+                onChange={(e) => handleFormChange('item_name', e.target.value)}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
-              <input
-                type="date"
+              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+              <select
                 className="w-full border border-gray-300 rounded px-3 py-2"
-                value={formData.due_date}
-                onChange={(e) => handleFormChange('due_date', e.target.value)}
-              />
+                value={formData.status}
+                onChange={(e) => handleFormChange('status', e.target.value)}
+              >
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+                <option value="Completed">Completed</option>
+              </select>
             </div>
 
             <div className="md:col-span-2">
@@ -311,65 +335,45 @@ const AccountReceivablePage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Original Amount</label>
               <input
                 type="number"
                 min="0"
                 className="w-full border border-gray-300 rounded px-3 py-2"
-                value={formData.amount}
-                onChange={(e) => handleFormChange('amount', parseFloat(e.target.value) || 0)}
+                value={formData.original_amount}
+                onChange={(e) => handleFormChange('original_amount', parseFloat(e.target.value) || 0)}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Paid Amount</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Adjusted Amount</label>
               <input
                 type="number"
                 min="0"
                 className="w-full border border-gray-300 rounded px-3 py-2"
-                value={formData.paid_amount}
-                onChange={(e) => handleFormChange('paid_amount', parseFloat(e.target.value) || 0)}
+                value={formData.adjusted_amount}
+                onChange={(e) => handleFormChange('adjusted_amount', parseFloat(e.target.value) || 0)}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Balance</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Difference</label>
               <input
                 type="number"
                 className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-50"
-                value={formData.balance}
+                value={formData.difference}
                 readOnly
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
-              <select
+              <label className="block text-sm font-medium text-gray-700 mb-1">Reason</label>
+              <input
+                type="text"
                 className="w-full border border-gray-300 rounded px-3 py-2"
-                value={formData.payment_method}
-                onChange={(e) => handleFormChange('payment_method', e.target.value)}
-              >
-                <option value="">Select Method</option>
-                <option value="Cash">Cash</option>
-                <option value="Transfer">Transfer</option>
-                <option value="Credit Card">Credit Card</option>
-                <option value="Debit">Debit</option>
-                <option value="Voucher">Voucher</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-              <select
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={formData.status}
-                onChange={(e) => handleFormChange('status', e.target.value)}
-              >
-                <option value="Outstanding">Outstanding</option>
-                <option value="Partial">Partial</option>
-                <option value="Paid">Paid</option>
-                <option value="Overdue">Overdue</option>
-              </select>
+                value={formData.reason}
+                onChange={(e) => handleFormChange('reason', e.target.value)}
+              />
             </div>
 
             <div className="md:col-span-2">
@@ -398,29 +402,13 @@ const AccountReceivablePage = () => {
     <Layout>
       <div className="page-container">
         <div className="page-header">
-          <h1 className="page-title">💰 Account Receivable</h1>
-          <p className="page-subtitle">Manage outstanding payments and receivables</p>
+          <h1 className="page-title">{icon} {title}</h1>
+          <p className="page-subtitle">{subtitle}</p>
         </div>
 
         {successMessage && (
           <div className="mb-4 p-3 bg-green-100 text-green-800 rounded-lg">{successMessage}</div>
         )}
-
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <div className="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
-            <p className="text-sm text-gray-600">Total Amount</p>
-            <p className="text-xl font-bold text-gray-800">Rp {formatCurrency(totalAmount)}</p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-4 border-l-4 border-green-500">
-            <p className="text-sm text-gray-600">Total Paid</p>
-            <p className="text-xl font-bold text-green-700">Rp {formatCurrency(totalPaid)}</p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-4 border-l-4 border-red-500">
-            <p className="text-sm text-gray-600">Outstanding Balance</p>
-            <p className="text-xl font-bold text-red-700">Rp {formatCurrency(totalBalance)}</p>
-          </div>
-        </div>
 
         <div className="content-card">
           {/* Toolbar */}
@@ -444,24 +432,24 @@ const AccountReceivablePage = () => {
 
               <select className="border border-gray-300 rounded px-2 py-1 text-sm" value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}>
                 <option value="ALL">All Status</option>
-                <option value="Outstanding">Outstanding</option>
-                <option value="Partial">Partial</option>
-                <option value="Paid">Paid</option>
-                <option value="Overdue">Overdue</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+                <option value="Completed">Completed</option>
               </select>
             </div>
 
             <div className="flex items-center gap-3">
               <input type="text" placeholder="Search..." className="border border-gray-300 rounded px-3 py-1 text-sm" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
               {canEdit() && (
-                <button onClick={handleAddClick} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">+ Add Invoice</button>
+                <button onClick={handleAddClick} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">+ Add Adjustment</button>
               )}
             </div>
           </div>
 
           {/* Table */}
           {loading ? (
-            <div className="text-center py-8 text-gray-500">Loading records...</div>
+            <div className="text-center py-8 text-gray-500">Loading adjustments...</div>
           ) : error ? (
             <div className="text-center py-8 text-red-500">{error}</div>
           ) : (
@@ -470,35 +458,37 @@ const AccountReceivablePage = () => {
                 <thead>
                   <tr className="bg-gray-50 border-b">
                     <th className="text-left px-4 py-3 font-semibold text-gray-600">No</th>
-                    <th className="text-left px-4 py-3 font-semibold text-gray-600">Invoice</th>
+                    <th className="text-left px-4 py-3 font-semibold text-gray-600">Date</th>
                     <th className="text-left px-4 py-3 font-semibold text-gray-600">Hotel</th>
-                    <th className="text-left px-4 py-3 font-semibold text-gray-600">Guest</th>
-                    <th className="text-left px-4 py-3 font-semibold text-gray-600">Room</th>
+                    <th className="text-left px-4 py-3 font-semibold text-gray-600">Type</th>
+                    <th className="text-left px-4 py-3 font-semibold text-gray-600">Ref No</th>
                     <th className="text-left px-4 py-3 font-semibold text-gray-600">Description</th>
-                    <th className="text-right px-4 py-3 font-semibold text-gray-600">Amount</th>
-                    <th className="text-right px-4 py-3 font-semibold text-gray-600">Paid</th>
-                    <th className="text-right px-4 py-3 font-semibold text-gray-600">Balance</th>
-                    <th className="text-left px-4 py-3 font-semibold text-gray-600">Due Date</th>
+                    <th className="text-right px-4 py-3 font-semibold text-gray-600">Original</th>
+                    <th className="text-right px-4 py-3 font-semibold text-gray-600">Adjusted</th>
+                    <th className="text-right px-4 py-3 font-semibold text-gray-600">Diff</th>
                     <th className="text-center px-4 py-3 font-semibold text-gray-600">Status</th>
                     {canEdit() && <th className="text-center px-4 py-3 font-semibold text-gray-600">Actions</th>}
                   </tr>
                 </thead>
                 <tbody>
                   {currentRecords.length === 0 ? (
-                    <tr><td colSpan={canEdit() ? 12 : 11} className="text-center py-8 text-gray-500">No records found</td></tr>
+                    <tr><td colSpan={canEdit() ? 11 : 10} className="text-center py-8 text-gray-500">No adjustments found</td></tr>
                   ) : (
                     currentRecords.map((record, index) => (
                       <tr key={record.id} className="border-b hover:bg-gray-50">
                         <td className="px-4 py-3">{indexOfFirstItem + index + 1}</td>
-                        <td className="px-4 py-3 font-medium">{record.invoice_no || '-'}</td>
+                        <td className="px-4 py-3">{formatDate(record.adj_date)}</td>
                         <td className="px-4 py-3">{record.hotel_name || '-'}</td>
-                        <td className="px-4 py-3">{record.guest_name || '-'}</td>
-                        <td className="px-4 py-3">{record.room_number || '-'}</td>
-                        <td className="px-4 py-3 max-w-[200px] truncate">{record.description || '-'}</td>
-                        <td className="px-4 py-3 text-right">{formatCurrency(record.amount)}</td>
-                        <td className="px-4 py-3 text-right">{formatCurrency(record.paid_amount)}</td>
-                        <td className="px-4 py-3 text-right font-medium">{formatCurrency(record.balance)}</td>
-                        <td className="px-4 py-3">{formatDate(record.due_date)}</td>
+                        <td className="px-4 py-3">{record.adj_type || '-'}</td>
+                        <td className="px-4 py-3">{record.reference_no || '-'}</td>
+                        <td className="px-4 py-3 max-w-[200px] truncate">{record.description || record.item_name || '-'}</td>
+                        <td className="px-4 py-3 text-right">{formatCurrency(record.original_amount)}</td>
+                        <td className="px-4 py-3 text-right">{formatCurrency(record.adjusted_amount)}</td>
+                        <td className="px-4 py-3 text-right font-medium">
+                          <span className={parseFloat(record.difference) >= 0 ? 'text-green-600' : 'text-red-600'}>
+                            {parseFloat(record.difference) >= 0 ? '+' : ''}{formatCurrency(record.difference)}
+                          </span>
+                        </td>
                         <td className="px-4 py-3 text-center">
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(record.status)}`}>{record.status}</span>
                         </td>
@@ -532,12 +522,11 @@ const AccountReceivablePage = () => {
         </div>
 
         {/* Modals */}
-        {showAddModal && renderFormModal('Add Account Receivable', handleAddSave, () => setShowAddModal(false))}
-        {showEditModal && renderFormModal('Edit Account Receivable', handleEditSave, () => { setShowEditModal(false); setEditingItem(null); })}
+        {showAddModal && renderFormModal(`Add ${title}`, handleAddSave, () => setShowAddModal(false))}
+        {showEditModal && renderFormModal(`Edit ${title}`, handleEditSave, () => { setShowEditModal(false); setEditingItem(null); })}
       </div>
     </Layout>
   );
 };
 
-export default AccountReceivablePage;
-export default AccountReceivablePage
+export default AdjustmentPageTemplate;

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { galleryImages } from '../data/hotels'
 import { X, ChevronLeft, ChevronRight, Instagram, ZoomIn } from 'lucide-react'
 
@@ -34,6 +34,19 @@ export default function GalleryPage() {
       index: (prev.index - 1 + filteredImages.length) % filteredImages.length,
     }))
   }
+
+  // Keyboard navigation for lightbox
+  const handleKeyDown = useCallback((e) => {
+    if (!lightbox.open) return
+    if (e.key === 'Escape') closeLightbox()
+    else if (e.key === 'ArrowRight') nextImage()
+    else if (e.key === 'ArrowLeft') prevImage()
+  }, [lightbox.open, filteredImages.length])
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [handleKeyDown])
 
   return (
     <>
@@ -143,7 +156,9 @@ export default function GalleryPage() {
             Bagikan momen liburan Anda bersama kami dengan hashtag #HotelResortMoments
           </p>
           <a
-            href="#"
+            href="https://instagram.com/hotelresort"
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-full text-sm font-semibold hover:opacity-90 transition-opacity"
           >
             <Instagram size={18} />

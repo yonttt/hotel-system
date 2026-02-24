@@ -173,7 +173,7 @@ const ProfilePage = () => {
                   <div>
                     <div style={{ fontSize: '11px', color: '#6c757d' }}>Hotel</div>
                     <div style={{ fontSize: '14px', fontWeight: '500', color: '#343a40' }}>
-                      {user?.hotel_name || 'HOTEL NEW IDOLA'}
+                      {user?.hotel_name || '-'}
                     </div>
                   </div>
                 </div>

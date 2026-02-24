@@ -11,7 +11,7 @@ router = APIRouter(prefix="/kategori-menu-resto", tags=["Kategori Menu Resto"])
 # Pydantic models
 class KategoriMenuRestoBase(BaseModel):
     hotel_id: Optional[int] = 1
-    hotel_name: Optional[str] = "HOTEL NEW IDOLA"
+    hotel_name: Optional[str] = None
     nama_kategori: str
     description: Optional[str] = None
 

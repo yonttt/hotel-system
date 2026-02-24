@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MapPin, Phone, Mail, Clock, Send, MessageSquare, Building2, Globe } from 'lucide-react'
+import { MapPin, Phone, Mail, Clock, Send, MessageSquare, Building2, Globe, CheckCircle, ChevronDown } from 'lucide-react'
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -9,6 +9,7 @@ export default function ContactPage() {
     subject: '',
     message: '',
   })
+  const [submitted, setSubmitted] = useState(false)
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -16,8 +17,9 @@ export default function ContactPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    alert('Terima kasih! Pesan Anda telah dikirim. Tim kami akan segera menghubungi Anda.')
+    setSubmitted(true)
     setFormData({ name: '', email: '', phone: '', subject: '', message: '' })
+    setTimeout(() => setSubmitted(false), 5000)
   }
 
   const contactInfo = [
@@ -96,6 +98,15 @@ export default function ContactPage() {
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-5">
+                {submitted && (
+                  <div className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl p-4 mb-2">
+                    <CheckCircle size={20} className="text-green-500 shrink-0" />
+                    <div>
+                      <p className="text-green-800 font-semibold text-sm">Pesan berhasil dikirim!</p>
+                      <p className="text-green-600 text-xs">Tim kami akan segera menghubungi Anda.</p>
+                    </div>
+                  </div>
+                )}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
                     <label className="block text-sm font-semibold text-hotel-dark mb-2">Nama Lengkap *</label>
@@ -217,26 +228,49 @@ export default function ContactPage() {
               </div>
 
               {/* FAQ Quick */}
-              <div className="bg-hotel-cream rounded-2xl p-6">
-                <h4 className="font-display font-bold text-hotel-dark mb-4">Pertanyaan Umum</h4>
-                <div className="space-y-3">
-                  {[
-                    'Bagaimana cara melakukan reservasi?',
-                    'Apakah tersedia airport transfer?',
-                    'Jam check-in dan check-out?',
-                    'Apakah ada parking area?',
-                  ].map((q, i) => (
-                    <div key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                      <span className="text-gold-500 font-bold">Q:</span>
-                      <span>{q}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <FaqSection />
             </div>
           </div>
         </div>
       </section>
     </>
+  )
+}
+
+const faqData = [
+  { q: 'Bagaimana cara melakukan reservasi?', a: 'Anda dapat melakukan reservasi melalui website kami dengan mengklik tombol "Pesan Sekarang" di halaman Kamar, atau hubungi kami melalui telepon/WhatsApp.' },
+  { q: 'Apakah tersedia airport transfer?', a: 'Ya, kami menyediakan layanan airport transfer untuk semua tamu. Silakan informasikan detail penerbangan Anda saat melakukan reservasi.' },
+  { q: 'Jam check-in dan check-out?', a: 'Check-in mulai pukul 14:00 dan check-out paling lambat pukul 12:00. Early check-in dan late check-out tersedia sesuai ketersediaan.' },
+  { q: 'Apakah ada parking area?', a: 'Ya, kami menyediakan area parkir gratis untuk tamu hotel. Tersedia parkir valet untuk tamu suite.' },
+]
+
+function FaqSection() {
+  const [openIndex, setOpenIndex] = useState(null)
+
+  return (
+    <div className="bg-hotel-cream rounded-2xl p-6">
+      <h4 className="font-display font-bold text-hotel-dark mb-4">Pertanyaan Umum</h4>
+      <div className="space-y-2">
+        {faqData.map((item, i) => (
+          <div key={i} className="bg-white rounded-xl overflow-hidden">
+            <button
+              onClick={() => setOpenIndex(openIndex === i ? null : i)}
+              className="w-full flex items-center justify-between gap-2 text-left p-4 text-sm font-medium text-gray-700 hover:text-hotel-dark transition-colors"
+            >
+              <span>{item.q}</span>
+              <ChevronDown
+                size={16}
+                className={`text-gold-500 shrink-0 transition-transform duration-200 ${openIndex === i ? 'rotate-180' : ''}`}
+              />
+            </button>
+            {openIndex === i && (
+              <div className="px-4 pb-4 text-sm text-gray-500 leading-relaxed border-t border-gray-100 pt-3">
+                {item.a}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }

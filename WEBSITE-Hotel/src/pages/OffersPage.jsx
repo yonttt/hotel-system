@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Tag, Clock, Building2, Check } from 'lucide-react'
 import { specialOffers } from '../data/hotels'
@@ -29,6 +30,18 @@ const extendedOffers = [
 ]
 
 export default function OffersPage() {
+  const [nlEmail, setNlEmail] = useState('')
+  const [nlSuccess, setNlSuccess] = useState(false)
+
+  const handleNewsletter = (e) => {
+    e.preventDefault()
+    if (nlEmail) {
+      setNlSuccess(true)
+      setNlEmail('')
+      setTimeout(() => setNlSuccess(false), 4000)
+    }
+  }
+
   return (
     <>
       {/* Hero Banner */}
@@ -58,9 +71,9 @@ export default function OffersPage() {
                 <p className="text-white/80 text-sm">Harga terbaik dijamin hanya di website resmi kami</p>
               </div>
             </div>
-            <button className="bg-white text-gold-600 px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-gold-50 transition-colors">
+            <Link to="/contact" className="bg-white text-gold-600 px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-gold-50 transition-colors">
               Menjadi Member
-            </button>
+            </Link>
           </div>
         </div>
       </section>
@@ -116,9 +129,9 @@ export default function OffersPage() {
                     </div>
                   </div>
 
-                  <button className="w-full btn-gold rounded-lg text-center">
+                  <Link to={`/booking?offer=${offer.id}`} className="w-full btn-gold rounded-lg text-center block">
                     Pesan Sekarang
-                  </button>
+                  </Link>
                 </div>
               </div>
             ))}
@@ -135,17 +148,23 @@ export default function OffersPage() {
           <p className="text-white/60 mb-8">
             Daftar newsletter kami dan dapatkan notifikasi penawaran eksklusif langsung di inbox
           </p>
-          <form className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto" onSubmit={(e) => e.preventDefault()}>
+          <form className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto" onSubmit={handleNewsletter}>
             <input
               type="email"
               placeholder="Email Anda"
+              value={nlEmail}
+              onChange={(e) => setNlEmail(e.target.value)}
+              required
               className="w-full bg-white/10 border border-white/20 rounded-lg px-5 py-3 text-white text-sm 
                 placeholder-white/40 focus:outline-none focus:border-gold-400 transition-all"
             />
             <button className="bg-gold-500 text-white px-8 py-3 rounded-lg text-sm font-semibold hover:bg-gold-400 transition-colors whitespace-nowrap">
-              Daftar
+              {nlSuccess ? '✓ Terdaftar!' : 'Daftar'}
             </button>
           </form>
+          {nlSuccess && (
+            <p className="text-green-400 text-sm mt-3">Terima kasih! Anda akan menerima penawaran eksklusif.</p>
+          )}
         </div>
       </section>
     </>

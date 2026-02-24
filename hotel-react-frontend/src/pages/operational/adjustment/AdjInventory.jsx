@@ -1,17 +1,19 @@
-import ComingSoonPage from '../../../components/ComingSoonPage'
+import AdjustmentPageTemplate from '../../../components/AdjustmentPageTemplate'
 
 const AdjInventory = () => {
   return (
-    <ComingSoonPage
+    <AdjustmentPageTemplate
+      category="inventory"
       title="Adjustment - Inventory"
       subtitle="Inventory adjustment and corrections"
       icon="📦"
-      features={[
-        'Stock adjustments',
-        'Inventory corrections',
-        'Stock opname',
-        'Write-off management',
-        'Transfer between locations'
+      adjTypes={[
+        'Stock Addition',
+        'Stock Reduction',
+        'Write-off',
+        'Stock Opname',
+        'Transfer',
+        'Correction'
       ]}
     />
   )

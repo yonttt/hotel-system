@@ -21,7 +21,7 @@ class UserCreate(UserBase):
     password: str
     full_name: Optional[str] = None
     title: Optional[str] = None
-    hotel_name: Optional[str] = "HOTEL NEW IDOLA"
+    hotel_name: Optional[str] = None
 
 class UserUpdate(BaseModel):
     username: Optional[str] = None

@@ -13,7 +13,7 @@ router = APIRouter()
 # Pydantic schemas for night audit
 class NightAuditCreate(BaseModel):
     audit_date: date
-    hotel_name: Optional[str] = 'HOTEL NEW IDOLA'
+    hotel_name: Optional[str] = None
     room_number: Optional[str] = None
     registration_id: Optional[int] = None
     registration_no: Optional[str] = None
@@ -270,7 +270,7 @@ def create_night_audit(
             """),
             {
                 "audit_date": audit_data.audit_date,
-                "hotel_name": audit_data.hotel_name or 'HOTEL NEW IDOLA',
+                "hotel_name": audit_data.hotel_name or '',
                 "room_number": audit_data.room_number,
                 "registration_id": audit_data.registration_id,
                 "registration_no": audit_data.registration_no,

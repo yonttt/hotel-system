@@ -1,17 +1,19 @@
-import ComingSoonPage from '../../../components/ComingSoonPage'
+import AdjustmentPageTemplate from '../../../components/AdjustmentPageTemplate'
 
 const AdjPettyCash = () => {
   return (
-    <ComingSoonPage
+    <AdjustmentPageTemplate
+      category="petty_cash"
       title="Adjustment - Petty Cash"
       subtitle="Petty cash adjustment and corrections"
       icon="💵"
-      features={[
-        'Cash adjustments',
-        'Transaction corrections',
-        'Receipt modifications',
-        'Expense corrections',
-        'Balance reconciliation'
+      adjTypes={[
+        'Cash Correction',
+        'Void Transaction',
+        'Receipt Modification',
+        'Expense Correction',
+        'Balance Reconciliation',
+        'Addition'
       ]}
     />
   )

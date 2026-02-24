@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import { Calendar, ArrowRight } from 'lucide-react'
 import { newsItems } from '../data/hotels'
 
@@ -72,10 +73,10 @@ export default function NewsSection() {
 
         {/* CTA */}
         <div className="text-center mt-12 animate-on-scroll">
-          <button className="btn-outline-gold rounded-full inline-flex items-center gap-2">
+          <Link to="/about" className="btn-outline-gold rounded-full inline-flex items-center gap-2">
             Tampilkan Berita Lainnya
             <ArrowRight size={16} />
-          </button>
+          </Link>
         </div>
       </div>
     </section>

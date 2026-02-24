@@ -19,8 +19,8 @@ const MasterMeja = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({
-    hotel_id: 1,
-    hotel_name: 'HOTEL NEW IDOLA',
+    hotel_id: '',
+    hotel_name: '',
     no_meja: '',
     lantai: 1,
     kursi: 4,
@@ -84,8 +84,8 @@ const MasterMeja = () => {
   // Handle add new table
   const handleAddClick = () => {
     setFormData({
-      hotel_id: 1,
-      hotel_name: 'HOTEL NEW IDOLA',
+      hotel_id: hotels.length > 0 ? hotels[0].id : '',
+      hotel_name: hotels.length > 0 ? hotels[0].name : '',
       no_meja: '',
       lantai: 1,
       kursi: 4,
@@ -119,8 +119,8 @@ const MasterMeja = () => {
     if (!canEdit()) return;
     setEditingItem(table);
     setFormData({
-      hotel_id: table.hotel_id || 1,
-      hotel_name: table.hotel_name || 'HOTEL NEW IDOLA',
+      hotel_id: table.hotel_id || '',
+      hotel_name: table.hotel_name || '',
       no_meja: table.no_meja || '',
       lantai: table.lantai || 1,
       kursi: table.kursi || 4,

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi.errors import RateLimitExceeded
-from app.api import auth, users, hotel_rooms, room_pricing, guests, hotel_registrations, hotel_reservations, cities, nationalities, category_markets, market_segments, payment_methods, group_bookings, revenue_reports, master_data, room_rates, master_meja, kategori_menu_resto, checkin, checkout, night_audit, properties
+from app.api import auth, users, hotel_rooms, room_pricing, guests, hotel_registrations, hotel_reservations, cities, nationalities, category_markets, market_segments, payment_methods, group_bookings, revenue_reports, master_data, room_rates, master_meja, kategori_menu_resto, checkin, checkout, night_audit, properties, laundry, account_receivable, adjustments
 from app.core.security_middleware import (
     limiter, 
     SecurityHeadersMiddleware, 
@@ -73,6 +73,9 @@ app.include_router(checkin.router, prefix="/checkin", tags=["checkin"])
 app.include_router(checkout.router, prefix="/checkout", tags=["checkout"])
 app.include_router(night_audit.router, prefix="/night-audit", tags=["night-audit"])
 app.include_router(properties.router, prefix="/properties", tags=["properties"])
+app.include_router(laundry.router, prefix="", tags=["laundry"])
+app.include_router(account_receivable.router, prefix="", tags=["account-receivable"])
+app.include_router(adjustments.router, prefix="", tags=["adjustments"])
 
 @app.on_event("startup")
 async def startup_event():

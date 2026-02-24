@@ -1,17 +1,19 @@
-import ComingSoonPage from '../../../components/ComingSoonPage'
+import AdjustmentPageTemplate from '../../../components/AdjustmentPageTemplate'
 
 const AdjMeetingRoom = () => {
   return (
-    <ComingSoonPage
+    <AdjustmentPageTemplate
+      category="meeting_room"
       title="Adjustment - Meeting Room"
       subtitle="Meeting room adjustment and corrections"
       icon="🏢"
-      features={[
-        'Booking adjustments',
-        'Price corrections',
-        'Schedule modifications',
-        'Bill adjustments',
-        'Cancellation processing'
+      adjTypes={[
+        'Booking Adjustment',
+        'Price Correction',
+        'Schedule Modification',
+        'Cancellation',
+        'Refund',
+        'Bill Adjustment'
       ]}
     />
   )
