@@ -4,7 +4,7 @@ from typing import List
 from app.core.database import get_db
 from app.core.auth import get_current_user, get_current_manager_or_admin_user
 from app.core.room_utils import update_room_status
-from app.models import User, HotelRegistration
+from app.models import User, HotelRegistration, Guest
 from app.schemas import (
     GuestRegistrationCreate, 
     GuestRegistrationResponse, 
@@ -35,6 +35,28 @@ def create_guest_registration(
         # Set created_by to current user's ID
         registration_data = registration.dict()
         registration_data['created_by'] = current_user.id
+        
+        # Auto-link or create guest if guest_id not provided
+        if not registration_data.get('guest_id') and registration_data.get('guest_name'):
+            # Try to find existing guest by name
+            existing_guest = db.query(Guest).filter(
+                Guest.guest_name == registration_data['guest_name']
+            ).first()
+            if existing_guest:
+                registration_data['guest_id'] = existing_guest.id
+            else:
+                # Create new guest from registration data
+                new_guest = Guest(
+                    guest_name=registration_data.get('guest_name'),
+                    email=registration_data.get('email'),
+                    phone=registration_data.get('mobile_phone'),
+                    address=registration_data.get('address'),
+                    id_number=registration_data.get('id_card_number'),
+                    nationality=registration_data.get('nationality', 'INDONESIA')
+                )
+                db.add(new_guest)
+                db.flush()
+                registration_data['guest_id'] = new_guest.id
         
         db_registration = HotelRegistration(**registration_data)
         db.add(db_registration)

@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, DateTime, Enum, Text, Boolean, DECIMAL, Date
+from sqlalchemy import Column, Integer, String, DateTime, Enum, Text, Boolean, DECIMAL, Date, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.core.database import Base
 
@@ -71,11 +72,16 @@ class Guest(Base):
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
+    # Relationships
+    reservations = relationship("HotelReservation", back_populates="guest")
+    registrations = relationship("HotelRegistration", back_populates="guest")
+
 class HotelReservation(Base):
     __tablename__ = "hotel_reservations"
     
     id = Column(Integer, primary_key=True, index=True)
     reservation_no = Column(String(20), unique=True)
+    guest_id = Column(Integer, ForeignKey('guests.id'), nullable=True)
     category_market = Column(String(50), default='Normal')
     member_id = Column(String(50))
     transaction_by = Column(String(100))
@@ -111,11 +117,15 @@ class HotelReservation(Base):
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
+    # Relationship
+    guest = relationship("Guest", back_populates="reservations")
+
 class HotelRegistration(Base):
     __tablename__ = "hotel_registrations"
     
     id = Column(Integer, primary_key=True, index=True)
     registration_no = Column(String(20), unique=True)
+    guest_id = Column(Integer, ForeignKey('guests.id'), nullable=True)
     category_market = Column(String(50), default='Normal')
     member_id = Column(String(50))
     transaction_by = Column(String(100))
@@ -150,6 +160,9 @@ class HotelRegistration(Base):
     created_by = Column(Integer)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+    # Relationship
+    guest = relationship("Guest", back_populates="registrations")
 
 class GroupBooking(Base):
     __tablename__ = "group_bookings"

@@ -83,8 +83,7 @@ class TokenData(BaseModel):
 
 # Guest Schemas
 class GuestBase(BaseModel):
-    first_name: str
-    last_name: str
+    guest_name: str
     email: Optional[str] = None
     phone: Optional[str] = None
     address: Optional[str] = None
@@ -95,8 +94,7 @@ class GuestCreate(GuestBase):
     pass
 
 class GuestUpdate(BaseModel):
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
+    guest_name: Optional[str] = None
     email: Optional[str] = None
     phone: Optional[str] = None
     address: Optional[str] = None
@@ -137,6 +135,7 @@ class TransactionStatus(str, Enum):
 
 class ReservationBase(BaseModel):
     reservation_no: str
+    guest_id: Optional[int] = None
     category_market: str = "Walkin"
     market_segment: str = "Normal"
     member_id: Optional[str] = None
@@ -174,6 +173,7 @@ class ReservationCreate(ReservationBase):
     pass
 
 class ReservationUpdate(BaseModel):
+    guest_id: Optional[int] = None
     category_market: Optional[str] = None
     market_segment: Optional[str] = None
     member_id: Optional[str] = None
@@ -218,6 +218,7 @@ class ReservationResponse(ReservationBase):
 # Guest Registration Schemas
 class GuestRegistrationBase(BaseModel):
     registration_no: str
+    guest_id: Optional[int] = None
     category_market_id: Optional[int] = None
     market_segment: str = "Normal"
     member_id: Optional[str] = None
@@ -257,6 +258,7 @@ class GuestRegistrationCreate(GuestRegistrationBase):
     pass
 
 class GuestRegistrationUpdate(BaseModel):
+    guest_id: Optional[int] = None
     category_market_id: Optional[int] = None
     market_segment: Optional[str] = None
     member_id: Optional[str] = None

@@ -87,8 +87,7 @@ def search_guests(
 ):
     """Search guests by name, email, or phone."""
     guests = db.query(Guest).filter(
-        (Guest.first_name.contains(query)) |
-        (Guest.last_name.contains(query)) |
+        (Guest.guest_name.contains(query)) |
         (Guest.email.contains(query)) |
         (Guest.phone.contains(query))
     ).all()
