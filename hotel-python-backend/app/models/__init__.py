@@ -258,3 +258,29 @@ class NonHotelRevenueSummary(Base):
     net_income = Column(DECIMAL(15, 2), default=0)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+
+class ChatbotKnowledgeBase(Base):
+    __tablename__ = "chatbot_knowledge_base"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    category = Column(Enum('policies', 'rooms', 'facilities', 'services', 'faq', 'promotions'), nullable=False)
+    question = Column(Text, nullable=False)
+    answer = Column(Text, nullable=False)
+    hotel_id = Column(Integer, ForeignKey('hotels.id'), nullable=True)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+    hotel = relationship("Hotel")
+
+
+class ChatbotSession(Base):
+    __tablename__ = "chatbot_sessions"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    session_id = Column(String(100), nullable=False, index=True)
+    user_message = Column(Text, nullable=False)
+    bot_response = Column(Text, nullable=False)
+    hotel_id = Column(Integer, ForeignKey('hotels.id'), nullable=True)
+    created_at = Column(DateTime, server_default=func.now())

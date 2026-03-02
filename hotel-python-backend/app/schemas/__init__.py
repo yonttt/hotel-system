@@ -388,3 +388,60 @@ class GroupBookingWithRoomsResponse(GroupBookingResponse):
 
     class Config:
         from_attributes = True
+
+
+# Chatbot Schemas
+class ChatbotCategory(str, Enum):
+    policies = "policies"
+    rooms = "rooms"
+    facilities = "facilities"
+    services = "services"
+    faq = "faq"
+    promotions = "promotions"
+
+class ChatbotKnowledgeCreate(BaseModel):
+    category: ChatbotCategory
+    question: str
+    answer: str
+    hotel_id: Optional[int] = None
+    is_active: Optional[bool] = True
+
+class ChatbotKnowledgeUpdate(BaseModel):
+    category: Optional[ChatbotCategory] = None
+    question: Optional[str] = None
+    answer: Optional[str] = None
+    hotel_id: Optional[int] = None
+    is_active: Optional[bool] = None
+
+class ChatbotKnowledgeResponse(BaseModel):
+    id: int
+    category: str
+    question: str
+    answer: str
+    hotel_id: Optional[int] = None
+    is_active: bool
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class ChatbotAskRequest(BaseModel):
+    message: str
+    session_id: Optional[str] = None
+    hotel_id: Optional[int] = None
+
+class ChatbotAskResponse(BaseModel):
+    response: str
+    session_id: str
+
+class ChatbotSessionResponse(BaseModel):
+    id: int
+    session_id: str
+    user_message: str
+    bot_response: str
+    hotel_id: Optional[int] = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
