@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import apiService from '../../services/api';
 
 const LaporanGlobal = () => {
-  const { user } = useAuth();
+  useAuth();
   const [startDate, setStartDate] = useState(() => {
     const today = new Date();
     return today.toISOString().split('T')[0];

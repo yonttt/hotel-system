@@ -15,7 +15,7 @@ const DashboardPage = () => {
     availableRooms: 0,
     occupiedRooms: 0
   })
-  const [recentReservations, setRecentReservations] = useState([])
+  const [, setRecentReservations] = useState([])
 
   useEffect(() => {
     fetchDashboardData()

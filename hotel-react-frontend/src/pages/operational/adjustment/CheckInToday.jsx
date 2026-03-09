@@ -4,7 +4,7 @@ import Layout from '../../../components/Layout';
 import { useAuth } from '../../../context/AuthContext';
 
 const CheckInToday = () => {
-  const { user } = useAuth();
+  useAuth();
   const [checkins, setCheckins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

@@ -400,7 +400,7 @@ const UserManagement = () => {
                   </td>
                 </tr>
               ) : (
-                users.map((usr, index) => (
+                users.map((usr) => (
                   <tr key={usr.id} style={{
                     borderBottom: '1px solid #dee2e6'
                   }}>
@@ -463,7 +463,7 @@ const UserManagement = () => {
               gap: '24px',
               marginTop: '8px'
             }}>
-              {Object.keys(authorities).map((role, index) => (
+              {Object.keys(authorities).map((role) => (
                 <div 
                   key={role}
                   style={{

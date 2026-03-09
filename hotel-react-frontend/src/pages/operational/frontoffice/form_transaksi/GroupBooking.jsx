@@ -8,10 +8,10 @@ import useHotels from '../../../../hooks/useHotels'
 
 const GroupBooking = () => {
   const { user } = useAuth()
-  const navigate = useNavigate()
+  useNavigate()
   const { defaultHotel } = useHotels()
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [, setError] = useState('')
   const [success, setSuccess] = useState('')
 
   // Reference data
@@ -219,7 +219,7 @@ const GroupBooking = () => {
               if (rateResponse.data?.room_rate) {
                 rate = parseFloat(rateResponse.data.room_rate)
               }
-            } catch (rateError) {
+            } catch (_rateError) {
               console.log('No rate found for date, falling back to room pricing')
             }
           }

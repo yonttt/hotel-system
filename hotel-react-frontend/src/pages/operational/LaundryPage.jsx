@@ -548,4 +548,3 @@ const LaundryPage = () => {
 };
 
 export default LaundryPage;
-export default LaundryPage

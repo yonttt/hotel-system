@@ -10,8 +10,8 @@ const UserAuthority = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rolePermissions, setRolePermissions] = useState({});
   const [successMessage, setSuccessMessage] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [, setLoading] = useState(true);
+  const [, setError] = useState(null);
 
   // Define roles from the system
   const systemRoles = [

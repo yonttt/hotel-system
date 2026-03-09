@@ -540,4 +540,3 @@ const AccountReceivablePage = () => {
 };
 
 export default AccountReceivablePage;
-export default AccountReceivablePage

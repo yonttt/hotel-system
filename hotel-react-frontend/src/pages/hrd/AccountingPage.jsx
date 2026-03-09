@@ -32,5 +32,3 @@ const AccountingPage = () => {
 }
 
 export default AccountingPage
-
-export default AccountingPage
