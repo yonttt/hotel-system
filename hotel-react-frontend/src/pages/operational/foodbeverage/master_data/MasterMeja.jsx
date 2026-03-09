@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { apiService } from '../../../../services/api';
 import Layout from '../../../../components/Layout';
 import { useAuth } from '../../../../context/AuthContext';
+import useHotels from '../../../../hooks/useHotels';
 
 const MasterMeja = () => {
   const { user } = useAuth();
+  const { hotels } = useHotels();
   const [tables, setTables] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -12,7 +14,6 @@ const MasterMeja = () => {
   const [showEntries, setShowEntries] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedHotel, setSelectedHotel] = useState('ALL');
-  const [hotels, setHotels] = useState([]);
 
   // Modal states
   const [showAddModal, setShowAddModal] = useState(false);
@@ -32,7 +33,6 @@ const MasterMeja = () => {
 
   useEffect(() => {
     fetchTables();
-    fetchHotels();
   }, []);
 
   const fetchTables = async () => {
@@ -46,15 +46,6 @@ const MasterMeja = () => {
       console.error('Error fetching tables:', err);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchHotels = async () => {
-    try {
-      const response = await apiService.getMasterMejaHotels();
-      setHotels(response.data || []);
-    } catch (err) {
-      console.error('Error fetching hotels:', err);
     }
   };
 
@@ -216,8 +207,8 @@ const MasterMeja = () => {
                 >
                   <option value="ALL">ALL</option>
                   {hotels.map(hotel => (
-                    <option key={hotel.hotel_id} value={hotel.hotel_name}>
-                      {hotel.hotel_name}
+                    <option key={hotel.id} value={hotel.name}>
+                      {hotel.name}
                     </option>
                   ))}
                 </select>
@@ -421,12 +412,19 @@ const MasterMeja = () => {
 
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Hotel</label>
-              <input
-                type="text"
+              <select
                 value={formData.hotel_name}
-                onChange={(e) => setFormData({...formData, hotel_name: e.target.value})}
+                onChange={(e) => {
+                  const selected = hotels.find(h => h.name === e.target.value);
+                  setFormData({...formData, hotel_name: e.target.value, hotel_id: selected?.id || ''});
+                }}
                 style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
-              />
+              >
+                <option value="">Select Hotel</option>
+                {hotels.map(h => (
+                  <option key={h.id} value={h.name}>{h.name}</option>
+                ))}
+              </select>
             </div>
 
             <div style={{ marginBottom: '15px' }}>
@@ -541,12 +539,19 @@ const MasterMeja = () => {
 
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Hotel</label>
-              <input
-                type="text"
+              <select
                 value={formData.hotel_name}
-                onChange={(e) => setFormData({...formData, hotel_name: e.target.value})}
+                onChange={(e) => {
+                  const selected = hotels.find(h => h.name === e.target.value);
+                  setFormData({...formData, hotel_name: e.target.value, hotel_id: selected?.id || ''});
+                }}
                 style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
-              />
+              >
+                <option value="">Select Hotel</option>
+                {hotels.map(h => (
+                  <option key={h.id} value={h.name}>{h.name}</option>
+                ))}
+              </select>
             </div>
 
             <div style={{ marginBottom: '15px' }}>

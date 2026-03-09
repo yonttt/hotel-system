@@ -71,7 +71,7 @@ def get_checkout_today(
             SELECT 
                 id,
                 registration_no,
-                COALESCE(hotel_name, 'HOTEL NEW IDOLA') as hotel_name,
+                hotel_name,
                 guest_name,
                 guest_type,
                 market_segment,
@@ -92,7 +92,7 @@ def get_checkout_today(
         params = {"today": today}
         
         if hotel_name and hotel_name != 'ALL':
-            query += " AND (hotel_name = :hotel_name OR (hotel_name IS NULL AND :hotel_name = 'HOTEL NEW IDOLA'))"
+            query += " AND (hotel_name = :hotel_name OR hotel_name IS NULL)"
             params["hotel_name"] = hotel_name
             
         query += " ORDER BY departure_date ASC"
@@ -149,7 +149,7 @@ def process_checkout(
                     nights, guest_count_male, guest_count_female, guest_count_child,
                     extra_bed_nights, extra_bed_qty, payment_method, payment_amount,
                     discount, deposit, balance, notes,
-                    COALESCE(hotel_name, 'HOTEL NEW IDOLA') as hotel_name
+                    hotel_name
                 FROM hotel_registrations
                 WHERE id = :id AND transaction_status = 'Check-in'
             """),

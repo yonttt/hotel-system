@@ -87,7 +87,7 @@ def register(
         password=hashed_password,
         full_name=user.full_name or user.username.upper(),
         title=title,
-        hotel_name=user.hotel_name or "HOTEL NEW IDOLA",
+        hotel_name=user.hotel_name or None,
         account_type=account_type
     )
     db.add(db_user)

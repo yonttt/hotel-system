@@ -100,7 +100,7 @@ async def get_hotel_revenue(
         
         # Process registration data
         for reg in reg_results:
-            hotel_name = reg.hotel_name or 'Hotel New Idola'
+            hotel_name = reg.hotel_name or 'Unknown'
             if hotel_name not in hotel_data:
                 hotel_data[hotel_name] = {
                     'room_sales': 0,
@@ -115,7 +115,7 @@ async def get_hotel_revenue(
         
         # Process reservation data
         for res in res_results:
-            hotel_name = res.hotel_name or 'Hotel New Idola'
+            hotel_name = res.hotel_name or 'Unknown'
             if hotel_name not in hotel_data:
                 hotel_data[hotel_name] = {
                     'room_sales': 0,
@@ -130,7 +130,7 @@ async def get_hotel_revenue(
         
         # Process group booking data
         for gb in gb_results:
-            hotel_name = gb.hotel_name or 'Hotel New Idola'
+            hotel_name = gb.hotel_name or 'Unknown'
             if hotel_name not in hotel_data:
                 hotel_data[hotel_name] = {
                     'room_sales': 0,

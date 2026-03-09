@@ -53,10 +53,9 @@ const ReservasiPage = () => {
     payment_diskon: 0,
     deposit: 0,
     balance: 0,
-    hotel_name: 'New Idola Hotel'
-  }
+    hotel_name: ''
+  }
 
-  const [formData, setFormData] = useState(initialFormState)
 
   // Update hotel_name when defaultHotel loads
   useEffect(() => {

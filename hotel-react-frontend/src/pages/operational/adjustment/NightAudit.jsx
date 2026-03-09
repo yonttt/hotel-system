@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { apiService } from '../../../services/api';
 import Layout from '../../../components/Layout';
 import { useAuth } from '../../../context/AuthContext';
+import useHotels from '../../../hooks/useHotels';
 
 const NightAudit = () => {
   useAuth();
+  const { hotels } = useHotels();
   const [audits, setAudits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -17,9 +19,6 @@ const NightAudit = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showEntries, setShowEntries] = useState(20);
   const [successMessage, setSuccessMessage] = useState(null);
-
-  // Master data
-  const [hotelOptions, setHotelOptions] = useState([]);
 
   // Add/Edit modal state
   const [showModal, setShowModal] = useState(false);
@@ -47,22 +46,12 @@ const NightAudit = () => {
   const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
-    fetchMasterData();
     fetchAuditData();
   }, [selectedDate, selectedHotel]);
 
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, showEntries]);
-
-  const fetchMasterData = async () => {
-    try {
-      const hotelResponse = await apiService.getHotels();
-      setHotelOptions(hotelResponse.data || []);
-    } catch (err) {
-      console.error('Error fetching master data:', err);
-    }
-  };
 
   const fetchAuditData = async () => {
     try {
@@ -112,7 +101,7 @@ const NightAudit = () => {
     setEditingItem(null);
     setFormData({
       audit_date: selectedDate,
-      hotel_name: selectedHotel !== 'ALL' ? selectedHotel : (hotelOptions.length > 0 ? hotelOptions[0].name : ''),
+      hotel_name: selectedHotel !== 'ALL' ? selectedHotel : (hotels.length > 0 ? hotels[0].name : ''),
       room_number: '',
       guest_name: '',
       extra_bed: 0,
@@ -289,9 +278,9 @@ const NightAudit = () => {
                   onChange={(e) => setSelectedHotel(e.target.value)}
                 >
                   <option value="ALL">ALL</option>
-                  {hotelOptions.map((hotel, index) => (
-                    <option key={index} value={hotel.name || hotel}>
-                      {hotel.name || hotel}
+                  {hotels.map(hotel => (
+                    <option key={hotel.id} value={hotel.name}>
+                      {hotel.name}
                     </option>
                   ))}
                 </select>
@@ -480,9 +469,9 @@ const NightAudit = () => {
                     onChange={(e) => handleFormChange('hotel_name', e.target.value)}
                     style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                   >
-                    {hotelOptions.map((hotel, index) => (
-                      <option key={index} value={hotel.name || hotel}>
-                        {hotel.name || hotel}
+                    {hotels.map(hotel => (
+                      <option key={hotel.id} value={hotel.name}>
+                        {hotel.name}
                       </option>
                     ))}
                   </select>

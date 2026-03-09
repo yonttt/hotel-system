@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../../../../services/api';
 import Layout from '../../../../components/Layout';
+import useHotels from '../../../../hooks/useHotels';
 
 const StatusKamarFO = () => {
+  const { hotels } = useHotels();
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,7 +21,6 @@ const StatusKamarFO = () => {
 
   // Master data from database
   const [statusOptions, setStatusOptions] = useState([]);
-  const [hotelOptions, setHotelOptions] = useState([]);
 
   useEffect(() => {
     fetchMasterData();
@@ -32,10 +33,6 @@ const StatusKamarFO = () => {
       // Fetch room statuses from database
       const statusResponse = await apiService.getRoomStatuses();
       setStatusOptions(statusResponse.data || []);
-      
-      // Fetch hotels from database
-      const hotelResponse = await apiService.getHotels();
-      setHotelOptions(hotelResponse.data || []);
     } catch (err) {
       console.error('Error fetching master data:', err);
     }
@@ -305,8 +302,8 @@ const StatusKamarFO = () => {
                 <label>Hotel :</label>
                 <select value={selectedHotel} onChange={(e) => setSelectedHotel(e.target.value)}>
                   <option value="ALL">ALL</option>
-                  {hotelOptions.map((hotel, index) => (
-                    <option key={index} value={hotel.name || hotel}>{hotel.name || hotel}</option>
+                  {hotels.map(hotel => (
+                    <option key={hotel.id} value={hotel.name}>{hotel.name}</option>
                   ))}
                 </select>
               </div>

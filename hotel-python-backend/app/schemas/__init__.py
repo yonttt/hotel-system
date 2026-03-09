@@ -167,7 +167,7 @@ class ReservationBase(BaseModel):
     payment_diskon: Decimal = Decimal('0.00')
     deposit: Decimal = Decimal('0.00')
     balance: Decimal = Decimal('0.00')
-    hotel_name: str = "New Idola Hotel"
+    hotel_name: Optional[str] = None
 
 class ReservationCreate(ReservationBase):
     pass
@@ -252,7 +252,7 @@ class GuestRegistrationBase(BaseModel):
     deposit: Decimal = Decimal('0.00')
     balance: Decimal = Decimal('0.00')
     created_by: Optional[int] = None
-    hotel_name: str = "New Idola Hotel"
+    hotel_name: Optional[str] = None
 
 class GuestRegistrationCreate(GuestRegistrationBase):
     pass
@@ -355,7 +355,7 @@ from typing import List
 class GroupBookingCreate(GroupBookingBase):
     rooms: List[GroupBookingRoomBase]
     created_by: Optional[str] = "ADMIN"
-    hotel_name: Optional[str] = "New Idola Hotel"
+    hotel_name: Optional[str] = None
 
 class GroupBookingUpdate(BaseModel):
     group_name: Optional[str] = None

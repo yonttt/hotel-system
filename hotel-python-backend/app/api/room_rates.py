@@ -11,7 +11,7 @@ router = APIRouter()
 
 # Pydantic schemas
 class RoomRateBase(BaseModel):
-    hotel_name: str = "HOTEL NEW IDOLA"
+    hotel_name: str
     rate_name: str
     room_type: str
     room_rate: Decimal = Decimal('0')
@@ -227,7 +227,7 @@ def get_room_types(db: Session = Depends(get_db)):
 def get_rate_for_date(
     room_type: str,
     check_date: Optional[str] = None,
-    hotel_name: str = "HOTEL NEW IDOLA",
+    hotel_name: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
     """

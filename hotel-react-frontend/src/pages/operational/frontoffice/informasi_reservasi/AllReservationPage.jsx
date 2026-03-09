@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../../../context/AuthContext';
 import { apiService } from '../../../../services/api';
 import Layout from '../../../../components/Layout';
+import useHotels from '../../../../hooks/useHotels';
 
 const AllReservationPage = () => {
   const { user } = useAuth();
+  const { hotels } = useHotels();
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -12,7 +14,6 @@ const AllReservationPage = () => {
   const [showEntries, setShowEntries] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedHotel, setSelectedHotel] = useState('ALL');
-  const [hotelOptions, setHotelOptions] = useState([]);
 
   // Edit modal state
   const [showEditModal, setShowEditModal] = useState(false);
@@ -31,7 +32,6 @@ const AllReservationPage = () => {
   const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
-    fetchMasterData();
     loadReservations();
   }, []);
 
@@ -39,15 +39,6 @@ const AllReservationPage = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, showEntries]);
-
-  const fetchMasterData = async () => {
-    try {
-      const hotelResponse = await apiService.getHotels();
-      setHotelOptions(hotelResponse.data || []);
-    } catch (err) {
-      console.error('Error fetching master data:', err);
-    }
-  };
 
   const loadReservations = async () => {
     try {
@@ -187,8 +178,8 @@ const AllReservationPage = () => {
                   onChange={(e) => setSelectedHotel(e.target.value)}
                 >
                   <option value="ALL">ALL</option>
-                  {hotelOptions.map((hotel, index) => (
-                    <option key={index} value={hotel.name || hotel}>{hotel.name || hotel}</option>
+                  {hotels.map(hotel => (
+                    <option key={hotel.id} value={hotel.name}>{hotel.name}</option>
                   ))}
                 </select>
               </div>

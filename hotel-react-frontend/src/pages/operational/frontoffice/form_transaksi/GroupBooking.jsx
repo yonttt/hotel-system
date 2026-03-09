@@ -403,7 +403,7 @@ const GroupBooking = () => {
         total_deposit: parseFloat(groupInfo.total_deposit) || 0,
         notes: groupInfo.notes,
         created_by: user?.username || 'ADMIN',
-        hotel_name: defaultHotel || 'New Idola Hotel',
+        hotel_name: defaultHotel || '',
         rooms: roomBookings.map(room => ({
           room_number: room.room_number,
           room_type: room.room_type,

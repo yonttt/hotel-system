@@ -6,7 +6,7 @@ import useHotels from '../../../../hooks/useHotels';
 
 const UbahStatusKamar = () => {
   const { user } = useAuth();
-  const { hotelNames, defaultHotel } = useHotels();
+  const { hotelNames, defaultHotel, hotels } = useHotels();
   const [rooms, setRooms] = useState([]);
   const [filteredRooms, setFilteredRooms] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +33,6 @@ const UbahStatusKamar = () => {
 
   // Master data from database
   const [statusOptions, setStatusOptions] = useState([]);
-  const [hotelOptions, setHotelOptions] = useState([]);
 
   // Fetch room types for add modal
   const [roomTypeOptions, setRoomTypeOptions] = useState([]);
@@ -57,10 +56,6 @@ const UbahStatusKamar = () => {
       // Fetch room statuses from database
       const statusResponse = await apiService.getRoomStatuses();
       setStatusOptions(statusResponse.data || []);
-      
-      // Fetch hotels from database
-      const hotelResponse = await apiService.getHotels();
-      setHotelOptions(hotelResponse.data || []);
 
       // Fetch room types
       const roomTypesResponse = await apiService.getRoomTypesLookup();
@@ -290,7 +285,7 @@ const UbahStatusKamar = () => {
                   onChange={(e) => setSelectedHotel(e.target.value)}
                 >
                   <option value="ALL">ALL HOTELS</option>
-                  {hotelOptions.map(hotel => (
+                  {hotels.map(hotel => (
                     <option key={hotel.id} value={hotel.name}>{hotel.name}</option>
                   ))}
                 </select>
@@ -685,7 +680,7 @@ const UbahStatusKamar = () => {
                   onChange={(e) => setAddFormData({...addFormData, hotel_name: e.target.value})}
                   style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
                 >
-                  {hotelOptions.map(hotel => (
+                  {hotels.map(hotel => (
                     <option key={hotel.id} value={hotel.name}>{hotel.name}</option>
                   ))}
                 </select>

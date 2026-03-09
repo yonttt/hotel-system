@@ -6,7 +6,7 @@ import useHotels from '../../../../hooks/useHotels';
 
 const MasterHargaKamar = () => {
   const { user } = useAuth();
-  const { hotelNames, defaultHotel } = useHotels();
+  const { hotelNames, defaultHotel, hotels } = useHotels();
   const [rates, setRates] = useState([]);
   const [filteredRates, setFilteredRates] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +32,6 @@ const MasterHargaKamar = () => {
   const [processing, setProcessing] = useState(false);
 
   // Master data
-  const [hotelOptions, setHotelOptions] = useState([]);
   const [roomTypes, setRoomTypes] = useState([]);
 
   useEffect(() => {
@@ -51,9 +50,6 @@ const MasterHargaKamar = () => {
 
   const fetchMasterData = async () => {
     try {
-      const hotelResponse = await apiService.getHotels();
-      setHotelOptions(hotelResponse.data || []);
-      
       const roomTypesResponse = await apiService.getRoomTypesLookup();
       setRoomTypes(roomTypesResponse.data || []);
     } catch (err) {
@@ -273,7 +269,7 @@ const MasterHargaKamar = () => {
                   onChange={(e) => setSelectedHotel(e.target.value)}
                 >
                   <option value="ALL">ALL HOTELS</option>
-                  {hotelOptions.map(hotel => (
+                  {hotels.map(hotel => (
                     <option key={hotel.id} value={hotel.name}>{hotel.name}</option>
                   ))}
                 </select>
@@ -502,7 +498,7 @@ const MasterHargaKamar = () => {
                 onChange={(e) => setFormData({...formData, hotel_name: e.target.value})}
                 style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
               >
-                {hotelOptions.map(hotel => (
+                {hotels.map(hotel => (
                   <option key={hotel.id} value={hotel.name}>{hotel.name}</option>
                 ))}
               </select>

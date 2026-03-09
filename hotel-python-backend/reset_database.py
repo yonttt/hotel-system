@@ -79,7 +79,7 @@ def reset_database():
             email="admin@hotel.com",
             full_name="System Administrator",
             title="Admin Hotel",
-            hotel_name="HOTEL NEW IDOLA",
+            hotel_name=None,
             is_blocked=False,
             account_type="Management",
             role="admin",

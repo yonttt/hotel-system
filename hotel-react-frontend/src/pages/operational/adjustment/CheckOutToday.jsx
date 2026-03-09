@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { apiService } from '../../../services/api';
 import Layout from '../../../components/Layout';
 import { useAuth } from '../../../context/AuthContext';
+import useHotels from '../../../hooks/useHotels';
 
 const CheckOutToday = () => {
   useAuth();
+  const { hotels } = useHotels();
   const [checkouts, setCheckouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,31 +16,18 @@ const CheckOutToday = () => {
   const [showEntries, setShowEntries] = useState(100);
   const [successMessage, setSuccessMessage] = useState(null);
 
-  // Master data
-  const [hotelOptions, setHotelOptions] = useState([]);
-
   // Checkout modal state
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [selectedGuest, setSelectedGuest] = useState(null);
   const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
-    fetchMasterData();
     fetchCheckoutData();
   }, []);
 
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, showEntries, selectedHotel]);
-
-  const fetchMasterData = async () => {
-    try {
-      const hotelResponse = await apiService.getHotels();
-      setHotelOptions(hotelResponse.data || []);
-    } catch (err) {
-      console.error('Error fetching master data:', err);
-    }
-  };
 
   const fetchCheckoutData = async () => {
     try {
@@ -176,9 +165,9 @@ const CheckOutToday = () => {
                   onChange={(e) => setSelectedHotel(e.target.value)}
                 >
                   <option value="ALL">ALL</option>
-                  {hotelOptions.map((hotel, index) => (
-                    <option key={index} value={hotel.name || hotel}>
-                      {hotel.name || hotel}
+                  {hotels.map(hotel => (
+                    <option key={hotel.id} value={hotel.name}>
+                      {hotel.name}
                     </option>
                   ))}
                 </select>

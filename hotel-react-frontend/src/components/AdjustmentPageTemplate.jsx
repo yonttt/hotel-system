@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { apiService } from '../services/api';
 import Layout from './Layout';
 import { useAuth } from '../context/AuthContext';
+import useHotels from '../hooks/useHotels';
 
 /**
  * Reusable Adjustment Page component for all adjustment categories.
@@ -14,6 +15,7 @@ import { useAuth } from '../context/AuthContext';
  */
 const AdjustmentPageTemplate = ({ category, title, subtitle, icon, adjTypes = [] }) => {
   const { user } = useAuth();
+  const { hotels } = useHotels();
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -22,7 +24,6 @@ const AdjustmentPageTemplate = ({ category, title, subtitle, icon, adjTypes = []
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedHotel, setSelectedHotel] = useState('ALL');
   const [selectedStatus, setSelectedStatus] = useState('ALL');
-  const [hotels, setHotels] = useState([]);
 
   // Modal states
   const [showAddModal, setShowAddModal] = useState(false);
@@ -50,7 +51,6 @@ const AdjustmentPageTemplate = ({ category, title, subtitle, icon, adjTypes = []
 
   useEffect(() => {
     fetchRecords();
-    fetchHotels();
   }, []);
 
   useEffect(() => {
@@ -67,15 +67,6 @@ const AdjustmentPageTemplate = ({ category, title, subtitle, icon, adjTypes = []
       setError('Failed to fetch adjustments: ' + (err.response?.data?.detail || err.message));
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchHotels = async () => {
-    try {
-      const response = await apiService.getHotels(true);
-      setHotels(response.data || []);
-    } catch (err) {
-      console.error('Error fetching hotels:', err);
     }
   };
 

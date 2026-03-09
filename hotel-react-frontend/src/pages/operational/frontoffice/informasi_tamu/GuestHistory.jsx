@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../../../../context/AuthContext'
 import { apiService } from '../../../../services/api'
 import Layout from '../../../../components/Layout'
+import useHotels from '../../../../hooks/useHotels'
 
 const GuestHistory = () => {
   const { user } = useAuth()
+  const { hotels } = useHotels()
   const [registrations, setRegistrations] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -13,7 +15,6 @@ const GuestHistory = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [successMessage, setSuccessMessage] = useState(null)
   const [selectedHotel, setSelectedHotel] = useState('ALL')
-  const [hotelOptions, setHotelOptions] = useState([])
   
   // Default date range: last 30 days to today
   const today = new Date().toISOString().split('T')[0]
@@ -34,19 +35,9 @@ const GuestHistory = () => {
   const [processing, setProcessing] = useState(false)
 
   useEffect(() => { 
-    fetchMasterData()
     loadRegistrations() 
   }, [dateFrom, dateTo])
   useEffect(() => { setCurrentPage(1) }, [searchTerm, showEntries, dateFrom, dateTo])
-
-  const fetchMasterData = async () => {
-    try {
-      const hotelResponse = await apiService.getHotels()
-      setHotelOptions(hotelResponse.data || [])
-    } catch (err) {
-      console.error('Error fetching master data:', err)
-    }
-  }
 
   const loadRegistrations = async () => {
     try {
@@ -215,8 +206,8 @@ const GuestHistory = () => {
                   onChange={(e) => setSelectedHotel(e.target.value)}
                 >
                   <option value="ALL">ALL</option>
-                  {hotelOptions.map((hotel, index) => (
-                    <option key={index} value={hotel.name || hotel}>{hotel.name || hotel}</option>
+                  {hotels.map(hotel => (
+                    <option key={hotel.id} value={hotel.name}>{hotel.name}</option>
                   ))}
                 </select>
               </div>

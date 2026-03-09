@@ -52,7 +52,7 @@ def get_checkin_today(
             SELECT 
                 id,
                 registration_no,
-                COALESCE(hotel_name, 'HOTEL NEW IDOLA') as hotel_name,
+                hotel_name,
                 guest_name,
                 guest_type,
                 market_segment,
@@ -74,7 +74,7 @@ def get_checkin_today(
         params = {"today": today}
         
         if hotel_name and hotel_name != 'ALL':
-            query += " AND (hotel_name = :hotel_name OR (hotel_name IS NULL AND :hotel_name = 'HOTEL NEW IDOLA'))"
+            query += " AND (hotel_name = :hotel_name OR hotel_name IS NULL)"
             params["hotel_name"] = hotel_name
             
         query += " ORDER BY arrival_date ASC"
@@ -127,7 +127,7 @@ def process_checkin(
             text("""
                 SELECT 
                     id, registration_no, guest_name, room_number,
-                    COALESCE(hotel_name, 'HOTEL NEW IDOLA') as hotel_name,
+                    hotel_name,
                     transaction_status
                 FROM hotel_registrations
                 WHERE id = :id AND transaction_status = 'Registration'
