@@ -217,7 +217,7 @@ async def create_adjustment(
             adj.guest_name, adj.room_number, adj.item_name,
             adj.original_amount, adj.adjusted_amount, difference,
             adj.reason, adj.status, adj.notes,
-            current_user.get('username', current_user.get('sub', 'system'))
+            current_user.get('username', current_user.get('sub', 'system')) if isinstance(current_user, dict) else getattr(current_user, 'username', 'system')
         ))
 
         connection.commit()

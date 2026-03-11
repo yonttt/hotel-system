@@ -119,7 +119,7 @@ async def create_master_meja(
 ):
     """Create a new restaurant table"""
     # Check role
-    if current_user.get('role') not in ['admin', 'manager']:
+    if getattr(current_user, 'role', None) not in ['admin', 'manager']:
         raise HTTPException(status_code=403, detail="Only admin and manager can create tables")
     
     try:
@@ -175,7 +175,7 @@ async def update_master_meja(
 ):
     """Update a restaurant table"""
     # Check role
-    if current_user.get('role') not in ['admin', 'manager']:
+    if getattr(current_user, 'role', None) not in ['admin', 'manager']:
         raise HTTPException(status_code=403, detail="Only admin and manager can update tables")
     
     try:
@@ -245,7 +245,7 @@ async def delete_master_meja(
 ):
     """Delete a restaurant table (soft delete)"""
     # Check role
-    if current_user.get('role') not in ['admin', 'manager']:
+    if getattr(current_user, 'role', None) not in ['admin', 'manager']:
         raise HTTPException(status_code=403, detail="Only admin and manager can delete tables")
     
     try:

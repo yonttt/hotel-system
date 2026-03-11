@@ -181,7 +181,7 @@ async def create_laundry_order(
             order.registration_no, order.order_date or date.today(),
             order.item_name, order.quantity, order.unit_price, total,
             order.status, order.notes,
-            current_user.get('username', current_user.get('sub', 'system'))
+            current_user.get('username', current_user.get('sub', 'system')) if isinstance(current_user, dict) else getattr(current_user, 'username', 'system')
         ))
 
         connection.commit()

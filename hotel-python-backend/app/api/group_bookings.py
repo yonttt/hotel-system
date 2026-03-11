@@ -7,6 +7,7 @@ from decimal import Decimal
 
 from app.core.database import get_db
 from app.core.auth import get_current_user
+from app.core.room_utils import update_room_status
 from app.models import GroupBooking, GroupBookingRoom, HotelReservation, User
 from app.schemas import (
     GroupBookingCreate,
@@ -17,16 +18,6 @@ from app.schemas import (
 )
 
 router = APIRouter(prefix="/group-bookings", tags=["Group Bookings"])
-
-def update_room_status(db: Session, room_number: str, new_status: str):
-    """Update room status in hotel_rooms table."""
-    try:
-        db.execute(
-            text("UPDATE hotel_rooms SET status = :status WHERE room_number = :room_number"),
-            {"status": new_status, "room_number": room_number}
-        )
-    except Exception as e:
-        print(f"Warning: Could not update room status: {e}")
 
 @router.post("/", response_model=GroupBookingWithRoomsResponse)
 async def create_group_booking(

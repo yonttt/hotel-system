@@ -106,7 +106,7 @@ async def create_kategori_menu_resto(
 ):
     """Create a new restaurant menu category"""
     # Check role
-    if current_user.get('role') not in ['admin', 'manager']:
+    if getattr(current_user, 'role', None) not in ['admin', 'manager']:
         raise HTTPException(status_code=403, detail="Only admin and manager can create categories")
     
     try:
@@ -158,7 +158,7 @@ async def update_kategori_menu_resto(
 ):
     """Update a restaurant menu category"""
     # Check role
-    if current_user.get('role') not in ['admin', 'manager']:
+    if getattr(current_user, 'role', None) not in ['admin', 'manager']:
         raise HTTPException(status_code=403, detail="Only admin and manager can update categories")
     
     try:
@@ -216,7 +216,7 @@ async def delete_kategori_menu_resto(
 ):
     """Delete a restaurant menu category (soft delete)"""
     # Check role
-    if current_user.get('role') not in ['admin', 'manager']:
+    if getattr(current_user, 'role', None) not in ['admin', 'manager']:
         raise HTTPException(status_code=403, detail="Only admin and manager can delete categories")
     
     try:

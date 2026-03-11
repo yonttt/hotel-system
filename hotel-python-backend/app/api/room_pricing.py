@@ -70,35 +70,56 @@ def get_room_pricing(
     """Get pricing information for a specific room type."""
     try:
         # Use provided date or current date
-        date_to_check = check_date if check_date else "CURDATE()"
+        use_curdate = True
+        target_date = None
         if check_date:
-            # Validate date format and use it directly in query
+            # Validate date format
             from datetime import datetime
             try:
-                datetime.strptime(check_date, '%Y-%m-%d')
-                date_to_check = f"'{check_date}'"
+                target_date = datetime.strptime(check_date, '%Y-%m-%d').date()
+                use_curdate = False
             except ValueError:
                 raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
         
         # Check if the date is weekend (Saturday = 7, Sunday = 1)
-        is_weekend_query = db.execute(
-            text(f"SELECT DAYOFWEEK({date_to_check}) IN (1, 7) as is_weekend")
-        ).first()
+        if use_curdate:
+            is_weekend_query = db.execute(
+                text("SELECT DAYOFWEEK(CURDATE()) IN (1, 7) as is_weekend")
+            ).first()
+        else:
+            is_weekend_query = db.execute(
+                text("SELECT DAYOFWEEK(:check_date) IN (1, 7) as is_weekend"),
+                {"check_date": target_date}
+            ).first()
         is_weekend = bool(is_weekend_query.is_weekend)
         
         # Get pricing for the room type
-        pricing = db.execute(
-            text(f"""
-                SELECT category_code, category_name, normal_rate, weekend_rate,
-                       CASE 
-                           WHEN DAYOFWEEK({date_to_check}) IN (1, 7) THEN weekend_rate
-                           ELSE normal_rate
-                       END as current_rate
-                FROM room_categories 
-                WHERE category_code = :room_type AND is_active = 1
-            """),
-            {"room_type": room_type.upper()}
-        ).first()
+        if use_curdate:
+            pricing = db.execute(
+                text("""
+                    SELECT category_code, category_name, normal_rate, weekend_rate,
+                           CASE 
+                               WHEN DAYOFWEEK(CURDATE()) IN (1, 7) THEN weekend_rate
+                               ELSE normal_rate
+                           END as current_rate
+                    FROM room_categories 
+                    WHERE category_code = :room_type AND is_active = 1
+                """),
+                {"room_type": room_type.upper()}
+            ).first()
+        else:
+            pricing = db.execute(
+                text("""
+                    SELECT category_code, category_name, normal_rate, weekend_rate,
+                           CASE 
+                               WHEN DAYOFWEEK(:check_date) IN (1, 7) THEN weekend_rate
+                               ELSE normal_rate
+                           END as current_rate
+                    FROM room_categories 
+                    WHERE category_code = :room_type AND is_active = 1
+                """),
+                {"room_type": room_type.upper(), "check_date": target_date}
+            ).first()
         
         if not pricing:
             raise HTTPException(status_code=404, detail="Room type pricing not found")

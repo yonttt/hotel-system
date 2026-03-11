@@ -66,7 +66,9 @@ def get_room_rates(
         params["room_type"] = room_type
     
     query += " ORDER BY effective_date DESC, room_type ASC"
-    query += f" LIMIT {limit} OFFSET {skip}"
+    query += " LIMIT :limit OFFSET :skip"
+    params["limit"] = limit
+    params["skip"] = skip
     
     result = db.execute(text(query), params)
     rows = result.fetchall()

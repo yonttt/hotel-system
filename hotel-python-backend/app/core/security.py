@@ -39,14 +39,11 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
             logger.error(f"Password verification error: {e}")
             return False
     else:
-        # LEGACY: Plain text password comparison
-        # Log warning for security audit - this should be migrated
-        if plain_password == hashed_password:
-            logger.warning(
-                "⚠️ SECURITY WARNING: Plain text password detected. "
-                "Please migrate this user's password to bcrypt hash."
-            )
-            return True
+        # SECURITY: Block login for unhashed passwords
+        logger.error(
+            "SECURITY ALERT: Attempted login with unhashed password in database. "
+            "Please migrate this user's password to bcrypt hash."
+        )
         return False
 
 def get_password_hash(password: str) -> str:

@@ -222,7 +222,7 @@ async def create_account_receivable(
             ar.hotel_name, ar.invoice_no, ar.guest_name, ar.room_number,
             ar.registration_no, ar.description, ar.amount, ar.paid_amount,
             balance, ar.due_date, ar.status, ar.payment_method, ar.notes,
-            current_user.get('username', current_user.get('sub', 'system'))
+            current_user.get('username', current_user.get('sub', 'system')) if isinstance(current_user, dict) else getattr(current_user, 'username', 'system')
         ))
 
         connection.commit()
