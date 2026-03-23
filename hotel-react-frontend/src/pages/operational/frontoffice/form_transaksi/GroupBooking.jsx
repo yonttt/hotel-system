@@ -11,12 +11,13 @@ const GroupBooking = () => {
   useNavigate()
   const { defaultHotel } = useHotels()
   const [loading, setLoading] = useState(false)
-  const [, setError] = useState('')
+  const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
   // Reference data
   const [rooms, setRooms] = useState([])
   const [availableRooms, setAvailableRooms] = useState([])
+  const [roomCategories, setRoomCategories] = useState([])
   const [paymentMethods, setPaymentMethods] = useState([])
   const [cities, setCities] = useState([])
   const [countries, setCountries] = useState([])
@@ -41,6 +42,7 @@ const GroupBooking = () => {
       id: 1,
       room_number: '',
       room_type: '',
+      room_type_filter: '',
       guest_name: '',
       guest_title: 'MR',
       id_card_type: 'KTP',
@@ -112,7 +114,7 @@ const GroupBooking = () => {
               subtotal: (rate - discount) * groupInfo.nights
             }
           }
-        } catch (error) {
+        } catch {
           console.log('No rate found for', rb.room_type, 'on', groupInfo.arrival_date)
         }
         return rb
@@ -131,7 +133,8 @@ const GroupBooking = () => {
         apiService.getRoomsByStatus('VR'),
         apiService.getPaymentMethods(),
         apiService.getCities(),
-        apiService.getCountries()
+        apiService.getCountries(),
+        apiService.getRoomCategories()
       ])
 
       const getDataOrDefault = (result, defaultValue = []) =>
@@ -145,6 +148,7 @@ const GroupBooking = () => {
       setPaymentMethods(getDataOrDefault(results[1]))
       setCities(getDataOrDefault(results[2]))
       setCountries(getDataOrDefault(results[3]))
+      setRoomCategories(getDataOrDefault(results[4]))
     } catch (err) {
       setError('Failed to load reference data: ' + err.message)
     }
@@ -175,6 +179,7 @@ const GroupBooking = () => {
         id: Date.now(),
         room_number: '',
         room_type: '',
+        room_type_filter: '',
         guest_name: '',
         guest_title: 'MR',
         id_card_type: 'KTP',
@@ -219,7 +224,7 @@ const GroupBooking = () => {
               if (rateResponse.data?.room_rate) {
                 rate = parseFloat(rateResponse.data.room_rate)
               }
-            } catch (_rateError) {
+            } catch {
               console.log('No rate found for date, falling back to room pricing')
             }
           }
@@ -342,15 +347,29 @@ const GroupBooking = () => {
     ]
   }
 
-  const formatRooms = (currentRoomNumber = null) => {
+  const formatRoomCategories = () => {
+    return [
+      { value: '', label: 'All Room Types' },
+      ...roomCategories.map(cat => ({ value: cat.category_code || cat.category_name, label: cat.category_name }))
+    ]
+  }
+
+  const formatRooms = (currentRoomNumber = null, filterType = null) => {
     console.log('Available rooms for dropdown:', availableRooms)
     
     // Include currently selected room if it exists
     let roomsToShow = [...availableRooms]
+    if (filterType) {
+        roomsToShow = roomsToShow.filter(r => r.room_type === filterType)
+    }
+
     if (currentRoomNumber) {
       const currentRoom = rooms.find(r => r.room_number === currentRoomNumber)
       if (currentRoom && !roomsToShow.find(r => r.room_number === currentRoomNumber)) {
-        roomsToShow = [currentRoom, ...roomsToShow]
+        // Only include current room if it matches filter or if no filter
+        if (!filterType || (currentRoom.room_type === filterType)) {
+             roomsToShow = [currentRoom, ...roomsToShow]
+        }
       }
     }
     
@@ -718,18 +737,29 @@ const GroupBooking = () => {
                     {/* COLUMN 1 - Room & Guest Info */}
                     <div className="form-column">
                       <div className="form-group">
+                        <label>Filter Room Type</label>
+                         <SearchableSelect
+                          name="room_type_filter"
+                          value={room.room_type_filter}
+                          onChange={(e) => updateRoomBooking(room.id, 'room_type_filter', e.target.value)}
+                          options={formatRoomCategories()}
+                          placeholder="All Room Types"
+                          className="form-select"
+                        />
+                      </div>
+                      <div className="form-group">
                         <label>Room Number <span style={{color: 'red'}}>*</span></label>
                         <SearchableSelect
                           name="room_number"
                           value={room.room_number}
                           onChange={(e) => updateRoomBooking(room.id, 'room_number', e.target.value)}
-                          options={formatRooms(room.room_number)}
+                          options={formatRooms(room.room_number, room.room_type_filter)}
                           placeholder="Search room..."
                           required
                         />
                       </div>
                       <div className="form-group">
-                        <label>Room Type</label>
+                        <label>Room Type (Read Only)</label>
                         <input
                           type="text"
                           className="form-input bg-gray-100"

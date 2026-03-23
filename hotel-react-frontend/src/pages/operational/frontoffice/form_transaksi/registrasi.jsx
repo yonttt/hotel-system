@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../../../context/AuthContext'
-import { useNavigate } from 'react-router-dom'
 import { apiService } from '../../../../services/api'
 import Layout from '../../../../components/Layout'
 import SearchableSelect from '../../../../components/SearchableSelect'
@@ -8,10 +7,11 @@ import useHotels from '../../../../hooks/useHotels'
 
 const RegistrasiPage = () => {
   const { user } = useAuth()
-  useNavigate()
   const { defaultHotel } = useHotels()
   const [, setApiError] = useState(null)
   const [rooms, setRooms] = useState([])
+  const [roomCategories, setRoomCategories] = useState([])
+  const [selectedRoomCategory, setSelectedRoomCategory] = useState('')
   const [cities, setCities] = useState([])
   const [countries, setCountries] = useState([])
   const [categoryMarkets, setCategoryMarkets] = useState([])
@@ -178,6 +178,7 @@ const RegistrasiPage = () => {
         apiService.getCategoryMarkets(),
         apiService.getMarketSegments(),
         apiService.getPaymentMethods(),
+        apiService.getRoomCategories(),
       ]);
 
       const getDataOrDefault = (result, defaultValue = []) =>
@@ -196,6 +197,7 @@ const RegistrasiPage = () => {
       setCategoryMarkets(getDataOrDefault(results[4]));
       setMarketSegments(getDataOrDefault(results[5]));
       setPaymentMethods(getDataOrDefault(results[6]));
+      setRoomCategories(getDataOrDefault(results[7]));
 
     } catch (error) {
       console.error('Critical error loading initial data:', error);
@@ -230,7 +232,7 @@ const RegistrasiPage = () => {
               })
               return
             }
-          } catch (rateError) {
+          } catch {
             console.log('Room rates API not available, falling back to room_pricing')
           }
           
@@ -296,10 +298,21 @@ const RegistrasiPage = () => {
     ]
   }
 
+  const formatRoomCategories = () => {
+    return [
+      { value: '', label: 'All Room Types' },
+      ...roomCategories.map(cat => ({ value: cat.category_code || cat.category_name, label: cat.category_name }))
+    ]
+  }
+
   const formatRooms = () => {
+    let filteredRooms = rooms;
+    if (selectedRoomCategory) {
+      filteredRooms = rooms.filter(room => room.room_type === selectedRoomCategory);
+    }
     return [
       { value: '', label: 'None selected' },
-      ...rooms.map(room => ({ 
+      ...filteredRooms.map(room => ({ 
         value: room.room_number, 
         label: `${room.room_number} - ${room.room_type} (Floor ${room.floor_number})` 
       }))
@@ -511,6 +524,17 @@ const RegistrasiPage = () => {
                     className="form-input" 
                     placeholder="0" 
                     min="0" 
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Room Type (Filter)</label>
+                  <SearchableSelect
+                    name="room_type_filter"
+                    value={selectedRoomCategory}
+                    onChange={(e) => setSelectedRoomCategory(e.target.value)}
+                    options={formatRoomCategories()}
+                    placeholder="All Room Types"
+                    className="form-select"
                   />
                 </div>
                 <div className="form-group">
