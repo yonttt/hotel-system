@@ -1,10 +1,49 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Bed, Maximize2, Users } from 'lucide-react'
-import { featuredRooms, formatCurrency } from '../data/hotels'
+import { formatCurrency } from '../data/hotels'
+import { hotelAPI } from '../services/api'
 
 export default function RoomsSection() {
   const sectionRef = useRef(null)
+  const [rooms, setRooms] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchRooms = async () => {
+      try {
+        const response = await hotelAPI.getRooms()
+        const mappedRooms = response.data.map(room => ({
+          id: room.id,
+          name: room.number || room.room_number || `Room ${room.id}`,
+          description: room.description || 'Kamar mewah dengan fasilitas lengkap dan pemandangan menakjubkan.',
+          size: room.size || '30 sqm',
+          bed: room.bed_type || 'King Bed',
+          guests: room.capacity || 2,
+          amenities: room.amenities || ['WiFi', 'AC', 'TV', 'Minibar'],
+          price: room.base_price || 1500000,
+          image: room.photo_url || "https://images.unsplash.com/photo-1611892440504-42a792e24d32?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
+        })).slice(0, 4)
+        
+        // If the backend has no rooms yet, use some fallback data to still render nicely
+        if (mappedRooms.length === 0) {
+           setRooms([
+             {
+               id: 'fb1', name: 'Deluxe Room', description: 'Kamar mewah', size: '30 sqm', bed: 'King', guests: 2, amenities: ['WiFi', 'AC'], price: 1000000, image: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
+             }
+           ])
+        } else {
+           setRooms(mappedRooms)
+        }
+      } catch (error) {
+        console.error("Failed to fetch rooms:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    fetchRooms()
+  }, [])
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -38,13 +77,18 @@ export default function RoomsSection() {
         </div>
 
         {/* Rooms Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {featuredRooms.map((room, index) => (
-            <div
-              key={room.id}
-              className="animate-on-scroll group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100"
-              style={{ transitionDelay: `${index * 100}ms` }}
-            >
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {rooms.map((room, index) => (
+              <div
+                key={room.id}
+                className="animate-on-scroll group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100"
+                style={{ transitionDelay: `${index * 100}ms` }}
+              >
               <div className="relative h-64 overflow-hidden">
                 <img
                   src={room.image}
@@ -101,7 +145,8 @@ export default function RoomsSection() {
               </div>
             </div>
           ))}
-        </div>
+          </div>
+        )}
 
         {/* CTA */}
         <div className="text-center mt-12 animate-on-scroll">

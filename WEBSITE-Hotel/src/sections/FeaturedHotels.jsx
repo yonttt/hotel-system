@@ -1,10 +1,35 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { MapPin, Star, ArrowRight } from 'lucide-react'
-import { hotelProperties } from '../data/hotels'
+import { hotelAPI } from '../services/api'
 
 export default function FeaturedHotels() {
   const sectionRef = useRef(null)
+  const [hotels, setHotels] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchHotels = async () => {
+      try {
+        const response = await hotelAPI.getProperties()
+        // Map backend property model to frontend expectations if needed
+        const mappedHotels = response.data.map((prop) => ({
+          id: prop.id,
+          name: prop.name,
+          image: prop.photo_url || "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+          rating: 4.8, // Hardcoded for now, or get from prop.rating
+          location: prop.city_name || prop.address || "Pusat Kota"
+        }))
+        setHotels(mappedHotels)
+      } catch (error) {
+        console.error("Failed to fetch hotels:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    fetchHotels()
+  }, [])
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -38,13 +63,18 @@ export default function FeaturedHotels() {
         </div>
 
         {/* Hotels Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {hotelProperties.map((hotel, index) => (
-            <div
-              key={hotel.id}
-              className="animate-on-scroll group"
-              style={{ transitionDelay: `${index * 100}ms` }}
-            >
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">  
+            {hotels.map((hotel, index) => (
+              <div
+                key={hotel.id}
+                className="animate-on-scroll group"
+                style={{ transitionDelay: `${index * 100}ms` }}
+              >
               <div className="card-overlay rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
                 <div className="relative h-72">
                   <img
@@ -83,7 +113,8 @@ export default function FeaturedHotels() {
               </div>
             </div>
           ))}
-        </div>
+          </div>
+        )}
 
         {/* CTA */}
         <div className="text-center mt-12 animate-on-scroll">
