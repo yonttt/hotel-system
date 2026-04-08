@@ -1,81 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import Layout from '../components/Layout'
-import { apiService } from '../services/api'
-import {
-  CalendarIcon,
-  UserGroupIcon,
-  BuildingOfficeIcon,
-  ChartBarIcon
-} from '@heroicons/react/24/outline'
 
 const DashboardPage = () => {
-  const [stats, setStats] = useState({
-    totalReservations: 0,
-    totalGuests: 0,
-    availableRooms: 0,
-    occupiedRooms: 0
-  })
-  const [, setRecentReservations] = useState([])
-
   useEffect(() => {
-    fetchDashboardData()
+    // fetchDashboardData()
   }, [])
-
-  const fetchDashboardData = async () => {
-    try {
-      // Fetch reservations
-      const reservationsResponse = await apiService.getHotelReservations(0, 10)
-      const reservations = reservationsResponse.data || []
-      setRecentReservations(reservations.slice(0, 5))
-      
-      // Fetch rooms
-      const roomsResponse = await apiService.getHotelRooms()
-      const rooms = roomsResponse.data || []
-      // VR = Vacant Ready (available), OR = Occupied Ready (occupied)
-      const availableRooms = rooms.filter(room => room.status === 'VR').length
-      const occupiedRooms = rooms.filter(room => ['OR', 'OC', 'OD'].includes(room.status)).length
-      
-      // Fetch guests
-      const guestsResponse = await apiService.getGuests()
-      const guests = guestsResponse.data || []
-      
-      setStats({
-        totalReservations: reservations.length,
-        totalGuests: guests.length,
-        availableRooms,
-        occupiedRooms
-      })
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error)
-    }
-  }
-
-  const statsCards = [
-    {
-      name: 'Total Reservations',
-      value: stats.totalReservations,
-      icon: CalendarIcon,
-      color: 'stat-blue'
-    },
-    {
-      name: 'Total Guests',
-      value: stats.totalGuests,
-      icon: UserGroupIcon,
-      color: 'stat-green'
-    },
-    {
-      name: 'Available Rooms',
-      value: stats.availableRooms,
-      icon: BuildingOfficeIcon,
-      color: 'stat-purple'
-    },
-    {
-      name: 'Occupied Rooms',
-      value: stats.occupiedRooms,
-      icon: ChartBarIcon,
-      color: 'stat-orange'
-    }
-  ]
 
   return (
     <Layout>

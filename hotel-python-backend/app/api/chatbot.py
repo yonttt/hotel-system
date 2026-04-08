@@ -45,8 +45,6 @@ def ask_chatbot(request: ChatbotAskRequest, db: Session = Depends(get_db)):
     try:
         session_id = request.session_id or str(uuid.uuid4())
         
-        # Get knowledge base context
-        context = get_knowledge_context(db, request.hotel_id)
         
         # Build response from knowledge base (keyword matching)
         user_msg = request.message.lower()

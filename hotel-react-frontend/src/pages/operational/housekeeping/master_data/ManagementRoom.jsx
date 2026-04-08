@@ -6,7 +6,7 @@ import useHotels from '../../../../hooks/useHotels';
 
 const ManagementRoom = () => {
   const { user } = useAuth();
-  const { hotelNames, defaultHotel, loading: hotelsLoading } = useHotels();
+  const { hotelNames, defaultHotel } = useHotels();
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

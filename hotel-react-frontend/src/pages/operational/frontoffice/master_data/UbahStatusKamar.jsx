@@ -6,7 +6,7 @@ import useHotels from '../../../../hooks/useHotels';
 
 const UbahStatusKamar = () => {
   const { user } = useAuth();
-  const { hotelNames, defaultHotel, hotels } = useHotels();
+  const { defaultHotel, hotels } = useHotels();
   const [rooms, setRooms] = useState([]);
   const [filteredRooms, setFilteredRooms] = useState([]);
   const [loading, setLoading] = useState(true);

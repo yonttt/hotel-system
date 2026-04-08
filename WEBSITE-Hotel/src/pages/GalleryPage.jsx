@@ -21,19 +21,19 @@ export default function GalleryPage() {
   const openLightbox = (index) => setLightbox({ open: true, index })
   const closeLightbox = () => setLightbox({ open: false, index: 0 })
 
-  const nextImage = () => {
+  const nextImage = useCallback(() => {
     setLightbox((prev) => ({
       ...prev,
       index: (prev.index + 1) % filteredImages.length,
     }))
-  }
+  }, [filteredImages.length])
 
-  const prevImage = () => {
+  const prevImage = useCallback(() => {
     setLightbox((prev) => ({
       ...prev,
       index: (prev.index - 1 + filteredImages.length) % filteredImages.length,
     }))
-  }
+  }, [filteredImages.length])
 
   // Keyboard navigation for lightbox
   const handleKeyDown = useCallback((e) => {
@@ -41,7 +41,7 @@ export default function GalleryPage() {
     if (e.key === 'Escape') closeLightbox()
     else if (e.key === 'ArrowRight') nextImage()
     else if (e.key === 'ArrowLeft') prevImage()
-  }, [lightbox.open, filteredImages.length])
+  }, [lightbox.open, nextImage, prevImage])
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown)

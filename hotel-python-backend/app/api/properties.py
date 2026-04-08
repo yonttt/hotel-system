@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 from typing import List, Optional
 from pydantic import BaseModel
-from decimal import Decimal
 from ..core.database import get_db
 from ..core.auth import get_current_user, get_current_manager_or_admin_user
 from ..models import User

@@ -23,8 +23,10 @@ export const hotelAPI = {
   // Room Rates
   getRoomRates: (params) => api.get('/room-rates/', { params }),
 
-  // Reservations
+  // Reservations & Registration API bindings for Hotel Website
   createReservation: (data) => api.post('/hotel-reservations/', data),
+  // For same day, we create a registration
+  createRegistration: (data) => api.post('/hotel-registrations/', data),
   getReservation: (confirmationCode) => api.get(`/hotel-reservations/${confirmationCode}`),
 
   // Cities

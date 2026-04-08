@@ -181,7 +181,7 @@ const StatusKamarFO = () => {
       // Use getShortStatus to normalize all status variations
       const normalizedStatus = getShortStatus(room.status);
       
-      if (counts.hasOwnProperty(normalizedStatus)) {
+      if (Object.prototype.hasOwnProperty.call(counts, normalizedStatus)) {
         counts[normalizedStatus]++;
       }
     });

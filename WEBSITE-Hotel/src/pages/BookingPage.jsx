@@ -1,9 +1,10 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import {
   CalendarDays, Users, CreditCard, User, Mail, Phone, Bed, Maximize2,
   Star, Check, ChevronLeft, ArrowRight, CheckCircle, MapPin
 } from 'lucide-react'
+import { hotelAPI } from '../services/api'
 import { featuredRooms, hotelProperties, formatCurrency } from '../data/hotels'
 
 const allRooms = [
@@ -39,14 +40,42 @@ export default function BookingPage() {
     checkOut: checkOutParam,
     guests: guestsParam,
     rooms: roomsParam,
+    
+    guestTitle: 'MR',
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
+    address: '',
+    idCardType: 'KTP',
+    idCardNumber: '',
+    nationality: 'INDONESIA',
+    city: '',
+
+    guestMale: 1,
+    guestFemale: 0,
+    guestChild: 0,
+
     specialRequests: '',
-    paymentMethod: 'credit_card',
+    paymentMethod: 'Credit Card',
   })
   const [submitted, setSubmitted] = useState(false)
+  const [bookingId, setBookingId] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
+  const [dynamicHotels, setDynamicHotels] = useState([])
+
+  useEffect(() => {
+    const fetchHotels = async () => {
+      try {
+        const res = await hotelAPI.getProperties()
+        if (res.data) setDynamicHotels(res.data)
+      } catch (err) {
+        console.error('Failed to fetch dynamic hotels', err)
+      }
+    }
+    fetchHotels()
+  }, [])
 
   const selectedRoomData = useMemo(() => allRooms.find(r => r.id === selectedRoom), [selectedRoom])
 
@@ -70,14 +99,83 @@ export default function BookingPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    setSubmitted(true)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    setIsSubmitting(true)
+    setErrorMsg('')
+
+    try {
+      const today = new Date()
+      // Reset time portion for accurate date comparison
+      today.setHours(0, 0, 0, 0)
+      
+      const checkInDate = new Date(formData.checkIn)
+      checkInDate.setHours(0, 0, 0, 0)
+
+      const isToday = checkInDate.getTime() === today.getTime()
+      
+      const payload = {
+        hotel_name: formData.destination,
+        guest_name: `${formData.firstName} ${formData.lastName}`.trim(),
+        guest_title: formData.guestTitle,
+        email: formData.email,
+        mobile_phone: formData.phone,
+        address: formData.address,
+        id_card_type: formData.idCardType,
+        id_card_number: formData.idCardNumber,
+        nationality: formData.nationality,
+        city: formData.city,
+        
+        arrival_date: new Date(formData.checkIn).toISOString(),
+        departure_date: new Date(formData.checkOut).toISOString(),
+        nights: nights,
+        
+        guest_male: formData.guestMale,
+        guest_female: formData.guestFemale,
+        guest_child: formData.guestChild,
+        
+        note: formData.specialRequests || undefined,
+        payment_method: formData.paymentMethod,
+        payment_amount: totalPrice,
+        
+        transaction_by: 'Website',
+        category_market: 'Website',
+      }
+
+      if (isToday) {
+        // Create Guest Registration
+        payload.registration_no = `REG${Date.now().toString().slice(-8)}`
+        payload.transaction_status = "Registration"
+        payload.guest_count_male = payload.guest_male
+        payload.guest_count_female = payload.guest_female
+        payload.guest_count_child = payload.guest_child
+        payload.payment_method_id = 1 // Basic mapping or would need fetching
+        // map names back if needed for backend validation matching
+        delete payload.guest_male
+        delete payload.guest_female
+        delete payload.guest_child
+        
+        await hotelAPI.createRegistration(payload)
+        setBookingId(payload.registration_no)
+      } else {
+        // Create Hotel Reservation
+        payload.reservation_no = `RSV${Date.now().toString().slice(-8)}`
+        payload.transaction_status = "Reservation"
+        await hotelAPI.createReservation(payload)
+        setBookingId(payload.reservation_no)
+      }
+
+      setSubmitted(true)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    } catch (error) {
+      console.error('Error submitting booking:', error)
+      setErrorMsg('Gagal melakukan pemesanan. Silakan coba lagi.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   if (submitted) {
-    const bookingId = `BK${Date.now().toString().slice(-8)}`
     return (
       <>
         <section className="relative h-[35vh] min-h-[300px] flex items-center justify-center">
@@ -261,8 +359,8 @@ export default function BookingPage() {
                         <select name="destination" value={formData.destination} onChange={handleChange}
                           className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400 focus:ring-2 focus:ring-gold-400/20">
                           <option value="">Pilih Hotel</option>
-                          {hotelProperties.map(h => (
-                            <option key={h.id} value={h.location.toLowerCase()}>{h.name}</option>
+                          {(dynamicHotels.length > 0 ? dynamicHotels : hotelProperties).map(h => (
+                            <option key={h.id} value={h.name}>{h.name}</option>
                           ))}
                         </select>
                       </div>
@@ -324,6 +422,74 @@ export default function BookingPage() {
                     </div>
                   </div>
 
+                  {/* Guest Additional Detail */}
+                  <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
+                    <h3 className="font-display font-bold text-lg text-hotel-dark mb-4 flex items-center gap-2">
+                      <User size={20} className="text-gold-500" />
+                      Detail Pribadi & Identitas
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-hotel-dark mb-2">Titel *</label>
+                        <select name="guestTitle" value={formData.guestTitle} onChange={handleChange} required
+                          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400">
+                          <option value="MR">Mr.</option>
+                          <option value="MRS">Mrs.</option>
+                          <option value="MS">Ms.</option>
+                          <option value="MISS">Miss</option>
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-semibold text-hotel-dark mb-2">Tipe Identitas *</label>
+                        <select name="idCardType" value={formData.idCardType} onChange={handleChange} required
+                          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400">
+                          <option value="KTP">KTP</option>
+                          <option value="PASSPORT">Passport</option>
+                          <option value="SIM">SIM</option>
+                          <option value="DRIVING_LICENSE">Driving License</option>
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-semibold text-hotel-dark mb-2">No. Identitas *</label>
+                        <input type="text" name="idCardNumber" value={formData.idCardNumber} onChange={handleChange} required placeholder="1234567890"
+                          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400" />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-semibold text-hotel-dark mb-2">Kewarganegaraan *</label>
+                        <input type="text" name="nationality" value={formData.nationality} onChange={handleChange} required placeholder="INDONESIA"
+                          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400" />
+                      </div>
+                      
+                      <div className="sm:col-span-2 border-t pt-2 mt-2 border-gray-100">
+                        <label className="block text-sm font-semibold text-hotel-dark mb-2">Alamat Asal Kamar</label>
+                        <textarea name="address" value={formData.address} onChange={handleChange} rows={2}
+                          placeholder="Alamat asal tamu"
+                          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400 resize-none" />
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-2 sm:col-span-2 items-end">
+                         <div>
+                            <label className="block text-sm font-semibold text-hotel-dark mb-2">Laki-laki</label>
+                            <input type="number" min="0" name="guestMale" value={formData.guestMale} onChange={handleChange} 
+                                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-gold-400" />
+                         </div>
+                         <div>
+                            <label className="block text-sm font-semibold text-hotel-dark mb-2">Perempuan</label>
+                            <input type="number" min="0" name="guestFemale" value={formData.guestFemale} onChange={handleChange} 
+                                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-gold-400" />
+                         </div>
+                         <div>
+                            <label className="block text-sm font-semibold text-hotel-dark mb-2">Anak-anak</label>
+                            <input type="number" min="0" name="guestChild" value={formData.guestChild} onChange={handleChange} 
+                                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-gold-400" />
+                         </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Payment Method */}
                   <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
                     <h3 className="font-display font-bold text-lg text-hotel-dark mb-4 flex items-center gap-2">
@@ -354,10 +520,11 @@ export default function BookingPage() {
                     </div>
                   </div>
 
-                  <button type="submit" className="w-full btn-gold rounded-xl text-center py-4 text-base flex items-center justify-center gap-2">
-                    Konfirmasi Reservasi
-                    <ArrowRight size={18} />
+                  <button type="submit" disabled={isSubmitting} className="w-full btn-gold rounded-xl text-center py-4 text-base flex items-center justify-center gap-2">
+                    {isSubmitting ? 'Memproses...' : 'Konfirmasi Reservasi'}
+                    {!isSubmitting && <ArrowRight size={18} />}
                   </button>
+                  {errorMsg && <p className="text-red-500 text-sm text-center mt-2">{errorMsg}</p>}
                 </form>
               </div>
 

@@ -6,7 +6,7 @@ import useHotels from '../../../../hooks/useHotels';
 
 const MasterHargaKamar = () => {
   const { user } = useAuth();
-  const { hotelNames, defaultHotel, hotels } = useHotels();
+  const { defaultHotel, hotels } = useHotels();
   const [rates, setRates] = useState([]);
   const [filteredRates, setFilteredRates] = useState([]);
   const [loading, setLoading] = useState(true);

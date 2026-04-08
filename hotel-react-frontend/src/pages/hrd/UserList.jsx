@@ -141,21 +141,6 @@ const UserList = () => {
     }
   };
 
-  const getRoleBadgeColor = (role) => {
-    switch (role) {
-      case 'admin':
-        return '#dc3545'; // red
-      case 'manager':
-        return '#6f42c1'; // purple
-      case 'frontoffice':
-        return '#007bff'; // blue
-      case 'housekeeping':
-        return '#28a745'; // green
-      default:
-        return '#6c757d'; // gray
-    }
-  };
-
   // Check if user is admin
   if (!user || user.role !== 'admin') {
     return (
