@@ -8,8 +8,8 @@ import useHotels from '../../../../hooks/useHotels'
 
 const GroupBooking = () => {
   const { user } = useAuth()
-  useNavigate()
-  const { defaultHotel } = useHotels()
+  const navigate = useNavigate()
+  const { defaultHotel, hotels } = useHotels()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -33,7 +33,8 @@ const GroupBooking = () => {
     nights: 1,
     payment_method: '',
     total_deposit: 0,
-    notes: ''
+    notes: '',
+    hotel_name: ''
   });
 
   // Room bookings array
@@ -422,7 +423,7 @@ const GroupBooking = () => {
         total_deposit: parseFloat(groupInfo.total_deposit) || 0,
         notes: groupInfo.notes,
         created_by: user?.username || 'ADMIN',
-        hotel_name: defaultHotel || '',
+        hotel_name: groupInfo.hotel_name || defaultHotel || '',
         rooms: roomBookings.map(room => ({
           room_number: room.room_number,
           room_type: room.room_type,
@@ -530,6 +531,19 @@ const GroupBooking = () => {
             <div className="form-grid">
                 {/* COLUMN 1 */}
                 <div className="form-column">
+                  <div className="form-group">
+                    <label>Hotel Property</label>
+                    <select
+                      name="hotel_name"
+                      value={groupInfo.hotel_name}
+                      onChange={(e) => setGroupInfo({...groupInfo, hotel_name: e.target.value})}
+                      className="form-select border border-gray-300 rounded px-3 py-2 w-full"
+                    >
+                      {hotels.map(h => (
+                        <option key={h.id} value={h.name}>{h.name}</option>
+                      ))}
+                    </select>
+                  </div>
                   <div className="form-group">
                     <label>Group Name</label>
                     <input

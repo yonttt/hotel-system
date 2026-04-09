@@ -15,7 +15,7 @@ router = APIRouter()
 
 class HotelResponse(BaseModel):
     id: int
-    code: str
+    code: Optional[str] = None
     name: str
     address: Optional[str] = None
     phone: Optional[str] = None

@@ -14,6 +14,7 @@ const UserList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showEntries, setShowEntries] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedHotel, setSelectedHotel] = useState('ALL');
   const [filterJabatan, setFilterJabatan] = useState('');
   const [filterLevelAkses, setFilterLevelAkses] = useState('');
   const [formData, setFormData] = useState({
@@ -35,7 +36,7 @@ const UserList = () => {
   // Reset to first page when search/filter changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, showEntries, filterJabatan, filterLevelAkses]);
+  }, [searchTerm, showEntries, filterJabatan, filterLevelAkses, selectedHotel]);
 
   // Get unique jabatan (titles) and level akses (roles) from users
   const uniqueJabatan = [...new Set(users.map(usr => {
@@ -61,8 +62,9 @@ const UserList = () => {
     
     const matchesJabatan = !filterJabatan || jabatanTitle === filterJabatan;
     const matchesLevel = !filterLevelAkses || usr.role === filterLevelAkses;
-    
-    return matchesSearch && matchesJabatan && matchesLevel;
+    const matchesHotel = selectedHotel === 'ALL' || usr.hotel_name === selectedHotel || usr.hotel === selectedHotel;
+
+    return matchesSearch && matchesJabatan && matchesLevel && matchesHotel;
   });
 
   const totalPages = Math.max(1, Math.ceil(filteredUsers.length / showEntries));
@@ -191,7 +193,11 @@ const UserList = () => {
             <div className="unified-header-right">
               <div className="hotel-select">
                 <label>Hotel :</label>
-                <select className="header-hotel-select">
+                  <select 
+                    className="header-hotel-select"
+                    value={selectedHotel}
+                    onChange={(e) => setSelectedHotel(e.target.value)}    
+                  >
                   <option value="ALL">ALL</option>
                   {hotelNames.map(name => (
                     <option key={name} value={name}>{name}</option>

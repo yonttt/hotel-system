@@ -20,7 +20,7 @@ const AllReservationPage = () => {
   const [editingItem, setEditingItem] = useState(null);
   const [editFormData, setEditFormData] = useState({
     guest_name: '',
-    market_segment: '',
+    category_market: '',
     arrival_date: '',
     departure_date: '',
     transaction_by: '',
@@ -55,12 +55,24 @@ const AllReservationPage = () => {
     }
   };
 
-  const filteredReservations = reservations.filter(reservation =>
-    reservation.guest_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    reservation.reservation_no?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    reservation.market_segment?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    reservation.transaction_by?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredReservations = reservations.filter(reservation => {
+    const term = searchTerm ? searchTerm.toLowerCase() : '';
+    
+    // First check if a specific hotel is selected
+    if (selectedHotel !== 'ALL' && reservation.hotel_name !== selectedHotel) {
+      return false;
+    }
+    
+    // Then apply the search filter if there is a search term
+    if (!term) return true;
+    
+    return (
+      reservation.guest_name?.toLowerCase().includes(term) ||
+      reservation.reservation_no?.toLowerCase().includes(term) ||
+      reservation.category_market?.toLowerCase().includes(term) ||
+      reservation.transaction_by?.toLowerCase().includes(term)
+    );
+  });
 
   const totalPages = Math.max(1, Math.ceil(filteredReservations.length / showEntries));
   const startIndex = (currentPage - 1) * showEntries;
@@ -91,7 +103,7 @@ const AllReservationPage = () => {
     setEditingItem(reservation);
     setEditFormData({
       guest_name: reservation.guest_name || '',
-      market_segment: reservation.market_segment || '',
+      category_market: reservation.category_market || '',
       arrival_date: reservation.arrival_date ? reservation.arrival_date.split('T')[0] : '',
       departure_date: reservation.departure_date ? reservation.departure_date.split('T')[0] : '',
       transaction_by: reservation.transaction_by || '',
@@ -112,7 +124,7 @@ const AllReservationPage = () => {
     try {
       await apiService.updateHotelReservation(editingItem.id, {
         guest_name: editFormData.guest_name,
-        market_segment: editFormData.market_segment,
+        category_market: editFormData.category_market,
         arrival_date: editFormData.arrival_date,
         departure_date: editFormData.departure_date,
         transaction_by: editFormData.transaction_by,
@@ -263,14 +275,14 @@ const AllReservationPage = () => {
                   <tr key={reservation.id}>
                     <td>{startIndex + index + 1}</td>
                     <td title={reservation.guest_name || 'N/A'}>{reservation.guest_name || 'N/A'}</td>
-                    <td title={reservation.market_segment || 'N/A'}>{reservation.market_segment || 'N/A'}</td>
+                    <td title={reservation.category_market || 'N/A'}>{reservation.category_market || 'N/A'}</td>
                     <td className="mono" title={reservation.reservation_no || 'N/A'}>{reservation.reservation_no || 'N/A'}</td>
                     <td>{formatDate(reservation.arrival_date)}</td>
                     <td>{formatDate(reservation.departure_date)}</td>
                     <td title={reservation.transaction_by || 'N/A'}>{reservation.transaction_by || 'N/A'}</td>
                     <td title={reservation.payment_method || 'N/A'}>{reservation.payment_method || 'N/A'}</td>
                     <td className="align-right">{formatCurrency(reservation.deposit || 0)}</td>
-                    <td className="align-center">{(reservation.guest_count_male || 0) + (reservation.guest_count_female || 0) + (reservation.guest_count_child || 0)}</td>
+                    <td className="align-center">{(reservation.guest_male || 0) + (reservation.guest_female || 0) + (reservation.guest_child || 0)}</td>
                     <td className="align-center">
                       {canEdit() && (
                         <button className="btn-table-action" title="Edit Details" onClick={() => handleEditClick(reservation)}>Edit</button>
@@ -415,8 +427,8 @@ const AllReservationPage = () => {
                 <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Payment Method</label>
                 <input
                   type="text"
-                  value={editFormData.payment_method}
-                  onChange={(e) => setEditFormData({...editFormData, payment_method: e.target.value})}
+                  value={editFormData.category_market}
+                  onChange={(e) => setEditFormData({...editFormData, category_market: e.target.value})}
                   style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                 />
               </div>

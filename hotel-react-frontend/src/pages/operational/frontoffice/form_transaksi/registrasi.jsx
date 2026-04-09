@@ -7,7 +7,7 @@ import useHotels from '../../../../hooks/useHotels'
 
 const RegistrasiPage = () => {
   const { user } = useAuth()
-  const { defaultHotel } = useHotels()
+  const { defaultHotel, hotels } = useHotels()
   const [, setApiError] = useState(null)
   const [rooms, setRooms] = useState([])
   const [roomCategories, setRoomCategories] = useState([])
@@ -525,6 +525,19 @@ const RegistrasiPage = () => {
                     placeholder="0" 
                     min="0" 
                   />
+                </div>
+                <div className="form-group">
+                  <label>Hotel Property</label>
+                  <select
+                    name="hotel_name"
+                    value={formData.hotel_name}
+                    onChange={handleInputChange}
+                    className="form-select border border-gray-300 rounded px-3 py-2 w-full"
+                  >
+                    {hotels.map(h => (
+                      <option key={h.id} value={h.name}>{h.name}</option>
+                    ))}
+                  </select>
                 </div>
                 <div className="form-group">
                   <label>Room Type (Filter)</label>

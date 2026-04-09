@@ -64,13 +64,25 @@ const ReservasiDeposit = () => {
     }
   }
 
-  const filteredReservations = reservations.filter(reservation =>
-    reservation.guest_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    reservation.reservation_no?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    reservation.category_market?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    reservation.transaction_by?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    reservation.payment_method?.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredReservations = reservations.filter(reservation => {
+    const term = searchTerm ? searchTerm.toLowerCase() : '';
+    
+    // First check if a specific hotel is selected
+    if (selectedHotel !== 'ALL' && reservation.hotel_name !== selectedHotel) {
+      return false;
+    }
+    
+    // Then apply the search filter if there is a search term
+    if (!term) return true;
+
+    return (
+      reservation.guest_name?.toLowerCase().includes(term) ||
+      reservation.reservation_no?.toLowerCase().includes(term) ||
+      reservation.category_market?.toLowerCase().includes(term) ||
+      reservation.transaction_by?.toLowerCase().includes(term) ||
+      reservation.payment_method?.toLowerCase().includes(term)
+    );
+  });
 
   const totalPages = Math.ceil(filteredReservations.length / showEntries)
   const startIndex = (currentPage - 1) * showEntries

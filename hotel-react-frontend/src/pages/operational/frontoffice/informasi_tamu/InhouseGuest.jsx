@@ -56,13 +56,23 @@ const InhouseGuest = () => {
     }
   }
 
-  const filteredRegistrations = registrations.filter(r =>
-    r.guest_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    r.registration_no?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    r.category_market?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    r.transaction_by?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    r.mobile_phone?.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredRegistrations = registrations.filter(r => {
+    const term = searchTerm ? searchTerm.toLowerCase() : '';
+    
+    if (selectedHotel !== 'ALL' && r.hotel_name !== selectedHotel) {
+      return false;
+    }
+    
+    if (!term) return true;
+
+    return (
+      r.guest_name?.toLowerCase().includes(term) ||
+      r.registration_no?.toLowerCase().includes(term) ||
+      r.category_market?.toLowerCase().includes(term) ||
+      r.transaction_by?.toLowerCase().includes(term) ||
+      r.mobile_phone?.toLowerCase().includes(term)
+    );
+  })
 
   const totalPages = Math.max(1, Math.ceil(filteredRegistrations.length / showEntries))
   const startIndex = (currentPage - 1) * showEntries

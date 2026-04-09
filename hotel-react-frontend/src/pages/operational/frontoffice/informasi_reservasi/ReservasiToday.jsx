@@ -58,13 +58,25 @@ const ReservasiToday = () => {
     }
   }
 
-  const filteredReservations = reservations.filter(r =>
-    r.guest_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    r.reservation_no?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    r.category_market?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    r.transaction_by?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    r.mobile_phone?.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredReservations = reservations.filter(r => {
+    const term = searchTerm ? searchTerm.toLowerCase() : '';
+    
+    // First check if a specific hotel is selected
+    if (selectedHotel !== 'ALL' && r.hotel_name !== selectedHotel) {
+      return false;
+    }
+    
+    // Then apply the search filter if there is a search term
+    if (!term) return true;
+
+    return (
+      r.guest_name?.toLowerCase().includes(term) ||
+      r.reservation_no?.toLowerCase().includes(term) ||
+      r.category_market?.toLowerCase().includes(term) ||
+      r.transaction_by?.toLowerCase().includes(term) ||
+      r.mobile_phone?.toLowerCase().includes(term)
+    );
+  });
 
   const totalPages = Math.max(1, Math.ceil(filteredReservations.length / showEntries))
   const startIndex = (currentPage - 1) * showEntries

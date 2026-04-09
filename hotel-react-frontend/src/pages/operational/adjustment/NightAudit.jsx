@@ -74,6 +74,9 @@ const NightAudit = () => {
 
   // Filter audits
   const filteredAudits = audits.filter(item => {
+    if (selectedHotel !== 'ALL' && item.hotel_name !== selectedHotel) {
+      return false;
+    }
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
       return (

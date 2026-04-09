@@ -2,9 +2,12 @@ import { useState, useEffect } from 'react';
 import { apiService } from '../../../services/api';
 import Layout from '../../../components/Layout';
 import { useAuth } from '../../../context/AuthContext';
+  import useHotels from '../../../hooks/useHotels';
 
-const PropertyList = () => {
-  const { user } = useAuth();
+  const PropertyList = () => {
+    const { user } = useAuth();
+    const { hotels } = useHotels();
+    const [selectedHotel, setSelectedHotel] = useState('ALL');
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -64,13 +67,17 @@ const PropertyList = () => {
 
   const filteredProperties = properties.filter(prop => {
     const term = searchTerm.toLowerCase();
-    return (
+    const searchMatch = (
       prop.name?.toLowerCase().includes(term) ||
       prop.category?.toLowerCase().includes(term) ||
       prop.address?.toLowerCase().includes(term) ||
       prop.phone?.toLowerCase().includes(term) ||
       prop.code?.toLowerCase().includes(term)
     );
+    
+    const hotelMatch = selectedHotel === 'ALL' || prop.name === selectedHotel;
+    
+    return searchMatch && hotelMatch;
   });
 
   const totalPages = Math.max(1, Math.ceil(filteredProperties.length / showEntries));
@@ -497,8 +504,11 @@ const PropertyList = () => {
             <div className="unified-header-right">
               <div className="hotel-select">
                 <label>Hotel :</label>
-                <select className="header-hotel-select">
-                  <option>ALL</option>
+                <select className="header-hotel-select" value={selectedHotel} onChange={(e) => setSelectedHotel(e.target.value)}>
+                  <option value="ALL">ALL</option>
+                  {hotels.map(h => (
+                    <option key={h.id} value={h.name}>{h.name}</option>
+                  ))}
                 </select>
               </div>
             </div>
