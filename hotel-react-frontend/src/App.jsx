@@ -130,7 +130,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <Router basename="/admin">
         <div className="app-wrapper">
           <Routes>
             <Route path="/login" element={<LoginPage />} />
