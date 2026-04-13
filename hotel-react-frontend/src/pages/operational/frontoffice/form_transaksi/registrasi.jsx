@@ -5,6 +5,8 @@ import Layout from '../../../../components/Layout'
 import SearchableSelect from '../../../../components/SearchableSelect'
 import useHotels from '../../../../hooks/useHotels'
 
+import { formatCountriesOptions, formatCitiesOptions, formatPaymentMethodsOptions } from '../../../../utils/dropdownFormatters';
+
 const RegistrasiPage = () => {
   const { user } = useAuth()
   const { defaultHotel, hotels } = useHotels()
@@ -288,26 +290,6 @@ const RegistrasiPage = () => {
     ]
   }
 
-  const formatCountries = () => {
-    return [
-      { value: '', label: '--Nationality--' },
-      ...countries.map(country => ({
-        value: country.name || country.nationality_name || country.nationality,
-        label: country.name || country.nationality_name || country.nationality
-      }))
-    ]
-  }
-
-  const formatCities = () => {
-    return [
-      { value: '', label: '--City--' },
-      ...cities.map(city => ({
-        value: city.city_name || city.name,
-        label: city.city_name || city.name
-      }))
-    ]
-  }
-
   const formatRoomCategories = () => {
     return [
       { value: '', label: 'All Room Types' },
@@ -326,13 +308,6 @@ const RegistrasiPage = () => {
         value: room.room_number, 
         label: `${room.room_number} - ${room.room_type} (Floor ${room.floor_number})` 
       }))
-    ]
-  }
-
-  const formatPaymentMethods = () => {
-    return [
-      { value: '', label: 'Debit Bca 446' },
-      ...paymentMethods.map(pm => ({ value: pm.name, label: pm.name }))
     ]
   }
 
@@ -466,7 +441,7 @@ const RegistrasiPage = () => {
                     name="nationality"
                     value={formData.nationality}
                     onChange={handleInputChange}
-                    options={formatCountries()}
+                    options={formatCountriesOptions(countries)}
                     placeholder="Select Nationality"
                     className="form-select"
                   />
@@ -477,7 +452,7 @@ const RegistrasiPage = () => {
                     name="city"
                     value={formData.city}
                     onChange={handleInputChange}
-                    options={formatCities()}
+                    options={formatCitiesOptions(cities)}
                     placeholder="Select City"
                     className="form-select"
                   />
@@ -591,7 +566,7 @@ const RegistrasiPage = () => {
                       name="payment_method"
                       value={formData.payment_method}
                       onChange={handleInputChange}
-                      options={formatPaymentMethods()}
+                      options={formatPaymentMethodsOptions(paymentMethods, 'Debit Bca 446')}
                       placeholder="Select Payment Method"
                       className="form-select"
                     />

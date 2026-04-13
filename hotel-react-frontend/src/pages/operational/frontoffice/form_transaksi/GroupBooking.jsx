@@ -5,6 +5,8 @@ import Layout from '../../../../components/Layout'
 import SearchableSelect from '../../../../components/SearchableSelect'
 import useHotels from '../../../../hooks/useHotels'
 
+import { formatCountriesOptions, formatCitiesOptions, formatPaymentMethodsOptions } from '../../../../utils/dropdownFormatters';
+
 const GroupBooking = () => {
   const { user } = useAuth()
   const { defaultHotel, hotels } = useHotels()
@@ -47,7 +49,7 @@ const GroupBooking = () => {
       id_card_type: 'KTP',
       id_card_number: '',
       mobile_phone: '',
-      nationality: 'INDONESIA',
+      nationality: '',
       city: '',
       address: '',
       guest_count_male: 1,
@@ -184,7 +186,7 @@ const GroupBooking = () => {
         id_card_type: 'KTP',
         id_card_number: '',
         mobile_phone: '',
-        nationality: 'INDONESIA',
+        nationality: '',
         city: '',
         address: '',
         guest_count_male: 1,
@@ -315,36 +317,6 @@ const GroupBooking = () => {
   const getTotalAmount = () => {
     return roomBookings.reduce((sum, rb) => sum + (rb.subtotal || 0), 0);
   };
-
-  const formatCities = () => {
-    return [
-      { value: '', label: '--City--' },
-      ...cities.map(city => ({
-        value: city.city_name || city.name,
-        label: city.city_name || city.name
-      }))
-    ]
-  }
-
-  const formatCountries = () => {
-    return [
-      { value: 'INDONESIA', label: 'INDONESIA' },
-      ...countries.filter(c => (c.name || c.nationality) !== 'INDONESIA').map(country => ({
-        value: country.name || country.nationality,
-        label: country.name || country.nationality
-      }))
-    ]
-  }
-
-  const formatPaymentMethods = () => {
-    return [
-      { value: '', label: 'Select Payment Method' },
-      ...paymentMethods.map(pm => ({
-        value: pm.method_name || pm.name,
-        label: pm.method_name || pm.name
-      }))
-    ]
-  }
 
   const formatRoomCategories = () => {
     return [
@@ -639,7 +611,7 @@ const GroupBooking = () => {
                       name="payment_method"
                       value={groupInfo.payment_method}
                       onChange={(e) => setGroupInfo({...groupInfo, payment_method: e.target.value})}
-                      options={formatPaymentMethods()}
+                      options={formatPaymentMethodsOptions(paymentMethods, 'Select Payment Method')}
                       placeholder="Search payment method..."
                       required
                     />
@@ -842,7 +814,7 @@ const GroupBooking = () => {
                           name="nationality"
                           value={room.nationality}
                           onChange={(e) => updateRoomBooking(room.id, 'nationality', e.target.value)}
-                          options={formatCountries()}
+                          options={formatCountriesOptions(countries)}
                           placeholder="Select Nationality"
                           className="form-select"
                         />
@@ -853,7 +825,7 @@ const GroupBooking = () => {
                           name="city"
                           value={room.city}
                           onChange={(e) => updateRoomBooking(room.id, 'city', e.target.value)}
-                          options={formatCities()}
+                          options={formatCitiesOptions(cities)}
                           placeholder="Select City"
                           className="form-select"
                         />
