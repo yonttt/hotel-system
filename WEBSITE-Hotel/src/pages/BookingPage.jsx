@@ -64,6 +64,8 @@ export default function BookingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
   const [dynamicHotels, setDynamicHotels] = useState([])
+  const [dynamicCities, setDynamicCities] = useState([])
+  const [dynamicCountries, setDynamicCountries] = useState([])
 
   useEffect(() => {
     const fetchHotels = async () => {
@@ -74,7 +76,20 @@ export default function BookingPage() {
         console.error('Failed to fetch dynamic hotels', err)
       }
     }
+    const fetchLocations = async () => {
+      try {
+        const [citiesRes, countriesRes] = await Promise.all([
+          hotelAPI.getCities(),
+          hotelAPI.getCountries()
+        ])
+        if (citiesRes.data?.data) setDynamicCities(citiesRes.data.data)
+        if (countriesRes.data?.data) setDynamicCountries(countriesRes.data.data)
+      } catch (err) {
+        console.error('Failed to fetch locations', err)
+      }
+    }
     fetchHotels()
+    fetchLocations()
   }, [])
 
   const selectedRoomData = useMemo(() => allRooms.find(r => r.id === selectedRoom), [selectedRoom])
@@ -459,8 +474,20 @@ export default function BookingPage() {
                       
                       <div>
                         <label className="block text-sm font-semibold text-hotel-dark mb-2">Kewarganegaraan *</label>
-                        <input type="text" name="nationality" value={formData.nationality} onChange={handleChange} required placeholder="INDONESIA"
-                          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400" />
+                        <select name="nationality" value={formData.nationality} onChange={handleChange} required
+                          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400">
+                          <option value="">Pilih Kewarganegaraan</option>
+
+
+                      <div>
+                        <label className="block text-sm font-semibold text-hotel-dark mb-2">Kota Asal (City) *</label>
+                        <select name="city" value={formData.city} onChange={handleChange} required
+                          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400">
+                          <option value="">Pilih Kota Asal</option>
+                          {dynamicCities.map(c => (
+                            <option key={c.id} value={c.name}>{c.name}</option>
+                          ))}
+                        </select>
                       </div>
                       
                       <div className="sm:col-span-2 border-t pt-2 mt-2 border-gray-100">

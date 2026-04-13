@@ -29,8 +29,9 @@ export const hotelAPI = {
   createRegistration: (data) => api.post('/hotel-registrations/', data),
   getReservation: (confirmationCode) => api.get(`/hotel-reservations/${confirmationCode}`),
 
-  // Cities
+  // Cities & Nationalities
   getCities: () => api.get('/cities/'),
+  getCountries: () => api.get('/countries/'),
 
   // Guest Registration
   registerGuest: (data) => api.post('/guests/', data),
