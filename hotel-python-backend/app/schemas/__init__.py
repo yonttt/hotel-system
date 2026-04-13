@@ -219,7 +219,7 @@ class ReservationResponse(ReservationBase):
 class GuestRegistrationBase(BaseModel):
     registration_no: str
     guest_id: Optional[int] = None
-    category_market_id: Optional[int] = None
+    category_market: str = "Walkin"
     market_segment: str = "Normal"
     member_id: Optional[str] = None
     transaction_by: Optional[str] = None
@@ -229,8 +229,8 @@ class GuestRegistrationBase(BaseModel):
     guest_title: str = "MR"
     mobile_phone: Optional[str] = None
     address: Optional[str] = None
-    nationality_id: Optional[int] = None
-    city_id: Optional[int] = None
+    nationality: Optional[str] = None
+    city: Optional[str] = None
     email: Optional[str] = None
     arrival_date: Optional[datetime] = None
     arrival_time: Optional[str] = None
@@ -244,7 +244,7 @@ class GuestRegistrationBase(BaseModel):
     extra_bed_qty: int = 0
     room_number: Optional[str] = None
     transaction_status: str = "Registration"
-    payment_method_id: Optional[int] = None
+    payment_method: str = "Cash"
     notes: Optional[str] = None
     payment_amount: Decimal = Decimal('0.00')
     discount: Decimal = Decimal('0.00')
@@ -259,7 +259,7 @@ class GuestRegistrationCreate(GuestRegistrationBase):
 
 class GuestRegistrationUpdate(BaseModel):
     guest_id: Optional[int] = None
-    category_market_id: Optional[int] = None
+    category_market: Optional[str] = None
     market_segment: Optional[str] = None
     member_id: Optional[str] = None
     transaction_by: Optional[str] = None
@@ -269,8 +269,8 @@ class GuestRegistrationUpdate(BaseModel):
     guest_title: Optional[str] = None
     mobile_phone: Optional[str] = None
     address: Optional[str] = None
-    nationality_id: Optional[int] = None
-    city_id: Optional[int] = None
+    nationality: Optional[str] = None
+    city: Optional[str] = None
     email: Optional[str] = None
     arrival_date: Optional[datetime] = None
     arrival_time: Optional[str] = None
@@ -284,7 +284,7 @@ class GuestRegistrationUpdate(BaseModel):
     extra_bed_qty: Optional[int] = None
     room_number: Optional[str] = None
     transaction_status: Optional[str] = None
-    payment_method_id: Optional[int] = None
+    payment_method: Optional[str] = None
     notes: Optional[str] = None
     payment_amount: Optional[Decimal] = None
     discount: Optional[Decimal] = None
