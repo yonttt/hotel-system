@@ -477,7 +477,11 @@ export default function BookingPage() {
                         <select name="nationality" value={formData.nationality} onChange={handleChange} required
                           className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400">
                           <option value="">Pilih Kewarganegaraan</option>
-
+                          {dynamicCountries.map(c => (
+                            <option key={c.id || c.code} value={c.name}>{c.name}</option>
+                          ))}
+                        </select>
+                      </div>
 
                       <div>
                         <label className="block text-sm font-semibold text-hotel-dark mb-2">Kota Asal (City) *</label>
