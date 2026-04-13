@@ -32,7 +32,7 @@ const RegistrasiPage = () => {
     guest_title: 'MR',
     mobile_phone: '',
     address: '',
-    nationality: 'INDONESIA',
+    nationality: '',
     city: '',
     email: '',
     arrival_date: new Date().toISOString().split('T')[0],
@@ -205,6 +205,10 @@ const RegistrasiPage = () => {
     }
   }
 
+  useEffect(() => {
+    loadInitialData();
+  }, []);
+
   const generateRegistrationNo = () => {
     const timestamp = Date.now().toString().slice(-6);
     const random = Math.floor(Math.random() * 9999) + 1;
@@ -286,15 +290,21 @@ const RegistrasiPage = () => {
 
   const formatCountries = () => {
     return [
-      { value: 'INDONESIA', label: 'INDONESIA' },
-      ...countries.map(c => ({ value: c.name, label: c.name }))
+      { value: '', label: '--Nationality--' },
+      ...countries.map(country => ({
+        value: country.name || country.nationality_name || country.nationality,
+        label: country.name || country.nationality_name || country.nationality
+      }))
     ]
   }
 
   const formatCities = () => {
     return [
       { value: '', label: '--City--' },
-      ...cities.map(c => ({ value: c.name, label: c.name }))
+      ...cities.map(city => ({
+        value: city.city_name || city.name,
+        label: city.city_name || city.name
+      }))
     ]
   }
 
