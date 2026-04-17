@@ -18,6 +18,7 @@ class RoomCategoryResponse(BaseModel):
     normal_rate: float
     weekend_rate: float
     is_active: bool
+    hotel_name: Optional[str] = None
     
     class Config:
         from_attributes = True
@@ -48,11 +49,13 @@ def get_room_categories(
         categories = db.execute(
             text("""
                 SELECT id, category_code, category_name, description, 
-                       normal_rate, weekend_rate, is_active
+                       normal_rate, weekend_rate, is_active, hotel_name
                 FROM room_categories 
-                WHERE is_active = 1
+                WHERE is_active = 1 
+                  AND (hotel_name = :hotel_name OR hotel_name IS NULL)
                 ORDER BY category_code
-            """)
+            """),
+            {"hotel_name": current_user.hotel_name}
         ).fetchall()
         
         return [dict(category._mapping) for category in categories]
@@ -103,9 +106,11 @@ def get_room_pricing(
                                ELSE normal_rate
                            END as current_rate
                     FROM room_categories 
-                    WHERE category_code = :room_type AND is_active = 1
+                    WHERE category_code = :room_type 
+                      AND is_active = 1
+                      AND (hotel_name = :hotel_name OR hotel_name IS NULL)
                 """),
-                {"room_type": room_type.upper()}
+                {"room_type": room_type.upper(), "hotel_name": current_user.hotel_name}
             ).first()
         else:
             pricing = db.execute(
@@ -116,9 +121,11 @@ def get_room_pricing(
                                ELSE normal_rate
                            END as current_rate
                     FROM room_categories 
-                    WHERE category_code = :room_type AND is_active = 1
+                    WHERE category_code = :room_type 
+                      AND is_active = 1
+                      AND (hotel_name = :hotel_name OR hotel_name IS NULL)
                 """),
-                {"room_type": room_type.upper(), "check_date": target_date}
+                {"room_type": room_type.upper(), "check_date": target_date, "hotel_name": current_user.hotel_name}
             ).first()
         
         if not pricing:
@@ -155,8 +162,10 @@ def get_all_room_pricing(
                        DAYOFWEEK(CURDATE()) IN (1, 7) as is_weekend
                 FROM room_categories 
                 WHERE is_active = 1
+                  AND (hotel_name = :hotel_name OR hotel_name IS NULL)
                 ORDER BY category_code
-            """)
+            """),
+            {"hotel_name": current_user.hotel_name}
         ).fetchall()
         
         return [
@@ -193,10 +202,10 @@ def create_room_category(
         if current_user.role not in ['admin', 'manager']:
             raise HTTPException(status_code=403, detail="Only admin or manager can create room categories")
         
-        # Check if code already exists
+        # Check if code already exists for this hotel
         existing = db.execute(
-            text("SELECT id FROM room_categories WHERE category_code = :code"),
-            {"code": category.category_code}
+            text("SELECT id FROM room_categories WHERE category_code = :code AND (hotel_name = :h_name OR hotel_name IS NULL)"),
+            {"code": category.category_code, "h_name": current_user.hotel_name}
         ).first()
         
         if existing:
@@ -204,8 +213,8 @@ def create_room_category(
         
         db.execute(
             text("""
-                INSERT INTO room_categories (category_code, category_name, description, normal_rate, weekend_rate, is_active)
-                VALUES (:code, :name, :desc, :normal, :weekend, :active)
+                INSERT INTO room_categories (category_code, category_name, description, normal_rate, weekend_rate, is_active, hotel_name)
+                VALUES (:code, :name, :desc, :normal, :weekend, :active, :h_name)
             """),
             {
                 "code": category.category_code,
@@ -213,17 +222,17 @@ def create_room_category(
                 "desc": category.description,
                 "normal": category.normal_rate,
                 "weekend": category.weekend_rate,
-                "active": category.is_active
+                "active": category.is_active,
+                "h_name": current_user.hotel_name
             }
         )
         db.commit()
         
         created = db.execute(
             text("""
-                SELECT id, category_code, category_name, description, normal_rate, weekend_rate, is_active
-                FROM room_categories WHERE category_code = :code
-            """),
-            {"code": category.category_code}
+                SELECT id, category_code, category_name, description, normal_rate, weekend_rate, is_active, hotel_name
+                FROM room_categories WHERE id = LAST_INSERT_ID()
+            """)
         ).first()
         
         return dict(created._mapping)

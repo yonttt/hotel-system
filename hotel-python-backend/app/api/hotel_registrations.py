@@ -174,14 +174,14 @@ def get_next_registration_number(
 ):
     """Generate next available registration number."""
     try:
-        # Get the latest registration number
-        latest_registration = db.query(HotelRegistration).order_by(HotelRegistration.id.desc()).first()
-        
-        if latest_registration and latest_registration.registration_no:
+        from sqlalchemy import text
+        # Get the latest registration number using raw SQL to avoid model mismatch issues
+        result = db.execute(text("SELECT registration_no FROM hotel_registrations ORDER BY id DESC LIMIT 1")).fetchone()
+
+        if result and result[0]:
             try:
                 # Extract number from the registration number (assuming 10-digit format like "0000000001")
-                last_number = int(latest_registration.registration_no)
-                next_number = last_number + 1
+                last_number = int(result[0])
             except ValueError:
                 # If parsing fails, start from 1
                 next_number = 1
