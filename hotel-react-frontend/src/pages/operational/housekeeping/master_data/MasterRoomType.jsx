@@ -55,9 +55,10 @@ const MasterRoomType = () => {
       item.category_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.category_name?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    // Note: room_categories table doesn't have hotel_name, so we show all for now
-    // If you need hotel filtering, the table needs to be updated
-    const matchesHotel = selectedHotel === 'ALL' || true;
+    // Check if the item belongs to the selected hotel (or globally shared if null)
+    let itemHotel = item.hotel_name;
+    if (!itemHotel) itemHotel = 'ALL';
+    const matchesHotel = selectedHotel === 'ALL' || itemHotel === selectedHotel;
     
     return matchesSearch && matchesHotel;
   });

@@ -279,7 +279,7 @@ const ReservasiPage = () => {
   const formatRoomCategories = () => {
     return [
       { value: '', label: 'All Room Types' },
-      ...roomCategories.map(cat => ({ value: cat.category_code || cat.category_name, label: cat.category_name }))
+      ...roomCategories.map(cat => ({ value: cat.category_code, label: cat.category_name }))
     ]
   }
 

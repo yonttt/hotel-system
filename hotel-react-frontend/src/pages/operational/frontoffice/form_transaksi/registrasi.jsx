@@ -212,9 +212,7 @@ const RegistrasiPage = () => {
   }, []);
 
   const generateRegistrationNo = () => {
-    const timestamp = Date.now().toString().slice(-6);
-    const random = Math.floor(Math.random() * 9999) + 1;
-    return (timestamp + random.toString().padStart(4, '0')).slice(0, 10).padStart(10, '0');
+    return '0000000001';
   }
 
   const handleInputChange = async (e) => {
@@ -293,7 +291,7 @@ const RegistrasiPage = () => {
   const formatRoomCategories = () => {
     return [
       { value: '', label: 'All Room Types' },
-      ...roomCategories.map(cat => ({ value: cat.category_code || cat.category_name, label: cat.category_name }))
+      ...roomCategories.map(cat => ({ value: cat.category_code, label: cat.category_name }))
     ]
   }
 
