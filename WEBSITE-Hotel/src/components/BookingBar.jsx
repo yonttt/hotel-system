@@ -1,9 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CalendarDays, Users, Search, MapPin } from 'lucide-react'
+import { hotelAPI } from '../services/api'
+import { hotelProperties as defaultHotels } from '../data/hotels'
 
 export default function BookingBar() {
   const navigate = useNavigate()
+  const [dynamicHotels, setDynamicHotels] = useState([])
   const [formData, setFormData] = useState({
     destination: '',
     checkIn: '',
@@ -12,6 +15,18 @@ export default function BookingBar() {
     rooms: '1',
   })
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    const fetchHotels = async () => {
+      try {
+        const res = await hotelAPI.getProperties()
+        if (res.data) setDynamicHotels(res.data)
+      } catch (err) {
+        console.error('Failed to fetch dynamic hotels', err)
+      }
+    }
+    fetchHotels()
+  }, [])
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -72,12 +87,9 @@ export default function BookingBar() {
                   appearance-none cursor-pointer"
               >
                 <option value="" className="bg-hotel-dark">Pilih Hotel</option>
-                <option value="jakarta" className="bg-hotel-dark">Jakarta</option>
-                <option value="bali" className="bg-hotel-dark">Bali</option>
-                <option value="yogyakarta" className="bg-hotel-dark">Yogyakarta</option>
-                <option value="bandung" className="bg-hotel-dark">Bandung</option>
-                <option value="surabaya" className="bg-hotel-dark">Surabaya</option>
-                <option value="lombok" className="bg-hotel-dark">Lombok</option>
+                {dynamicHotels.map(h => (
+                  <option key={h.id} value={h.name} className="bg-hotel-dark">{h.name}</option>
+                ))}
               </select>
             </div>
 

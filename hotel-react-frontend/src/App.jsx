@@ -543,7 +543,7 @@ function App() {
               } 
             />
             <Route 
-              path="/hrd/property-list" 
+              path="/hrd/profil-hotel" 
               element={
                 <ProtectedRoute>
                   <ErrorBoundary>

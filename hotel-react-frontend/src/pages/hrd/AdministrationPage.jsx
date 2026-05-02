@@ -3,7 +3,7 @@ import Layout from '../../components/Layout'
 
 const AdministrationPage = () => {
   const menuItems = [
-    { title: 'Property List', description: 'Manage hotel properties and configurations', path: '/hrd/property-list', icon: '🏨' },
+    { title: 'Profil Hotel', description: 'Manage hotel properties and configurations', path: '/hrd/profil-hotel', icon: '🏨' },
     { title: 'User List', description: 'View and manage all system users', path: '/hrd/user-list', icon: '👥' },
     { title: 'User Authority', description: 'Configure user roles and permissions', path: '/hrd/user-authority', icon: '🔐' },
     { title: 'User Management', description: 'Register and manage user accounts', path: '/hrd/user-management', icon: '👤' }

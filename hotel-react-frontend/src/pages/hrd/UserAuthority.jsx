@@ -3,6 +3,48 @@ import Layout from '../../components/Layout';
 import { useAuth } from '../../context/AuthContext';
 import { apiService } from '../../services/api';
 
+const ModernSwitch = ({ checked, onChange }) => (
+  <label style={{
+    position: 'relative',
+    display: 'inline-block',
+    width: '44px',
+    height: '22px',
+    margin: '0 auto',
+    cursor: 'pointer'
+  }}>
+    <input 
+      type="checkbox" 
+      checked={checked} 
+      onChange={onChange} 
+      style={{ opacity: 0, width: 0, height: 0, position: 'absolute' }} 
+    />
+    <span style={{
+      position: 'absolute',
+      cursor: 'pointer',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: checked ? '#10b981' : '#e5e7eb',
+      transition: '0.3s',
+      borderRadius: '22px',
+      border: checked ? '1px solid #10b981' : '1px solid #d1d5db',
+    }}></span>
+    <span style={{
+      position: 'absolute',
+      height: '16px',
+      width: '16px',
+      left: checked ? '23px' : '2px',
+      bottom: '2px',
+      backgroundColor: 'white',
+      transition: '0.3s',
+      borderRadius: '50%',
+      boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+      pointerEvents: 'none'
+    }}></span>
+  </label>
+);
+
 const UserAuthority = () => {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
@@ -238,59 +280,27 @@ const UserAuthority = () => {
                     <td>{startIndex + index + 1}</td>
                     <td>{roleItem.label}</td>
                     <td style={{ textAlign: 'center' }}>
-                      <input
-                        type="checkbox"
+                      <ModernSwitch
                         checked={rolePermissions[roleItem.role]?.canView || false}
                         onChange={() => handlePermissionChange(roleItem.role, 'canView')}
-                        style={{
-                          width: '16px',
-                          height: '16px',
-                          cursor: 'pointer',
-                          verticalAlign: 'middle',
-                          margin: '0'
-                        }}
                       />
                     </td>
                     <td style={{ textAlign: 'center' }}>
-                      <input
-                        type="checkbox"
+                      <ModernSwitch
                         checked={rolePermissions[roleItem.role]?.canCreate || false}
                         onChange={() => handlePermissionChange(roleItem.role, 'canCreate')}
-                        style={{
-                          width: '16px',
-                          height: '16px',
-                          cursor: 'pointer',
-                          verticalAlign: 'middle',
-                          margin: '0'
-                        }}
                       />
                     </td>
                     <td style={{ textAlign: 'center' }}>
-                      <input
-                        type="checkbox"
+                      <ModernSwitch
                         checked={rolePermissions[roleItem.role]?.canEdit || false}
                         onChange={() => handlePermissionChange(roleItem.role, 'canEdit')}
-                        style={{
-                          width: '16px',
-                          height: '16px',
-                          cursor: 'pointer',
-                          verticalAlign: 'middle',
-                          margin: '0'
-                        }}
                       />
                     </td>
                     <td style={{ textAlign: 'center' }}>
-                      <input
-                        type="checkbox"
+                      <ModernSwitch
                         checked={rolePermissions[roleItem.role]?.canDelete || false}
                         onChange={() => handlePermissionChange(roleItem.role, 'canDelete')}
-                        style={{
-                          width: '16px',
-                          height: '16px',
-                          cursor: 'pointer',
-                          verticalAlign: 'middle',
-                          margin: '0'
-                        }}
                       />
                     </td>
                   </tr>

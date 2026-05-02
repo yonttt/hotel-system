@@ -46,16 +46,6 @@ export default function BookingPage() {
     lastName: '',
     email: '',
     phone: '',
-    address: '',
-    idCardType: 'KTP',
-    idCardNumber: '',
-    nationality: 'INDONESIA',
-    city: '',
-
-    guestMale: 1,
-    guestFemale: 0,
-    guestChild: 0,
-
     specialRequests: '',
     paymentMethod: 'Credit Card',
   })
@@ -135,19 +125,17 @@ export default function BookingPage() {
         guest_title: formData.guestTitle,
         email: formData.email,
         mobile_phone: formData.phone,
-        address: formData.address,
-        id_card_type: formData.idCardType,
-        id_card_number: formData.idCardNumber,
-        nationality: formData.nationality,
-        city: formData.city,
         
         arrival_date: new Date(formData.checkIn).toISOString(),
         departure_date: new Date(formData.checkOut).toISOString(),
         nights: nights,
         
-        guest_male: formData.guestMale,
-        guest_female: formData.guestFemale,
-        guest_child: formData.guestChild,
+        // Provide defaults for omitted fields so backend is happy
+        nationality: 'INDONESIA',
+        id_card_type: 'KTP',
+        guest_male: 1,
+        guest_female: 0,
+        guest_child: 0,
         
         note: formData.specialRequests || undefined,
         payment_method: formData.paymentMethod,
@@ -374,7 +362,7 @@ export default function BookingPage() {
                         <select name="destination" value={formData.destination} onChange={handleChange}
                           className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400 focus:ring-2 focus:ring-gold-400/20">
                           <option value="">Pilih Hotel</option>
-                          {(dynamicHotels.length > 0 ? dynamicHotels : hotelProperties).map(h => (
+                            {dynamicHotels.map(h => (
                             <option key={h.id} value={h.name}>{h.name}</option>
                           ))}
                         </select>
@@ -405,9 +393,19 @@ export default function BookingPage() {
                   <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
                     <h3 className="font-display font-bold text-lg text-hotel-dark mb-4 flex items-center gap-2">
                       <User size={20} className="text-gold-500" />
-                      Informasi Tamu
+                      Informasi Tamu & Kontak
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="sm:col-span-2">
+                        <label className="block text-sm font-semibold text-hotel-dark mb-2">Titel *</label>
+                        <select name="guestTitle" value={formData.guestTitle} onChange={handleChange} required
+                          className="w-full sm:w-1/2 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400 focus:ring-2 focus:ring-gold-400/20">
+                          <option value="MR">Mr.</option>
+                          <option value="MRS">Mrs.</option>
+                          <option value="MS">Ms.</option>
+                          <option value="MISS">Miss</option>
+                        </select>
+                      </div>
                       <div>
                         <label className="block text-sm font-semibold text-hotel-dark mb-2">Nama Depan *</label>
                         <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} required placeholder="John"
@@ -434,90 +432,6 @@ export default function BookingPage() {
                       <textarea name="specialRequests" value={formData.specialRequests} onChange={handleChange} rows={3}
                         placeholder="Contoh: Kamar lantai atas, extra pillow, dll."
                         className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400 focus:ring-2 focus:ring-gold-400/20 resize-none" />
-                    </div>
-                  </div>
-
-                  {/* Guest Additional Detail */}
-                  <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
-                    <h3 className="font-display font-bold text-lg text-hotel-dark mb-4 flex items-center gap-2">
-                      <User size={20} className="text-gold-500" />
-                      Detail Pribadi & Identitas
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-semibold text-hotel-dark mb-2">Titel *</label>
-                        <select name="guestTitle" value={formData.guestTitle} onChange={handleChange} required
-                          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400">
-                          <option value="MR">Mr.</option>
-                          <option value="MRS">Mrs.</option>
-                          <option value="MS">Ms.</option>
-                          <option value="MISS">Miss</option>
-                        </select>
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-semibold text-hotel-dark mb-2">Tipe Identitas *</label>
-                        <select name="idCardType" value={formData.idCardType} onChange={handleChange} required
-                          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400">
-                          <option value="KTP">KTP</option>
-                          <option value="PASSPORT">Passport</option>
-                          <option value="SIM">SIM</option>
-                          <option value="DRIVING_LICENSE">Driving License</option>
-                        </select>
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-semibold text-hotel-dark mb-2">No. Identitas *</label>
-                        <input type="text" name="idCardNumber" value={formData.idCardNumber} onChange={handleChange} required placeholder="1234567890"
-                          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400" />
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-semibold text-hotel-dark mb-2">Kewarganegaraan *</label>
-                        <select name="nationality" value={formData.nationality} onChange={handleChange} required
-                          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400">
-                          <option value="">Pilih Kewarganegaraan</option>
-                          {dynamicCountries.map(c => (
-                            <option key={c.id || c.code} value={c.name}>{c.name}</option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-semibold text-hotel-dark mb-2">Kota Asal (City) *</label>
-                        <select name="city" value={formData.city} onChange={handleChange} required
-                          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400">
-                          <option value="">Pilih Kota Asal</option>
-                          {dynamicCities.map(c => (
-                            <option key={c.id} value={c.name}>{c.name}</option>
-                          ))}
-                        </select>
-                      </div>
-                      
-                      <div className="sm:col-span-2 border-t pt-2 mt-2 border-gray-100">
-                        <label className="block text-sm font-semibold text-hotel-dark mb-2">Alamat Asal Kamar</label>
-                        <textarea name="address" value={formData.address} onChange={handleChange} rows={2}
-                          placeholder="Alamat asal tamu"
-                          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400 resize-none" />
-                      </div>
-
-                      <div className="grid grid-cols-3 gap-2 sm:col-span-2 items-end">
-                         <div>
-                            <label className="block text-sm font-semibold text-hotel-dark mb-2">Laki-laki</label>
-                            <input type="number" min="0" name="guestMale" value={formData.guestMale} onChange={handleChange} 
-                                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-gold-400" />
-                         </div>
-                         <div>
-                            <label className="block text-sm font-semibold text-hotel-dark mb-2">Perempuan</label>
-                            <input type="number" min="0" name="guestFemale" value={formData.guestFemale} onChange={handleChange} 
-                                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-gold-400" />
-                         </div>
-                         <div>
-                            <label className="block text-sm font-semibold text-hotel-dark mb-2">Anak-anak</label>
-                            <input type="number" min="0" name="guestChild" value={formData.guestChild} onChange={handleChange} 
-                                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-gold-400" />
-                         </div>
-                      </div>
                     </div>
                   </div>
 

@@ -466,7 +466,7 @@ import { useAuth } from '../../../context/AuthContext';
           <div className="header-row header-row-top">
             <div className="unified-header-left">
               <div className="header-title">
-                <span>PROPERTY LIST</span>
+                <span>PROFIL HOTEL</span>
               </div>
               <button
                 onClick={() => { resetForm(); setShowAddModal(true); setSubmitError(null); }}

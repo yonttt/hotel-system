@@ -77,52 +77,72 @@ const StatusKamarHP = () => {
   // All available room status codes from database
   const allStatusCodes = statusOptions.map(s => s.code);
 
+  const getTextColor = (bgColor) => {
+    if (!bgColor) return '#ffffff';
+    const lightColors = ['#ffffff', '#a3e4d7', '#c4b5fd', '#93c5fd', '#d9f99d', '#e5e7eb', '#f9a8d4', '#fef08a', '#fdba74', '#86efac', '#bef264', '#f87171'];
+    return lightColors.includes(bgColor.toLowerCase()) ? '#000000' : '#ffffff';
+  };
+
   // Get room status color based on status code
   const getStatusColor = (status) => {
+    if (!status) return '#22C55E'; // Default to Vacant Ready
+    const statusLower = status.toLowerCase().trim();
+    
+    const dbStatus = statusOptions.find(s => 
+      s.code.toLowerCase() === statusLower || 
+      (s.name && s.name.toLowerCase() === statusLower)
+    );
+    
+    if (dbStatus && dbStatus.color) return dbStatus.color;
+
     const statusMap = {
-      'co': '#000000',      // Checkout - black
-      'c o': '#000000',     // Checkout - black
+      'co': '#000000',
+      'c o': '#000000',
       'checkout': '#000000',
-      'gc': '#808080',      // General Cleaning - gray
-      'oo': '#ff0000',      // Out of Order - red
-      'vd': '#ff8c00',      // Vacant Dirty - dark orange
-      'vc': '#90ee90',      // Vacant Clean - light green
-      'vr': '#008000',      // Vacant Ready - green
-      'v r': '#008000',     // Vacant Ready - green
-      'vacant ready': '#008000',  // Vacant Ready - green
-      'vu': '#e6e6fa',      // Vacant Uncheck - lavender
-      'ar': '#87ceeb',      // Arrival - sky blue
-      'arrival': '#87ceeb', // Arrival - sky blue
-      'available': '#008000', // Available - treated as Vacant Ready - green
-      'ic': '#008080',      // Incognito - teal
-      'dnd': '#0000ff',     // DND - blue
-      'od': '#9acd32',      // Occupied Dirty - yellow green
-      'mu': '#800080',      // Makeup Room - purple
-      'oc': '#ff8c00',      // Occupied Clean - dark orange
-      'or': '#1e90ff',      // Occupied Ready - dodger blue
-      'occupied ready': '#1e90ff',  // Occupied Ready - dodger blue
-      'hu': '#d3d3d3',      // House Use - light gray
-      'so': '#ff69b4',      // Sleep Out - hot pink
-      'sk': '#ffffff',      // Skipper - white
-      'ed': '#ffff00',      // Expected Departure - yellow
+      'gc': '#808080',
+      'oo': '#FF3333',
+      'vd': '#E67E22',
+      'vc': '#A3E4D7',
+      'vr': '#22C55E',
+      'v r': '#22C55E',
+      'vacant ready': '#22C55E',
+      'vu': '#C4B5FD',
+      'ar': '#93C5FD',
+      'arrival': '#93C5FD',
+      'available': '#22C55E',
+      'ic': '#0F766E',
+      'dnd': '#1D4ED8',
+      'od': '#D9F99D',
+      'mu': '#7E22CE',
+      'oc': '#FDBA74',
+      'or': '#3B82F6',
+      'occupied ready': '#3B82F6',
+      'hu': '#E5E7EB',
+      'so': '#F9A8D4',
+      'sk': '#FFFFFF',
+      'ed': '#FEF08A'
     };
     
-    const statusLower = (status || '').toLowerCase().trim();
-    return statusMap[statusLower] || '#008000'; // Default to Vacant Ready green
+    return statusMap[statusLower] || '#22C55E';
   };
 
   // Get short status code from full status name
   const getShortStatus = (status) => {
     if (!status) return 'CO';
-    
     const statusLower = status.toLowerCase().trim();
     
-    // Check if it's already a short code (2-3 characters)
+    // Check in database by exact name or code
+    const dbStatus = statusOptions.find(s => 
+      s.code.toLowerCase() === statusLower || 
+      (s.name && s.name.toLowerCase() === statusLower)
+    );
+    
+    if (dbStatus) return dbStatus.code;
+
     if (status.length <= 3) {
       return status.toUpperCase();
     }
     
-    // Map full status names to short codes
     const statusToCode = {
       'checkout': 'CO',
       'general cleaning': 'GC',
@@ -132,7 +152,7 @@ const StatusKamarHP = () => {
       'vacant ready': 'VR',
       'vacant uncheck': 'VU',
       'arrival': 'AR',
-      'available': 'VR',  // Map available to Vacant Ready
+      'available': 'VR',
       'incognito': 'IC',
       'do not disturb': 'DND',
       'occupied dirty': 'OD',
@@ -340,7 +360,7 @@ const StatusKamarHP = () => {
                   <div
                     key={room.id}
                     className="room-box"
-                    style={{ backgroundColor: getStatusColor(room.status) }}
+                    style={{ backgroundColor: getStatusColor(room.status), color: getTextColor(getStatusColor(room.status)) }}
                     onClick={() => handleRoomClick(room)}
                   >
                     <div className="room-type">{room.room_type}</div>
@@ -372,8 +392,8 @@ const StatusKamarHP = () => {
                         <td>
                           <div className="status-badge" style={{ 
                             backgroundColor: item.color,
-                            color: item.color === '#ffffff' ? '#000000' : '#ffffff',
-                            border: item.color === '#ffffff' ? '2px solid #000000' : 'none'
+                              color: getTextColor(item.color),
+                              border: item.color.toLowerCase() === '#ffffff' ? '2px solid #000000' : 'none'
                           }}>
                             {item.status}
                           </div>
@@ -402,8 +422,8 @@ const StatusKamarHP = () => {
                         <td>
                           <div className="status-badge" style={{ 
                             backgroundColor: item.color,
-                            color: item.color === '#ffffff' ? '#000000' : '#ffffff',
-                            border: item.color === '#ffffff' ? '2px solid #000000' : 'none'
+                              color: getTextColor(item.color),
+                              border: item.color.toLowerCase() === '#ffffff' ? '2px solid #000000' : 'none'
                           }}>
                             {item.status}
                           </div>

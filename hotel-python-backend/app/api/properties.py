@@ -111,8 +111,7 @@ def ensure_properties_columns(db: Session):
 def get_properties(
     active_only: bool = False,
     category: Optional[str] = None,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    db: Session = Depends(get_db)
 ):
     """Get all properties/hotels."""
     try:
