@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useAuth } from '../../../../context/AuthContext'
 import { apiService } from '../../../../services/api'
 import Layout from '../../../../components/Layout'
@@ -8,6 +9,7 @@ import useHotels from '../../../../hooks/useHotels'
 import { formatCountriesOptions, formatCitiesOptions, formatPaymentMethodsOptions } from '../../../../utils/dropdownFormatters';
 
 const RegistrasiPage = () => {
+  const location = useLocation()
   const { user } = useAuth()
   const { defaultHotel, hotels } = useHotels()
   const [, setApiError] = useState(null)
@@ -60,12 +62,34 @@ const RegistrasiPage = () => {
 
   const [formData, setFormData] = useState(initialFormState)
 
-  // Update hotel_name when defaultHotel loads
+  // Automatically fill data if navigated from a Reservation page
   useEffect(() => {
-    if (defaultHotel) {
+    if (location.state && location.state.reservation) {
+      const res = location.state.reservation;
+      setFormData(prev => ({
+        ...prev,
+        guest_name: res.guest_name || '',
+        category_market: res.category_market || 'Walkin',
+        market_segment: res.market_segment || 'Normal',
+        mobile_phone: res.mobile_phone || '',
+        email: res.email || '',
+        room_number: res.room_number || '',
+        arrival_date: res.arrival_date ? res.arrival_date.split('T')[0] : prev.arrival_date,
+        departure_date: res.departure_date ? res.departure_date.split('T')[0] : prev.departure_date,
+        payment_method: res.payment_method || '',
+        deposit: res.deposit || 0,
+        notes: res.notes || '',
+        hotel_name: res.hotel_name || prev.hotel_name
+      }));
+    }
+  }, [location.state]);
+
+  // Update hotel_name when defaultHotel loads (only if not loaded from state)
+  useEffect(() => {
+    if (defaultHotel && !formData.hotel_name) {
       setFormData(prev => ({ ...prev, hotel_name: defaultHotel }))
     }
-  }, [defaultHotel])
+  }, [defaultHotel, formData.hotel_name])
 
   useEffect(() => {
     if (formData.arrival_date && formData.nights > 0) {

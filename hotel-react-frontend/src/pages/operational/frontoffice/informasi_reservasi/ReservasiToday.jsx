@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../../context/AuthContext'
 import { apiService } from '../../../../services/api'
 import Layout from '../../../../components/Layout'
 import useHotels from '../../../../hooks/useHotels'
 
 const ReservasiToday = () => {
+  const navigate = useNavigate()
   const { user } = useAuth()
   const { hotels } = useHotels()
   const [reservations, setReservations] = useState([])
@@ -257,6 +259,14 @@ const ReservasiToday = () => {
                     <td title={r.payment_method || 'N/A'}>{r.payment_method || 'N/A'}</td>
                     <td className="align-right">{formatCurrency(r.deposit || 0)}</td>
                     <td className="align-center">
+                      <button 
+                        className="btn-table-action" 
+                        title="Process to Registration" 
+                        onClick={() => navigate('/operational/frontoffice/form-transaksi/registrasi', { state: { reservation: r } })}
+                        style={{ marginRight: '5px', backgroundColor: '#2196F3', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '3px', cursor: 'pointer' }}
+                      >
+                        Register
+                      </button>
                       {canEdit() && (
                         <button className="btn-table-action" title="Edit Details" onClick={() => handleEditClick(r)}>Edit</button>
                       )}
