@@ -115,6 +115,7 @@ const Sidebar = () => {
     }
 
     setExpandedMenus(newExpandedMenus)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname])
 
   const isActiveRoute = (path) => {

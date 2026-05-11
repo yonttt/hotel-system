@@ -51,6 +51,7 @@ const AdjustmentPageTemplate = ({ category, title, subtitle, icon, adjTypes = []
 
   useEffect(() => {
     fetchRecords();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

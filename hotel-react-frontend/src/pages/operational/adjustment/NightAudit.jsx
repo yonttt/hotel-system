@@ -47,6 +47,7 @@ const NightAudit = () => {
 
   useEffect(() => {
     fetchAuditData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate, selectedHotel]);
 
   useEffect(() => {

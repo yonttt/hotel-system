@@ -41,6 +41,7 @@ const MasterHargaKamar = () => {
 
   useEffect(() => {
     filterRates();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rates, selectedHotel, searchTerm]);
 
   // Reset to first page when search/filter changes

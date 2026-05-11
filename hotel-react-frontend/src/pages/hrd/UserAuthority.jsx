@@ -66,6 +66,7 @@ const UserAuthority = () => {
 
   useEffect(() => {
     fetchPermissions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchPermissions = async () => {

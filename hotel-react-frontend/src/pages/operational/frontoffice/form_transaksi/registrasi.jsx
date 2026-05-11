@@ -233,6 +233,7 @@ const RegistrasiPage = () => {
 
   useEffect(() => {
     loadInitialData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const generateRegistrationNo = () => {

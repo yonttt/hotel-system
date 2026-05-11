@@ -206,6 +206,7 @@ const ReservasiPage = () => {
 
   useEffect(() => {
     loadInitialData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const generateReservationNo = () => {

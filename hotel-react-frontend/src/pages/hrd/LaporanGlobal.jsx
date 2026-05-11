@@ -49,6 +49,7 @@ const LaporanGlobal = () => {
   // Load data on component mount and when dates change
   useEffect(() => {
     fetchRevenueData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startDate, endDate]);
 
   // Calculate hotel totals

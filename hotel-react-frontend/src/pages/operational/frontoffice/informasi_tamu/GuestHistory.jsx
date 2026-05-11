@@ -36,6 +36,7 @@ const GuestHistory = () => {
 
   useEffect(() => { 
     loadRegistrations() 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateFrom, dateTo])
   useEffect(() => { setCurrentPage(1) }, [searchTerm, showEntries, dateFrom, dateTo])
 

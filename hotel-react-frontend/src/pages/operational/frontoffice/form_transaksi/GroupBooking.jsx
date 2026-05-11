@@ -72,6 +72,7 @@ const GroupBooking = () => {
     if (groupInfo.arrival_date && groupInfo.departure_date) {
       calculateNights()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupInfo.arrival_date, groupInfo.departure_date])
 
   // Calculate departure date when nights changes
@@ -90,6 +91,7 @@ const GroupBooking = () => {
   // Filter available rooms
   useEffect(() => {
     filterAvailableRooms();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rooms, groupInfo.arrival_date, groupInfo.departure_date, roomBookings]);
 
   // Recalculate room rates when arrival date changes
@@ -125,6 +127,7 @@ const GroupBooking = () => {
     }
     
     updateRoomRates()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupInfo.arrival_date, groupInfo.hotel_name])
 
   const loadReferenceData = async () => {

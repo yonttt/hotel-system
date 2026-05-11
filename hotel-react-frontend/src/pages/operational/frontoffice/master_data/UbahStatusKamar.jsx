@@ -44,6 +44,7 @@ const UbahStatusKamar = () => {
 
   useEffect(() => {
     filterRooms();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rooms, selectedHotel, searchTerm]);
 
   // Reset to first page when search/filter changes
