@@ -1,7 +1,7 @@
-from fastapi import FastAPI
+﻿from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi.errors import RateLimitExceeded
-from app.api import auth, users, hotel_rooms, room_pricing, guests, hotel_registrations, hotel_reservations, cities, nationalities, category_markets, market_segments, payment_methods, group_bookings, revenue_reports, master_data, room_rates, master_meja, kategori_menu_resto, checkin, checkout, night_audit, properties, laundry, account_receivable, adjustments, chatbot
+from app.api import auth, users, hotel_rooms, room_pricing, guests, hotel_registrations, hotel_reservations, cities, nationalities, category_markets, market_segments, payment_methods, group_bookings, revenue_reports, master_data, room_rates, master_meja, kategori_menu_resto, checkin, checkout, night_audit, properties, laundry, account_receivable, adjustments, chatbot, public_website, cms
 from app.core.security_middleware import (
     limiter, 
     SecurityHeadersMiddleware, 
@@ -79,6 +79,8 @@ app.include_router(laundry.router, prefix="", tags=["laundry"])
 app.include_router(account_receivable.router, prefix="", tags=["account-receivable"])
 app.include_router(adjustments.router, prefix="", tags=["adjustments"])
 app.include_router(chatbot.router, prefix="/chatbot", tags=["chatbot"])
+app.include_router(public_website.router, prefix="/public", tags=["public-website"])
+app.include_router(cms.router, prefix="/cms", tags=["cms"])
 
 @app.on_event("startup")
 async def startup_event():
@@ -87,9 +89,9 @@ async def startup_event():
         from app.core.database import engine
         from app.models import Base
         Base.metadata.create_all(bind=engine)
-        print("✅ Database tables created successfully")
+        print("âœ… Database tables created successfully")
     except Exception as e:
-        print(f"⚠️ Database initialization failed: {e}")
+        print(f"âš ï¸ Database initialization failed: {e}")
         print("API will still work but database operations may fail")
 
 @app.get("/")

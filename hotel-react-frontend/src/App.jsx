@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import LoginPage from './pages/LoginPage';
@@ -120,17 +120,20 @@ import UserManagement from './pages/hrd/UserManagement';
 import UserList from './pages/hrd/UserList';
 import UserAuthority from './pages/hrd/UserAuthority';
 import LaporanGlobal from './pages/hrd/LaporanGlobal';
+import WebsiteEditor from './pages/WebsiteEditor';
 import PropertyList from './pages/hrd/master_data/PropertyList';
 
 // Profile Page
 import ProfilePage from './pages/ProfilePage';
 
 import ProtectedRoute from './components/ProtectedRoute';
+import TopProgressBar from './components/TopProgressBar';
 
 function App() {
   return (
     <AuthProvider>
       <Router basename="/admin">
+        <TopProgressBar />
         <div className="app-wrapper">
           <Routes>
             <Route path="/login" element={<LoginPage />} />
@@ -552,6 +555,14 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+                        <Route 
+              path="/website-editor" 
+              element={
+                <ProtectedRoute>
+                  <WebsiteEditor />
+                </ProtectedRoute>
+              } 
+            />
             {/* --- END OF CORRECTION --- */}
 
           </Routes>
@@ -562,3 +573,4 @@ function App() {
 }
 
 export default App;
+

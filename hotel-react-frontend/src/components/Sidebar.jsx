@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import {
@@ -320,6 +320,11 @@ const Sidebar = () => {
       ]
     },
     {
+      title: 'Website CMS',
+      icon: DocumentTextIcon,
+      path: '/website-editor'
+    },
+    {
       title: 'HRD',
       icon: UserGroupIcon,
       hasSubmenu: true,
@@ -463,7 +468,7 @@ const Sidebar = () => {
             }}
             title="Refresh Status Kamar"
           >
-            ↻
+            â†»
           </button>
         )}
       </Link>

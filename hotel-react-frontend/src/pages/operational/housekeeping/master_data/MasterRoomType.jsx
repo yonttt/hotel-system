@@ -25,6 +25,7 @@ const MasterRoomType = () => {
     category_name: '',
     normal_rate: 0,
     weekend_rate: 0,
+    six_hours_rate: 0,
     description: ''
   });
   const [processing, setProcessing] = useState(false);
@@ -91,6 +92,7 @@ const MasterRoomType = () => {
       category_name: '',
       normal_rate: 0,
       weekend_rate: 0,
+      six_hours_rate: 0,
       description: ''
     });
   };
@@ -112,7 +114,8 @@ const MasterRoomType = () => {
       await apiService.createRoomCategory({
         ...formData,
         normal_rate: parseFloat(formData.normal_rate) || 0,
-        weekend_rate: parseFloat(formData.weekend_rate) || 0
+        weekend_rate: parseFloat(formData.weekend_rate) || 0,
+        six_hours_rate: parseFloat(formData.six_hours_rate) || null
       });
       setSuccessMessage(`Room type "${formData.category_name}" added successfully`);
       setShowAddModal(false);
@@ -136,6 +139,7 @@ const MasterRoomType = () => {
       category_name: item.category_name || '',
       normal_rate: item.normal_rate || 0,
       weekend_rate: item.weekend_rate || 0,
+      six_hours_rate: item.six_hours_rate || 0,
       description: item.description || ''
     });
     setShowEditModal(true);
@@ -152,7 +156,8 @@ const MasterRoomType = () => {
       await apiService.updateRoomCategory(editingItem.id, {
         ...formData,
         normal_rate: parseFloat(formData.normal_rate) || 0,
-        weekend_rate: parseFloat(formData.weekend_rate) || 0
+        weekend_rate: parseFloat(formData.weekend_rate) || 0,
+        six_hours_rate: parseFloat(formData.six_hours_rate) || null
       });
       setSuccessMessage(`Room type "${formData.category_name}" updated successfully`);
       setShowEditModal(false);
@@ -324,7 +329,7 @@ const MasterRoomType = () => {
                   <td>{item.category_name || '-'}</td>
                   <td className="align-right">{formatCurrency(item.normal_rate || 0)}</td>
                   <td className="align-right">{formatCurrency(item.weekend_rate || 0)}</td>
-                  <td className="align-right">-</td>
+                  <td className="align-right">{item.six_hours_rate ? formatCurrency(item.six_hours_rate) : '-'}</td>
                   <td>
                     {canEdit() && (
                       <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
@@ -454,10 +459,19 @@ const MasterRoomType = () => {
               </div>
               <div style={{ flex: 1 }}>
                 <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Weekend Rate</label>
-                <input
-                  type="number"
-                  value={formData.weekend_rate}
-                  onChange={(e) => setFormData({...formData, weekend_rate: e.target.value})}
+                  <input
+                    type="number"
+                    value={formData.weekend_rate}
+                    onChange={(e) => setFormData({...formData, weekend_rate: e.target.value})}
+                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>6 Hours Rate</label>
+                  <input
+                    type="number"
+                    value={formData.six_hours_rate}
+                    onChange={(e) => setFormData({...formData, six_hours_rate: e.target.value})}
                   style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                 />
               </div>
