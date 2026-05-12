@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, ChevronDown, Phone, Globe } from 'lucide-react'
+import { Menu, X, ChevronDown, Phone, Globe, User } from 'lucide-react'
 
 const navLinks = [
   { name: 'Beranda', path: '/' },
@@ -96,6 +96,20 @@ export default function Navbar() {
 
             {/* CTA Button */}
             <div className="hidden lg:flex items-center gap-4">
+              {localStorage.getItem('customer_token') ? (
+                <div className="flex items-center gap-4">
+                  <span className="text-white font-medium">Hello, {JSON.parse(localStorage.getItem('customer_user'))?.full_name?.split(' ')[0] || 'User'}</span>
+                  <button onClick={() => {localStorage.removeItem('customer_token'); localStorage.removeItem('customer_user'); window.location.reload();}} className="text-sm text-gray-300 hover:text-gold-400 font-semibold uppercase tracking-wider">Logout</button>
+                </div>
+              ) : (
+                <Link
+                  to="/login"
+                  className="text-white hover:text-gold-400 font-semibold text-sm tracking-wider uppercase flex items-center gap-2 transition-colors mr-2"
+                >
+                  <User size={18} />
+                  Login
+                </Link>
+              )}
               <Link
                 to="/rooms"
                 className="bg-gold-500 text-white px-6 py-2.5 text-sm font-semibold tracking-wider 
@@ -168,7 +182,22 @@ export default function Navbar() {
               ))}
             </div>
 
-            <div className="mt-8 pt-6 border-t border-white/10">
+            <div className="mt-8 pt-6 border-t border-white/10 gap-3 flex flex-col">
+              {localStorage.getItem('customer_token') ? (
+                <button
+                  onClick={() => {localStorage.removeItem('customer_token'); localStorage.removeItem('customer_user'); window.location.reload();}}
+                  className="block w-full border border-white/30 text-white text-center px-6 py-3 text-sm font-semibold tracking-wider hover:bg-white/10 transition-all duration-300 uppercase rounded"
+                >
+                  Logout
+                </button>
+              ) : (
+                <Link
+                  to="/login"
+                  className="block w-full border border-white/30 text-white text-center px-6 py-3 text-sm font-semibold tracking-wider hover:bg-white/10 transition-all duration-300 uppercase rounded"
+                >
+                  Login / Register
+                </Link>
+              )}
               <Link
                 to="/rooms"
                 className="block w-full bg-gold-500 text-white text-center px-6 py-3 text-sm font-semibold 
@@ -191,3 +220,4 @@ export default function Navbar() {
     </>
   )
 }
+

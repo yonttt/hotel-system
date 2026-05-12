@@ -12,17 +12,17 @@ export default function RoomsSection() {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const response = await hotelAPI.getRooms()
+        const response = await hotelAPI.getPublicRooms()
         const mappedRooms = response.data.map(room => ({
           id: room.id,
-          name: room.number || room.room_number || `Room ${room.id}`,
-          description: room.description || 'Kamar mewah dengan fasilitas lengkap dan pemandangan menakjubkan.',
+          name: room.category_name || room.category_code,
+          description: room.description || `Menginap dengan nyaman di tipe ${room.category_name} di ${room.hotel_name}.`,
           size: room.size || '30 sqm',
           bed: room.bed_type || 'King Bed',
           guests: room.capacity || 2,
           amenities: room.amenities || ['WiFi', 'AC', 'TV', 'Minibar'],
-          price: room.base_price || 1500000,
-          image: room.photo_url || "https://images.unsplash.com/photo-1611892440504-42a792e24d32?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
+          price: room.normal_rate || 250000,
+          image: room.image || "https://images.unsplash.com/photo-1611892440504-42a792e24d32?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
         })).slice(0, 4)
         
         // If the backend has no rooms yet, use some fallback data to still render nicely

@@ -1,6 +1,20 @@
 // Mock data for the hotel website
 // In the future, this will be replaced with API calls to the shared backend
 
+export const fetchCMSContent = async () => {
+  try {
+    const res = await fetch("http://localhost:8000/cms/content");
+    const data = await res.json();
+    return data.reduce((acc, curr) => {
+      acc[curr.setting_key] = curr.setting_value;
+      return acc;
+    }, {});
+  } catch (error) {
+    console.error("Failed to fetch CMS content:", error);
+    return {};
+  }
+};
+
 export const heroSlides = [
   {
     id: 1,

@@ -1,35 +1,8 @@
-import { useState } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Bed, Maximize2, Users, Wifi, Wind, Tv, Coffee, Bath, Star, Check } from 'lucide-react'
-import { featuredRooms, formatCurrency } from '../data/hotels'
-
-const allRooms = [
-  ...featuredRooms,
-  {
-    id: 5,
-    name: 'Superior Room',
-    type: 'standard',
-    description: 'Kamar nyaman dengan desain modern dan semua kebutuhan dasar untuk menginap yang menyenangkan.',
-    price: 900000,
-    image: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80',
-    size: '28 m²',
-    bed: 'Queen Size',
-    guests: 2,
-    amenities: ['WiFi Gratis', 'AC', 'TV LED 43"', 'Room Service'],
-  },
-  {
-    id: 6,
-    name: 'Grand Suite',
-    type: 'suite',
-    description: 'Suite premium dengan balkon pribadi dan pemandangan laut yang menakjubkan.',
-    price: 4200000,
-    image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&q=80',
-    size: '75 m²',
-    bed: 'King Size',
-    guests: 3,
-    amenities: ['WiFi Gratis', 'AC', 'TV LED 65"', 'Mini Bar', 'Bathtub', 'Balcony', 'Sea View'],
-  },
-]
+import { formatCurrency } from '../data/hotels'
+import { hotelAPI } from '../services/api'
 
 const roomTypes = [
   { key: 'all', label: 'Semua' },
@@ -42,6 +15,43 @@ export default function RoomsPage() {
   const [searchParams] = useSearchParams()
   const initialType = searchParams.get('type') || 'all'
   const [selectedType, setSelectedType] = useState(initialType)
+  const [allRooms, setAllRooms] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchRooms = async () => {
+      try {
+        const response = await hotelAPI.getPublicRooms()
+        const mappedRooms = response.data.map(room => {
+          let type = 'standard'
+          const lowerName = String(room.category_name).toLowerCase()
+          const lowerCode = String(room.category_code).toLowerCase()
+          
+          if (lowerName.includes('suite') || lowerCode.includes('apt') || lowerCode.includes('exe')) type = 'suite'
+          else if (lowerName.includes('bis') || lowerCode.includes('fam') || lowerCode.includes('ghs')) type = 'family'
+
+          return {
+            id: room.id,
+            name: room.hotel_name + ' - ' + room.category_name,
+            type: type,
+            description: room.description || 'Pengalaman menginap yang istimewa di tipe ' + room.category_name + ' persembahan ' + room.hotel_name + '.',
+            price: room.normal_rate || 250000,
+            image: room.image || 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80',
+            size: '30 m²',
+            bed: 'Queen Size',
+            guests: 2,
+            amenities: room.amenities || ['WiFi Gratis', 'AC', 'TV LED', 'Room Service']
+          }
+        })
+        setAllRooms(mappedRooms)
+      } catch (error) {
+        console.error('Failed to fetch rooms', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchRooms()
+  }, [])
 
   const filteredRooms = selectedType === 'all'
     ? allRooms
@@ -87,7 +97,11 @@ export default function RoomsPage() {
       {/* Rooms Listing */}
       <section className="py-16 lg:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {filteredRooms.length === 0 ? (
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500"></div>
+            </div>
+          ) : filteredRooms.length === 0 ? (
             <div className="text-center py-16">
               <p className="text-gray-400 text-lg">Tidak ada kamar ditemukan untuk kategori ini.</p>
               <button
@@ -202,3 +216,4 @@ export default function RoomsPage() {
     </>
   )
 }
+

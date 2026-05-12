@@ -1,4 +1,4 @@
-import axios from 'axios'
+﻿import axios from 'axios'
 
 // API base URL - will connect to the same backend as hotel-react-frontend
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
@@ -12,6 +12,15 @@ const api = axios.create({
 
 // Future API endpoints for the public hotel website
 export const hotelAPI = {
+  // Public Access APIs
+  getPublicRooms: () => api.get('/public/rooms'),
+  getPublicHotels: () => api.get('/public/hotels'),
+  getWebsiteContent: () => api.get('/cms/content'),
+
+  // Customer Auth
+  loginCustomer: (data) => api.post('/public/login', data, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}),
+  registerCustomer: (data) => api.post('/public/register', data),
+
   // Properties / Hotels
   getProperties: () => api.get('/properties/'),
   getPropertyById: (id) => api.get(`/properties/${id}`),
@@ -38,3 +47,4 @@ export const hotelAPI = {
 }
 
 export default api
+

@@ -1,11 +1,40 @@
-import { useState, useEffect, useCallback } from 'react'
+﻿import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { heroSlides } from '../data/hotels'
+import { hotelAPI } from '../services/api'
 
 export default function HeroSlider() {
   const [current, setCurrent] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
+  const [slides, setSlides] = useState(heroSlides)
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        const response = await hotelAPI.getWebsiteContent()
+        const contentData = {}
+        response.data.forEach(item => {
+          contentData[item.setting_key] = item.setting_value
+        })
+        
+        if (contentData.hero_title || contentData.hero_subtitle) {
+          setSlides(prevSlides => {
+            const newSlides = [...prevSlides]
+            newSlides[0] = {
+              ...newSlides[0],
+              title: contentData.hero_title || newSlides[0].title,
+              subtitle: contentData.hero_subtitle || newSlides[0].subtitle,
+            }
+            return newSlides
+          })
+        }
+      } catch(err) {
+        console.error('Failed to fetch CMS content:', err)
+      }
+    }
+    fetchContent()
+  }, [])
 
   const goTo = useCallback((index) => {
     if (isAnimating) return
@@ -15,11 +44,11 @@ export default function HeroSlider() {
   }, [isAnimating])
 
   const next = useCallback(() => {
-    goTo((current + 1) % heroSlides.length)
+    goTo((current + 1) % slides.length)
   }, [current, goTo])
 
   const prev = useCallback(() => {
-    goTo((current - 1 + heroSlides.length) % heroSlides.length)
+    goTo((current - 1 + slides.length) % slides.length)
   }, [current, goTo])
 
   useEffect(() => {
@@ -30,7 +59,7 @@ export default function HeroSlider() {
   return (
     <section className="relative h-screen w-full overflow-hidden">
       {/* Slides */}
-      {heroSlides.map((slide, index) => (
+      {slides.map((slide, index) => (
         <div
           key={slide.id}
           className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
@@ -107,7 +136,7 @@ export default function HeroSlider() {
 
       {/* Dots */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3">
-        {heroSlides.map((_, index) => (
+        {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => goTo(index)}
@@ -131,3 +160,4 @@ export default function HeroSlider() {
     </section>
   )
 }
+

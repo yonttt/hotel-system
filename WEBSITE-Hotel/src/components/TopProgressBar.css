@@ -1,0 +1,14 @@
+/* TopProgressBar.css for Public */
+#nprogress .bar {
+  background: #c9940f !important; /* Tailwind gold-500 */
+  height: 4px !important;
+}
+
+#nprogress .peg {
+  box-shadow: 0 0 10px #c9940f, 0 0 5px #c9940f !important;
+}
+
+#nprogress .spinner-icon {
+  border-top-color: #c9940f !important;
+  border-left-color: #c9940f !important;
+}
