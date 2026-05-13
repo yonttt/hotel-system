@@ -181,7 +181,7 @@ def get_next_registration_number(
         if result and result[0]:
             try:
                 # Extract number from the registration number (assuming 10-digit format like "0000000001")
-                last_number = int(result[0])
+                int(result[0])
             except ValueError:
                 # If parsing fails, start from 1
                 next_number = 1
