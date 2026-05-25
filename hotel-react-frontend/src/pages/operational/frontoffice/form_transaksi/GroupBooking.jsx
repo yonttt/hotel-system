@@ -1015,3 +1015,4 @@ const GroupBooking = () => {
 };
 
 export default GroupBooking;
+

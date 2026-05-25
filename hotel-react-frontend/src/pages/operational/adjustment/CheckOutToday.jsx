@@ -105,7 +105,7 @@ const CheckOutToday = () => {
     setProcessing(true);
     try {
       await apiService.processCheckout(selectedGuest.id);
-      setSuccessMessage(`Successfully checked out ${selectedGuest.guest_name}`);
+      setSuccessMessage('Pembayaran berhasil dikonfirmasi');
       setShowCheckoutModal(false);
       setSelectedGuest(null);
       fetchCheckoutData();
@@ -358,3 +358,5 @@ const CheckOutToday = () => {
 };
 
 export default CheckOutToday;
+
+

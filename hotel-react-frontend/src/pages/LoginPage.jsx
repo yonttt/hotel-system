@@ -10,6 +10,7 @@ const LoginPage = () => {
     password: ''
   })
   const [error, setError] = useState('')
+  const [notification, setNotification] = useState({ show: false, type: '', message: '' })
   const [recaptchaToken, setRecaptchaToken] = useState('')
   const recaptchaRef = useRef(null)
   const recaptchaWidgetId = useRef(null)
@@ -95,19 +96,27 @@ const LoginPage = () => {
     })
   }
 
+  const showNotification = (type, message) => {
+    setNotification({ show: true, type, message })
+    setTimeout(() => {
+      setNotification(prev => ({ ...prev, show: false }))
+    }, 4000)
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setNotification(prev => ({ ...prev, show: false }))
 
     // Validate form fields
     if (!formData.username.trim() || !formData.password.trim()) {
-      setError('Please enter both username and password')
+      showNotification('error', 'Please enter both username and password')
       return
     }
 
     // Validate reCAPTCHA token
     if (!recaptchaToken) {
-      setError('Please complete the reCAPTCHA verification')
+      showNotification('error', 'Please complete the reCAPTCHA verification')
       return
     }
 
@@ -118,9 +127,14 @@ const LoginPage = () => {
       })
       
       if (result.success) {
-        navigate('/dashboard')
+        showNotification('success', 'Login berhasil! Mengalihkan...')
+        setTimeout(() => {
+          navigate('/dashboard')
+        }, 1000)
       } else {
-        setError(result.error || 'Login failed. Please try again.')
+        const errorMsg = result.error || 'Username atau Password salah'
+        showNotification('error', errorMsg)
+        
         // Reset form on error
         setFormData(prev => ({
           ...prev,
@@ -137,7 +151,7 @@ const LoginPage = () => {
         }
       }
     } catch (err) {
-      setError('A system error occurred. Please try again later.')
+      showNotification('error', 'A system error occurred. Please try again later.')
       console.error('Login submission error:', err)
       // Reset form
       setFormData(prev => ({
@@ -157,7 +171,51 @@ const LoginPage = () => {
   }
 
   return (
-    <div className="login-container">
+    <div className="login-container" style={{ position: 'relative', overflowX: 'hidden' }}>
+      
+      {/* Slide-in Notification from Right */}
+      <div 
+        style={{
+          position: 'fixed',
+          top: '20px',
+          right: notification.show ? '20px' : '-400px',
+          width: '320px',
+          padding: '16px 20px',
+          backgroundColor: '#ffffff',
+          borderRadius: '8px',
+          boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '12px',
+          zIndex: 9999,
+          transition: 'right 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+          borderLeft: `4px solid ${notification.type === 'success' ? '#10b981' : '#ef4444'}`
+        }}
+      >
+        <div style={{ flexShrink: 0, marginTop: '2px' }}>
+          {notification.type === 'success' ? (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          ) : (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          )}
+        </div>
+        <div style={{ flex: 1, textAlign: 'left' }}>
+          <h4 style={{ margin: '0 0 4px 0', fontSize: '0.95rem', fontWeight: '600', color: '#1f2937' }}>
+            {notification.type === 'success' ? 'Success' : 'Authentication Failed'}
+          </h4>
+          <p style={{ margin: 0, fontSize: '0.85rem', color: '#4b5563', lineHeight: '1.4' }}>
+            {notification.message}
+          </p>
+        </div>
+      </div>
+
       <div className="login-card">
         <EvaGroupLogo size={80} />
         
@@ -167,37 +225,6 @@ const LoginPage = () => {
         <h2 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1.5rem', color: '#000000' }}>
           Authorized Access Only
         </h2>
-
-        {error && (
-          <div style={{ 
-            background: '#fff2f2', 
-            color: '#d32f2f',
-            padding: '0.75rem 1rem',
-            borderRadius: '8px', 
-            marginBottom: '1.5rem',
-            fontSize: '0.9rem',
-            border: '1px solid #ffcdd2',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-          }}>
-            <svg 
-              style={{ flexShrink: 0 }} 
-              width="20" 
-              height="20" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" 
-              strokeWidth="2"
-            >
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="8" x2="12" y2="12"></line>
-              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            </svg>
-            {error}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
@@ -249,3 +276,5 @@ const LoginPage = () => {
 }
 
 export default LoginPage
+
+

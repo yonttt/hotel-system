@@ -3,4 +3,5 @@ sys.path.insert(0, '.')
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+    # Changed host to 127.0.0.1 so the terminal link works correctly in Windows browsers
+    uvicorn.run("app.main:app", host="127.0.0.1", port=8000, reload=True)

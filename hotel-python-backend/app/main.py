@@ -94,10 +94,9 @@ async def startup_event():
         print(f"âš ï¸ Database initialization failed: {e}")
         print("API will still work but database operations may fail")
 
+from fastapi.responses import RedirectResponse
+
 @app.get("/")
 async def root():
-    return {
-        "message": "Eva Group Hotel Management System API",
-        "version": "2.0.0",
-        "status": "running"
-    }
+    # Redirect root directly to Swagger UI so it's easier to access
+    return RedirectResponse(url="/docs")

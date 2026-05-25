@@ -4,6 +4,9 @@ import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
 import './TopProgressBar.css'; // We will create this for custom colors
 
+// Matikan lingkaran spinner di pojok kanan atas bawaan nprogress
+NProgress.configure({ showSpinner: false });
+
 const TopProgressBar = () => {
   const location = useLocation();
 

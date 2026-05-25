@@ -142,7 +142,7 @@ const ReservasiDeposit = () => {
         deposit: parseFloat(editFormData.deposit) || 0,
         notes: editFormData.notes
       });
-      setSuccessMessage('Reservation updated successfully!');
+      setSuccessMessage('Pembayaran berhasil dikonfirmasi');
       setShowEditModal(false);
       setEditingItem(null);
       loadReservations();

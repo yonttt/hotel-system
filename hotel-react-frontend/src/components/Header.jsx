@@ -1,18 +1,34 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { useRefresh } from '../context/RefreshContext'
 import { useNavigate } from 'react-router-dom'
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 import {
   ChevronDownIcon,
   UserIcon,
   ArrowRightOnRectangleIcon,
   InformationCircleIcon,
-  EnvelopeIcon
+  EnvelopeIcon,
+  ArrowPathIcon
 } from '@heroicons/react/24/outline'
 
 const Header = () => {
   const [showUserMenu, setShowUserMenu] = useState(false)
   const { user, logout } = useAuth()
+  const { triggerRefresh } = useRefresh()
   const navigate = useNavigate()
+
+  const handleRefreshClick = () => {
+    // Gunakan sistem loading NProgress bawaan aplikasi
+    NProgress.start()
+    triggerRefresh()
+    
+    // Matikan NProgress setelah refresh di eksekusi
+    setTimeout(() => {
+      NProgress.done()
+    }, 700)
+  }
 
   const handleLogout = () => {
     logout()
@@ -36,6 +52,17 @@ const Header = () => {
 
       {/* Right side - User menu and logout */}
       <div className="header-right">
+        {/* Refresh Button */}
+        <button 
+          className="header-action-btn" 
+          onClick={handleRefreshClick}
+          title="Refresh Current Page"
+          style={{ backgroundColor: '#007bff', borderColor: '#0056b3' }}
+        >
+          <ArrowPathIcon className="w-2.5 h-2.5" />
+          <span>Refresh</span>
+        </button>
+
         {/* User Menu */}
         <div className="header-user-menu">
           <button 

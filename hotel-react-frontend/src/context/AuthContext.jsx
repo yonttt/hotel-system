@@ -90,7 +90,7 @@ export const AuthProvider = ({ children }) => {
       if (error.response?.status === 401) {
         return {
           success: false,
-          error: 'Invalid username or password'
+          error: 'Username atau Password salah'
         };
       } else if (error.response?.data?.detail) {
         return {

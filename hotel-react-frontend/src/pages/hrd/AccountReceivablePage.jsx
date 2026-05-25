@@ -179,7 +179,7 @@ const AccountReceivablePage = () => {
       await apiService.updateAccountReceivable(editingItem.id, formData);
       setShowEditModal(false);
       setEditingItem(null);
-      setSuccessMessage('Account receivable updated successfully!');
+      setSuccessMessage('Pembayaran berhasil dikonfirmasi');
       fetchRecords();
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {

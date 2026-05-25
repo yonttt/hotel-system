@@ -1,4 +1,5 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
+
 import { useAuth } from '../../../../context/AuthContext'
 import { apiService } from '../../../../services/api'
 import Layout from '../../../../components/Layout'
@@ -318,7 +319,7 @@ const ReservasiPage = () => {
           // Don't fail the reservation if room update fails
         }
         
-        alert('Reservation successful!')
+        alert('Proses reservasi kamar berhasil')
         loadInitialData() 
       }
     } catch (error) {
@@ -595,3 +596,13 @@ const ReservasiPage = () => {
 }
 
 export default ReservasiPage
+
+
+
+
+
+
+
+
+
+
