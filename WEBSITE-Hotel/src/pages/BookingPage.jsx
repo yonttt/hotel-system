@@ -5,23 +5,8 @@ import {
   Star, Check, ChevronLeft, ArrowRight, CheckCircle, MapPin
 } from 'lucide-react'
 import { hotelAPI } from '../services/api'
-import { featuredRooms, hotelProperties, formatCurrency } from '../data/hotels'
-
-const allRooms = [
-  ...featuredRooms,
-  {
-    id: 5, name: 'Superior Room', type: 'standard', price: 900000,
-    image: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80',
-    size: '28 m²', bed: 'Queen Size', guests: 2,
-    amenities: ['WiFi Gratis', 'AC', 'TV LED 43"', 'Room Service'],
-  },
-  {
-    id: 6, name: 'Grand Suite', type: 'suite', price: 4200000,
-    image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&q=80',
-    size: '75 m²', bed: 'King Size', guests: 3,
-    amenities: ['WiFi Gratis', 'AC', 'TV LED 65"', 'Mini Bar', 'Bathtub', 'Balcony', 'Sea View'],
-  },
-]
+import { formatCurrency } from '../data/hotels'
+import { useNotification } from '../context/NotificationContext'
 
 export default function BookingPage() {
   const [searchParams] = useSearchParams()
@@ -49,6 +34,7 @@ export default function BookingPage() {
     specialRequests: '',
     paymentMethod: 'Credit Card',
   })
+  const { showNotification } = useNotification()
   const [submitted, setSubmitted] = useState(false)
   const [bookingId, setBookingId] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -56,6 +42,7 @@ export default function BookingPage() {
   const [dynamicHotels, setDynamicHotels] = useState([])
   const [dynamicCities, setDynamicCities] = useState([])
   const [dynamicCountries, setDynamicCountries] = useState([])
+  const [apiRooms, setApiRooms] = useState([])
 
   useEffect(() => {
     const fetchHotels = async () => {
@@ -78,11 +65,25 @@ export default function BookingPage() {
         console.error('Failed to fetch locations', err)
       }
     }
+    const fetchPublicRooms = async () => {
+      try {
+        const res = await hotelAPI.getPublicRooms()
+        if (res.data) setApiRooms(res.data)
+      } catch (err) {
+        console.error('Failed to fetch public rooms', err)
+      }
+    }
     fetchHotels()
     fetchLocations()
+    fetchPublicRooms()
   }, [])
 
-  const selectedRoomData = useMemo(() => allRooms.find(r => r.id === selectedRoom), [selectedRoom])
+  const displayRooms = useMemo(() => {
+    if (!formData.destination) return apiRooms;
+    return apiRooms.filter(r => r.hotel_name === formData.destination);
+  }, [apiRooms, formData.destination])
+
+  const selectedRoomData = useMemo(() => apiRooms.find(r => r.id === selectedRoom), [selectedRoom, apiRooms])
 
   const nights = useMemo(() => {
     if (formData.checkIn && formData.checkOut) {
@@ -92,7 +93,7 @@ export default function BookingPage() {
     return 1
   }, [formData.checkIn, formData.checkOut])
 
-  const totalPrice = selectedRoomData ? selectedRoomData.price * nights * Number(formData.rooms || 1) : 0
+  const totalPrice = selectedRoomData ? selectedRoomData.normal_rate * nights * Number(formData.rooms || 1) : 0
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -172,7 +173,7 @@ export default function BookingPage() {
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (error) {
       console.error('Error submitting booking:', error)
-      setErrorMsg('Gagal melakukan pemesanan. Silakan coba lagi.')
+      showNotification('error', 'Gagal melakukan pemesanan. Silakan coba lagi.')
     } finally {
       setIsSubmitting(false)
     }
@@ -203,7 +204,7 @@ export default function BookingPage() {
                 </div>
                 <div className="flex justify-between py-3 border-b border-gray-100">
                   <span className="text-gray-500">Tipe Kamar</span>
-                  <span className="font-semibold text-hotel-dark">{selectedRoomData?.name}</span>
+                  <span className="font-semibold text-hotel-dark">{selectedRoomData?.category_name}</span>
                 </div>
                 <div className="flex justify-between py-3 border-b border-gray-100">
                   <span className="text-gray-500">Check-in</span>
@@ -294,43 +295,53 @@ export default function BookingPage() {
       {step === 1 && (
         <section className="py-12 bg-gray-50">
           <div className="max-w-6xl mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {allRooms.map((room) => (
-                <div
-                  key={room.id}
-                  className={`bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border-2 cursor-pointer ${
-                    selectedRoom === room.id ? 'border-gold-500' : 'border-transparent'
-                  }`}
-                  onClick={() => handleSelectRoom(room.id)}
-                >
-                  <div className="relative h-48 overflow-hidden">
-                    <img src={room.image} alt={room.name} className="w-full h-full object-cover" />
-                    <div className="absolute top-3 right-3 bg-gold-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                      {formatCurrency(room.price)}/malam
+            {displayRooms.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-500 text-lg">
+                  {formData.destination 
+                    ? `Maaf, belum ada data kamar untuk ${formData.destination}.`
+                    : 'Tidak ada kamar yang tersedia saat ini.'}
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {displayRooms.map((room) => (
+                  <div
+                    key={room.id}
+                    className={`bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border-2 cursor-pointer ${
+                      selectedRoom === room.id ? 'border-gold-500' : 'border-transparent'
+                    }`}
+                    onClick={() => handleSelectRoom(room.id)}
+                  >
+                    <div className="relative h-48 overflow-hidden">
+                      <img src={room.image} alt={room.category_name} className="w-full h-full object-cover" />
+                      <div className="absolute top-3 right-3 bg-gold-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                        {formatCurrency(room.normal_rate)}/malam
+                      </div>
+                    </div>
+                    <div className="p-5">
+                      <h3 className="font-display font-bold text-lg text-hotel-dark mb-1">{room.category_name}</h3>
+                      <div className="flex items-center gap-3 text-xs text-gray-400 mb-3">
+                        <span className="flex items-center gap-1"><Maximize2 size={12} /> {room.size || '30 m²'}</span>
+                        <span className="flex items-center gap-1"><Bed size={12} /> {room.bed || 'Queen/Twin Size'}</span>
+                        <span className="flex items-center gap-1"><Users size={12} /> {room.guests || 2} Tamu</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 mb-4">
+                        {room.amenities.slice(0, 4).map((a, i) => (
+                          <span key={i} className="text-[10px] bg-gray-100 px-2 py-1 rounded text-gray-500">{a}</span>
+                        ))}
+                        {room.amenities.length > 4 && (
+                          <span className="text-[10px] bg-gray-100 px-2 py-1 rounded text-gray-500">+{room.amenities.length - 4}</span>
+                        )}
+                      </div>
+                      <button className="w-full bg-gold-500 hover:bg-gold-400 text-white py-2.5 rounded-lg text-sm font-semibold transition-colors">
+                        Pilih Kamar Ini
+                      </button>
                     </div>
                   </div>
-                  <div className="p-5">
-                    <h3 className="font-display font-bold text-lg text-hotel-dark mb-1">{room.name}</h3>
-                    <div className="flex items-center gap-3 text-xs text-gray-400 mb-3">
-                      <span className="flex items-center gap-1"><Maximize2 size={12} /> {room.size}</span>
-                      <span className="flex items-center gap-1"><Bed size={12} /> {room.bed}</span>
-                      <span className="flex items-center gap-1"><Users size={12} /> {room.guests}</span>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5 mb-4">
-                      {room.amenities.slice(0, 4).map((a, i) => (
-                        <span key={i} className="text-[10px] bg-gray-100 px-2 py-1 rounded text-gray-500">{a}</span>
-                      ))}
-                      {room.amenities.length > 4 && (
-                        <span className="text-[10px] bg-gray-100 px-2 py-1 rounded text-gray-500">+{room.amenities.length - 4}</span>
-                      )}
-                    </div>
-                    <button className="w-full bg-gold-500 hover:bg-gold-400 text-white py-2.5 rounded-lg text-sm font-semibold transition-colors">
-                      Pilih Kamar Ini
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
       )}

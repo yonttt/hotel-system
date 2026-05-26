@@ -75,11 +75,11 @@ export default function Footer() {
           <div>
             <Link to="/" className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 bg-gold-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-display font-bold text-xl">H</span>
+                <span className="text-white font-display font-bold text-xl">E</span>
               </div>
               <div>
-                <span className="font-display font-bold text-xl tracking-wide">HOTEL</span>
-                <span className="text-gold-400 text-xs tracking-[0.3em] uppercase block">& Resort</span>
+                <span className="font-display font-bold text-xl tracking-wide">EVA GROUP</span>
+                <span className="text-gold-400 text-xs tracking-[0.3em] uppercase block">Hotel</span>
               </div>
             </Link>
             <p className="text-white/50 text-sm leading-relaxed mb-6">
@@ -146,15 +146,15 @@ export default function Footer() {
             <ul className="space-y-4">
               <li className="flex items-start gap-3 text-white/60 text-sm">
                 <MapPin size={16} className="text-gold-500 mt-0.5 shrink-0" />
-                <span>Jl. Sudirman No. 123, Jakarta Pusat, DKI Jakarta 10220</span>
+                <span>Jl. Pramuka Raya No.26, Jakarta Timur, DKI Jakarta</span>
               </li>
               <li className="flex items-center gap-3 text-white/60 text-sm">
                 <Phone size={16} className="text-gold-500 shrink-0" />
-                <a href="tel:+62211234567" className="hover:text-gold-400 transition-colors">+62 21 1234 567</a>
+                <a href="tel:+62218580224" className="hover:text-gold-400 transition-colors">+62 21 8580224</a>
               </li>
               <li className="flex items-center gap-3 text-white/60 text-sm">
                 <Mail size={16} className="text-gold-500 shrink-0" />
-                <a href="mailto:info@hotelresort.com" className="hover:text-gold-400 transition-colors">info@hotelresort.com</a>
+                <a href="mailto:info@hotelnewidola.com" className="hover:text-gold-400 transition-colors">info@hotelnewidola.com</a>
               </li>
               <li className="flex items-center gap-3 text-white/60 text-sm">
                 <Clock size={16} className="text-gold-500 shrink-0" />

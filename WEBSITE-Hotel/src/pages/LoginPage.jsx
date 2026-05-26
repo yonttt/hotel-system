@@ -1,18 +1,18 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { hotelAPI } from '../services/api';
+import { useNotification } from '../context/NotificationContext';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { showNotification } = useNotification();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
     try {
       const formData = new URLSearchParams();
       formData.append('username', email);
@@ -21,9 +21,13 @@ export default function LoginPage() {
       const response = await hotelAPI.loginCustomer(formData);
       localStorage.setItem('customer_token', response.data.access_token);
       localStorage.setItem('customer_user', JSON.stringify(response.data.user));
-      window.location.href = '/'; // Refresh to load avatar
+      
+      showNotification('success', 'Logged in successfully');
+      setTimeout(() => {
+        window.location.href = '/'; // Refresh to load avatar
+      }, 1000);
     } catch (err) {
-      setError('Invalid email or password');
+      showNotification('error', 'Invalid email or password');
     } finally {
       setLoading(false);
     }
@@ -33,7 +37,7 @@ export default function LoginPage() {
     <div className="min-h-screen py-32 flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl">
         <h2 className="text-3xl font-bold text-center mb-6 text-hotel-dark">Sign In</h2>
-        {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm text-center">{error}</div>}
+        
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>

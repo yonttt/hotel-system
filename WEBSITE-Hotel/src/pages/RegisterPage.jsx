@@ -1,22 +1,23 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { hotelAPI } from '../services/api';
+import { useNotification } from '../context/NotificationContext';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({ email: '', password: '', full_name: '', phone: '' });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { showNotification } = useNotification();
 
   const handleRegister = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
     try {
       await hotelAPI.registerCustomer(formData);
+      showNotification('success', 'Registration successful! Please log in.');
       navigate('/login');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Registration failed');
+      showNotification('error', err.response?.data?.detail || 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -26,7 +27,7 @@ export default function RegisterPage() {
     <div className="min-h-screen py-32 flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl">
         <h2 className="text-3xl font-bold text-center mb-6 text-hotel-dark">Create Account</h2>
-        {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm text-center">{error}</div>}
+        
         <form onSubmit={handleRegister} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>

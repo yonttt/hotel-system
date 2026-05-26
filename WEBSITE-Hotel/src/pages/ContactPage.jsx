@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { MapPin, Phone, Mail, Clock, Send, MessageSquare, Building2, Globe, CheckCircle, ChevronDown } from 'lucide-react'
+import { useNotification } from '../context/NotificationContext'
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -9,7 +10,7 @@ export default function ContactPage() {
     subject: '',
     message: '',
   })
-  const [submitted, setSubmitted] = useState(false)
+  const { showNotification } = useNotification()
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -17,31 +18,30 @@ export default function ContactPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    setSubmitted(true)
+    showNotification('success', 'Message sent successfully! We will get back to you soon.')
     setFormData({ name: '', email: '', phone: '', subject: '', message: '' })
-    setTimeout(() => setSubmitted(false), 5000)
   }
 
   const contactInfo = [
     {
       icon: MapPin,
       title: 'Alamat',
-      lines: ['Jl. Jend. Sudirman No. 123', 'Jakarta Pusat, DKI Jakarta 10220'],
+      lines: ['Jl. Pramuka Raya No.26', 'Jakarta Timur, DKI Jakarta'],
     },
     {
       icon: Phone,
       title: 'Telepon',
-      lines: ['+62 21 1234 567', '+62 812 3456 7890 (WhatsApp)'],
+      lines: ['+62 21 8580224'],
     },
     {
       icon: Mail,
       title: 'Email',
-      lines: ['info@hotelresort.com', 'reservasi@hotelresort.com'],
+      lines: ['info@hotelnewidola.com', 'reservasi@hotelnewidola.com'],
     },
     {
       icon: Clock,
       title: 'Jam Operasional',
-      lines: ['24/7 Customer Service', 'Reception: 06:00 - 23:00'],
+      lines: ['24/7 Customer Service', 'Reception: 24 Jam'],
     },
   ]
 
@@ -98,15 +98,6 @@ export default function ContactPage() {
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-5">
-                {submitted && (
-                  <div className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl p-4 mb-2">
-                    <CheckCircle size={20} className="text-green-500 shrink-0" />
-                    <div>
-                      <p className="text-green-800 font-semibold text-sm">Pesan berhasil dikirim!</p>
-                      <p className="text-green-600 text-xs">Tim kami akan segera menghubungi Anda.</p>
-                    </div>
-                  </div>
-                )}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
                     <label className="block text-sm font-semibold text-hotel-dark mb-2">Nama Lengkap *</label>
@@ -194,7 +185,7 @@ export default function ContactPage() {
             <div className="space-y-8">
               <div className="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100 h-80">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.521260322283!2d106.8195613!3d-6.2087634!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f5d2e764b12d%3A0x3d2ad6e1e0e9bcc8!2sJl.%20Jend.%20Sudirman%2C%20Jakarta!5e0!3m2!1sid!2sid!4v1630000000000!5m2!1sid!2sid"
+                  src="https://maps.google.com/maps?q=HOTEL%20NEW%20IDOLA,%20Jl.%20Pramuka%20Raya%20No.26%20Jakarta%20Timur&t=&z=15&ie=UTF8&iwloc=&output=embed"
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
@@ -216,13 +207,13 @@ export default function ContactPage() {
                 </div>
                 <div className="bg-green-600 rounded-2xl p-6 text-center">
                   <Phone size={28} className="text-white mx-auto mb-3" />
-                  <h4 className="text-white font-display font-bold mb-1">WhatsApp</h4>
-                  <p className="text-white/70 text-xs mb-3">Chat langsung dengan kami</p>
+                  <h4 className="text-white font-display font-bold mb-1">Telepon</h4>
+                  <p className="text-white/70 text-xs mb-3">Hubungi kami langsung</p>
                   <a
-                    href="https://wa.me/6281234567890"
+                    href="tel:+62218580224"
                     className="bg-white text-green-600 px-5 py-2 rounded-full text-sm font-semibold hover:bg-green-50 transition-colors inline-block"
                   >
-                    Chat WA
+                    Panggil +62 21 8580224
                   </a>
                 </div>
               </div>

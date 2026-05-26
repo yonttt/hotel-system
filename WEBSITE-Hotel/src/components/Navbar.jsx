@@ -67,14 +67,14 @@ export default function Navbar() {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3 group">
               <div className="w-10 h-10 bg-gold-500 rounded-lg flex items-center justify-center group-hover:bg-gold-400 transition-colors">
-                <span className="text-white font-display font-bold text-xl">H</span>
+                <span className="text-white font-display font-bold text-xl">E</span>
               </div>
               <div className="flex flex-col">
                 <span className="text-white font-display font-bold text-xl leading-tight tracking-wide">
-                  HOTEL
+                  EVA GROUP
                 </span>
                 <span className="text-gold-400 text-[10px] tracking-[0.3em] uppercase">
-                  & Resort
+                  Hotel
                 </span>
               </div>
             </Link>
