@@ -28,8 +28,9 @@ const useHotels = () => {
   // Extract hotel names for easy dropdown use
   const hotelNames = hotels.map(h => h.name);
 
-  // Default hotel = first active hotel or empty string
-  const defaultHotel = hotels.length > 0 ? hotels[0].name : '';
+  // Default hotel = prioritize Hotel New Idola, otherwise first active hotel or empty string
+  const idolaHotel = hotels.find(h => h.name.toLowerCase().includes('idola'));
+  const defaultHotel = idolaHotel ? idolaHotel.name : (hotels.length > 0 ? hotels[0].name : '');
 
   return { hotels, hotelNames, loading, defaultHotel };
 };

@@ -287,8 +287,11 @@ const ReservasiPage = () => {
 
   const formatRooms = () => {
     let filteredRooms = rooms;
+    if (formData.hotel_name) {
+      filteredRooms = filteredRooms.filter(room => room.hotel_name === formData.hotel_name);
+    }
     if (selectedRoomCategory) {
-      filteredRooms = rooms.filter(room => room.room_type === selectedRoomCategory);
+      filteredRooms = filteredRooms.filter(room => room.room_type === selectedRoomCategory);
     }
     return [
       { value: '', label: 'None selected' },
