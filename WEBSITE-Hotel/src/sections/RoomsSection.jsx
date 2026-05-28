@@ -64,7 +64,13 @@ export default function RoomsSection() {
   }, [])
 
   return (
-    <section ref={sectionRef} className="py-20 lg:py-28 bg-white">
+    <section 
+      ref={sectionRef} 
+      className="py-20 lg:py-28 bg-cover bg-center"
+      style={{
+        backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url('https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1920&q=80')`,
+      }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-14 animate-on-scroll">

@@ -137,7 +137,12 @@ export default function HotelDetailPage() {
       </section>
 
       {/* Available Rooms */}
-      <section className="py-16 lg:py-24 bg-white">
+      <section 
+        className="py-16 lg:py-24 bg-cover bg-center"
+        style={{
+          backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url('https://images.unsplash.com/photo-1590080876286-cd827bcf3e60?w=1920&q=80')`,
+        }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <p className="text-gold-500 text-sm font-semibold tracking-widest uppercase mb-3">Akomodasi</p>

@@ -1,27 +1,30 @@
-import { Link } from 'react-router-dom'
-import { Sparkles, ShieldCheck, Heart, Leaf, Award, Users, Building2, Globe } from 'lucide-react'
+  import { Link } from 'react-router-dom'
+import { Users, ShieldCheck, Heart, Lightbulb, Award, Building2, Globe, Handshake } from 'lucide-react'
 
 const milestones = [
-  { year: '2003', title: 'Didirikan', desc: 'Memulai perjalanan dengan 1 hotel di Jakarta' },
-  { year: '2008', title: 'Ekspansi Bali', desc: 'Membuka resort pertama di Pulau Dewata' },
-  { year: '2013', title: '25 Hotel', desc: 'Mencapai 25 properti di seluruh Indonesia' },
-  { year: '2018', title: 'ISO Certified', desc: 'Mendapatkan sertifikasi ISO 9001 & ISO 14001' },
-  { year: '2023', title: '50+ Hotel', desc: 'Lebih dari 50 hotel dan resort di Asia Tenggara' },
-  { year: '2026', title: 'Global Vision', desc: 'Ekspansi internasional dan inovasi berkelanjutan' },
+  { year: '2003', title: 'Didirikan', desc: 'Eva Hotel Management Group berdiri dengan visi melayani kebutuhan akomodasi budget' },
+  { year: '2008', title: 'Ekspansi Jakarta', desc: 'Memperluas layanan ke berbagai wilayah Jakarta Timur' },
+  { year: '2015', title: 'Jangkauan Nasional', desc: 'Berkembang ke Bogor, Bandung, dan Cirebon' },
+  { year: '2020', title: 'Inovasi Digital', desc: 'Meluncurkan platform booking online dan manajemen modern' },
+  { year: '2023', title: 'Pertumbuhan Berkelanjutan', desc: 'Terus berkembang dengan komitmen pada kualitas dan pelayanan prima' },
+  { year: '2026', title: 'Visi Masa Depan', desc: 'Menjadi pilihan utama untuk akomodasi budget berkualitas di Indonesia' },
 ]
 
 const values = [
-  { icon: Sparkles, title: 'Keunggulan', desc: 'Menghadirkan standar tertinggi dalam setiap aspek pelayanan' },
-  { icon: ShieldCheck, title: 'Kepercayaan', desc: 'Membangun hubungan yang kokoh dengan setiap tamu' },
-  { icon: Heart, title: 'Keramahan', desc: 'Sentuhan personal yang hangat dalam setiap interaksi' },
-  { icon: Leaf, title: 'Keberlanjutan', desc: 'Komitmen terhadap kelestarian lingkungan' },
+  { icon: Handshake, title: 'Team Work', desc: 'Upaya untuk saling mengisi, saling membantu, mengoreksi, menguntungkan dan menikmati hasil untuk mengoptimalkan pekerjaan.' },
+  { icon: Award, title: 'Discipline', desc: 'Memposisikan segala sesuatu pada tempat dan waktu yang semestinya.' },
+  { icon: ShieldCheck, title: 'Responsibility', desc: 'Kesediaan untuk menjalankan dan mengelola tugas, wewenang dan kepercayaan untuk menerima tugas dan menjaga kepercayaan yang diberikan.' },
+  { icon: Heart, title: 'Care', desc: 'Perhatian dan dorongan untuk menjaga, mempertahankan dan meningkatkan nilai, mutu atau tingkat kebaikan sesuatu hal, keadaan atau orang lain.' },
+  { icon: Lightbulb, title: 'Visionary', desc: 'Pandangan jauh kedepan yang berorientasi kepada pencapaian visi dan misi perusahaan.' },
+  { icon: Heart, title: 'Fairness', desc: 'Membagi secara sesuatu dengan proposional.' },
+  { icon: Users, title: 'Honesty', desc: 'Mengutamakan kebenaran hakiki pada diri sendiri, lingkungan dan rekan kerja.' },
 ]
 
 const stats = [
-  { icon: Building2, number: '50+', label: 'Hotel & Resort' },
-  { icon: Globe, number: '20+', label: 'Kota' },
-  { icon: Users, number: '5,000+', label: 'Karyawan' },
-  { icon: Award, number: '100+', label: 'Penghargaan' },
+  { icon: Building2, number: '25+', label: 'Hotel & Akomodasi' },
+  { icon: Globe, number: '4', label: 'Kota' },
+  { icon: Users, number: '500+', label: 'Karyawan' },
+  { icon: Award, number: '15+', label: 'Penghargaan' },
 ]
 
 export default function AboutPage() {
@@ -48,23 +51,25 @@ export default function AboutPage() {
             <div>
               <p className="section-subtitle text-left">Sejak 2003</p>
               <h2 className="text-3xl md:text-4xl font-display font-bold text-hotel-dark mb-6">
-                Lebih Dari Dua Dekade Melayani Dunia
+                Eva Hotel Management Group
               </h2>
               <div className="gold-divider-left mb-8" />
               <div className="space-y-4 text-gray-600 leading-relaxed">
                 <p>
-                  Kami adalah merek perhotelan paling terpercaya dan dikenal secara luas yang telah 
-                  melayani jutaan tamu domestik dan mancanegara setiap bulan selama lebih dari dua dekade.
+                  Eva Hotel Management Group didirikan pada tahun 2003 sebagai perusahaan manajemen hotel budget 
+                  yang berkomitmen memberikan akomodasi berkualitas dengan harga terjangkau. Berkedudukan di Jalan 
+                  Pramuka Raya No. 26 Matraman, Jakarta Timur, kami telah berkembang menjadi jaringan hotel terpercaya 
+                  di Indonesia.
                 </p>
                 <p>
-                  Keunikan pengalaman lokal yang dipadukan dengan karakter autentik menjadi ciri khas kami. 
-                  Melalui ide-ide yang inovatif dan pelayanan yang ramah, setiap hotel dan individu merasakan 
-                  pengalaman spesial yang dipersonalisasi.
+                  Dengan motto "<strong>Pilihan Tepat Harga Bersahabat</strong>" dan "<strong>Murah dan Bersih</strong>", 
+                  kami menghadirkan produk akomodasi yang memberikan kepuasan, keindahan, keamanan, dan kenyamanan kepada 
+                  setiap tamu melalui pelayanan prima.
                 </p>
                 <p>
-                  Dengan lebih dari 50 hotel dan resort yang tersebar di seluruh Indonesia, kami terus 
-                  berinovasi untuk menghadirkan standar hospitalitas terbaik. Setiap properti dirancang 
-                  untuk mencerminkan keindahan budaya lokal sambil memenuhi standar internasional.
+                  Jaringan hotel kami tersebar di berbagai kota strategis termasuk Jakarta, Bogor, Bandung, dan Cirebon. 
+                  Setiap properti dikelola dengan standar operasional yang tinggi untuk memastikan pengalaman menginap 
+                  yang konsisten dan memuaskan bagi semua tamu kami.
                 </p>
               </div>
             </div>

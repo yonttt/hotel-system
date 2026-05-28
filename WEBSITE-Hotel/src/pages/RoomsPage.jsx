@@ -95,7 +95,12 @@ export default function RoomsPage() {
       </section>
 
       {/* Rooms Listing */}
-      <section className="py-16 lg:py-24 bg-gray-50">
+      <section 
+        className="py-16 lg:py-24 bg-cover bg-center bg-fixed"
+        style={{
+          backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)), url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1920&q=80')`,
+        }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {loading ? (
             <div className="flex justify-center py-20">
