@@ -17,21 +17,34 @@ const GroupBookingList = () => {
   const [editingItem, setEditingItem] = useState(null);
   const [editFormData, setEditFormData] = useState({
     group_name: '',
-    pic_name: '',
+    group_pic: '',
     pic_phone: '',
-    check_in_date: '',
-    check_out_date: '',
+    arrival_date: '',
+    arrival_time: '',
+    departure_date: '',
     total_rooms: '',
+    market_segment: '',
     payment_method: '',
     total_amount: '',
     notes: ''
   });
   const [processing, setProcessing] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [marketSegments, setMarketSegments] = useState([]);
 
   useEffect(() => {
     fetchGroupBookings();
+    fetchMarketSegments();
   }, []);
+
+  const fetchMarketSegments = async () => {
+    try {
+      const response = await apiService.getMarketSegments();
+      setMarketSegments(response.data?.data || response.data || []);
+    } catch (err) {
+      console.error('Error fetching market segments:', err);
+    }
+  };
 
   const fetchGroupBookings = async () => {
     try {
@@ -51,7 +64,7 @@ const GroupBookingList = () => {
   // Filter data based on search
   const filteredBookings = groupBookings.filter(booking => 
     booking.group_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    booking.pic_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    booking.group_pic?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     booking.pic_phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     booking.payment_method?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -101,11 +114,13 @@ const GroupBookingList = () => {
     setEditingItem(booking);
     setEditFormData({
       group_name: booking.group_name || '',
-      pic_name: booking.pic_name || '',
+      group_pic: booking.group_pic || '',
       pic_phone: booking.pic_phone || '',
-      check_in_date: booking.check_in_date ? booking.check_in_date.split('T')[0] : '',
-      check_out_date: booking.check_out_date ? booking.check_out_date.split('T')[0] : '',
+      arrival_date: booking.arrival_date ? booking.arrival_date.split('T')[0] : '',
+      arrival_time: booking.arrival_time || '',
+      departure_date: booking.departure_date ? booking.departure_date.split('T')[0] : '',
       total_rooms: booking.total_rooms || '',
+      market_segment: booking.market_segment || 'Normal',
       payment_method: booking.payment_method || '',
       total_amount: booking.total_amount || '',
       notes: booking.notes || ''
@@ -123,10 +138,12 @@ const GroupBookingList = () => {
     try {
       await apiService.updateGroupBooking(editingItem.id, {
         group_name: editFormData.group_name,
-        pic_name: editFormData.pic_name,
+        group_pic: editFormData.group_pic,
         pic_phone: editFormData.pic_phone,
-        check_in_date: editFormData.check_in_date,
-        check_out_date: editFormData.check_out_date,
+        arrival_date: editFormData.arrival_date,
+        arrival_time: editFormData.arrival_time,
+        departure_date: editFormData.departure_date,
+        market_segment: editFormData.market_segment,
         total_rooms: parseInt(editFormData.total_rooms) || 0,
         payment_method: editFormData.payment_method,
         total_amount: parseFloat(editFormData.total_amount) || 0,
@@ -252,12 +269,12 @@ const GroupBookingList = () => {
                     <td>{indexOfFirstItem + index + 1}</td>
                     <td style={{ fontWeight: '500' }}>GB-{booking.id}</td>
                     <td style={{ fontWeight: '500' }}>{booking.group_name || 'N/A'}</td>
-                    <td>{booking.pic_name || 'N/A'}</td>
+                    <td>{booking.group_pic || 'N/A'}</td>
                     <td>{booking.pic_phone || 'N/A'}</td>
-                    <td>{formatDate(booking.check_in_date)}</td>
-                    <td>{formatDate(booking.check_out_date)}</td>
+                    <td>{formatDate(booking.arrival_date)}</td>
+                    <td>{formatDate(booking.departure_date)}</td>
                     <td className="align-center">
-                      {calculateNights(booking.check_in_date, booking.check_out_date)}
+                      {calculateNights(booking.arrival_date, booking.departure_date)}
                     </td>
                     <td className="align-center">{booking.total_rooms || 0}</td>
                     <td>{booking.payment_method || 'N/A'}</td>
@@ -390,8 +407,8 @@ const GroupBookingList = () => {
                 <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>PIC Name</label>
                 <input
                   type="text"
-                  value={editFormData.pic_name}
-                  onChange={(e) => setEditFormData({...editFormData, pic_name: e.target.value})}
+                  value={editFormData.group_pic}
+                  onChange={(e) => setEditFormData({...editFormData, group_pic: e.target.value})}
                   style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                 />
               </div>
@@ -408,22 +425,50 @@ const GroupBookingList = () => {
 
             <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Check-in Date</label>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Arrival Date</label>
                 <input
                   type="date"
-                  value={editFormData.check_in_date}
-                  onChange={(e) => setEditFormData({...editFormData, check_in_date: e.target.value})}
+                  value={editFormData.arrival_date}
+                  onChange={(e) => setEditFormData({...editFormData, arrival_date: e.target.value})}
                   style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                 />
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Check-out Date</label>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Departure Date</label>
                 <input
                   type="date"
-                  value={editFormData.check_out_date}
-                  onChange={(e) => setEditFormData({...editFormData, check_out_date: e.target.value})}
+                  value={editFormData.departure_date}
+                  onChange={(e) => setEditFormData({...editFormData, departure_date: e.target.value})}
                   style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                 />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Arrival Time</label>
+                <input
+                  type="text"
+                  value={editFormData.arrival_time}
+                  onChange={(e) => setEditFormData({...editFormData, arrival_time: e.target.value})}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#f9f9f9' }}
+                  readOnly
+                />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Market Segment</label>
+                <select
+                  value={editFormData.market_segment}
+                  onChange={(e) => setEditFormData({...editFormData, market_segment: e.target.value})}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: 'white' }}
+                >
+                  <option value="Normal">Normal</option>
+                  {marketSegments.map(segment => (
+                    <option key={segment.id || segment.name} value={segment.name}>
+                      {segment.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 

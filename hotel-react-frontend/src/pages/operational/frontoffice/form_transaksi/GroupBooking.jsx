@@ -21,6 +21,7 @@ const GroupBooking = () => {
   const [paymentMethods, setPaymentMethods] = useState([])
   const [cities, setCities] = useState([])
   const [countries, setCountries] = useState([])
+  const [marketSegments, setMarketSegments] = useState([])
 
   // Group information
   const [groupInfo, setGroupInfo] = useState({
@@ -28,7 +29,9 @@ const GroupBooking = () => {
     group_pic: '',
     pic_phone: '',
     pic_email: '',
+    market_segment: 'Normal',
     arrival_date: new Date().toISOString().split('T')[0],
+    arrival_time: new Date().toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' }),
     departure_date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
     nights: 1,
     payment_method: '',
@@ -138,7 +141,8 @@ const GroupBooking = () => {
         apiService.getPaymentMethods(),
         apiService.getCities(),
         apiService.getCountries(),
-        apiService.getRoomCategories()
+        apiService.getRoomCategories(),
+        apiService.getMarketSegments()
       ])
 
       const getDataOrDefault = (result, defaultValue = []) =>
@@ -153,6 +157,7 @@ const GroupBooking = () => {
       setCities(getDataOrDefault(results[2]))
       setCountries(getDataOrDefault(results[3]))
       setRoomCategories(getDataOrDefault(results[4]))
+      setMarketSegments(getDataOrDefault(results[5]))
     } catch (err) {
       setError('Failed to load reference data: ' + err.message)
     }
@@ -394,7 +399,9 @@ const GroupBooking = () => {
         group_pic: groupInfo.group_pic,
         pic_phone: groupInfo.pic_phone,
         pic_email: groupInfo.pic_email,
+        market_segment: groupInfo.market_segment,
         arrival_date: groupInfo.arrival_date,
+        arrival_time: groupInfo.arrival_time,
         departure_date: groupInfo.departure_date,
         nights: groupInfo.nights,
         payment_method: groupInfo.payment_method,
@@ -433,7 +440,9 @@ const GroupBooking = () => {
         group_pic: '',
         pic_phone: '',
         pic_email: '',
+        market_segment: 'Normal',
         arrival_date: new Date().toISOString().split('T')[0],
+        arrival_time: new Date().toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' }),
         departure_date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
         nights: 1,
         payment_method: '',
@@ -579,6 +588,16 @@ const GroupBooking = () => {
                     />
                   </div>
                   <div className="form-group">
+                    <label>Arrival Time</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={groupInfo.arrival_time}
+                      onChange={(e) => setGroupInfo({...groupInfo, arrival_time: e.target.value})}
+                      readOnly
+                    />
+                  </div>
+                  <div className="form-group">
                     <label>Departure Date</label>
                     <input
                       type="date"
@@ -633,6 +652,21 @@ const GroupBooking = () => {
                       onChange={(e) => setGroupInfo({...groupInfo, total_deposit: e.target.value})}
                       min="0"
                     />
+                  </div>
+                  <div className="form-group">
+                    <label>Market Segment</label>
+                    <select
+                      className="form-select border border-gray-300 rounded px-3 py-2 w-full"
+                      value={groupInfo.market_segment}
+                      onChange={(e) => setGroupInfo({...groupInfo, market_segment: e.target.value})}
+                    >
+                      <option value="Normal">Normal</option>
+                      {marketSegments.map(segment => (
+                        <option key={segment.id || segment.name} value={segment.name}>
+                          {segment.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               </div>

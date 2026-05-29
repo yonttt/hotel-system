@@ -43,7 +43,9 @@ async def create_group_booking(
             group_pic=booking.group_pic,
             pic_phone=booking.pic_phone,
             pic_email=booking.pic_email,
+            market_segment=booking.market_segment,
             arrival_date=booking.arrival_date,
+            arrival_time=booking.arrival_time,
             departure_date=booking.departure_date,
             nights=booking.nights,
             total_rooms=len(booking.rooms),
@@ -67,7 +69,7 @@ async def create_group_booking(
         for index, room in enumerate(booking.rooms):
             # Generate reservation number
             timestamp = int(datetime.now().timestamp())
-            reservation_no = f"GRP{timestamp}{str(index + 1).zfill(3)}"[:10]
+            reservation_no = f"GRP{str(timestamp)[-5:]}{str(index + 1).zfill(2)}"[:10]
             
             # Create group booking room record
             db_room = GroupBookingRoom(
@@ -104,12 +106,14 @@ async def create_group_booking(
                 id_card_number=room.id_card_number,
                 guest_name=room.guest_name,
                 guest_title=room.guest_title or 'MR',
+                market_segment=booking.market_segment,
                 mobile_phone=room.mobile_phone,
                 address=room.address,
                 nationality=room.nationality or 'INDONESIA',
                 city=room.city,
                 email=booking.pic_email,
                 arrival_date=booking.arrival_date,
+                arrival_time=booking.arrival_time,
                 departure_date=booking.departure_date,
                 nights=booking.nights,
                 guest_type='Normal',
@@ -155,7 +159,9 @@ async def create_group_booking(
             group_pic=db_group_booking.group_pic,
             pic_phone=db_group_booking.pic_phone,
             pic_email=db_group_booking.pic_email,
+            market_segment=db_group_booking.market_segment,
             arrival_date=db_group_booking.arrival_date,
+            arrival_time=db_group_booking.arrival_time,
             departure_date=db_group_booking.departure_date,
             nights=db_group_booking.nights,
             total_rooms=db_group_booking.total_rooms,

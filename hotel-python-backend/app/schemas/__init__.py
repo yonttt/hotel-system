@@ -150,6 +150,7 @@ class ReservationBase(BaseModel):
     city: Optional[str] = None
     email: Optional[str] = None
     arrival_date: datetime
+    arrival_time: Optional[str] = None
     nights: int = 1
     departure_date: datetime
     guest_type: GuestType = GuestType.Normal
@@ -188,6 +189,7 @@ class ReservationUpdate(BaseModel):
     city: Optional[str] = None
     email: Optional[str] = None
     arrival_date: Optional[datetime] = None
+    arrival_time: Optional[str] = None
     nights: Optional[int] = None
     departure_date: Optional[datetime] = None
     guest_type: Optional[GuestType] = None
@@ -343,7 +345,9 @@ class GroupBookingBase(BaseModel):
     group_pic: str
     pic_phone: str
     pic_email: Optional[str] = None
+    market_segment: Optional[str] = "Normal"
     arrival_date: datetime
+    arrival_time: Optional[str] = None
     departure_date: datetime
     nights: int
     payment_method: str
@@ -360,6 +364,8 @@ class GroupBookingCreate(GroupBookingBase):
 class GroupBookingUpdate(BaseModel):
     group_name: Optional[str] = None
     group_pic: Optional[str] = None
+    market_segment: Optional[str] = None
+    arrival_time: Optional[str] = None
     pic_phone: Optional[str] = None
     pic_email: Optional[str] = None
     payment_method: Optional[str] = None
