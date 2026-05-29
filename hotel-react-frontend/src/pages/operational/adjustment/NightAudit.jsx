@@ -195,6 +195,23 @@ const NightAudit = () => {
     }
   };
 
+  const handleProcessNightAudit = async () => {
+    setProcessing(true);
+    try {
+      const response = await apiService.processNightAudit({
+        audit_date: selectedDate,
+        hotel_name: selectedHotel
+      });
+      setSuccessMessage(response.data.message);
+      fetchAuditData();
+      setTimeout(() => setSuccessMessage(null), 4000);
+    } catch (err) {
+      setError('Failed to process night audit: ' + (err.response?.data?.detail || err.message));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   // Handle form change
   const handleFormChange = (field, value) => {
     setFormData(prev => ({
@@ -256,6 +273,25 @@ const NightAudit = () => {
                   onMouseOut={(e) => e.target.style.backgroundColor = '#3498db'}
                 >
                   + Tambah Data
+                </button>
+                <button
+                  onClick={handleProcessNightAudit}
+                  disabled={processing}
+                  style={{
+                    padding: '8px 20px',
+                    backgroundColor: '#e67e22',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: processing ? 'not-allowed' : 'pointer',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    boxShadow: '0 2px 4px rgba(230, 126, 34, 0.3)'
+                  }}
+                  onMouseOver={(e) => !processing && (e.target.style.backgroundColor = '#d35400')}
+                  onMouseOut={(e) => !processing && (e.target.style.backgroundColor = '#e67e22')}
+                >
+                  {processing ? 'Processing...' : 'Process Night Audit'}
                 </button>
               </div>
             </div>

@@ -322,9 +322,14 @@ const GroupBooking = () => {
   };
 
   const formatRoomCategories = () => {
+    let filteredCategories = roomCategories;
+    if (groupInfo.hotel_name) {
+      filteredCategories = roomCategories.filter(cat => !cat.hotel_name || cat.hotel_name === groupInfo.hotel_name);
+    }
+    
     return [
       { value: '', label: 'All Room Types' },
-      ...roomCategories.map(cat => ({ value: cat.category_code || cat.category_name, label: cat.category_name }))
+      ...filteredCategories.map(cat => ({ value: cat.category_code || cat.category_name, label: cat.category_name }))
     ]
   }
 

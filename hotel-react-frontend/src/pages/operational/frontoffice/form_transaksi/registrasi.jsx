@@ -314,9 +314,13 @@ const RegistrasiPage = () => {
   }
 
   const formatRoomCategories = () => {
+    let filteredCategories = roomCategories;
+    if (formData.hotel_name) {
+      filteredCategories = roomCategories.filter(cat => !cat.hotel_name || cat.hotel_name === formData.hotel_name);
+    }
     return [
       { value: '', label: 'All Room Types' },
-      ...roomCategories.map(cat => ({ value: cat.category_code, label: cat.category_name }))
+      ...filteredCategories.map(cat => ({ value: cat.category_code, label: cat.category_name }))
     ]
   }
 

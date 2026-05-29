@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from app.core.database import get_db
-from app.core.auth import get_current_user, get_current_manager_or_admin_user
+from app.core.auth import get_current_user, get_current_manager_or_admin_user, get_optional_user
 from app.core.room_utils import update_room_status
 from app.models import User, HotelReservation, Guest
 from app.schemas import (
@@ -17,7 +17,7 @@ router = APIRouter()
 def create_hotel_reservation(
     reservation: ReservationCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User | None = Depends(get_optional_user)
 ):
     """Create a new hotel reservation."""
     try:
@@ -34,7 +34,10 @@ def create_hotel_reservation(
         
         # Set created_by to current user's ID
         reservation_data = reservation.dict()
-        reservation_data['created_by'] = current_user.id
+        if current_user:
+            reservation_data['created_by'] = current_user.id
+        else:
+            reservation_data['created_by'] = None
         
         # Auto-link or create guest if guest_id not provided
         if not reservation_data.get('guest_id') and reservation_data.get('guest_name'):
@@ -57,6 +60,12 @@ def create_hotel_reservation(
                 db.add(new_guest)
                 db.flush()
                 reservation_data['guest_id'] = new_guest.id
+                
+        # Remove fields that do not exist in the HotelReservation model to prevent SQLAlchemy errors
+        if 'market_segment' in reservation_data:
+            del reservation_data['market_segment']
+        if 'arrival_time' in reservation_data:
+            del reservation_data['arrival_time']
         
         db_reservation = HotelReservation(**reservation_data)
         db.add(db_reservation)
@@ -124,6 +133,13 @@ def update_hotel_reservation(
         raise HTTPException(status_code=404, detail="Reservation not found")
     
     reservation_data = reservation.dict(exclude_unset=True)
+    
+    # Remove fields that do not exist in the HotelReservation model to prevent SQLAlchemy errors
+    if 'market_segment' in reservation_data:
+        del reservation_data['market_segment']
+    if 'arrival_time' in reservation_data:
+        del reservation_data['arrival_time']
+        
     for field, value in reservation_data.items():
         setattr(db_reservation, field, value)
     

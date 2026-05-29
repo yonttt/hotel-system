@@ -82,6 +82,80 @@ class NightAuditUpdate(BaseModel):
     notes: Optional[str] = None
 
 
+class NightAuditProcessRequest(BaseModel):
+    audit_date: date
+    hotel_name: Optional[str] = None
+
+@router.post("/process")
+def process_night_audit(
+    request: NightAuditProcessRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Automatically process night audit for all Checked-in guests."""
+    try:
+        # 1. Check if audit is already processed for this date and hotel (optional safety check, but let's allow it to just do ones that aren't there)
+        
+        # 2. Get active check-ins
+        params = {"status": "Check-in"}
+        query = "SELECT id, registration_no, guest_name, room_number, hotel_name, payment_amount, nights, discount FROM hotel_registrations WHERE transaction_status = :status"
+        
+        if request.hotel_name and request.hotel_name != 'ALL':
+            query += " AND hotel_name = :hname"
+            params["hname"] = request.hotel_name
+            
+        active_guests = db.execute(text(query), params).fetchall()
+        
+        processed_count = 0
+        for guest in active_guests:
+            # Check if this specific guest's room is already audited today
+            existing = db.execute(
+                text("SELECT id FROM night_audit WHERE audit_date = :adate AND registration_id = :rid"),
+                {"adate": request.audit_date, "rid": guest.id}
+            ).first()
+            
+            if existing:
+                continue # Already audited today
+                
+            # Calculate daily room rate from total payment amount / nights
+            nights = guest.nights if guest.nights and guest.nights > 0 else 1
+            daily_rate = float(guest.payment_amount or 0) / nights
+            daily_discount = float(guest.discount or 0) / nights
+            
+            db.execute(
+                text("""
+                    INSERT INTO night_audit (
+                        audit_date, hotel_name, room_number, registration_id, registration_no,
+                        guest_name, guest_ledger_plus, discount, total_revenue, total_payment,
+                        created_by, notes
+                    ) VALUES (
+                        :audit_date, :hotel_name, :room_number, :registration_id, :registration_no,
+                        :guest_name, :guest_ledger_plus, :discount, :total_revenue, 0,
+                        :created_by, 'Automated Night Audit Process'
+                    )
+                """),
+                {
+                    "audit_date": request.audit_date,
+                    "hotel_name": guest.hotel_name or '',
+                    "room_number": guest.room_number,
+                    "registration_id": guest.id,
+                    "registration_no": guest.registration_no,
+                    "guest_name": guest.guest_name,
+                    "guest_ledger_plus": daily_rate,
+                    "discount": daily_discount,
+                    "total_revenue": daily_rate - daily_discount,
+                    "created_by": current_user.username
+                }
+            )
+            processed_count += 1
+            
+        db.commit()
+        return {"message": f"Successfully processed {processed_count} rooms.", "count": processed_count}
+        
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.get("/", response_model=List[NightAuditResponse])
 def get_night_audits(
     skip: int = 0,

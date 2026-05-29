@@ -19,7 +19,7 @@ export default function BookingBar() {
   useEffect(() => {
     const fetchHotels = async () => {
       try {
-        const res = await hotelAPI.getProperties()
+        const res = await hotelAPI.getPublicHotels()
         if (res.data) setDynamicHotels(res.data)
       } catch (err) {
         console.error('Failed to fetch dynamic hotels', err)
@@ -87,8 +87,8 @@ export default function BookingBar() {
                   appearance-none cursor-pointer"
               >
                 <option value="" className="bg-hotel-dark">Pilih Hotel</option>
-                {dynamicHotels.map(h => (
-                  <option key={h.id} value={h.name} className="bg-hotel-dark">{h.name}</option>
+                {dynamicHotels.map((h, i) => (
+                  <option key={h.id || i} value={h.name} className="bg-hotel-dark">{h.name}</option>
                 ))}
               </select>
             </div>

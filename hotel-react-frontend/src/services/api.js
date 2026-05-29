@@ -563,6 +563,11 @@ class ApiService {
     return this.client.delete(`/night-audit/${id}`)
   }
 
+  // Automate Night Audit Process
+  async processNightAudit(data) {
+    return this.client.post('/night-audit/process', data)
+  }
+
   // ==================== PROPERTIES (Property List) ====================
   
   // Get all properties

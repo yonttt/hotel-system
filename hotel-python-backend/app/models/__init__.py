@@ -127,6 +127,7 @@ class HotelRegistration(Base):
     registration_no = Column(String(20), unique=True)
     guest_id = Column(Integer, ForeignKey('guests.id'), nullable=True)
     category_market = Column(String(50), default='Normal')
+    market_segment = Column(String(50), default='Normal')
     member_id = Column(String(50))
     transaction_by = Column(String(100))
     transaction_status = Column(Enum('Registration', 'Check-in', 'Check-out', 'Cancelled'), default='Registration')

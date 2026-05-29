@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from app.core.database import get_db
-from app.core.auth import get_current_user, get_current_manager_or_admin_user
+from app.core.auth import get_current_user, get_current_manager_or_admin_user, get_optional_user
 from app.core.room_utils import update_room_status
 from app.models import User, HotelRegistration, Guest
 from app.schemas import (
@@ -17,7 +17,7 @@ router = APIRouter()
 def create_guest_registration(
     registration: GuestRegistrationCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User | None = Depends(get_optional_user)
 ):
     """Create a new guest registration."""
     try:
@@ -34,7 +34,10 @@ def create_guest_registration(
         
         # Set created_by to current user's ID
         registration_data = registration.dict()
-        registration_data['created_by'] = current_user.id
+        if current_user:
+            registration_data['created_by'] = current_user.id
+        else:
+            registration_data['created_by'] = None
         
         # Auto-link or create guest if guest_id not provided
         if not registration_data.get('guest_id') and registration_data.get('guest_name'):
@@ -57,6 +60,10 @@ def create_guest_registration(
                 db.add(new_guest)
                 db.flush()
                 registration_data['guest_id'] = new_guest.id
+                
+        # Remove fields that do not exist in the HotelRegistration model to prevent SQLAlchemy errors
+        if 'arrival_time' in registration_data:
+            del registration_data['arrival_time']
         
         db_registration = HotelRegistration(**registration_data)
         db.add(db_registration)
@@ -130,6 +137,10 @@ def update_guest_registration(
     
     # Update only provided fields
     update_data = registration_update.dict(exclude_unset=True)
+    
+    # Remove fields that do not exist in the HotelRegistration model to prevent SQLAlchemy errors
+    if 'arrival_time' in update_data:
+        del update_data['arrival_time']
     
     # Check if transaction_status is being updated
     if 'transaction_status' in update_data and registration.room_number:

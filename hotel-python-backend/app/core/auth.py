@@ -51,3 +51,16 @@ def get_current_manager_or_admin_user(current_user: User = Depends(get_current_u
             detail="Not enough permissions"
         )
     return current_user
+security_optional = HTTPBearer(auto_error=False)
+
+def get_optional_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security_optional),
+    db: Session = Depends(get_db)
+) -> User | None:
+    if not credentials:
+        return None
+    token = credentials.credentials
+    username = verify_token(token)
+    if not username:
+        return None
+    return db.query(User).filter(User.username == username).first()

@@ -47,7 +47,7 @@ export default function BookingPage() {
   useEffect(() => {
     const fetchHotels = async () => {
       try {
-        const res = await hotelAPI.getProperties()
+        const res = await hotelAPI.getPublicHotels()
         if (res.data) setDynamicHotels(res.data)
       } catch (err) {
         console.error('Failed to fetch dynamic hotels', err)
@@ -138,7 +138,7 @@ export default function BookingPage() {
         guest_female: 0,
         guest_child: 0,
         
-        note: formData.specialRequests || undefined,
+        note: `Website Booking for: ${selectedRoomData?.category_name || 'Room'} (${formData.rooms || 1} room/s). ` + (formData.specialRequests || ''),
         payment_method: formData.paymentMethod,
         payment_amount: totalPrice,
         
@@ -153,18 +153,22 @@ export default function BookingPage() {
         payload.guest_count_male = payload.guest_male
         payload.guest_count_female = payload.guest_female
         payload.guest_count_child = payload.guest_child
-        payload.payment_method_id = 1 // Basic mapping or would need fetching
         // map names back if needed for backend validation matching
         delete payload.guest_male
         delete payload.guest_female
         delete payload.guest_child
+        
+        if (payload.note !== undefined) {
+          payload.notes = payload.note
+          delete payload.note
+        }
         
         await hotelAPI.createRegistration(payload)
         setBookingId(payload.registration_no)
       } else {
         // Create Hotel Reservation
         payload.reservation_no = `RSV${Date.now().toString().slice(-8)}`
-        payload.transaction_status = "Reservation"
+        payload.transaction_status = "Pending"
         await hotelAPI.createReservation(payload)
         setBookingId(payload.reservation_no)
       }
@@ -373,8 +377,8 @@ export default function BookingPage() {
                         <select name="destination" value={formData.destination} onChange={handleChange}
                           className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400 focus:ring-2 focus:ring-gold-400/20">
                           <option value="">Pilih Hotel</option>
-                            {dynamicHotels.map(h => (
-                            <option key={h.id} value={h.name}>{h.name}</option>
+                          {dynamicHotels.map((h, i) => (
+                            <option key={h.id || i} value={h.name}>{h.name}</option>
                           ))}
                         </select>
                       </div>
