@@ -3,10 +3,12 @@ import { apiService } from '../../../../api/api';
 import Layout from '../../../../ui/Layout';
 import { useAuth } from '../../../../state/AuthContext';
 import useHotels from '../../../../logic/useHotels';
+import { useNotification } from '../../../../state/NotificationContext';
 
 const UbahStatusKamar = () => {
   const { user } = useAuth();
   const { defaultHotel, hotels } = useHotels();
+  const { showNotification } = useNotification();
   const [rooms, setRooms] = useState([]);
   const [filteredRooms, setFilteredRooms] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -166,7 +168,7 @@ const UbahStatusKamar = () => {
   // Handle add save
   const handleAddSave = async () => {
     if (!addFormData.room_number || !addFormData.room_type) {
-      alert('Please fill in Room Number and Room Type');
+      showNotification('error', 'Please fill in Room Number and Room Type');
       return;
     }
     try {
@@ -178,13 +180,12 @@ const UbahStatusKamar = () => {
         floor_number: parseInt(addFormData.floor_number) || 1,
         status: addFormData.status
       });
-      setSuccessMessage(`Room "${addFormData.room_number}" added successfully`);
+      showNotification('success', `Room "${addFormData.room_number}" added successfully`);
       setShowAddModal(false);
       await fetchRooms();
-      setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
       console.error('Error adding room:', err);
-      alert('Failed to add room: ' + (err.response?.data?.detail || err.message));
+      showNotification('error', 'Failed to add room: ' + (err.response?.data?.detail || err.message));
     } finally {
       setProcessing(false);
     }
@@ -200,7 +201,7 @@ const UbahStatusKamar = () => {
   // Handle save edit
   const handleSaveEdit = async () => {
     if (!editStatus) {
-      alert('Please select a status');
+      showNotification('error', 'Please select a status');
       return;
     }
 
@@ -210,17 +211,13 @@ const UbahStatusKamar = () => {
         status: editStatus
       });
       
-      setSuccessMessage(`Room ${editingRoom.room_number} status updated to ${getStatusDisplayName(editStatus)}`);
+      showNotification('success', `Room ${editingRoom.room_number} status updated to ${getStatusDisplayName(editStatus)}`);
       setShowEditModal(false);
       setEditingRoom(null);
       await fetchRooms();
-      
-      setTimeout(() => {
-        setSuccessMessage(null);
-      }, 3000);
     } catch (err) {
       console.error('Error updating room:', err);
-      alert('Failed to update room status: ' + (err.response?.data?.detail || err.message));
+      showNotification('error', 'Failed to update room status: ' + (err.response?.data?.detail || err.message));
     } finally {
       setProcessing(false);
     }
@@ -231,12 +228,11 @@ const UbahStatusKamar = () => {
     if (!window.confirm(`Are you sure you want to delete room "${room.room_number}"?`)) return;
     try {
       await apiService.deleteHotelRoom(room.room_number);
-      setSuccessMessage(`Room "${room.room_number}" deleted successfully`);
+      showNotification('success', `Room "${room.room_number}" deleted successfully`);
       await fetchRooms();
-      setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
       console.error('Error deleting room:', err);
-      alert('Failed to delete room: ' + (err.response?.data?.detail || err.message));
+      showNotification('error', 'Failed to delete room: ' + (err.response?.data?.detail || err.message));
     }
   };
 
@@ -324,20 +320,7 @@ const UbahStatusKamar = () => {
           </div>
         </div>
 
-        {/* Success/Error Messages */}
-        {successMessage && (
-          <div style={{
-            background: '#d4edda',
-            border: '1px solid #c3e6cb',
-            color: '#155724',
-            padding: '12px 16px',
-            borderRadius: '4px',
-            marginBottom: '20px'
-          }}>
-            {successMessage}
-          </div>
-        )}
-
+        {/* Error Messages */}
         {error && (
           <div style={{
             background: '#f8d7da',

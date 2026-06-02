@@ -3,10 +3,12 @@ import { apiService } from '../../api/api';
 import Layout from '../../ui/Layout';
 import { useAuth } from '../../state/AuthContext';
 import useHotels from '../../logic/useHotels';
+import { useNotification } from '../../state/NotificationContext';
 
 const UserList = () => {
   const { user } = useAuth();
   const { hotelNames } = useHotels();
+  const { showNotification } = useNotification();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -102,7 +104,7 @@ const UserList = () => {
 
     try {
       await apiService.registerUser(formData);
-      setSuccessMessage(`User "${formData.username}" added successfully!`);
+      showNotification('success', `User "${formData.username}" added successfully!`);
       
       // Reset form
       setFormData({
@@ -115,11 +117,12 @@ const UserList = () => {
       // Close modal after 2 seconds
       setTimeout(() => {
         setShowAddModal(false);
-        setSuccessMessage(null);
         fetchUsers(); // Refresh the list
       }, 2000);
     } catch (err) {
-      setSubmitError(err.response?.data?.detail || 'Failed to add user');
+      const errorMessage = err.response?.data?.detail || 'Failed to add user';
+      setSubmitError(errorMessage);
+      showNotification('error', 'Error adding user: ' + errorMessage);
       console.error('Error adding user:', err);
     } finally {
       setSubmitLoading(false);
@@ -130,14 +133,10 @@ const UserList = () => {
     if (window.confirm(`Are you sure you want to delete user "${username}"?`)) {
       try {
         await apiService.deleteUser(userId);
-        setSuccessMessage(`User "${username}" deleted successfully!`);
+        showNotification('success', `User "${username}" deleted successfully!`);
         fetchUsers();
-        
-        setTimeout(() => {
-          setSuccessMessage(null);
-        }, 3000);
       } catch (err) {
-        setError('Failed to delete user: ' + (err.response?.data?.detail || err.message));
+        showNotification('error', `Error deleting user "${username}"`);
         console.error('Error deleting user:', err);
       }
     }
@@ -263,20 +262,7 @@ const UserList = () => {
           </div>
         </div>
 
-        {/* Success/Error Messages */}
-        {successMessage && (
-          <div style={{
-            background: '#d4edda',
-            border: '1px solid #c3e6cb',
-            color: '#155724',
-            padding: '12px 16px',
-            borderRadius: '4px',
-            marginBottom: '20px'
-          }}>
-            {successMessage}
-          </div>
-        )}
-
+        {/* Error Messages */}
         {error && (
           <div style={{
             background: '#f8d7da',

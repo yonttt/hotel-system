@@ -1,6 +1,7 @@
 ﻿import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './state/AuthContext';
+import { NotificationProvider } from './state/NotificationContext';
 import LoginPage from './views/LoginPage';
 import DashboardPage from './views/DashboardPage';
 
@@ -131,8 +132,9 @@ import TopProgressBar from './ui/TopProgressBar';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router basename="/admin">
+    <NotificationProvider>
+      <AuthProvider>
+        <Router basename="/admin">
         <TopProgressBar />
         <div className="app-wrapper">
           <Routes>
@@ -569,6 +571,7 @@ function App() {
         </div>
       </Router>
     </AuthProvider>
+    </NotificationProvider>
   );
 }
 

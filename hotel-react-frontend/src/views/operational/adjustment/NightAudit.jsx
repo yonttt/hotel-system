@@ -3,10 +3,12 @@ import { apiService } from '../../../api/api';
 import Layout from '../../../ui/Layout';
 import { useAuth } from '../../../state/AuthContext';
 import useHotels from '../../../logic/useHotels';
+import { useNotification } from '../../../state/NotificationContext';
 
 const NightAudit = () => {
   useAuth();
   const { hotels } = useHotels();
+  const { showNotification } = useNotification();
   const [audits, setAudits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -160,18 +162,17 @@ const NightAudit = () => {
     
     try {
       await apiService.deleteNightAudit(item.id);
-      setSuccessMessage(`Night audit for room ${item.room_number} deleted successfully`);
+      showNotification('success', `Night audit for room ${item.room_number} deleted successfully`);
       fetchAuditData();
-      setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
-      setError('Failed to delete: ' + (err.response?.data?.detail || err.message));
+      showNotification('error', 'Failed to delete: ' + (err.response?.data?.detail || err.message));
     }
   };
 
   // Handle save
   const handleSave = async () => {
     if (!formData.room_number) {
-      alert('Please enter room number');
+      showNotification('error', 'Please enter room number');
       return;
     }
     
@@ -179,17 +180,16 @@ const NightAudit = () => {
     try {
       if (editingItem) {
         await apiService.updateNightAudit(editingItem.id, formData);
-        setSuccessMessage('Night audit updated successfully');
+        showNotification('success', 'Night audit updated successfully');
       } else {
         await apiService.createNightAudit(formData);
-        setSuccessMessage('Night audit created successfully');
+        showNotification('success', 'Night audit created successfully');
       }
       setShowModal(false);
       setEditingItem(null);
       fetchAuditData();
-      setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
-      setError('Failed to save: ' + (err.response?.data?.detail || err.message));
+      showNotification('error', 'Failed to save: ' + (err.response?.data?.detail || err.message));
     } finally {
       setProcessing(false);
     }
@@ -202,11 +202,10 @@ const NightAudit = () => {
         audit_date: selectedDate,
         hotel_name: selectedHotel
       });
-      setSuccessMessage(response.data.message);
+      showNotification('success', response.data.message || 'Night audit processed successfully');
       fetchAuditData();
-      setTimeout(() => setSuccessMessage(null), 4000);
     } catch (err) {
-      setError('Failed to process night audit: ' + (err.response?.data?.detail || err.message));
+      showNotification('error', 'Failed to process night audit: ' + (err.response?.data?.detail || err.message));
     } finally {
       setProcessing(false);
     }
@@ -223,20 +222,6 @@ const NightAudit = () => {
   return (
     <Layout>
       <div className="unified-reservation-container">
-        {/* Success Message */}
-        {successMessage && (
-          <div style={{
-            background: '#d4edda',
-            border: '1px solid #c3e6cb',
-            color: '#155724',
-            padding: '12px 16px',
-            borderRadius: '4px',
-            marginBottom: '20px'
-          }}>
-            {successMessage}
-          </div>
-        )}
-
         {/* Error Message */}
         {error && (
           <div style={{

@@ -173,6 +173,7 @@ export default function BookingPage() {
         setBookingId(payload.reservation_no)
       }
 
+      showNotification('success', 'Reservasi Berhasil! Silakan periksa detail pesanan Anda.')
       setSubmitted(true)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (error) {

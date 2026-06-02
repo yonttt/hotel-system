@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../state/AuthContext'
+import { useNotification } from '../state/NotificationContext'
 import { useNavigate } from 'react-router-dom'
 import EvaGroupLogo from '../ui/EvaGroupLogo'
 import { getRecaptchaSiteKey, RECAPTCHA_CONFIG } from '../config/recaptcha'
@@ -10,7 +11,7 @@ const LoginPage = () => {
     password: ''
   })
   const [error, setError] = useState('')
-  const [notification, setNotification] = useState({ show: false, type: '', message: '' })
+  const { showNotification } = useNotification()
   const [recaptchaToken, setRecaptchaToken] = useState('')
   const recaptchaRef = useRef(null)
   const recaptchaWidgetId = useRef(null)
@@ -96,17 +97,9 @@ const LoginPage = () => {
     })
   }
 
-  const showNotification = (type, message) => {
-    setNotification({ show: true, type, message })
-    setTimeout(() => {
-      setNotification(prev => ({ ...prev, show: false }))
-    }, 4000)
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
-    setNotification(prev => ({ ...prev, show: false }))
 
     // Validate form fields
     if (!formData.username.trim() || !formData.password.trim()) {
