@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Bed, Maximize2, Users } from 'lucide-react'
 import { formatCurrency } from '../data/hotels'
-import { hotelAPI } from '../services/api'
+import { hotelAPI } from '../api/api'
 
 export default function RoomsSection() {
   const sectionRef = useRef(null)

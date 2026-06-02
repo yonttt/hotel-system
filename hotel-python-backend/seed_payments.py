@@ -1,4 +1,4 @@
-from app.core.database import get_db_connection
+from app.config.database import get_db_connection
 
 def seed_payment_methods():
     conn = get_db_connection()

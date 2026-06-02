@@ -1,0 +1,641 @@
+import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
+import { useAuth } from '../../../../state/AuthContext'
+import { apiService } from '../../../../api/api'
+import Layout from '../../../../ui/Layout'
+import SearchableSelect from '../../../../ui/SearchableSelect'
+import useHotels from '../../../../logic/useHotels'
+
+import { formatCountriesOptions, formatCitiesOptions, formatPaymentMethodsOptions } from '../../../../helpers/dropdownFormatters';
+
+const RegistrasiPage = () => {
+  const location = useLocation()
+  const { user } = useAuth()
+  const { defaultHotel, hotels } = useHotels()
+  const [, setApiError] = useState(null)
+  const [rooms, setRooms] = useState([])
+  const [roomCategories, setRoomCategories] = useState([])
+  const [selectedRoomCategory, setSelectedRoomCategory] = useState('')
+  const [cities, setCities] = useState([])
+  const [countries, setCountries] = useState([])
+  const [categoryMarkets, setCategoryMarkets] = useState([])
+  const [marketSegments, setMarketSegments] = useState([])
+  const [filteredMarketSegments, setFilteredMarketSegments] = useState([])
+  const [paymentMethods, setPaymentMethods] = useState([])
+  const [pricingInfo, setPricingInfo] = useState(null)
+
+  const initialFormState = {
+    registration_no: '0000000001',
+    category_market: 'Walkin',
+    market_segment: 'Normal',
+    member_id: '',
+    transaction_by: user?.username || 'ADMIN',
+    id_card_type: 'KTP',
+    id_card_number: '',
+    guest_name: '',
+    guest_title: 'MR',
+    mobile_phone: '',
+    address: '',
+    nationality: '',
+    city: '',
+    email: '',
+    arrival_date: new Date().toISOString().split('T')[0],
+    arrival_time: new Date().toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' }),
+    departure_date: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0],
+    nights: 1,
+    guest_type: 'Normal',
+    guest_count_male: 1,
+    guest_count_female: 0,
+    guest_count_child: 0,
+    extra_bed: 0,
+    room_number: '',
+    transaction_status: 'Registration',
+    payment_method: '',
+    notes: '',
+    payment_amount: 0,
+    discount: 0,
+    payment_diskon: 0,
+    deposit: 0,
+    balance: 0,
+    hotel_name: ''
+  }
+
+  const [formData, setFormData] = useState(initialFormState)
+
+  // Automatically fill data if navigated from a Reservation page
+  useEffect(() => {
+    if (location.state && location.state.reservation) {
+      const res = location.state.reservation;
+      setFormData(prev => ({
+        ...prev,
+        guest_name: res.guest_name || '',
+        category_market: res.category_market || 'Walkin',
+        market_segment: res.market_segment || 'Normal',
+        mobile_phone: res.mobile_phone || '',
+        email: res.email || '',
+        room_number: res.room_number || '',
+        arrival_date: res.arrival_date ? res.arrival_date.split('T')[0] : prev.arrival_date,
+        departure_date: res.departure_date ? res.departure_date.split('T')[0] : prev.departure_date,
+        payment_method: res.payment_method || '',
+        deposit: res.deposit || 0,
+        notes: res.notes || '',
+        hotel_name: res.hotel_name || prev.hotel_name
+      }));
+    }
+  }, [location.state]);
+
+  // Update hotel_name when defaultHotel loads (only if not loaded from state)
+  useEffect(() => {
+    if (defaultHotel && !formData.hotel_name) {
+      setFormData(prev => ({ ...prev, hotel_name: defaultHotel }))
+    }
+  }, [defaultHotel, formData.hotel_name])
+
+  useEffect(() => {
+    if (formData.arrival_date && formData.nights > 0) {
+      const arrivalDate = new Date(formData.arrival_date)
+      const departureDate = new Date(arrivalDate)
+      departureDate.setDate(departureDate.getDate() + parseInt(formData.nights, 10))
+      setFormData(prev => ({
+        ...prev,
+        departure_date: departureDate.toISOString().split('T')[0]
+      }))
+    }
+  }, [formData.arrival_date, formData.nights])
+
+    useEffect(() => {
+        let basePrice = 0;
+        if (pricingInfo && pricingInfo.current_rate) {
+            basePrice = parseFloat(pricingInfo.current_rate);
+        }
+
+        let calculatedDiscount = 0;
+        const selectedSegment = marketSegments.find(segment => segment.name === formData.market_segment);
+        if (selectedSegment && selectedSegment.discount_percentage > 0 && basePrice > 0) {
+            calculatedDiscount = basePrice * (selectedSegment.discount_percentage / 100);
+        }
+
+        const priceAfterDiscount = basePrice - calculatedDiscount;
+        const deposit = parseFloat(formData.deposit) || 0;
+        const balance = priceAfterDiscount - deposit;
+
+        setFormData(prev => ({
+            ...prev,
+            payment_amount: basePrice,
+            discount: calculatedDiscount,
+            payment_diskon: priceAfterDiscount,
+            balance: balance,
+        }));
+
+    }, [formData.market_segment, pricingInfo, marketSegments, formData.deposit]);
+
+    useEffect(() => {
+        if (formData.category_market === 'Walkin') {
+            const walkinSegments = marketSegments.filter(segment => 
+                segment.name.toLowerCase().includes('walkin') || 
+                (segment.category && segment.category.toLowerCase() === 'walkin')
+            );
+            setFilteredMarketSegments(walkinSegments);
+        } else if (formData.category_market === 'Online Travel Agent (OTA)') {
+            const otaSegments = marketSegments.filter(segment => 
+                segment.name.toLowerCase().includes('ota') || 
+                (segment.category && segment.category.toLowerCase() === 'online travel agent (ota)')
+            );
+            setFilteredMarketSegments(otaSegments);
+        } else if (formData.category_market === 'Corporate Rate') {
+            const corporateSegments = marketSegments.filter(segment => 
+                segment.name.toLowerCase().includes('corporate') || 
+                (segment.category && segment.category.toLowerCase() === 'corporate rate')
+            );
+            setFilteredMarketSegments(corporateSegments);
+        } else if (formData.category_market === 'Group') {
+            const groupSegments = marketSegments.filter(segment => 
+                segment.name.toLowerCase().includes('group') || 
+                (segment.category && segment.category.toLowerCase() === 'group')
+            );
+            setFilteredMarketSegments(groupSegments);
+        } else if (formData.category_market === 'Government Rate') {
+            const governmentSegments = marketSegments.filter(segment => 
+                segment.name.toLowerCase().includes('government') || 
+                (segment.category && segment.category.toLowerCase() === 'government rate')
+            );
+            setFilteredMarketSegments(governmentSegments);
+        } else if (formData.category_market === 'Travel Agent') {
+            const travelAgentSegments = marketSegments.filter(segment => 
+                segment.name.toLowerCase().includes('travel agent') || 
+                (segment.category && segment.category.toLowerCase() === 'travel agent')
+            );
+            setFilteredMarketSegments(travelAgentSegments);
+        } else if (formData.category_market === 'Social Media') {
+            const socialMediaSegments = marketSegments.filter(segment => 
+                segment.name.toLowerCase().includes('social media') || 
+                (segment.category && segment.category.toLowerCase() === 'social media')
+            );
+            setFilteredMarketSegments(socialMediaSegments);
+        } else if (formData.category_market === 'WAWCARD') {
+            const wawcardSegments = marketSegments.filter(segment => 
+                segment.name.toLowerCase().includes('wawcard') || 
+                (segment.category && segment.category.toLowerCase() === 'wawcard')
+            );
+            setFilteredMarketSegments(wawcardSegments);
+        } else if (formData.category_market === 'SMS Blast') {
+            const smsBlastSegments = marketSegments.filter(segment => 
+                segment.name.toLowerCase().includes('sms blast') || 
+                (segment.category && segment.category.toLowerCase() === 'sms blast')
+            );
+            setFilteredMarketSegments(smsBlastSegments);
+        } else {
+            // For uncategorized segments, show all remaining segments
+            setFilteredMarketSegments(marketSegments);
+        }
+        // Reset market segment when category changes to avoid invalid selection
+        setFormData(prev => ({ ...prev, market_segment: '' }));
+    }, [formData.category_market, marketSegments]);
+
+
+  const loadInitialData = async () => {
+    setApiError(null);
+    try {
+      const results = await Promise.allSettled([
+        apiService.getNextRegistrationNumber(),
+        apiService.getRoomsByStatus('VR'),
+        apiService.getCities(),
+        apiService.getCountries(),
+        apiService.getCategoryMarkets(),
+        apiService.getMarketSegments(),
+        apiService.getPaymentMethods(),
+        apiService.getRoomCategories(),
+      ]);
+
+      const getDataOrDefault = (result, defaultValue = []) =>
+        result.status === 'fulfilled' && result.value.data ? (result.value.data.data || result.value.data) : defaultValue;
+
+      setFormData(prev => ({
+        ...prev,
+        registration_no: results[0].status === 'fulfilled' ?
+          (results[0].value.data?.next_registration_no || generateRegistrationNo()) :
+          generateRegistrationNo()
+      }));
+
+      setRooms(getDataOrDefault(results[1]));
+      setCities(getDataOrDefault(results[2]));
+      setCountries(getDataOrDefault(results[3]));
+      setCategoryMarkets(getDataOrDefault(results[4]));
+      setMarketSegments(getDataOrDefault(results[5]));
+      setPaymentMethods(getDataOrDefault(results[6]));
+      setRoomCategories(getDataOrDefault(results[7]));
+
+    } catch (error) {
+      console.error('Critical error loading initial data:', error);
+      setApiError('A critical error occurred. Please refresh the page.');
+    }
+  }
+
+  useEffect(() => {
+    loadInitialData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const generateRegistrationNo = () => {
+    return '0000000001';
+  }
+
+  const handleInputChange = async (e) => {
+    const { name, value } = e.target
+    
+    setFormData(prev => ({ ...prev, [name]: value }))
+    
+    if (name === 'room_number' && value) {
+      try {
+        const selectedRoom = rooms.find(room => room.room_number === value)
+        if (selectedRoom && selectedRoom.room_type) {
+          // Try new room_rates API first (auto-pricing based on date)
+          try {
+            const rateResponse = await apiService.getRateForDate(selectedRoom.room_type, formData.arrival_date)
+            if (rateResponse.data && rateResponse.data.room_rate) {
+              setPricingInfo({
+                current_rate: rateResponse.data.room_rate,
+                extrabed_rate: rateResponse.data.extrabed,
+                rate_name: rateResponse.data.rate_name,
+                effective_date: rateResponse.data.effective_date
+              })
+              return
+            }
+          } catch {
+            console.log('Room rates API not available, falling back to room_pricing')
+          }
+          
+          // Fallback to old room_pricing API
+          const pricingResponse = await apiService.getRoomPricing(selectedRoom.room_type)
+          if (pricingResponse.data && pricingResponse.data.current_rate) {
+            setPricingInfo(pricingResponse.data)
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching room pricing:', error)
+        setPricingInfo(null)
+      }
+    } else if (name === 'room_number' && !value) {
+      setPricingInfo(null)
+    }
+    
+    // Also update pricing when arrival_date changes
+    if (name === 'arrival_date' && value && formData.room_number) {
+      try {
+        const selectedRoom = rooms.find(room => room.room_number === formData.room_number)
+        if (selectedRoom && selectedRoom.room_type) {
+          const rateResponse = await apiService.getRateForDate(selectedRoom.room_type, value)
+          if (rateResponse.data && rateResponse.data.room_rate) {
+            setPricingInfo({
+              current_rate: rateResponse.data.room_rate,
+              extrabed_rate: rateResponse.data.extrabed,
+              rate_name: rateResponse.data.rate_name,
+              effective_date: rateResponse.data.effective_date
+            })
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching room pricing for date change:', error)
+      }
+    }
+  }  // Helper functions to format data for SearchableSelect
+  const formatCategoryMarkets = () => {
+    return [
+      { value: 'Walkin', label: 'Walkin' },
+      ...categoryMarkets.map(cm => ({ value: cm.name, label: cm.name }))
+    ]
+  }
+
+  const formatMarketSegments = () => {
+    return [
+      { value: 'Normal', label: 'Normal' },
+      ...filteredMarketSegments.map(ms => ({ value: ms.name, label: `${ms.name} - ${ms.discount_percentage || 0}%` }))
+    ]
+  }
+
+  const formatRoomCategories = () => {
+    let filteredCategories = roomCategories;
+    if (formData.hotel_name) {
+      filteredCategories = roomCategories.filter(cat => !cat.hotel_name || cat.hotel_name === formData.hotel_name);
+    }
+    return [
+      { value: '', label: 'All Room Types' },
+      ...filteredCategories.map(cat => ({ value: cat.category_code, label: cat.category_name }))
+    ]
+  }
+
+  const formatRooms = () => {
+    let filteredRooms = rooms;
+    if (formData.hotel_name) {
+      filteredRooms = filteredRooms.filter(room => room.hotel_name === formData.hotel_name);
+    }
+    if (selectedRoomCategory) {
+      filteredRooms = filteredRooms.filter(room => room.room_type === selectedRoomCategory);
+    }
+    return [
+      { value: '', label: 'None selected' },
+      ...filteredRooms.map(room => ({ 
+        value: room.room_number, 
+        label: `${room.room_number} - ${room.room_type} (Floor ${room.floor_number})` 
+      }))
+    ]
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!isFormValid()) {
+      alert('Please fill Guest Name, ID Card, Room Number, and Mobile Phone.')
+      return
+    }
+
+    try {
+      const registrationData = { ...formData, created_by: user?.id || null }
+      const response = await apiService.createHotelRegistration(registrationData)
+      if (response.data) {
+        // Update room status to OR (Occupied Ready) after successful registration
+        try {
+          await apiService.updateHotelRoom(formData.room_number, { status: 'OR' })
+          console.log('Room status updated to OR (Occupied Ready)')
+        } catch (roomError) {
+          console.error('Failed to update room status:', roomError)
+          // Don't fail the registration if room update fails
+        }
+        
+        alert('Registration successful!')
+        loadInitialData() 
+      }
+    } catch (error) {
+      console.error('Error submitting registration:', error)
+      alert('Error submitting registration: ' + (error.response?.data?.detail || error.message))
+    }
+  }
+
+  const isFormValid = () => {
+    return formData.guest_name && formData.id_card_number && formData.room_number && formData.mobile_phone
+  }
+
+  return (
+    <Layout>
+      <div className="registration-container">
+        <div className="registration-header">
+          <h1 className="registration-title">REGISTRATION FORM</h1>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button type="button" className="tab-button active blue-button">Single Registration</button>
+          </div>
+        </div>        <div className="registration-form-container">
+          <form onSubmit={handleSubmit} className="registration-form">
+            <div className="form-grid">
+              {/* KOLOM 1 */}
+              <div className="form-column">
+                <div className="form-group">
+                  <label>REGISTRATION NO</label>
+                  <input type="text" name="registration_no" value={formData.registration_no} className="form-input" readOnly />
+                </div>
+                <div className="form-group">
+                  <label>Category Market</label>
+                  <SearchableSelect
+                    name="category_market"
+                    value={formData.category_market}
+                    onChange={handleInputChange}
+                    options={formatCategoryMarkets()}
+                    placeholder="Select Category Market"
+                    className="form-select"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Market Segment</label>
+                  <SearchableSelect
+                    name="market_segment"
+                    value={formData.market_segment}
+                    onChange={handleInputChange}
+                    options={formatMarketSegments()}
+                    placeholder="Select Market Segment"
+                    className="form-select"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Member ID</label>
+                  <input type="text" name="member_id" value={formData.member_id} onChange={handleInputChange} className="form-input" />
+                </div>
+                <div className="form-group">
+                  <label>Transaction By</label>
+                  <input type="text" name="transaction_by" value={formData.transaction_by} className="form-input" readOnly />
+                </div>
+                <div className="form-group">
+                  <label>ID Card</label>
+                  <div className="input-group">
+                    <select name="id_card_type" value={formData.id_card_type} onChange={handleInputChange} className="form-select title-select">
+                      <option value="KTP">KTP</option>
+                      <option value="Passport">Passport</option>
+                      <option value="SIM">SIM</option>
+                    </select>
+                    <input 
+                      type="text" 
+                      name="id_card_number" 
+                      value={formData.id_card_number} 
+                      onChange={handleInputChange} 
+                      className={`form-input flex-1 ${!formData.id_card_number ? 'required-field' : ''}`}
+                      placeholder="Required*" 
+                    />
+                  </div>
+                </div>
+                 <div className="form-group">
+                  <label>Guest Name</label>
+                  <div className="input-group">
+                    <select name="guest_title" value={formData.guest_title} onChange={handleInputChange} className="form-select title-select">
+                      <option value="MR">MR</option>
+                      <option value="MRS">MRS</option>
+                      <option value="MS">MS</option>
+                    </select>
+                    <input 
+                      type="text" 
+                      name="guest_name" 
+                      value={formData.guest_name} 
+                      onChange={handleInputChange} 
+                      className={`form-input flex-1 ${!formData.guest_name ? 'required-field' : ''}`}
+                      placeholder="Required*" 
+                    />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Mobile Phone</label>
+                  <input type="tel" name="mobile_phone" value={formData.mobile_phone} onChange={handleInputChange} className="form-input" />
+                </div>
+                <div className="form-group">
+                  <label>Address</label>
+                  <textarea name="address" value={formData.address} onChange={handleInputChange} className="form-input" rows="1" />
+                </div>
+                 <div className="form-group">
+                  <label>Nationality</label>
+                  <SearchableSelect
+                    name="nationality"
+                    value={formData.nationality}
+                    onChange={handleInputChange}
+                    options={formatCountriesOptions(countries)}
+                    placeholder="Select Nationality"
+                    className="form-select"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>City</label>
+                  <SearchableSelect
+                    name="city"
+                    value={formData.city}
+                    onChange={handleInputChange}
+                    options={formatCitiesOptions(cities)}
+                    placeholder="Select City"
+                    className="form-select"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Email</label>
+                  <input type="email" name="email" value={formData.email} onChange={handleInputChange} className="form-input" />
+                </div>
+              </div>
+
+              {/* KOLOM 2 */}
+              <div className="form-column">
+                <div className="form-group">
+                    <label>Arrival Date</label>
+                    <div className="input-group">
+                        <input type="date" name="arrival_date" value={formData.arrival_date} readOnly className="form-input bg-gray-100" />
+                        <input type="text" name="arrival_time" value={formData.arrival_time} className="form-input" style={{maxWidth: '120px'}} readOnly />
+                    </div>
+                </div>
+                <div className="form-group">
+                  <label>Nights</label>
+                  <select name="nights" value={formData.nights} onChange={handleInputChange} className="form-select">
+                    {[...Array(30).keys()].map(n => <option key={n + 1} value={n + 1}>{n + 1}</option>)}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Departure</label>
+                  <input type="date" name="departure_date" value={formData.departure_date} className="form-input" readOnly />
+                </div>
+                 <div className="form-group">
+                  <label>Guest Type</label>
+                  <select name="guest_type" value={formData.guest_type} onChange={handleInputChange} className="form-select">
+                    <option value="Normal">Normal</option>
+                    <option value="VIP">VIP</option>
+                    <option value="VVIP">VVIP</option>
+                    <option value="Corporate">INCOGNITO</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Guest</label>
+                  <div className="guest-count-group">
+                    <div className="guest-count-item"><span>M</span><input type="number" name="guest_count_male" value={formData.guest_count_male} onChange={handleInputChange} className="form-input guest-number" min="0" /></div>
+                    <div className="guest-count-item"><span>F</span><input type="number" name="guest_count_female" value={formData.guest_count_female} onChange={handleInputChange} className="form-input guest-number" min="0" /></div>
+                    <div className="guest-count-item"><span>C</span><input type="number" name="guest_count_child" value={formData.guest_count_child} onChange={handleInputChange} className="form-input guest-number" min="0" /></div>
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Extra Bed</label>
+                  <input 
+                    type="number" 
+                    name="extra_bed" 
+                    value={formData.extra_bed} 
+                    onChange={handleInputChange} 
+                    className="form-input" 
+                    placeholder="0" 
+                    min="0" 
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Hotel Property</label>
+                  <select
+                    name="hotel_name"
+                    value={formData.hotel_name}
+                    onChange={handleInputChange}
+                    className="form-select border border-gray-300 rounded px-3 py-2 w-full"
+                  >
+                    {hotels.map(h => (
+                      <option key={h.id} value={h.name}>{h.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Room Type (Filter)</label>
+                  <SearchableSelect
+                    name="room_type_filter"
+                    value={selectedRoomCategory}
+                    onChange={(e) => setSelectedRoomCategory(e.target.value)}
+                    options={formatRoomCategories()}
+                    placeholder="All Room Types"
+                    className="form-select"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Room Number</label>
+                  <SearchableSelect
+                    name="room_number"
+                    value={formData.room_number}
+                    onChange={handleInputChange}
+                    options={formatRooms()}
+                    placeholder="Select Room"
+                    className="form-select"
+                  />
+                </div>
+              </div>
+
+              {/* KOLOM 3 */}
+              <div className="form-column">
+                  <div className="form-group">
+                    <label>Transaction Status</label>
+                    <input 
+                      type="text" 
+                      name="transaction_status" 
+                      value="Registration" 
+                      className="form-input" 
+                      readOnly
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Payment Method</label>
+                    <SearchableSelect
+                      name="payment_method"
+                      value={formData.payment_method}
+                      onChange={handleInputChange}
+                      options={formatPaymentMethodsOptions(paymentMethods, 'Debit Bca 446')}
+                      placeholder="Select Payment Method"
+                      className="form-select"
+                    />
+                  </div>
+                  <div className="form-group">
+                      <label>Note</label>
+                      <textarea name="notes" value={formData.notes} onChange={handleInputChange} className="form-input" rows="3" />
+                  </div>
+                  <div className="form-group">
+                    <label>Payment Amount</label>
+                    <input type="number" name="payment_amount" value={formData.payment_amount} readOnly className="form-input bg-gray-100" min="0" />
+                  </div>
+                  <div className="form-group">
+                    <label>Discount</label>
+                    <input type="number" name="discount" value={formData.discount} readOnly className="form-input bg-gray-100" min="0" />
+                  </div>
+                  <div className="form-group">
+                    <label>Payment - Diskon</label>
+                    <input type="number" name="payment_diskon" value={formData.payment_diskon} readOnly className="form-input bg-gray-100" min="0" />
+                  </div>
+                   <div className="form-group">
+                    <label>Deposit</label>
+                    <input type="number" name="deposit" value={formData.deposit} onChange={handleInputChange} className="form-input" min="0" />
+                  </div>
+                  <div className="form-group">
+                    <label>Balance</label>
+                    <input type="number" name="balance" value={formData.balance} className="form-input" readOnly />
+                  </div>
+              </div>
+            </div>
+
+            <div className="form-actions">
+              <button type="submit" className="btn-process" disabled={!isFormValid()}>Process</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </Layout>
+  )
+}
+
+export default RegistrasiPage

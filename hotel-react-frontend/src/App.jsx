@@ -1,8 +1,8 @@
 ﻿import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import LoginPage from './pages/LoginPage';
-import DashboardPage from './pages/DashboardPage';
+import { AuthProvider } from './state/AuthContext';
+import LoginPage from './views/LoginPage';
+import DashboardPage from './views/DashboardPage';
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component {
@@ -64,70 +64,70 @@ class ErrorBoundary extends React.Component {
 }
 
 // Operational - Front Office
-import RegistrasiPage from './pages/operational/frontoffice/form_transaksi/registrasi';
-import ReservasiPage from './pages/operational/frontoffice/form_transaksi/reservasi';
-import GroupBooking from './pages/operational/frontoffice/form_transaksi/GroupBooking';
-import GroupBookingList from './pages/operational/frontoffice/informasi_group_booking/GroupBookingList';
-import GroupBookingRooms from './pages/operational/frontoffice/informasi_group_booking/GroupBookingRooms';
+import RegistrasiPage from './views/operational/frontoffice/form_transaksi/registrasi';
+import ReservasiPage from './views/operational/frontoffice/form_transaksi/reservasi';
+import GroupBooking from './views/operational/frontoffice/form_transaksi/GroupBooking';
+import GroupBookingList from './views/operational/frontoffice/informasi_group_booking/GroupBookingList';
+import GroupBookingRooms from './views/operational/frontoffice/informasi_group_booking/GroupBookingRooms';
 
 // Operational - Other
-import AdjustmentPage from './pages/operational/AdjustmentPage';
-import FoodBeveragePage from './pages/operational/FoodBeveragePage';
-import LaundryPage from './pages/operational/LaundryPage';
+import AdjustmentPage from './views/operational/AdjustmentPage';
+import FoodBeveragePage from './views/operational/FoodBeveragePage';
+import LaundryPage from './views/operational/LaundryPage';
 
 // Operational - Adjustment
-import CheckInToday from './pages/operational/adjustment/CheckInToday';
-import CheckOutToday from './pages/operational/adjustment/CheckOutToday';
-import NightAudit from './pages/operational/adjustment/NightAudit';
-import AdjFoodBeverage from './pages/operational/adjustment/AdjFoodBeverage';
-import AdjInventory from './pages/operational/adjustment/AdjInventory';
-import AdjKos from './pages/operational/adjustment/AdjKos';
-import AdjLaundry from './pages/operational/adjustment/AdjLaundry';
-import AdjMeetingRoom from './pages/operational/adjustment/AdjMeetingRoom';
-import AdjPettyCash from './pages/operational/adjustment/AdjPettyCash';
+import CheckInToday from './views/operational/adjustment/CheckInToday';
+import CheckOutToday from './views/operational/adjustment/CheckOutToday';
+import NightAudit from './views/operational/adjustment/NightAudit';
+import AdjFoodBeverage from './views/operational/adjustment/AdjFoodBeverage';
+import AdjInventory from './views/operational/adjustment/AdjInventory';
+import AdjKos from './views/operational/adjustment/AdjKos';
+import AdjLaundry from './views/operational/adjustment/AdjLaundry';
+import AdjMeetingRoom from './views/operational/adjustment/AdjMeetingRoom';
+import AdjPettyCash from './views/operational/adjustment/AdjPettyCash';
 
 // Operational - Food & Beverage - Master Data
-import MasterMeja from './pages/operational/foodbeverage/master_data/MasterMeja';
-import KategoriMenuResto from './pages/operational/foodbeverage/master_data/KategoriMenuResto';
+import MasterMeja from './views/operational/foodbeverage/master_data/MasterMeja';
+import KategoriMenuResto from './views/operational/foodbeverage/master_data/KategoriMenuResto';
 
 // Operational - Front Office - Informasi Reservasi
-import AllReservationPage from './pages/operational/frontoffice/informasi_reservasi/AllReservationPage';
-import ReservasiDeposit from './pages/operational/frontoffice/informasi_reservasi/ReservasiDeposit';
-import ReservasiToday from './pages/operational/frontoffice/informasi_reservasi/ReservasiToday';
+import AllReservationPage from './views/operational/frontoffice/informasi_reservasi/AllReservationPage';
+import ReservasiDeposit from './views/operational/frontoffice/informasi_reservasi/ReservasiDeposit';
+import ReservasiToday from './views/operational/frontoffice/informasi_reservasi/ReservasiToday';
 
 // Operational - Front Office - Informasi Tamu
-import CheckinToday from './pages/operational/frontoffice/informasi_tamu/CheckinToday';
-import GuestHistory from './pages/operational/frontoffice/informasi_tamu/GuestHistory';
-import InhouseGuest from './pages/operational/frontoffice/informasi_tamu/InhouseGuest';
+import CheckinToday from './views/operational/frontoffice/informasi_tamu/CheckinToday';
+import GuestHistory from './views/operational/frontoffice/informasi_tamu/GuestHistory';
+import InhouseGuest from './views/operational/frontoffice/informasi_tamu/InhouseGuest';
 
 // Operational - Housekeeping - Master Data
-import MasterRoomType from './pages/operational/housekeeping/master_data/MasterRoomType';
-import ManagementRoom from './pages/operational/housekeeping/master_data/ManagementRoom';
-import StatusKamarHP from './pages/operational/housekeeping/statuskamarhp/StatusKamarHP';
+import MasterRoomType from './views/operational/housekeeping/master_data/MasterRoomType';
+import ManagementRoom from './views/operational/housekeeping/master_data/ManagementRoom';
+import StatusKamarHP from './views/operational/housekeeping/statuskamarhp/StatusKamarHP';
 
 // Operational - Front Office - Status Kamar FO
-import StatusKamarFO from './pages/operational/frontoffice/statuskamarfo/StatusKamarFO';
+import StatusKamarFO from './views/operational/frontoffice/statuskamarfo/StatusKamarFO';
 
 // Operational - Front Office - Master Data
-import UbahStatusKamar from './pages/operational/frontoffice/master_data/UbahStatusKamar';
-import MasterHargaKamar from './pages/operational/frontoffice/master_data/MasterHargaKamar';
+import UbahStatusKamar from './views/operational/frontoffice/master_data/UbahStatusKamar';
+import MasterHargaKamar from './views/operational/frontoffice/master_data/MasterHargaKamar';
 
 // HRD
-import AccountReceivablePage from './pages/hrd/AccountReceivablePage';
-import AccountingPage from './pages/hrd/AccountingPage';
-import AdministrationPage from './pages/hrd/AdministrationPage';
-import UserManagement from './pages/hrd/UserManagement';
-import UserList from './pages/hrd/UserList';
-import UserAuthority from './pages/hrd/UserAuthority';
-import LaporanGlobal from './pages/hrd/LaporanGlobal';
-import WebsiteEditor from './pages/WebsiteEditor';
-import PropertyList from './pages/hrd/master_data/PropertyList';
+import AccountReceivablePage from './views/hrd/AccountReceivablePage';
+import AccountingPage from './views/hrd/AccountingPage';
+import AdministrationPage from './views/hrd/AdministrationPage';
+import UserManagement from './views/hrd/UserManagement';
+import UserList from './views/hrd/UserList';
+import UserAuthority from './views/hrd/UserAuthority';
+import LaporanGlobal from './views/hrd/LaporanGlobal';
+import WebsiteEditor from './views/WebsiteEditor';
+import PropertyList from './views/hrd/master_data/PropertyList';
 
 // Profile Page
-import ProfilePage from './pages/ProfilePage';
+import ProfilePage from './views/ProfilePage';
 
-import ProtectedRoute from './components/ProtectedRoute';
-import TopProgressBar from './components/TopProgressBar';
+import ProtectedRoute from './ui/ProtectedRoute';
+import TopProgressBar from './ui/TopProgressBar';
 
 function App() {
   return (

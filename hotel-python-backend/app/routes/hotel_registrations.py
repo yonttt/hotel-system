@@ -1,0 +1,207 @@
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from typing import List
+from app.config.database import get_db
+from app.config.auth import get_current_user, get_current_manager_or_admin_user, get_optional_user
+from app.config.room_utils import update_room_status
+from app.tables import User, HotelRegistration, Guest
+from app.rules import (
+    GuestRegistrationCreate, 
+    GuestRegistrationResponse, 
+    GuestRegistrationUpdate
+)
+
+router = APIRouter()
+
+@router.post("/", response_model=GuestRegistrationResponse)
+def create_guest_registration(
+    registration: GuestRegistrationCreate,
+    db: Session = Depends(get_db),
+    current_user: User | None = Depends(get_optional_user)
+):
+    """Create a new guest registration."""
+    try:
+        # Check if registration number already exists
+        existing_registration = db.query(HotelRegistration).filter(
+            HotelRegistration.registration_no == registration.registration_no
+        ).first()
+        
+        if existing_registration:
+            raise HTTPException(
+                status_code=400,
+                detail="Registration number already exists"
+            )
+        
+        # Set created_by to current user's ID
+        registration_data = registration.dict()
+        if current_user:
+            registration_data['created_by'] = current_user.id
+        else:
+            registration_data['created_by'] = None
+        
+        # Auto-link or create guest if guest_id not provided
+        if not registration_data.get('guest_id') and registration_data.get('guest_name'):
+            # Try to find existing guest by name
+            existing_guest = db.query(Guest).filter(
+                Guest.guest_name == registration_data['guest_name']
+            ).first()
+            if existing_guest:
+                registration_data['guest_id'] = existing_guest.id
+            else:
+                # Create new guest from registration data
+                new_guest = Guest(
+                    guest_name=registration_data.get('guest_name'),
+                    email=registration_data.get('email'),
+                    phone=registration_data.get('mobile_phone'),
+                    address=registration_data.get('address'),
+                    id_number=registration_data.get('id_card_number'),
+                    nationality=registration_data.get('nationality', 'INDONESIA')
+                )
+                db.add(new_guest)
+                db.flush()
+                registration_data['guest_id'] = new_guest.id
+                
+        # Remove fields that do not exist in the HotelRegistration model to prevent SQLAlchemy errors
+        if 'arrival_time' in registration_data:
+            del registration_data['arrival_time']
+        
+        db_registration = HotelRegistration(**registration_data)
+        db.add(db_registration)
+        
+        # Update room status based on transaction_status
+        if registration.room_number:
+            if registration.transaction_status == 'Check-in':
+                # OR = Occupied Ready (guest has checked in)
+                update_room_status(db, registration.room_number, 'OR')
+            elif registration.transaction_status == 'Registration':
+                # AR = Arrival (registered but not yet checked in)
+                update_room_status(db, registration.room_number, 'AR')
+        
+        db.commit()
+        db.refresh(db_registration)
+        return db_registration
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+@router.get("/", response_model=List[GuestRegistrationResponse])
+def get_guest_registrations(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Get all guest registrations with pagination."""
+    try:
+        registrations = db.query(HotelRegistration).offset(skip).limit(limit).all()
+        return registrations
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+@router.get("/{registration_id}", response_model=GuestRegistrationResponse)
+def get_guest_registration(
+    registration_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Get a specific guest registration by ID."""
+    registration = db.query(HotelRegistration).filter(HotelRegistration.id == registration_id).first()
+    if not registration:
+        raise HTTPException(status_code=404, detail="Guest registration not found")
+    return registration
+
+@router.get("/number/{registration_no}", response_model=GuestRegistrationResponse)
+def get_guest_registration_by_number(
+    registration_no: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Get a specific guest registration by registration number."""
+    registration = db.query(HotelRegistration).filter(HotelRegistration.registration_no == registration_no).first()
+    if not registration:
+        raise HTTPException(status_code=404, detail="Guest registration not found")
+    return registration
+
+@router.put("/{registration_id}", response_model=GuestRegistrationResponse)
+def update_guest_registration(
+    registration_id: int,
+    registration_update: GuestRegistrationUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_manager_or_admin_user)
+):
+    """Update a guest registration (manager or admin only)."""
+    registration = db.query(HotelRegistration).filter(HotelRegistration.id == registration_id).first()
+    if not registration:
+        raise HTTPException(status_code=404, detail="Guest registration not found")
+    
+    # Update only provided fields
+    update_data = registration_update.dict(exclude_unset=True)
+    
+    # Remove fields that do not exist in the HotelRegistration model to prevent SQLAlchemy errors
+    if 'arrival_time' in update_data:
+        del update_data['arrival_time']
+    
+    # Check if transaction_status is being updated
+    if 'transaction_status' in update_data and registration.room_number:
+        new_status = update_data['transaction_status']
+        if new_status == 'Check-in':
+            update_room_status(db, registration.room_number, 'OR')  # Occupied Ready
+        elif new_status == 'Check-out':
+            update_room_status(db, registration.room_number, 'CO')  # Checkout
+        elif new_status == 'Cancelled':
+            update_room_status(db, registration.room_number, 'VR')  # Vacant Ready
+    
+    for field, value in update_data.items():
+        setattr(registration, field, value)
+    
+    db.commit()
+    db.refresh(registration)
+    return registration
+
+@router.delete("/{registration_id}")
+def delete_guest_registration(
+    registration_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_manager_or_admin_user)
+):
+    """Delete a guest registration (manager or admin only)."""
+    registration = db.query(HotelRegistration).filter(HotelRegistration.id == registration_id).first()
+    if not registration:
+        raise HTTPException(status_code=404, detail="Guest registration not found")
+    
+    # Update room status back to VR (Vacant Ready) when registration is deleted
+    if registration.room_number:
+        update_room_status(db, registration.room_number, 'VR')
+    
+    db.delete(registration)
+    db.commit()
+    return {"message": "Guest registration deleted successfully"}
+
+@router.get("/next/registration-number")
+def get_next_registration_number(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Generate next available registration number."""
+    try:
+        from sqlalchemy import text
+        # Get the latest registration number using raw SQL to avoid model mismatch issues
+        result = db.execute(text("SELECT registration_no FROM hotel_registrations ORDER BY id DESC LIMIT 1")).fetchone()
+
+        if result and result[0]:
+            try:
+                # Extract number from the registration number (assuming 10-digit format like "0000000001")
+                int(result[0])
+            except ValueError:
+                # If parsing fails, start from 1
+                next_number = 1
+        else:
+            next_number = 1
+        
+        # Format as 10 digits with leading zeros
+        next_registration_no = f"{next_number:010d}"
+        
+        return {"next_registration_no": next_registration_no}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

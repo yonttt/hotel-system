@@ -1,0 +1,291 @@
+from sqlalchemy import Column, Integer, String, DateTime, Enum, Text, Boolean, DECIMAL, Date, ForeignKey
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
+from app.config.database import Base
+
+
+class Hotel(Base):
+    __tablename__ = "hotels"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    code = Column(String(50), nullable=True)
+    name = Column(String(255), nullable=False)
+    category = Column(String(50), default='HOTEL')
+    address = Column(Text, nullable=True)
+    phone = Column(String(50), nullable=True)
+    fax = Column(String(50), nullable=True)
+    email = Column(String(100), nullable=True)
+    photo_url = Column(String(500), nullable=True)
+    logo_url = Column(String(500), nullable=True)
+    umh = Column(DECIMAL(15, 0), default=0)
+    umk = Column(DECIMAL(15, 0), default=0)
+    plafon_covid = Column(String(20), default='100%')
+    sub_cabang = Column(DECIMAL(15, 0), default=0)
+    t_tetap = Column(DECIMAL(15, 0), default=0)
+    t_jabatan = Column(DECIMAL(15, 0), default=0)
+    t_penempatan = Column(DECIMAL(15, 0), default=0)
+    extrabed = Column(Integer, default=0)
+    active = Column(Boolean, default=True)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+
+class User(Base):
+    __tablename__ = "users"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String(50), unique=True, index=True)
+    password = Column(String(255))
+    email = Column(String(100))
+    full_name = Column(String(100))
+    title = Column(String(100))
+    hotel_name = Column(String(100), nullable=True)
+    is_blocked = Column(Boolean, default=False)
+    last_login = Column(DateTime, nullable=True)
+    account_type = Column(Enum('Management', 'Non Management'))
+    role = Column(Enum('admin', 'manager', 'staff', 'frontoffice', 'housekeeping'), default='staff')
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+class UserPermission(Base):
+    __tablename__ = "user_permissions"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    role = Column(Enum('admin', 'manager', 'staff', 'frontoffice', 'housekeeping'), unique=True, nullable=False)
+    can_view = Column(Boolean, default=True)
+    can_create = Column(Boolean, default=False)
+    can_edit = Column(Boolean, default=False)
+    can_delete = Column(Boolean, default=False)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+class Guest(Base):
+    __tablename__ = "guests"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    guest_name = Column(String(100))
+    email = Column(String(100))
+    phone = Column(String(20))
+    address = Column(Text)
+    id_number = Column(String(50))
+    nationality = Column(String(50))
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+    # Relationships
+    reservations = relationship("HotelReservation", back_populates="guest")
+    registrations = relationship("HotelRegistration", back_populates="guest")
+
+class HotelReservation(Base):
+    __tablename__ = "hotel_reservations"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    reservation_no = Column(String(20), unique=True)
+    guest_id = Column(Integer, ForeignKey('guests.id'), nullable=True)
+    category_market = Column(String(50), default='Normal')
+    market_segment = Column(String(50), default='Normal')
+    member_id = Column(String(50))
+    transaction_by = Column(String(100))
+    transaction_status = Column(Enum('Pending', 'Confirmed', 'Cancelled', 'Checked-in', 'Checked-out'), default='Pending')
+    id_card_type = Column(Enum('KTP', 'SIM', 'PASSPORT', 'OTHERS'), default='KTP')
+    id_card_number = Column(String(50))
+    guest_title = Column(Enum('MR', 'MRS', 'MS', 'DR', 'PROF'), default='MR')
+    guest_name = Column(String(100))
+    mobile_phone = Column(String(20))
+    address = Column(Text)
+    nationality = Column(String(50), default='INDONESIA')
+    city = Column(String(100))
+    email = Column(String(100))
+    arrival_date = Column(DateTime)
+    arrival_time = Column(String(20), nullable=True)
+    departure_date = Column(DateTime)
+    nights = Column(Integer, default=1)
+    guest_type = Column(Enum('Normal', 'VIP', 'Corporate'), default='Normal')
+    guest_male = Column(Integer, default=1)
+    guest_female = Column(Integer, default=0)
+    guest_child = Column(Integer, default=0)
+    extra_bed_nights = Column(Integer, default=0)
+    extra_bed_qty = Column(Integer, default=0)
+    room_number = Column(String(20))
+    payment_method = Column(String(100), default='Debit BCA 446')
+    payment_amount = Column(DECIMAL(10, 2), default=0.00)
+    discount = Column(DECIMAL(10, 2), default=0.00)
+    payment_diskon = Column(DECIMAL(10, 2), default=0.00)
+    deposit = Column(DECIMAL(10, 2), default=0.00)
+    balance = Column(DECIMAL(10, 2), default=0.00)
+    note = Column(Text)
+    hotel_name = Column(String(100), nullable=True)
+    created_by = Column(Integer)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+    # Relationship
+    guest = relationship("Guest", back_populates="reservations")
+
+class HotelRegistration(Base):
+    __tablename__ = "hotel_registrations"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    registration_no = Column(String(20), unique=True)
+    guest_id = Column(Integer, ForeignKey('guests.id'), nullable=True)
+    category_market = Column(String(50), default='Normal')
+    market_segment = Column(String(50), default='Normal')
+    member_id = Column(String(50))
+    transaction_by = Column(String(100))
+    transaction_status = Column(Enum('Registration', 'Check-in', 'Check-out', 'Cancelled'), default='Registration')
+    id_card_type = Column(Enum('KTP', 'SIM', 'PASSPORT', 'OTHERS'), default='KTP')
+    id_card_number = Column(String(50))
+    guest_title = Column(Enum('MR', 'MRS', 'MS', 'DR', 'PROF'), default='MR')
+    guest_name = Column(String(100))
+    mobile_phone = Column(String(20))
+    address = Column(Text)
+    nationality = Column(String(50), default='INDONESIA')
+    city = Column(String(100))
+    email = Column(String(100))
+    arrival_date = Column(DateTime)
+    departure_date = Column(DateTime)
+    nights = Column(Integer, default=1)
+    guest_type = Column(Enum('Normal', 'VIP', 'Corporate'), default='Normal')
+    guest_count_male = Column(Integer, default=1)
+    guest_count_female = Column(Integer, default=0)
+    guest_count_child = Column(Integer, default=0)
+    extra_bed_nights = Column(Integer, default=0)
+    extra_bed_qty = Column(Integer, default=0)
+    room_number = Column(String(20))
+    payment_method = Column(String(100), default='Cash')
+    payment_amount = Column(DECIMAL(10, 2), default=0.00)
+    discount = Column(DECIMAL(10, 2), default=0.00)
+    payment_diskon = Column(DECIMAL(10, 2), default=0.00)
+    deposit = Column(DECIMAL(10, 2), default=0.00)
+    balance = Column(DECIMAL(10, 2), default=0.00)
+    notes = Column(Text)
+    hotel_name = Column(String(100), nullable=True)
+    created_by = Column(Integer)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+    # Relationship
+    guest = relationship("Guest", back_populates="registrations")
+
+class GroupBooking(Base):
+    __tablename__ = "group_bookings"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    group_booking_id = Column(String(50), unique=True, nullable=False, index=True)
+    group_name = Column(String(255), nullable=False)
+    group_pic = Column(String(255), nullable=False)
+    pic_phone = Column(String(50), nullable=False)
+    pic_email = Column(String(255))
+    market_segment = Column(String(50), default='Normal')
+    arrival_date = Column(DateTime, nullable=False)
+    arrival_time = Column(String(20), nullable=True)
+    departure_date = Column(DateTime, nullable=False)
+    nights = Column(Integer, nullable=False)
+    total_rooms = Column(Integer, nullable=False)
+    payment_method = Column(String(100), nullable=False)
+    total_amount = Column(DECIMAL(15, 3), default=0.000)
+    total_deposit = Column(DECIMAL(15, 3), default=0.000)
+    total_balance = Column(DECIMAL(15, 3), default=0.000)
+    notes = Column(Text)
+    status = Column(String(50), default='Active')
+    created_by = Column(String(100))
+    hotel_name = Column(String(255), nullable=True)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+class GroupBookingRoom(Base):
+    __tablename__ = "group_booking_rooms"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    group_booking_id = Column(String(50), nullable=False, index=True)
+    reservation_no = Column(String(10), nullable=False, index=True)
+    room_number = Column(String(20), nullable=False, index=True)
+    room_type = Column(String(100))
+    guest_name = Column(String(255), nullable=False, index=True)
+    guest_title = Column(String(10))
+    id_card_type = Column(String(50))
+    id_card_number = Column(String(100))
+    mobile_phone = Column(String(50))
+    nationality = Column(String(100))
+    city = Column(String(100))
+    address = Column(Text)
+    guest_count_male = Column(Integer, default=0)
+    guest_count_female = Column(Integer, default=0)
+    guest_count_child = Column(Integer, default=0)
+    extra_bed = Column(Integer, default=0)
+    rate = Column(DECIMAL(15, 3), default=0.000)
+    discount = Column(DECIMAL(15, 3), default=0.000)
+    subtotal = Column(DECIMAL(15, 3), default=0.000)
+    room_status = Column(String(50), default='Reserved')
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+class HotelRevenueSummary(Base):
+    __tablename__ = "hotel_revenue_summary"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    hotel_id = Column(Integer, nullable=False, index=True)
+    hotel_name = Column(String(255), nullable=False)
+    report_date = Column(Date, nullable=False, index=True)
+    available_rooms = Column(Integer, default=0)
+    room_sales = Column(Integer, default=0)
+    occupancy_rate = Column(String(10), default='0%')
+    arr = Column(DECIMAL(15, 2), default=0)
+    revenue_from_na = Column(DECIMAL(15, 2), default=0)
+    total_cash = Column(DECIMAL(15, 2), default=0)
+    collection = Column(DECIMAL(15, 2), default=0)
+    bank_distribution = Column(DECIMAL(15, 2), default=0)
+    balance = Column(DECIMAL(15, 2), default=0)
+    operational_expense = Column(DECIMAL(15, 2), default=0)
+    non_operational_expense = Column(DECIMAL(15, 2), default=0)
+    owner_receive_expense = Column(DECIMAL(15, 2), default=0)
+    total_expense = Column(DECIMAL(15, 2), default=0)
+    net_income = Column(DECIMAL(15, 2), default=0)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+class NonHotelRevenueSummary(Base):
+    __tablename__ = "non_hotel_revenue_summary"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    unit_id = Column(Integer, nullable=False, index=True)
+    unit_name = Column(String(255), nullable=False)
+    report_date = Column(Date, nullable=False, index=True)
+    revenue_from_na = Column(DECIMAL(15, 2), default=0)
+    total_cash = Column(DECIMAL(15, 2), default=0)
+    collection = Column(DECIMAL(15, 2), default=0)
+    bank_distribution = Column(DECIMAL(15, 2), default=0)
+    balance = Column(DECIMAL(15, 2), default=0)
+    operational_expense = Column(DECIMAL(15, 2), default=0)
+    non_operational_expense = Column(DECIMAL(15, 2), default=0)
+    owner_receive_expense = Column(DECIMAL(15, 2), default=0)
+    total_expense = Column(DECIMAL(15, 2), default=0)
+    net_income = Column(DECIMAL(15, 2), default=0)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+
+class ChatbotKnowledgeBase(Base):
+    __tablename__ = "chatbot_knowledge_base"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    category = Column(Enum('policies', 'rooms', 'facilities', 'services', 'faq', 'promotions'), nullable=False)
+    question = Column(Text, nullable=False)
+    answer = Column(Text, nullable=False)
+    hotel_id = Column(Integer, ForeignKey('hotels.id'), nullable=True)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+    hotel = relationship("Hotel")
+
+
+class ChatbotSession(Base):
+    __tablename__ = "chatbot_sessions"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    session_id = Column(String(100), nullable=False, index=True)
+    user_message = Column(Text, nullable=False)
+    bot_response = Column(Text, nullable=False)
+    hotel_id = Column(Integer, ForeignKey('hotels.id'), nullable=True)
+    created_at = Column(DateTime, server_default=func.now())

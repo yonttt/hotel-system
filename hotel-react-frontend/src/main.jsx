@@ -2,8 +2,8 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
-import { RefreshProvider } from './context/RefreshContext'
-import { NotificationProvider } from './context/NotificationContext'
+import { RefreshProvider } from './state/RefreshContext'
+import { NotificationProvider } from './state/NotificationContext'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

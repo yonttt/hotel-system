@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { MapPin, Star, ArrowRight } from 'lucide-react'
-import { hotelAPI } from '../services/api'
+import { hotelAPI } from '../api/api'
 
 export default function FeaturedHotels() {
   const sectionRef = useRef(null)

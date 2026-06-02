@@ -1,8 +1,8 @@
 ﻿from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi.errors import RateLimitExceeded
-from app.api import auth, users, hotel_rooms, room_pricing, guests, hotel_registrations, hotel_reservations, cities, nationalities, category_markets, market_segments, payment_methods, group_bookings, revenue_reports, master_data, room_rates, master_meja, kategori_menu_resto, checkin, checkout, night_audit, properties, laundry, account_receivable, adjustments, chatbot, public_website, cms
-from app.core.security_middleware import (
+from app.routes import auth, users, hotel_rooms, room_pricing, guests, hotel_registrations, hotel_reservations, cities, nationalities, category_markets, market_segments, payment_methods, group_bookings, revenue_reports, master_data, room_rates, master_meja, kategori_menu_resto, checkin, checkout, night_audit, properties, laundry, account_receivable, adjustments, chatbot, public_website, cms
+from app.config.security_middleware import (
     limiter, 
     SecurityHeadersMiddleware, 
     LoginProtectionMiddleware,
@@ -86,8 +86,8 @@ app.include_router(cms.router, prefix="/cms", tags=["cms"])
 async def startup_event():
     """Initialize database tables on startup"""
     try:
-        from app.core.database import engine
-        from app.models import Base
+        from app.config.database import engine
+        from app.tables import Base
         Base.metadata.create_all(bind=engine)
         print("âœ… Database tables created successfully")
     except Exception as e:

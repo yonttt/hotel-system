@@ -4,7 +4,7 @@ import sys
 from sqlalchemy import text
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from app.core.database import SessionLocal
+from app.config.database import SessionLocal
 
 db = SessionLocal()
 try:
