@@ -205,3 +205,21 @@ def get_next_registration_number(
         return {"next_registration_no": next_registration_no}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+@router.post("/number/{registration_no}/cancel")
+def cancel_registration_by_number(
+    registration_no: str,
+    db: Session = Depends(get_db)
+):
+    """Mark a registration as Cancelled due to payment timeout."""
+    db_reg = db.query(HotelRegistration).filter(HotelRegistration.registration_no == registration_no).first()
+    if db_reg is None:
+        raise HTTPException(status_code=404, detail="Registration not found")
+    
+    if db_reg.transaction_status != 'Cancelled':
+        db_reg.transaction_status = 'Cancelled'
+        if db_reg.room_number:
+            update_room_status(db, db_reg.room_number, 'VR')
+        db.commit()
+    
+    return {"message": "Registration cancelled successfully"}

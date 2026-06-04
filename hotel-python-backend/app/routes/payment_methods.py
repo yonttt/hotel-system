@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 import logging
-from ..core.database import get_db_connection
+from app.config.database import get_db_connection
 
 router = APIRouter()
 logger = logging.getLogger(__name__)

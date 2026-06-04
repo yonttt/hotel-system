@@ -53,6 +53,14 @@ class Settings(BaseSettings):
     RATE_LIMIT_PER_MINUTE: int = int(os.getenv("RATE_LIMIT_PER_MINUTE", "200"))
     LOGIN_ATTEMPT_LIMIT: int = int(os.getenv("LOGIN_ATTEMPT_LIMIT", "5"))
     LOGIN_LOCKOUT_MINUTES: int = int(os.getenv("LOGIN_LOCKOUT_MINUTES", "15"))
+
+    # Email & Notification Settings
+    SMTP_SERVER: str = os.getenv("SMTP_SERVER", "smtp.gmail.com")
+    SMTP_PORT: int = int(os.getenv("SMTP_PORT", "587"))
+    SMTP_USER: str = os.getenv("SMTP_USER", "")
+    SMTP_PASSWORD: str = os.getenv("SMTP_PASSWORD", "")
+    SMTP_TITLE: str = os.getenv("SMTP_TITLE", "Eva Group Hotel")
+    ADMIN_EMAIL: str = os.getenv("ADMIN_EMAIL", "yonathantambani109@gmail.com")
     
     class Config:
         case_sensitive = True

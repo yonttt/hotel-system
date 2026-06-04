@@ -3,9 +3,9 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 from typing import List, Optional
 from pydantic import BaseModel
-from ..core.database import get_db
-from ..core.auth import get_current_user, get_current_manager_or_admin_user
-from ..models import User
+from app.config.database import get_db
+from app.config.auth import get_current_user, get_current_manager_or_admin_user
+from app.tables import User
 
 router = APIRouter()
 

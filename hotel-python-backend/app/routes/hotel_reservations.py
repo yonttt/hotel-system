@@ -4,6 +4,7 @@ from typing import List
 from app.config.database import get_db
 from app.config.auth import get_current_user, get_current_manager_or_admin_user, get_optional_user
 from app.config.room_utils import update_room_status
+from app.config.email_utils import send_booking_notification
 from app.tables import User, HotelReservation, Guest
 from app.rules import (
     ReservationCreate, 
@@ -76,6 +77,31 @@ def create_hotel_reservation(
         
         db.commit()
         db.refresh(db_reservation)
+
+        # Send Email Notification
+        try:
+            # We run it synchronously or rely on it not blocking too long/failing silently
+            from datetime import datetime
+            
+            # Safely format dates
+            ci_str = str(db_reservation.arrival_date) if db_reservation.arrival_date else str(reservation.arrival_date)
+            co_str = str(db_reservation.departure_date) if db_reservation.departure_date else str(reservation.departure_date)
+            
+            guest_email = db_reservation.email if hasattr(db_reservation, 'email') else reservation.email
+
+            send_booking_notification(
+                reservation_no=db_reservation.reservation_no,
+                guest_name=db_reservation.guest_name,
+                guest_email=guest_email,
+                room_number=db_reservation.room_number,
+                check_in=ci_str,
+                check_out=co_str
+            )
+        except Exception as e:
+            # Log ignore failure so the booking still succeeds
+            print(f"Warning: Failed to send email: {str(e)}")
+            pass
+
         return db_reservation
     except HTTPException:
         raise
@@ -193,3 +219,21 @@ def get_next_reservation_number(
         return {"next_reservation_no": next_reservation_no}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+@router.post("/number/{reservation_no}/cancel")
+def cancel_reservation_by_number(
+    reservation_no: str,
+    db: Session = Depends(get_db)
+):
+    """Mark a reservation as Cancelled due to payment timeout."""
+    db_reservation = db.query(HotelReservation).filter(HotelReservation.reservation_no == reservation_no).first()
+    if db_reservation is None:
+        raise HTTPException(status_code=404, detail="Reservation not found")
+    
+    if db_reservation.transaction_status != 'Cancelled':
+        db_reservation.transaction_status = 'Cancelled'
+        if db_reservation.room_number:
+            update_room_status(db, db_reservation.room_number, 'VR')
+        db.commit()
+    
+    return {"message": "Reservation cancelled successfully"}
