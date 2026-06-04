@@ -37,6 +37,10 @@ export const hotelAPI = {
   // For same day, we create a registration
   createRegistration: (data) => api.post('/hotel-registrations/', data),
   getReservation: (confirmationCode) => api.get(`/hotel-reservations/${confirmationCode}`),
+  cancelBooking: (bookingId) => {
+    if(bookingId.startsWith('REG')) return api.post(`/hotel-registrations/number/${bookingId}/cancel`);
+    return api.post(`/hotel-reservations/number/${bookingId}/cancel`);
+  },
 
   // Cities & Nationalities
   getCities: () => api.get('/cities/'),

@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import {
   CalendarDays, Users, CreditCard, User, Mail, Phone, Bed, Maximize2,
-  Star, Check, ChevronLeft, ArrowRight, CheckCircle, MapPin
+  Star, Check, ChevronLeft, ArrowRight, CheckCircle, MapPin, Clock, AlertTriangle
 } from 'lucide-react'
 import { hotelAPI } from '../api/api'
 import { formatCurrency } from '../data/hotels'
@@ -39,6 +39,8 @@ export default function BookingPage() {
   const [bookingId, setBookingId] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
+  const [timeLeft, setTimeLeft] = useState(7200) // 2 hours in seconds
+  const [paymentExpired, setPaymentExpired] = useState(false)
   const [dynamicHotels, setDynamicHotels] = useState([])
   const [dynamicCities, setDynamicCities] = useState([])
   const [dynamicCountries, setDynamicCountries] = useState([])
@@ -77,6 +79,47 @@ export default function BookingPage() {
     fetchLocations()
     fetchPublicRooms()
   }, [])
+
+  // Timer Effect untuk Pelunasan (2 jam)
+  useEffect(() => {
+    let timer;
+    if (submitted && timeLeft > 0 && !paymentExpired) {
+      // Jika bayar di hotel, tidak perlu timer yang membatalkan (skip expiration)
+      if (formData.paymentMethod === 'pay_at_hotel') return;
+
+      timer = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer)
+            handleExpire()
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+    }
+    return () => clearInterval(timer)
+  }, [submitted, timeLeft, paymentExpired, formData.paymentMethod])
+
+  const handleExpire = async () => {
+    setPaymentExpired(true)
+    try {
+      if (bookingId) {
+        await hotelAPI.cancelBooking(bookingId)
+        showNotification('error', 'Waktu pembayaran habis. Reservasi otomatis dibatalkan.')
+      }
+    } catch (e) {
+      console.error('Failed to cancel expired booking:', e)
+    }
+  }
+
+  // Format Helper for Timer
+  const formatTime = (seconds) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  }
 
   const displayRooms = useMemo(() => {
     if (!formData.destination) return apiRooms;
@@ -190,16 +233,44 @@ export default function BookingPage() {
         <section className="relative h-[35vh] min-h-[300px] flex items-center justify-center">
           <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1920&q=80)' }} />
           <div className="absolute inset-0 bg-gradient-to-b from-hotel-dark/70 to-hotel-dark/50" />
-          <div className="relative z-10 text-center">
-            <CheckCircle size={48} className="text-green-400 mx-auto mb-4" />
-            <h1 className="text-3xl md:text-5xl font-display font-bold text-white mb-2">Reservasi Berhasil!</h1>
-            <p className="text-white/70">Nomor Booking: <span className="text-gold-400 font-semibold">{bookingId}</span></p>
+          <div className="relative z-10 text-center px-4">
+            {paymentExpired ? (
+              <>
+                <AlertTriangle size={48} className="text-red-500 mx-auto mb-4" />
+                <h1 className="text-3xl md:text-5xl font-display font-bold text-white mb-2">Reservasi Gagal / Batal</h1>
+                <p className="text-white/70">Pembayaran untuk <span className="text-red-400 font-semibold">{bookingId}</span> telah melampaui batas waktu.</p>
+              </>
+            ) : (
+              <>
+                <CheckCircle size={48} className="text-green-400 mx-auto mb-4" />
+                <h1 className="text-3xl md:text-5xl font-display font-bold text-white mb-2">Reservasi Berhasil!</h1>
+                <p className="text-white/70">Nomor Booking: <span className="text-gold-400 font-semibold">{bookingId}</span></p>
+              </>
+            )}
           </div>
         </section>
 
         <section className="py-16 bg-gray-50">
           <div className="max-w-2xl mx-auto px-4">
-            <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+
+            {!paymentExpired && formData.paymentMethod !== 'pay_at_hotel' && (
+              <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-r-2xl mb-8 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+                <div>
+                  <h3 className="font-bold text-red-800 text-lg flex items-center gap-2">
+                    <Clock size={20} /> Segera Lakukan Pembayaran!
+                  </h3>
+                  <p className="text-sm text-red-600 mt-1">
+                    Batas waktu pelunasan adalah <strong>2 Jam</strong> dari sekarang. Lewat dari batas waktu, pesanan Anda akan otomatis dibatalkan.
+                  </p>
+                </div>
+                <div className="bg-white px-6 py-3 rounded-xl border border-red-200 text-center min-w-[140px] shadow-sm">
+                  <span className="block text-xs font-semibold text-gray-500 mb-1">Sisa Waktu</span>
+                  <span className="text-2xl font-bold font-mono text-red-600">{formatTime(timeLeft)}</span>
+                </div>
+              </div>
+            )}
+
+            <div className={`bg-white rounded-2xl shadow-lg p-8 border border-gray-100 ${paymentExpired ? 'opacity-60 grayscale-[50%]' : ''}`}>
               <h2 className="text-2xl font-display font-bold text-hotel-dark mb-6">Detail Reservasi</h2>
 
               <div className="space-y-4 mb-8">
