@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+﻿﻿import { useState, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Bed, Maximize2, Users, Wifi, Wind, Tv, Coffee, Bath, Star, Check } from 'lucide-react'
 import { formatCurrency } from '../data/hotels'
@@ -9,6 +9,26 @@ const roomTypes = [
   { key: 'standard', label: 'Standard' },
   { key: 'suite', label: 'Suite' },
   { key: 'family', label: 'Family' },
+]
+
+// Fallback/Sample Room Data for when API returns no rooms
+const fallbackRooms = [
+  {
+    id: 'fb1', name: 'Deluxe Room - Hotel Jakarta', type: 'standard', description: 'Kamar mewah dengan pemandangan kota.', price: 1000000, size: '30 m²', bed: 'King Size', guests: 2, amenities: ['WiFi Gratis', 'AC', 'TV LED', 'Room Service'],
+    image: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=800&auto=format&fit=crop"
+  },
+  {
+    id: 'fb2', name: 'Suite Ocean View - Hotel Bali', type: 'suite', description: 'Suite luas dengan balkon pribadi menghadap laut.', price: 2500000, size: '60 m²', bed: 'King Size', guests: 3, amenities: ['WiFi Gratis', 'AC', 'TV LED', 'Minibar', 'Bathtub'],
+    image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=800&auto=format&fit=crop"
+  },
+  {
+    id: 'fb3', name: 'Family Room - Hotel Yogyakarta', type: 'family', description: 'Kamar nyaman untuk keluarga dengan 2 tempat tidur.', price: 1500000, size: '45 m²', bed: 'Twin Size', guests: 4, amenities: ['WiFi Gratis', 'AC', 'TV LED'],
+    image: "https://images.unsplash.com/photo-1582719508461-905c67379f03?q=80&w=800&auto=format&fit=crop"
+  },
+  {
+    id: 'fb4', name: 'Executive Suite - Hotel Surabaya', type: 'suite', description: 'Kamar eksekutif dengan ruang kerja terpisah.', price: 1800000, size: '50 m²', bed: 'King Size', guests: 2, amenities: ['WiFi Gratis', 'AC', 'TV LED', 'Desk'],
+    image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=800&auto=format&fit=crop"
+  },
 ]
 
 export default function RoomsPage() {
@@ -22,7 +42,7 @@ export default function RoomsPage() {
     const fetchRooms = async () => {
       try {
         const response = await hotelAPI.getPublicRooms()
-        const mappedRooms = response.data.map(room => {
+        let mappedRooms = response.data.map(room => {
           let type = 'standard'
           const lowerName = String(room.category_name).toLowerCase()
           const lowerCode = String(room.category_code).toLowerCase()
@@ -36,16 +56,22 @@ export default function RoomsPage() {
             type: type,
             description: room.description || 'Pengalaman menginap yang istimewa di tipe ' + room.category_name + ' persembahan ' + room.hotel_name + '.',
             price: room.normal_rate || 250000,
-            image: room.image || 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80',
+            image: room.image || 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=800&auto=format&fit=crop',
             size: '30 m²',
             bed: 'Queen Size',
             guests: 2,
             amenities: room.amenities || ['WiFi Gratis', 'AC', 'TV LED', 'Room Service']
           }
         })
-        setAllRooms(mappedRooms)
+        
+        if (mappedRooms.length === 0) {
+          setAllRooms(fallbackRooms)
+        } else {
+          setAllRooms(mappedRooms)
+        }
       } catch (error) {
         console.error('Failed to fetch rooms', error)
+        setAllRooms(fallbackRooms)
       } finally {
         setLoading(false)
       }
@@ -221,4 +247,3 @@ export default function RoomsPage() {
     </>
   )
 }
-

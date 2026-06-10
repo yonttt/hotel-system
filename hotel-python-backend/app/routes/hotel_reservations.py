@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 import os
 import uuid
 import shutil
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 from sqlalchemy.orm import Session
 from typing import List
@@ -114,8 +114,6 @@ def create_hotel_reservation(
             del reservation_data['arrival_time']
         
         # Calculate payment deadline based on business rules (2 hours if unpaid/Pending, else 24 hours)
-        from datetime import datetime, timedelta
-        
         is_paid = reservation_data.get('transaction_status') == 'Confirmed' or reservation_data.get('payment_proof') is not None
         
         # Determine duration: 2 hours if not paid, otherwise maybe not needed or 24 hrs
@@ -135,8 +133,6 @@ def create_hotel_reservation(
         # Send Email Notification
         try:
             # We run it synchronously or rely on it not blocking too long/failing silently
-            from datetime import datetime, timedelta
-            
             # Safely format dates
             ci_str = str(db_reservation.arrival_date) if db_reservation.arrival_date else str(reservation.arrival_date)
             co_str = str(db_reservation.departure_date) if db_reservation.departure_date else str(reservation.departure_date)

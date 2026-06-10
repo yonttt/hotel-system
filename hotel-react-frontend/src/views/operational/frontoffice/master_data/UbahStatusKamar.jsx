@@ -24,7 +24,6 @@ const UbahStatusKamar = () => {
   const [editingRoom, setEditingRoom] = useState(null);
   const [editStatus, setEditStatus] = useState('');
   const [processing, setProcessing] = useState(false);
-  const [successMessage, setSuccessMessage] = useState(null);
   const [addFormData, setAddFormData] = useState({
     hotel_name: '',
     room_number: '',

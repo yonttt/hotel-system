@@ -52,9 +52,9 @@ export default function FeaturedHotels() {
   return (
     <section 
       ref={sectionRef} 
-      className="py-20 lg:py-28 bg-cover bg-center"
+      className="py-20 lg:py-28 bg-cover bg-center bg-fixed"
       style={{
-        backgroundImage: `linear-gradient(rgba(252, 250, 245, 0.88), rgba(252, 250, 245, 0.88)), url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1920&q=80')`,
+        backgroundImage: `linear-gradient(rgba(252, 250, 245, 0.80), rgba(252, 250, 245, 0.95)), url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=1920&q=80')`,
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

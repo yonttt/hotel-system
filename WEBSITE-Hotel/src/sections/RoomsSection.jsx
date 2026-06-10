@@ -4,6 +4,27 @@ import { ArrowRight, Bed, Maximize2, Users } from 'lucide-react'
 import { formatCurrency } from '../data/hotels'
 import { hotelAPI } from '../api/api'
 
+// Fallback/Sample Room Data for when API returns no rooms
+const fallbackRooms = [
+  {
+    id: 'fb1', name: 'Deluxe Room - Hotel Jakarta', description: 'Kamar mewah dengan pemandangan kota.', size: '30 sqm', bed: 'King', guests: 2, amenities: ['WiFi', 'AC', 'TV', 'Minibar'], price: 1000000, 
+    image: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=800&auto=format&fit=crop"
+  },
+  {
+    id: 'fb2', name: 'Suite Ocean View - Hotel Bali', description: 'Suite luas dengan balkon pribadi menghadap laut.', size: '60 sqm', bed: 'King', guests: 3, amenities: ['WiFi', 'AC', 'TV', 'Minibar', 'Bathtub'], price: 2500000, 
+    image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=800&auto=format&fit=crop"
+  },
+  {
+    id: 'fb3', name: 'Family Room - Hotel Yogyakarta', description: 'Kamar nyaman untuk keluarga dengan 2 tempat tidur.', size: '45 sqm', bed: 'Twin', guests: 4, amenities: ['WiFi', 'AC', 'TV'], price: 1500000, 
+    image: "https://images.unsplash.com/photo-1582719508461-905c67379f03?q=80&w=800&auto=format&fit=crop"
+  },
+  {
+    id: 'fb4', name: 'Standard Twin - Hotel Surabaya', description: 'Kamar ekonomis dan bersih dengan dua ranjang single.', size: '25 sqm', bed: 'Single', guests: 2, amenities: ['WiFi', 'AC', 'TV'], price: 750000, 
+    image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=800&auto=format&fit=crop"
+  },
+];
+
+
 export default function RoomsSection() {
   const sectionRef = useRef(null)
   const [rooms, setRooms] = useState([])
@@ -27,11 +48,7 @@ export default function RoomsSection() {
         
         // If the backend has no rooms yet, use some fallback data to still render nicely
         if (mappedRooms.length === 0) {
-           setRooms([
-             {
-               id: 'fb1', name: 'Deluxe Room', description: 'Kamar mewah', size: '30 sqm', bed: 'King', guests: 2, amenities: ['WiFi', 'AC'], price: 1000000, image: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
-             }
-           ])
+           setRooms(fallbackRooms); // Use the diverse fallback rooms
         } else {
            setRooms(mappedRooms)
         }
@@ -66,9 +83,9 @@ export default function RoomsSection() {
   return (
     <section 
       ref={sectionRef} 
-      className="py-20 lg:py-28 bg-cover bg-center"
+      className="py-20 lg:py-28 bg-cover bg-center bg-fixed"
       style={{
-        backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url('https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1920&q=80')`,
+        backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.95)), url('https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1920&q=80')`,
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -92,7 +109,7 @@ export default function RoomsSection() {
             {rooms.map((room, index) => (
               <div
                 key={room.id}
-                className="animate-on-scroll group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100"
+                className="animate-on-scroll group bg-white/85 backdrop-blur-md rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 border border-white/40"
                 style={{ transitionDelay: `${index * 100}ms` }}
               >
               <div className="relative h-64 overflow-hidden">

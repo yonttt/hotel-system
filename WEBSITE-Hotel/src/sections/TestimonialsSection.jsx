@@ -29,11 +29,11 @@ export default function TestimonialsSection() {
       ref={sectionRef}
       className="py-20 lg:py-28 relative bg-cover bg-center bg-fixed"
       style={{
-        backgroundImage: 'url(https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1920&q=80)',
       }}
     >
       {/* Overlay */}
-      <div className="absolute inset-0 bg-hotel-dark/85" />
+      <div className="absolute inset-0 bg-hotel-dark/75" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}

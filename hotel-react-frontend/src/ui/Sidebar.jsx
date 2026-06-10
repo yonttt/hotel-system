@@ -3,18 +3,11 @@ import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../state/AuthContext'
 import {
   HomeIcon,
-  CalendarIcon,
   UserGroupIcon,
   BuildingOfficeIcon,
   ChevronDownIcon,
   ChevronRightIcon,
-  ClipboardDocumentIcon,
-  ChartBarIcon,
-  Cog6ToothIcon,
   DocumentTextIcon,
-  InformationCircleIcon,
-  UserIcon,
-  AdjustmentsHorizontalIcon
 } from '@heroicons/react/24/outline'
 
 const Sidebar = () => {
