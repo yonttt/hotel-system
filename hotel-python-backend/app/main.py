@@ -1,6 +1,7 @@
 ﻿from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi.errors import RateLimitExceeded
+import os
 from app.routes import auth, users, hotel_rooms, room_pricing, guests, hotel_registrations, hotel_reservations, cities, nationalities, category_markets, market_segments, payment_methods, group_bookings, revenue_reports, master_data, room_rates, master_meja, kategori_menu_resto, checkin, checkout, night_audit, properties, laundry, account_receivable, adjustments, chatbot, public_website, cms
 from app.config.security_middleware import (
     limiter, 
@@ -37,6 +38,10 @@ ALLOWED_ORIGINS = [
     # Add production domains here:
     # "https://your-hotel-domain.com",
 ]
+
+FRONTEND_URL = os.getenv("FRONTEND_URL")
+if FRONTEND_URL:
+    ALLOWED_ORIGINS.append(FRONTEND_URL)
 
 app.add_middleware(
     CORSMiddleware,
