@@ -167,6 +167,7 @@ class ReservationBase(BaseModel):
     discount: Decimal = Decimal('0.00')
     payment_diskon: Decimal = Decimal('0.00')
     deposit: Decimal = Decimal('0.00')
+    additional_deposit: Decimal = Decimal('0.00')
     balance: Decimal = Decimal('0.00')
     hotel_name: Optional[str] = None
 
@@ -177,6 +178,13 @@ class ReservationUpdate(BaseModel):
     guest_id: Optional[int] = None
     category_market: Optional[str] = None
     market_segment: Optional[str] = None
+
+class ReservationUpgrade(BaseModel):
+    new_room_number: str
+    additional_deposit: Decimal
+    new_payment_amount: Decimal
+    new_balance: Decimal
+    note: Optional[str] = None
     member_id: Optional[str] = None
     transaction_by: Optional[str] = None
     id_card_type: Optional[IDCardType] = None
@@ -206,6 +214,7 @@ class ReservationUpdate(BaseModel):
     discount: Optional[Decimal] = None
     payment_diskon: Optional[Decimal] = None
     deposit: Optional[Decimal] = None
+    additional_deposit: Optional[Decimal] = None
     balance: Optional[Decimal] = None
     hotel_name: Optional[str] = None
 
@@ -252,6 +261,7 @@ class GuestRegistrationBase(BaseModel):
     discount: Decimal = Decimal('0.00')
     payment_diskon: Decimal = Decimal('0.00')
     deposit: Decimal = Decimal('0.00')
+    additional_deposit: Decimal = Decimal('0.00')
     balance: Decimal = Decimal('0.00')
     created_by: Optional[int] = None
     hotel_name: Optional[str] = None
@@ -292,6 +302,7 @@ class GuestRegistrationUpdate(BaseModel):
     discount: Optional[Decimal] = None
     payment_diskon: Optional[Decimal] = None
     deposit: Optional[Decimal] = None
+    additional_deposit: Optional[Decimal] = None
     balance: Optional[Decimal] = None
     created_by: Optional[int] = None
     hotel_name: Optional[str] = None
@@ -370,6 +381,7 @@ class GroupBookingUpdate(BaseModel):
     pic_email: Optional[str] = None
     payment_method: Optional[str] = None
     total_deposit: Optional[Decimal] = None
+    additional_deposit: Optional[Decimal] = None
     notes: Optional[str] = None
     status: Optional[str] = None
 

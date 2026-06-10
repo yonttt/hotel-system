@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 from typing import List
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from app.config.database import get_db
@@ -36,7 +36,12 @@ async def create_group_booking(
         total_amount = sum(room.subtotal for room in booking.rooms)
         total_balance = total_amount - booking.total_deposit
         
-        # Create group booking header
+        from datetime import datetime, timedelta
+
+        is_paid = total_amount > 0 and Decimal(str(booking.total_deposit)) >= Decimal(str(total_amount))
+        deadline_hours = 24 if is_paid else 2
+
+        # Create group booking record
         db_group_booking = GroupBooking(
             group_booking_id=group_booking_id,
             group_name=booking.group_name,
@@ -54,7 +59,8 @@ async def create_group_booking(
             total_deposit=Decimal(str(booking.total_deposit)),
             total_balance=Decimal(str(total_balance)),
             notes=booking.notes,
-            status='Active',
+            status='Pending' if not is_paid else 'Active',
+            payment_deadline=datetime.now() + timedelta(hours=deadline_hours),
             created_by=booking.created_by or current_user.username,
             hotel_name=booking.hotel_name
         )

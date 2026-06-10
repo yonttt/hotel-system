@@ -253,6 +253,10 @@ class ApiService {
     return this.client.put(`/hotel-reservations/${id}`, reservationData)
   }
 
+  async upgradeHotelReservation(id, upgradeData) {
+    return this.client.put(`/hotel-reservations/${id}/upgrade`, upgradeData)
+  }
+
   async deleteHotelReservation(id) {
     return this.client.delete(`/hotel-reservations/${id}`)
   }

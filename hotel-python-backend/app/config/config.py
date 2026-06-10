@@ -37,8 +37,31 @@ def get_secret_key() -> str:
 
 
 class Settings(BaseSettings):
+    # TiDB settings - loaded from environment variable
+    TIDB_HOST: str | None = os.getenv("TIDB_HOST")
+    TIDB_PORT: int | None = int(os.getenv("TIDB_PORT")) if os.getenv("TIDB_PORT") else 4000
+    TIDB_USER: str | None = os.getenv("TIDB_USER")
+    TIDB_PASSWORD: str | None = os.getenv("TIDB_PASSWORD")
+    TIDB_DB_NAME: str | None = os.getenv("TIDB_DB_NAME")
+
+    # Local MySQL settings - loaded from environment variable
+    MYSQL_HOST: str | None = os.getenv("MYSQL_HOST", "localhost")
+    MYSQL_PORT: int | None = int(os.getenv("MYSQL_PORT")) if os.getenv("MYSQL_PORT") else 3306
+    MYSQL_USER: str | None = os.getenv("MYSQL_USER", "root")
+    MYSQL_PASSWORD: str | None = os.getenv("MYSQL_PASSWORD", "")
+    MYSQL_DB_NAME: str | None = os.getenv("MYSQL_DB_NAME", "hotel_analytics")
+
     # Database settings - loaded from environment variable
     DATABASE_URL: str = os.getenv("DATABASE_URL", "mysql+pymysql://user:password@localhost/hotel_system")
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # If TiDB is configured, override the DATABASE_URL
+        if self.TIDB_HOST and self.TIDB_USER and self.TIDB_DB_NAME:
+            port = self.TIDB_PORT or 4000
+            pwd = self.TIDB_PASSWORD or ""
+            # TiDB Serverless requires ssl_verify_cert and ssl_verify_identity
+            self.DATABASE_URL = f"mysql+pymysql://{self.TIDB_USER}:{pwd}@{self.TIDB_HOST}:{port}/{self.TIDB_DB_NAME}?ssl_verify_cert=true&ssl_verify_identity=true"
     
     # JWT settings - loaded from environment variable
     SECRET_KEY: str = get_secret_key()

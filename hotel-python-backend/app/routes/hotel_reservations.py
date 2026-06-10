@@ -1,4 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+import os
+import uuid
+import shutil
+from datetime import datetime
+from decimal import Decimal
 from sqlalchemy.orm import Session
 from typing import List
 from app.config.database import get_db
@@ -9,10 +14,50 @@ from app.tables import User, HotelReservation, Guest
 from app.rules import (
     ReservationCreate, 
     ReservationResponse, 
-    ReservationUpdate
+    ReservationUpdate,
+    ReservationUpgrade
 )
 
 router = APIRouter()
+
+@router.put("/{reservation_id}/upgrade", response_model=ReservationResponse)
+def upgrade_hotel_reservation(
+    reservation_id: int,
+    upgrade_data: ReservationUpgrade,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_manager_or_admin_user)
+):
+    """Upgrade a hotel reservation room, calculate additional deposit and send notification."""
+    db_reservation = db.query(HotelReservation).filter(HotelReservation.id == reservation_id).first()
+    if db_reservation is None:
+        raise HTTPException(status_code=404, detail="Reservation not found")
+    
+    old_room = db_reservation.room_number
+    new_room = upgrade_data.new_room_number
+
+    # Free up old room
+    if old_room:
+        update_room_status(db, old_room, 'VR')
+        
+    # Update to new room
+    update_room_status(db, new_room, 'AR')
+
+    # Update reservation financial records
+    db_reservation.room_number = new_room
+    db_reservation.additional_deposit = (db_reservation.additional_deposit or Decimal('0')) + upgrade_data.additional_deposit
+    db_reservation.payment_amount = upgrade_data.new_payment_amount
+    db_reservation.balance = upgrade_data.new_balance
+    if upgrade_data.note:
+        existing_notes = db_reservation.note or ""
+        db_reservation.note = f"{existing_notes}\n[Upgrade from {old_room} to {new_room}]: {upgrade_data.note}"
+    
+    db.commit()
+    db.refresh(db_reservation)
+
+    # TODO Requirement 14: Send notification to hotel unit about the change.
+    print(f"NOTIFICATION: Room upgraded from {old_room} to {new_room} for {db_reservation.guest_name}. Additional Deposit: {upgrade_data.additional_deposit}")
+
+    return db_reservation
 
 @router.post("/", response_model=ReservationResponse)
 def create_hotel_reservation(
@@ -68,6 +113,15 @@ def create_hotel_reservation(
         if 'arrival_time' in reservation_data:
             del reservation_data['arrival_time']
         
+        # Calculate payment deadline based on business rules (2 hours if unpaid/Pending, else 24 hours)
+        from datetime import datetime, timedelta
+        
+        is_paid = reservation_data.get('transaction_status') == 'Confirmed' or reservation_data.get('payment_proof') is not None
+        
+        # Determine duration: 2 hours if not paid, otherwise maybe not needed or 24 hrs
+        deadline_hours = 24 if is_paid else 2
+        reservation_data['payment_deadline'] = datetime.now() + timedelta(hours=deadline_hours)
+
         db_reservation = HotelReservation(**reservation_data)
         db.add(db_reservation)
         
@@ -81,7 +135,7 @@ def create_hotel_reservation(
         # Send Email Notification
         try:
             # We run it synchronously or rely on it not blocking too long/failing silently
-            from datetime import datetime
+            from datetime import datetime, timedelta
             
             # Safely format dates
             ci_str = str(db_reservation.arrival_date) if db_reservation.arrival_date else str(reservation.arrival_date)
@@ -237,3 +291,35 @@ def cancel_reservation_by_number(
         db.commit()
     
     return {"message": "Reservation cancelled successfully"}
+@router.post("/number/{reservation_no}/upload-proof")
+async def upload_payment_proof(
+    reservation_no: str,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db)
+):
+    db_reservation = db.query(HotelReservation).filter(HotelReservation.reservation_no == reservation_no).first()
+    if db_reservation is None:
+        raise HTTPException(status_code=404, detail="Reservation not found")
+    
+
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="File must be an image")
+    
+    ext = file.filename.split(".")[-1] if "." in file.filename else "jpg"
+    filename = f"{reservation_no}_{uuid.uuid4().hex[:8]}.{ext}"
+    file_path = os.path.join("uploads/payment_proofs", filename)
+    
+    try:
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Could not save file: {e}")
+    
+    db_reservation.payment_proof = file_path
+    db_reservation.payment_proof_at = datetime.now()
+    if db_reservation.transaction_status == 'Pending':
+        db_reservation.transaction_status = 'Confirmed'
+    
+    db.commit()
+    
+    return {"message": "Payment proof uploaded successfully", "file_path": f"/uploads/payment_proofs/{filename}"}
