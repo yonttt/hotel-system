@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 
 from app.config.database import get_db
+from app.tables import HotelReservation
 
 router = APIRouter()
 
@@ -13,51 +14,106 @@ def get_public_rooms(db: Session = Depends(get_db)):
         # Fetch active room categories
         categories = db.execute(
             text("""
-                SELECT id, category_code, category_name, description, 
-                       normal_rate, weekend_rate, six_hours_rate, hotel_name
-                FROM room_categories 
+                SELECT id, category_code, category_name, description,
+                       normal_rate, weekend_rate, six_hours_rate, photo_url, discount_percentage, hotel_name
+                FROM room_categories
                 WHERE is_active = 1
                 ORDER BY hotel_name, normal_rate ASC
             """)
         ).fetchall()
-        
+
         # Format the response
         result = []
         for cat in categories:
             cat_dict = dict(cat._mapping)
-            
-            # Since we don't have images in the DB yet, we'll assign a placeholder or mapped image string 
-            # based on category name or just hardcode some nice default pictures. 
-            # Later the CMS can override these.
-            picture = 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=800&q=80'
-            if 'suite' in str(cat_dict['category_name']).lower() or 'exe' in str(cat_dict['category_code']).lower():
-                picture = 'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800&q=80'
-            elif 'dlx' in str(cat_dict['category_code']).lower() or 'deluxe' in str(cat_dict['category_name']).lower():
-                picture = 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800&q=80'
-                
-            cat_dict['image'] = picture
+
+            # Staff-managed photo (Master Room Type page) takes priority; fall back to a
+            # generic placeholder image only if nothing has been uploaded yet.
+            if not cat_dict.get('photo_url'):
+                picture = 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=800&q=80'
+                if 'suite' in str(cat_dict['category_name']).lower() or 'exe' in str(cat_dict['category_code']).lower():
+                    picture = 'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800&q=80'
+                elif 'dlx' in str(cat_dict['category_code']).lower() or 'deluxe' in str(cat_dict['category_name']).lower():
+                    picture = 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800&q=80'
+                cat_dict['image'] = picture
+            else:
+                cat_dict['image'] = cat_dict['photo_url']
+
             cat_dict['amenities'] = ['WiFi Gratis', 'AC', 'TV LED', 'Room Service']
-            
+
+            # Published price for the website = normal_rate minus the staff-configured discount.
+            discount_pct = float(cat_dict.get('discount_percentage') or 0)
+            normal_rate = float(cat_dict['normal_rate'])
+            cat_dict['original_rate'] = normal_rate
+            cat_dict['discount_percentage'] = discount_pct
+            cat_dict['published_rate'] = round(normal_rate * (1 - discount_pct / 100), 2) if discount_pct > 0 else normal_rate
+
             result.append(cat_dict)
-            
+
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 @router.get("/hotels")
 def get_public_hotels(db: Session = Depends(get_db)):
-    """Get the distinct list of hotels available."""
+    """Get the distinct list of hotels available, with contact info for display on the site."""
     try:
-        hotels = db.execute(
+        room_hotels = db.execute(
             text("""
-                SELECT DISTINCT hotel_name 
-                FROM room_categories 
+                SELECT DISTINCT hotel_name
+                FROM room_categories
                 WHERE is_active = 1 AND hotel_name IS NOT NULL
             """)
         ).fetchall()
-        return [{"name": h.hotel_name} for h in hotels]
+        names = [h.hotel_name for h in room_hotels]
+        if not names:
+            return []
+
+        hotels = db.execute(text("SELECT name, phone, address, email FROM hotels")).fetchall()
+        by_name = {h.name: h for h in hotels}
+        return [
+            {
+                "name": name,
+                "phone": by_name[name].phone if name in by_name else None,
+                "address": by_name[name].address if name in by_name else None,
+                "email": by_name[name].email if name in by_name else None,
+            }
+            for name in names
+        ]
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+@router.get("/booking-lookup")
+def lookup_booking(reservation_no: str, email: str, db: Session = Depends(get_db)):
+    """Let a guest check their own booking status and payment proof.
+
+    Requires both reservation_no and the email used at booking time, so a
+    guest can't enumerate other people's reservations by guessing numbers.
+    """
+    reservation = db.query(HotelReservation).filter(
+        HotelReservation.reservation_no == reservation_no,
+        HotelReservation.email == email
+    ).first()
+
+    if not reservation:
+        raise HTTPException(status_code=404, detail="Booking not found. Periksa kembali nomor reservasi dan email Anda.")
+
+    return {
+        "reservation_no": reservation.reservation_no,
+        "guest_name": reservation.guest_name,
+        "hotel_name": reservation.hotel_name,
+        "room_type": reservation.room_type,
+        "arrival_date": reservation.arrival_date,
+        "departure_date": reservation.departure_date,
+        "nights": reservation.nights,
+        "transaction_status": reservation.transaction_status,
+        "payment_method": reservation.payment_method,
+        "payment_amount": reservation.payment_amount,
+        "deposit": reservation.deposit,
+        "balance": reservation.balance,
+        "payment_proof": f"/{reservation.payment_proof}" if reservation.payment_proof else None,
+        "payment_deadline": reservation.payment_deadline,
+    }
 
 from fastapi.security import OAuth2PasswordRequestForm
 from app.config.security import get_password_hash, verify_password, create_access_token

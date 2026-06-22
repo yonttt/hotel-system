@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../../../../api/api';
 import Layout from '../../../../ui/Layout';
+import UnifiedTableHeader from '../../../../ui/UnifiedTableHeader';
 import { useAuth } from '../../../../state/AuthContext';
+import usePaginatedTable from '../../../../logic/usePaginatedTable';
+import { formatCurrencyIDRSymbol } from '../../../../utils/formatters';
 
 const GroupBookingRooms = () => {
   const { user } = useAuth();
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showEntries, setShowEntries] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
 
   // Edit modal state
   const [showEditModal, setShowEditModal] = useState(false);
@@ -48,21 +48,15 @@ const GroupBookingRooms = () => {
     }
   };
 
-  // Filter data based on search
-  const filteredRooms = rooms.filter(room => 
-    room.group_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    room.guest_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    room.room_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    room.reservation_no?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    room.room_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    room.group_booking_id?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Pagination
-  const indexOfLastItem = currentPage * showEntries;
-  const indexOfFirstItem = indexOfLastItem - showEntries;
-  const currentRooms = filteredRooms.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredRooms.length / showEntries);
+  const {
+    searchTerm, setSearchTerm,
+    showEntries, setShowEntries,
+    currentPage, setCurrentPage,
+    filteredItems: filteredRooms, currentData: currentRooms,
+    totalPages, startIndex: indexOfFirstItem, endIndex: indexOfLastItem
+  } = usePaginatedTable(rooms, {
+    searchFields: ['group_name', 'guest_name', 'room_number', 'reservation_no', 'room_type', 'group_booking_id']
+  });
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
@@ -72,15 +66,6 @@ const GroupBookingRooms = () => {
       month: 'short',
       day: 'numeric'
     });
-  };
-
-  const formatCurrency = (amount) => {
-    if (!amount) return 'Rp 0';
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0
-    }).format(amount);
   };
 
   // Check if user has edit permission
@@ -146,50 +131,14 @@ const GroupBookingRooms = () => {
   return (
     <Layout>
       <div className="unified-reservation-container">
-        {/* Header Controls */}
-        <div className="unified-header-controls">
-          <div className="header-row header-row-top">
-            <div className="unified-header-left">
-              <h2 className="header-title">GROUP BOOKING ROOMS</h2>
-            </div>
-          </div>
-
-          <div className="header-row header-row-bottom">
-            <div className="unified-header-left">
-              <div className="search-section">
-                <label>Search:</label>
-                <input
-                  type="text"
-                  className="search-input"
-                  placeholder="Search by group, guest, room number..."
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                />
-              </div>
-            </div>
-            <div className="unified-header-right">
-              <div className="entries-control">
-                <span className="entries-label">Show entries:</span>
-                <select
-                  className="entries-select"
-                  value={showEntries}
-                  onChange={(e) => {
-                    setShowEntries(Number(e.target.value));
-                    setCurrentPage(1);
-                  }}
-                >
-                  <option value={10}>10</option>
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
+        <UnifiedTableHeader
+          title="GROUP BOOKING ROOMS"
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          searchPlaceholder="Search by group, guest, room number..."
+          showEntries={showEntries}
+          onEntriesChange={setShowEntries}
+        />
 
         {/* Table Section */}
         <div className="unified-table-wrapper">
@@ -262,8 +211,8 @@ const GroupBookingRooms = () => {
                     <td className="align-center">
                       M:{room.guest_count_male || 0} F:{room.guest_count_female || 0} C:{room.guest_count_child || 0}
                     </td>
-                    <td className="align-right">{formatCurrency(room.rate)}</td>
-                    <td className="align-right">{formatCurrency(room.subtotal)}</td>
+                    <td className="align-right">{formatCurrencyIDRSymbol(room.rate)}</td>
+                    <td className="align-right">{formatCurrencyIDRSymbol(room.subtotal)}</td>
                     <td>
                       <span className={`status-badge status-${room.room_status?.toLowerCase().replace(' ', '-')}`}>
                         {room.room_status || 'Reserved'}

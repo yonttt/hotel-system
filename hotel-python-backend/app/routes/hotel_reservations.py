@@ -245,17 +245,19 @@ def delete_hotel_reservation(
 @router.get("/next/reservation-number")
 def get_next_reservation_number(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User | None = Depends(get_optional_user)
 ):
     """Get the next available reservation number."""
     try:
+        import re
         # Get the latest reservation number
         latest_reservation = db.query(HotelReservation).order_by(HotelReservation.id.desc()).first()
         
         if latest_reservation and latest_reservation.reservation_no:
             try:
-                # Extract number from the reservation number (assuming 10-digit format like "0000000001")
-                last_number = int(latest_reservation.reservation_no)
+                # Extract only digits from the reservation number (e.g. RSV00000001 -> 1)
+                num_str = re.sub(r'\D', '', latest_reservation.reservation_no)
+                last_number = int(num_str) if num_str else 0
                 next_number = last_number + 1
             except ValueError:
                 # If parsing fails, start from 1
@@ -263,8 +265,8 @@ def get_next_reservation_number(
         else:
             next_number = 1
         
-        # Format as 10 digits with leading zeros
-        next_reservation_no = f"{next_number:010d}"
+        # Format with prefix and 8 digits
+        next_reservation_no = f"RSV{next_number:08d}"
         
         return {"next_reservation_no": next_reservation_no}
     except Exception as e:
@@ -275,18 +277,35 @@ def cancel_reservation_by_number(
     reservation_no: str,
     db: Session = Depends(get_db)
 ):
-    """Mark a reservation as Cancelled due to payment timeout."""
+    """Mark a reservation as Cancelled due to payment timeout.
+
+    Intentionally unauthenticated so the public booking site can self-cancel
+    its own timed-out reservation. To limit abuse from anyone guessing/
+    enumerating reservation numbers, this only works while the reservation
+    is still Pending (i.e. unpaid) - it can't be used to cancel a reservation
+    that staff has already confirmed or checked in.
+    """
     db_reservation = db.query(HotelReservation).filter(HotelReservation.reservation_no == reservation_no).first()
     if db_reservation is None:
         raise HTTPException(status_code=404, detail="Reservation not found")
-    
-    if db_reservation.transaction_status != 'Cancelled':
-        db_reservation.transaction_status = 'Cancelled'
-        if db_reservation.room_number:
-            update_room_status(db, db_reservation.room_number, 'VR')
-        db.commit()
-    
+
+    if db_reservation.transaction_status == 'Cancelled':
+        return {"message": "Reservation cancelled successfully"}
+
+    if db_reservation.transaction_status != 'Pending':
+        raise HTTPException(
+            status_code=409,
+            detail="Only a pending reservation can be cancelled this way. Please contact the hotel."
+        )
+
+    db_reservation.transaction_status = 'Cancelled'
+    if db_reservation.room_number:
+        update_room_status(db, db_reservation.room_number, 'VR')
+    db.commit()
+
     return {"message": "Reservation cancelled successfully"}
+ALLOWED_PROOF_EXTENSIONS = {"jpg", "jpeg", "png", "webp"}
+
 @router.post("/number/{reservation_no}/upload-proof")
 async def upload_payment_proof(
     reservation_no: str,
@@ -296,13 +315,22 @@ async def upload_payment_proof(
     db_reservation = db.query(HotelReservation).filter(HotelReservation.reservation_no == reservation_no).first()
     if db_reservation is None:
         raise HTTPException(status_code=404, detail="Reservation not found")
-    
 
-    if not file.content_type.startswith("image/"):
+    if db_reservation.transaction_status != 'Pending':
+        raise HTTPException(
+            status_code=409,
+            detail="Payment proof can only be uploaded for a pending reservation."
+        )
+
+    if not file.content_type or not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="File must be an image")
-    
-    ext = file.filename.split(".")[-1] if "." in file.filename else "jpg"
-    filename = f"{reservation_no}_{uuid.uuid4().hex[:8]}.{ext}"
+
+    ext = file.filename.rsplit(".", 1)[-1].lower() if file.filename and "." in file.filename else ""
+    if ext not in ALLOWED_PROOF_EXTENSIONS:
+        raise HTTPException(status_code=400, detail="Unsupported file type. Allowed: jpg, jpeg, png, webp")
+
+    # Filename is fully synthetic (no user input) to rule out path traversal.
+    filename = f"{uuid.uuid4().hex}.{ext}"
     file_path = os.path.join("uploads/payment_proofs", filename)
     
     try:

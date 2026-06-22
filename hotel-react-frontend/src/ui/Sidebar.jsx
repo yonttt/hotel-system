@@ -15,11 +15,11 @@ const Sidebar = () => {
   const [expandedMenus, setExpandedMenus] = useState({
     operational: false,
     adjustment: false,
-    adjFrontOffice: false,
     frontOffice: false,
     formTransaksi: false,
     infoReservasi: false,
     informasiTamu: false,
+    frontDeskActions: false,
     groupBookingInfo: false,
     statusKamarFO: false,
     masterDataFO: false,
@@ -56,9 +56,6 @@ const Sidebar = () => {
       newExpandedMenus.operational = true
       if (path.includes('/adjustment/')) {
         newExpandedMenus.adjustment = true
-        if (path.includes('/front-office/')) {
-          newExpandedMenus.adjFrontOffice = true
-        }
       }
       if (path.includes('/frontoffice/')) {
         newExpandedMenus.frontOffice = true
@@ -70,6 +67,9 @@ const Sidebar = () => {
         }
         if (path.includes('/informasi-tamu/')) {
           newExpandedMenus.informasiTamu = true
+        }
+        if (path.includes('/front-desk/')) {
+          newExpandedMenus.frontDeskActions = true
         }
         if (path.includes('/informasi-group-booking') || path.includes('/group-booking-rooms')) {
           newExpandedMenus.groupBookingInfo = true
@@ -145,11 +145,11 @@ const Sidebar = () => {
     setExpandedMenus({
       operational: false,
       adjustment: false,
-      adjFrontOffice: false,
       frontOffice: false,
       formTransaksi: false,
       infoReservasi: false,
       informasiTamu: false,
+      frontDeskActions: false,
       groupBookingInfo: false,
       statusKamarFO: false,
       masterDataFO: false,
@@ -188,17 +188,8 @@ const Sidebar = () => {
           hasSubmenu: true,
           submenu: 'adjustment',
           children: [
+            { title: 'Front Office', path: '/operational/adjustment/front-office' },
             { title: 'Food & Beverage', path: '/operational/adjustment/food-beverage' },
-            {
-              title: 'Front Office',
-              hasSubmenu: true,
-              submenu: 'adjFrontOffice',
-              children: [
-                { title: 'Check In Today', path: '/operational/adjustment/front-office/checkin' },
-                { title: 'Check Out Today', path: '/operational/adjustment/front-office/checkout' },
-                { title: 'Night Audit', path: '/operational/adjustment/front-office/night-audit' }
-              ]
-            },
             { title: 'Inventory', path: '/operational/adjustment/inventory' },
             { title: 'Kos', path: '/operational/adjustment/kos' },
             { title: 'Laundry', path: '/operational/adjustment/laundry' },
@@ -247,8 +238,8 @@ const Sidebar = () => {
                 { title: 'All Reservation', path: '/operational/frontoffice/info-reservasi/all' }
               ]
             },
-            { 
-              title: 'Informasi Tamu', 
+            {
+              title: 'Informasi Tamu',
               hasSubmenu: true,
               submenu: 'informasiTamu',
               children: [
@@ -257,7 +248,17 @@ const Sidebar = () => {
                 { title: 'Guest History', path: '/operational/frontoffice/informasi-tamu/guest-history' }
               ]
             },
-            { 
+            {
+              title: 'Front Desk Actions',
+              hasSubmenu: true,
+              submenu: 'frontDeskActions',
+              children: [
+                { title: 'Process Check-In', path: '/operational/frontoffice/front-desk/checkin' },
+                { title: 'Process Check-Out', path: '/operational/frontoffice/front-desk/checkout' },
+                { title: 'Night Audit', path: '/operational/frontoffice/front-desk/night-audit' }
+              ]
+            },
+            {
               title: 'Group Booking Info', 
               hasSubmenu: true,
               submenu: 'groupBookingInfo',

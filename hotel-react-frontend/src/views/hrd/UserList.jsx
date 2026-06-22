@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../../api/api';
 import Layout from '../../ui/Layout';
+import UnifiedTableHeader from '../../ui/UnifiedTableHeader';
+import UnifiedTableFooter from '../../ui/UnifiedTableFooter';
 import { useAuth } from '../../state/AuthContext';
 import useHotels from '../../logic/useHotels';
+import usePaginatedTable from '../../logic/usePaginatedTable';
 import { useNotification } from '../../state/NotificationContext';
 
 const UserList = () => {
@@ -13,10 +16,6 @@ const UserList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showEntries, setShowEntries] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedHotel, setSelectedHotel] = useState('ALL');
   const [filterJabatan, setFilterJabatan] = useState('');
   const [filterLevelAkses, setFilterLevelAkses] = useState('');
   const [formData, setFormData] = useState({
@@ -35,11 +34,6 @@ const UserList = () => {
     }
   }, [user]);
 
-  // Reset to first page when search/filter changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, showEntries, filterJabatan, filterLevelAkses, selectedHotel]);
-
   // Get unique jabatan (titles) and level akses (roles) from users
   const uniqueJabatan = [...new Set(users.map(usr => {
     if (usr.role === 'admin') return 'Admin Hotel';
@@ -48,31 +42,38 @@ const UserList = () => {
     if (usr.role === 'housekeeping') return 'Leader Housekeeping';
     return usr.role;
   }))].sort();
-  
+
   const uniqueLevelAkses = [...new Set(users.map(usr => usr.role))].sort();
 
-  const filteredUsers = users.filter(usr => {
-    const matchesSearch = usr.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      usr.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      usr.role?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const jabatanTitle = usr.role === 'admin' ? 'Admin Hotel' : 
-                        usr.role === 'manager' ? 'Finance Hotel' : 
+  const matchesJabatanLevel = (usr) => {
+    const jabatanTitle = usr.role === 'admin' ? 'Admin Hotel' :
+                        usr.role === 'manager' ? 'Finance Hotel' :
                         usr.role === 'frontoffice' ? 'Operational Front Office' :
-                        usr.role === 'housekeeping' ? 'Leader Housekeeping' : 
+                        usr.role === 'housekeeping' ? 'Leader Housekeeping' :
                         usr.role;
-    
+
     const matchesJabatan = !filterJabatan || jabatanTitle === filterJabatan;
     const matchesLevel = !filterLevelAkses || usr.role === filterLevelAkses;
-    const matchesHotel = selectedHotel === 'ALL' || usr.hotel_name === selectedHotel || usr.hotel === selectedHotel;
+    return matchesJabatan && matchesLevel;
+  };
 
-    return matchesSearch && matchesJabatan && matchesLevel && matchesHotel;
+  const {
+    searchTerm, setSearchTerm,
+    showEntries, setShowEntries,
+    currentPage, setCurrentPage,
+    selectedHotel, setSelectedHotel,
+    filteredItems: filteredUsers, currentData: currentUsers,
+    totalPages, startIndex, endIndex
+  } = usePaginatedTable(users, {
+    searchFields: ['username', 'email', 'role'],
+    hotelField: (usr, hotel) => usr.hotel_name === hotel || usr.hotel === hotel,
+    extraFilter: matchesJabatanLevel
   });
 
-  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / showEntries));
-  const startIndex = (currentPage - 1) * showEntries;
-  const endIndex = startIndex + showEntries;
-  const currentUsers = filteredUsers.slice(startIndex, endIndex);
+  useEffect(() => {
+    setCurrentPage(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterJabatan, filterLevelAkses]);
 
   const fetchUsers = async () => {
     try {
@@ -165,47 +166,34 @@ const UserList = () => {
   return (
     <Layout>
       <div className="unified-reservation-container">
-        {/* Header Controls */}
-        <div className="unified-header-controls">
-          <div className="header-row header-row-top">
-            <div className="unified-header-left">
-              <div className="header-title">
-                <span>MASTER USER</span>
-              </div>
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="btn-table-action"
-                style={{
-                  background: '#007bff',
-                  color: 'white',
-                  padding: '6px 16px',
-                  marginLeft: '20px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}
-              >
-                ADD
-              </button>
-            </div>
-            <div className="unified-header-right">
-              <div className="hotel-select">
-                <label>Hotel :</label>
-                  <select 
-                    className="header-hotel-select"
-                    value={selectedHotel}
-                    onChange={(e) => setSelectedHotel(e.target.value)}    
-                  >
-                  <option value="ALL">ALL</option>
-                  {hotelNames.map(name => (
-                    <option key={name} value={name}>{name}</option>
-                  ))}
-                </select>
-              </div>
+        <UnifiedTableHeader
+          title="MASTER USER"
+          actions={(
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="btn-table-action"
+              style={{
+                background: '#007bff',
+                color: 'white',
+                padding: '6px 16px',
+                marginLeft: '20px',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              ADD
+            </button>
+          )}
+          hotels={hotelNames.map(name => ({ id: name, name }))}
+          selectedHotel={selectedHotel}
+          onHotelChange={setSelectedHotel}
+          topRightExtra={(
+            <>
               <div className="hotel-select" style={{ marginLeft: '10px' }}>
                 <label>Jabatan :</label>
-                <select 
+                <select
                   className="header-hotel-select"
                   value={filterJabatan}
                   onChange={(e) => setFilterJabatan(e.target.value)}
@@ -218,7 +206,7 @@ const UserList = () => {
               </div>
               <div className="hotel-select" style={{ marginLeft: '10px' }}>
                 <label>Level Akses :</label>
-                <select 
+                <select
                   className="header-hotel-select"
                   value={filterLevelAkses}
                   onChange={(e) => setFilterLevelAkses(e.target.value)}
@@ -229,38 +217,13 @@ const UserList = () => {
                   ))}
                 </select>
               </div>
-            </div>
-          </div>
-          <div className="header-row header-row-bottom">
-            <div className="unified-header-left">
-              <div className="search-section">
-                <label>Search :</label>
-                <input
-                  type="text"
-                  className="search-input"
-                  placeholder="Search here..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="unified-header-right">
-              <div className="entries-control">
-                <span className="entries-label">Show entries:</span>
-                <select
-                  className="entries-select"
-                  value={showEntries}
-                  onChange={(e) => setShowEntries(Number(e.target.value))}
-                >
-                  <option value={10}>10</option>
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
+            </>
+          )}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          showEntries={showEntries}
+          onEntriesChange={setShowEntries}
+        />
 
         {/* Error Messages */}
         {error && (
@@ -368,39 +331,15 @@ const UserList = () => {
           </table>
         </div>
 
-        {/* Pagination */}
-        <div className="unified-footer">
-          <div className="entries-info">
-            Showing {startIndex + 1} to {Math.min(endIndex, filteredUsers.length)} of {filteredUsers.length} entries
-            {searchTerm && ` (filtered from ${users.length} total entries)`}
-          </div>
-          <div className="pagination">
-            <button
-              onClick={() => setCurrentPage(1)}
-              disabled={currentPage === 1}
-            >
-              First
-            </button>
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </button>
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </button>
-            <button
-              onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage === totalPages}
-            >
-              Last
-            </button>
-          </div>
-        </div>
+        <UnifiedTableFooter
+          startIndex={startIndex}
+          endIndex={endIndex}
+          total={filteredUsers.length}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          extraInfo={searchTerm && ` (filtered from ${users.length} total entries)`}
+        />
 
         {/* Add User Modal */}
         {showAddModal && (

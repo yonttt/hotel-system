@@ -42,7 +42,9 @@ export default function RoomsSection() {
           bed: room.bed_type || 'King Bed',
           guests: room.capacity || 2,
           amenities: room.amenities || ['WiFi', 'AC', 'TV', 'Minibar'],
-          price: room.normal_rate || 250000,
+          price: room.published_rate ?? room.normal_rate ?? 250000,
+          originalPrice: room.discount_percentage > 0 ? (room.original_rate ?? room.normal_rate) : null,
+          discountPercentage: room.discount_percentage || 0,
           image: room.image || "https://images.unsplash.com/photo-1611892440504-42a792e24d32?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
         })).slice(0, 4)
         
@@ -119,8 +121,16 @@ export default function RoomsSection() {
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   loading="lazy"
                 />
-                <div className="absolute top-4 right-4 bg-hotel-dark/80 backdrop-blur text-white px-4 py-2 rounded-full">
+                {room.discountPercentage > 0 && (
+                  <div className="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                    DISKON {room.discountPercentage}%
+                  </div>
+                )}
+                <div className="absolute top-4 right-4 bg-hotel-dark/80 backdrop-blur text-white px-4 py-2 rounded-full text-right">
                   <span className="text-xs text-gold-400">Mulai dari</span>
+                  {room.originalPrice && (
+                    <p className="text-xs font-normal text-white/50 line-through">{formatCurrency(room.originalPrice)}</p>
+                  )}
                   <p className="text-sm font-bold">{formatCurrency(room.price)}<span className="text-xs font-normal text-white/70">/malam</span></p>
                 </div>
               </div>

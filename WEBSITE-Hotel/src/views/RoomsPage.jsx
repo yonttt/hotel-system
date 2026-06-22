@@ -37,8 +37,19 @@ export default function RoomsPage() {
   const [selectedType, setSelectedType] = useState(initialType)
   const [allRooms, setAllRooms] = useState([])
   const [loading, setLoading] = useState(true)
+  const [hotelPhones, setHotelPhones] = useState({})
 
   useEffect(() => {
+    const fetchHotels = async () => {
+      try {
+        const res = await hotelAPI.getPublicHotels()
+        const phones = {}
+        ;(res.data || []).forEach(h => { if (h.phone) phones[h.name] = h.phone })
+        setHotelPhones(phones)
+      } catch (error) {
+        console.error('Failed to fetch hotels', error)
+      }
+    }
     const fetchRooms = async () => {
       try {
         const response = await hotelAPI.getPublicRooms()
@@ -46,16 +57,19 @@ export default function RoomsPage() {
           let type = 'standard'
           const lowerName = String(room.category_name).toLowerCase()
           const lowerCode = String(room.category_code).toLowerCase()
-          
+
           if (lowerName.includes('suite') || lowerCode.includes('apt') || lowerCode.includes('exe')) type = 'suite'
           else if (lowerName.includes('bis') || lowerCode.includes('fam') || lowerCode.includes('ghs')) type = 'family'
 
           return {
             id: room.id,
             name: room.hotel_name + ' - ' + room.category_name,
+            hotelName: room.hotel_name,
             type: type,
             description: room.description || 'Pengalaman menginap yang istimewa di tipe ' + room.category_name + ' persembahan ' + room.hotel_name + '.',
-            price: room.normal_rate || 250000,
+            price: room.published_rate ?? room.normal_rate ?? 250000,
+            originalPrice: room.discount_percentage > 0 ? (room.original_rate ?? room.normal_rate) : null,
+            discountPercentage: room.discount_percentage || 0,
             image: room.image || 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=800&auto=format&fit=crop',
             size: '30 m²',
             bed: 'Queen Size',
@@ -63,7 +77,7 @@ export default function RoomsPage() {
             amenities: room.amenities || ['WiFi Gratis', 'AC', 'TV LED', 'Room Service']
           }
         })
-        
+
         if (mappedRooms.length === 0) {
           setAllRooms(fallbackRooms)
         } else {
@@ -76,6 +90,7 @@ export default function RoomsPage() {
         setLoading(false)
       }
     }
+    fetchHotels()
     fetchRooms()
   }, [])
 
@@ -157,9 +172,17 @@ export default function RoomsPage() {
                       alt={room.name}
                       className="w-full h-72 lg:h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     />
-                    <div className="absolute top-4 left-4 bg-gold-500 text-white px-4 py-2 rounded-full text-sm font-semibold">
+                    <div className="absolute top-4 left-4 bg-gold-500 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2">
+                      {room.originalPrice && (
+                        <span className="text-xs line-through text-white/70">{formatCurrency(room.originalPrice)}</span>
+                      )}
                       {formatCurrency(room.price)}/malam
                     </div>
+                    {room.discountPercentage > 0 && (
+                      <div className="absolute bottom-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+                        DISKON {room.discountPercentage}%
+                      </div>
+                    )}
                     <div className="absolute top-4 right-4 bg-hotel-dark/80 backdrop-blur text-white px-3 py-1 rounded-full text-xs font-medium capitalize">
                       {room.type}
                     </div>
@@ -210,12 +233,22 @@ export default function RoomsPage() {
                       </div>
                     </div>
 
-                    <Link
-                      to={`/booking?room=${room.id}`}
-                      className="btn-gold rounded-lg w-full sm:w-auto text-center"
-                    >
-                      Pesan Sekarang
-                    </Link>
+                    <div className="flex flex-wrap items-center gap-4">
+                      <Link
+                        to={`/booking?room=${room.id}`}
+                        className="btn-gold rounded-lg text-center"
+                      >
+                        Pesan Sekarang
+                      </Link>
+                      {hotelPhones[room.hotelName] && (
+                        <a
+                          href={`tel:${hotelPhones[room.hotelName]}`}
+                          className="text-sm text-gray-500 hover:text-gold-500 transition-colors"
+                        >
+                          Ada perubahan tipe kamar? Hubungi {room.hotelName}: <span className="font-semibold">{hotelPhones[room.hotelName]}</span>
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}

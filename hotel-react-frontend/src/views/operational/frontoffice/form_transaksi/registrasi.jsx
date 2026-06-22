@@ -26,6 +26,7 @@ const RegistrasiPage = () => {
 
   const initialFormState = {
     registration_no: '0000000001',
+    reservation_no: '',
     category_market: 'Walkin',
     market_segment: 'Normal',
     member_id: '',
@@ -62,27 +63,59 @@ const RegistrasiPage = () => {
 
   const [formData, setFormData] = useState(initialFormState)
 
-  // Automatically fill data if navigated from a Reservation page
+  // Automatically fill data if navigated from a Reservation page (the "Register" button
+  // on the reservation list passes the full reservation via router state)
   useEffect(() => {
     if (location.state && location.state.reservation) {
       const res = location.state.reservation;
       setFormData(prev => ({
         ...prev,
+        reservation_no: res.reservation_no || '',
         guest_name: res.guest_name || '',
+        guest_title: res.guest_title || prev.guest_title,
+        id_card_type: res.id_card_type || prev.id_card_type,
+        id_card_number: res.id_card_number || '',
         category_market: res.category_market || 'Walkin',
         market_segment: res.market_segment || 'Normal',
         mobile_phone: res.mobile_phone || '',
+        address: res.address || '',
+        nationality: res.nationality || '',
+        city: res.city || '',
         email: res.email || '',
         room_number: res.room_number || '',
         arrival_date: res.arrival_date ? res.arrival_date.split('T')[0] : prev.arrival_date,
         departure_date: res.departure_date ? res.departure_date.split('T')[0] : prev.departure_date,
+        nights: res.nights || prev.nights,
+        guest_type: res.guest_type || 'Normal',
+        guest_count_male: res.guest_male ?? prev.guest_count_male,
+        guest_count_female: res.guest_female ?? prev.guest_count_female,
+        guest_count_child: res.guest_child ?? prev.guest_count_child,
+        extra_bed: res.extra_bed_qty ?? prev.extra_bed,
         payment_method: res.payment_method || '',
         deposit: res.deposit || 0,
-        notes: res.notes || '',
+        notes: res.note || res.notes || '',
         hotel_name: res.hotel_name || prev.hotel_name
       }));
+
+      if (res.room_type) {
+        setSelectedRoomCategory(res.room_type);
+      }
     }
   }, [location.state]);
+
+  // Once we know the room type (either carried over directly, or derived from the
+  // specific room the reservation already holds), fetch its rate so Payment Amount
+  // is populated immediately instead of waiting for the staff to re-touch the room field.
+  useEffect(() => {
+    const res = location.state?.reservation;
+    if (!res) return;
+    const roomType = res.room_type || rooms.find(r => r.room_number === res.room_number)?.room_type;
+    if (roomType) {
+      const arrivalDate = res.arrival_date ? res.arrival_date.split('T')[0] : formData.arrival_date;
+      fetchPricingForType(roomType, arrivalDate);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.state, rooms]);
 
   // Update hotel_name when defaultHotel loads (only if not loaded from state)
   useEffect(() => {
@@ -104,9 +137,10 @@ const RegistrasiPage = () => {
   }, [formData.arrival_date, formData.nights])
 
     useEffect(() => {
+        const nights = parseInt(formData.nights, 10) || 1;
         let basePrice = 0;
         if (pricingInfo && pricingInfo.current_rate) {
-            basePrice = parseFloat(pricingInfo.current_rate);
+            basePrice = parseFloat(pricingInfo.current_rate) * nights;
         }
 
         let calculatedDiscount = 0;
@@ -127,7 +161,7 @@ const RegistrasiPage = () => {
             balance: balance,
         }));
 
-    }, [formData.market_segment, pricingInfo, marketSegments, formData.deposit]);
+    }, [formData.market_segment, formData.nights, pricingInfo, marketSegments, formData.deposit]);
 
     useEffect(() => {
         if (formData.category_market === 'Walkin') {
@@ -240,63 +274,53 @@ const RegistrasiPage = () => {
     return '0000000001';
   }
 
-  const handleInputChange = async (e) => {
-    const { name, value } = e.target
-    
-    setFormData(prev => ({ ...prev, [name]: value }))
-    
-    if (name === 'room_number' && value) {
+  const fetchPricingForType = async (roomTypeCode, arrivalDate) => {
+    if (!roomTypeCode) {
+      setPricingInfo(null)
+      return
+    }
+    try {
+      // Try new room_rates API first (auto-pricing based on date)
       try {
-        const selectedRoom = rooms.find(room => room.room_number === value)
-        if (selectedRoom && selectedRoom.room_type) {
-          // Try new room_rates API first (auto-pricing based on date)
-          try {
-            const rateResponse = await apiService.getRateForDate(selectedRoom.room_type, formData.arrival_date)
-            if (rateResponse.data && rateResponse.data.room_rate) {
-              setPricingInfo({
-                current_rate: rateResponse.data.room_rate,
-                extrabed_rate: rateResponse.data.extrabed,
-                rate_name: rateResponse.data.rate_name,
-                effective_date: rateResponse.data.effective_date
-              })
-              return
-            }
-          } catch {
-            console.log('Room rates API not available, falling back to room_pricing')
-          }
-          
-          // Fallback to old room_pricing API
-          const pricingResponse = await apiService.getRoomPricing(selectedRoom.room_type)
-          if (pricingResponse.data && pricingResponse.data.current_rate) {
-            setPricingInfo(pricingResponse.data)
-          }
+        const rateResponse = await apiService.getRateForDate(roomTypeCode, arrivalDate)
+        if (rateResponse.data && rateResponse.data.room_rate) {
+          setPricingInfo({
+            current_rate: rateResponse.data.room_rate,
+            extrabed_rate: rateResponse.data.extrabed,
+            rate_name: rateResponse.data.rate_name,
+            effective_date: rateResponse.data.effective_date
+          })
+          return
         }
-      } catch (error) {
-        console.error('Error fetching room pricing:', error)
-        setPricingInfo(null)
+      } catch {
+        console.log('Room rates API not available, falling back to room_pricing')
       }
-    } else if (name === 'room_number' && !value) {
+
+      // Fallback to old room_pricing API
+      const pricingResponse = await apiService.getRoomPricing(roomTypeCode)
+      if (pricingResponse.data && pricingResponse.data.current_rate) {
+        setPricingInfo(pricingResponse.data)
+      }
+    } catch (error) {
+      console.error('Error fetching room pricing:', error)
       setPricingInfo(null)
     }
-    
+  }
+
+  const handleInputChange = async (e) => {
+    const { name, value } = e.target
+
+    setFormData(prev => ({ ...prev, [name]: value }))
+
+    if (name === 'room_number') {
+      const selectedRoom = value ? rooms.find(room => room.room_number === value) : null
+      await fetchPricingForType(selectedRoom?.room_type, formData.arrival_date)
+    }
+
     // Also update pricing when arrival_date changes
     if (name === 'arrival_date' && value && formData.room_number) {
-      try {
-        const selectedRoom = rooms.find(room => room.room_number === formData.room_number)
-        if (selectedRoom && selectedRoom.room_type) {
-          const rateResponse = await apiService.getRateForDate(selectedRoom.room_type, value)
-          if (rateResponse.data && rateResponse.data.room_rate) {
-            setPricingInfo({
-              current_rate: rateResponse.data.room_rate,
-              extrabed_rate: rateResponse.data.extrabed,
-              rate_name: rateResponse.data.rate_name,
-              effective_date: rateResponse.data.effective_date
-            })
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching room pricing for date change:', error)
-      }
+      const selectedRoom = rooms.find(room => room.room_number === formData.room_number)
+      await fetchPricingForType(selectedRoom?.room_type, value)
     }
   }  // Helper functions to format data for SearchableSelect
   const formatCategoryMarkets = () => {
@@ -332,13 +356,19 @@ const RegistrasiPage = () => {
     if (selectedRoomCategory) {
       filteredRooms = filteredRooms.filter(room => room.room_type === selectedRoomCategory);
     }
-    return [
+    const options = [
       { value: '', label: 'None selected' },
-      ...filteredRooms.map(room => ({ 
-        value: room.room_number, 
-        label: `${room.room_number} - ${room.room_type} (Floor ${room.floor_number})` 
+      ...filteredRooms.map(room => ({
+        value: room.room_number,
+        label: `${room.room_number} - ${room.room_type} (Floor ${room.floor_number})`
       }))
     ]
+    // A room carried over from a reservation may no longer be "Vacant Ready" (it was
+    // already marked AR when reserved), so it won't be in `rooms` - keep it selectable.
+    if (formData.room_number && !options.some(o => o.value === formData.room_number)) {
+      options.push({ value: formData.room_number, label: `${formData.room_number} (reserved)` })
+    }
+    return options
   }
 
   const handleSubmit = async (e) => {

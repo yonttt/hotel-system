@@ -160,6 +160,7 @@ class ReservationBase(BaseModel):
     extra_bed_nights: int = 0
     extra_bed_qty: int = 0
     room_number: Optional[str] = None
+    room_type: Optional[str] = None
     transaction_status: TransactionStatus = TransactionStatus.Pending
     payment_method: str = "Debit BCA 446"
     note: Optional[str] = None
@@ -207,6 +208,7 @@ class ReservationUpgrade(BaseModel):
     extra_bed_nights: Optional[int] = None
     extra_bed_qty: Optional[int] = None
     room_number: Optional[str] = None
+    room_type: Optional[str] = None
     transaction_status: Optional[TransactionStatus] = None
     payment_method: Optional[str] = None
     note: Optional[str] = None
@@ -229,6 +231,7 @@ class ReservationResponse(ReservationBase):
 # Guest Registration Schemas
 class GuestRegistrationBase(BaseModel):
     registration_no: str
+    reservation_no: Optional[str] = None
     guest_id: Optional[int] = None
     category_market: str = "Walkin"
     market_segment: str = "Normal"

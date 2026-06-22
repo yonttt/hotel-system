@@ -2,7 +2,11 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../../../../state/AuthContext'
 import { apiService } from '../../../../api/api'
 import Layout from '../../../../ui/Layout'
+import UnifiedTableHeader from '../../../../ui/UnifiedTableHeader'
+import UnifiedTableFooter from '../../../../ui/UnifiedTableFooter'
 import useHotels from '../../../../logic/useHotels'
+import usePaginatedTable from '../../../../logic/usePaginatedTable'
+import { formatDate, formatCurrencyFixed4 } from '../../../../utils/formatters'
 
 const ReservasiDeposit = () => {
   const { user } = useAuth()
@@ -10,10 +14,6 @@ const ReservasiDeposit = () => {
   const [reservations, setReservations] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [showEntries, setShowEntries] = useState(10)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [selectedHotel, setSelectedHotel] = useState('ALL')
 
   // Edit modal state
   const [showEditModal, setShowEditModal] = useState(false)
@@ -35,11 +35,6 @@ const ReservasiDeposit = () => {
     loadReservations()
   }, [])
 
-  // Reset to first page when search/filter changes
-  useEffect(() => {
-    setCurrentPage(1)
-  }, [searchTerm, showEntries])
-
   const loadReservations = async () => {
     try {
       setLoading(true)
@@ -57,50 +52,23 @@ const ReservasiDeposit = () => {
       
     } catch (err) {
       console.error('Error loading deposit reservations:', err)
-      setError('Failed to load deposit reservations data from database')
+      setError('Failed to load deposit reservations: ' + (err.response?.data?.detail || err.message))
       setReservations([])
     } finally {
       setLoading(false)
     }
   }
 
-  const filteredReservations = reservations.filter(reservation => {
-    const term = searchTerm ? searchTerm.toLowerCase() : '';
-    
-    // First check if a specific hotel is selected
-    if (selectedHotel !== 'ALL' && reservation.hotel_name !== selectedHotel) {
-      return false;
-    }
-    
-    // Then apply the search filter if there is a search term
-    if (!term) return true;
-
-    return (
-      reservation.guest_name?.toLowerCase().includes(term) ||
-      reservation.reservation_no?.toLowerCase().includes(term) ||
-      reservation.category_market?.toLowerCase().includes(term) ||
-      reservation.transaction_by?.toLowerCase().includes(term) ||
-      reservation.payment_method?.toLowerCase().includes(term)
-    );
-  });
-
-  const totalPages = Math.ceil(filteredReservations.length / showEntries)
-  const startIndex = (currentPage - 1) * showEntries
-  const endIndex = startIndex + showEntries
-  const currentReservations = filteredReservations.slice(startIndex, endIndex)
-
-  const formatCurrency = (amount) => {
-    // Format to match the image - just numbers without currency symbol
-    if (!amount || amount === 0) return '0.0000';
-    return parseFloat(amount).toFixed(4);
-  }
-
-  const formatDate = (dateString) => {
-    // A simple date format as shown in the image
-    if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return `${date.getDate()} ${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`;
-  };
+  const {
+    searchTerm, setSearchTerm,
+    showEntries, setShowEntries,
+    currentPage, setCurrentPage,
+    selectedHotel, setSelectedHotel,
+    filteredItems: filteredReservations, currentData: currentReservations,
+    totalPages, startIndex, endIndex
+  } = usePaginatedTable(reservations, {
+    searchFields: ['guest_name', 'reservation_no', 'category_market', 'transaction_by', 'payment_method']
+  })
 
   // Check if user has edit permission
   const canEdit = () => {
@@ -163,59 +131,16 @@ const ReservasiDeposit = () => {
   return (
     <Layout>
       <div className="unified-reservation-container">
-        <div className="unified-header-controls">
-          <div className="header-row header-row-top">
-            <div className="unified-header-left">
-              <div className="header-title">
-                <span>RESERVATION BY DEPOSIT</span>
-              </div>
-            </div>
-            <div className="unified-header-right">
-              <div className="hotel-select">
-                <label>Hotel :</label>
-                <select 
-                  className="header-hotel-select"
-                  value={selectedHotel}
-                  onChange={(e) => setSelectedHotel(e.target.value)}
-                >
-                  <option value="ALL">ALL</option>
-                  {hotels.map(hotel => (
-                    <option key={hotel.id} value={hotel.name}>{hotel.name}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-          <div className="header-row header-row-bottom">
-            <div className="unified-header-left">
-              <div className="search-section">
-                <label>Search :</label>
-                <input
-                  type="text"
-                  className="search-input"
-                  placeholder="Search here..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="unified-header-right">
-              <div className="entries-control">
-                <span className="entries-label">Show entries:</span>
-                <select
-                  className="entries-select"
-                  value={showEntries}
-                  onChange={(e) => setShowEntries(Number(e.target.value))}
-                >
-                  <option value={10}>10</option>
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
+        <UnifiedTableHeader
+          title="RESERVATION BY DEPOSIT"
+          hotels={hotels}
+          selectedHotel={selectedHotel}
+          onHotelChange={setSelectedHotel}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          showEntries={showEntries}
+          onEntriesChange={setShowEntries}
+        />
 
         {/* Table Section */}
         <div className="unified-table-wrapper">
@@ -280,7 +205,7 @@ const ReservasiDeposit = () => {
                     <td>{formatDate(reservation.arrival_date)}</td>
                     <td>{formatDate(reservation.departure_date)}</td>
                     <td title={reservation.payment_method || 'N/A'}>{reservation.payment_method || 'N/A'}</td>
-                    <td className="align-right">{formatCurrency(reservation.deposit || 0)}</td>
+                    <td className="align-right">{formatCurrencyFixed4(reservation.deposit || 0)}</td>
                     <td className="align-center">
                       {canEdit() && (
                         <button className="btn-table-action" title="Edit Details" onClick={() => handleEditClick(reservation)}>Edit</button>
@@ -293,38 +218,14 @@ const ReservasiDeposit = () => {
           </table>
         </div>
 
-        {/* Pagination Section */}
-        <div className="unified-footer">
-          <div className="entries-info">
-            {`Showing ${filteredReservations.length > 0 ? startIndex + 1 : 0} to ${Math.min(endIndex, filteredReservations.length)} of ${filteredReservations.length} entries`}
-          </div>
-          <div className="pagination">
-            <button
-              onClick={() => setCurrentPage(1)}
-              disabled={currentPage === 1}
-            >
-              First
-            </button>
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </button>
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </button>
-            <button
-              onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage === totalPages}
-            >
-              Last
-            </button>
-          </div>
-        </div>
+        <UnifiedTableFooter
+          startIndex={startIndex}
+          endIndex={endIndex}
+          total={filteredReservations.length}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </div>
 
       {/* Success Message */}

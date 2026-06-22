@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../../../../api/api';
 import Layout from '../../../../ui/Layout';
+import UnifiedTableHeader from '../../../../ui/UnifiedTableHeader';
+import UnifiedTableFooter from '../../../../ui/UnifiedTableFooter';
 import { useAuth } from '../../../../state/AuthContext';
 import useHotels from '../../../../logic/useHotels';
+import usePaginatedTable from '../../../../logic/usePaginatedTable';
 
 const ManagementRoom = () => {
   const { user } = useAuth();
@@ -10,10 +13,6 @@ const ManagementRoom = () => {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showEntries, setShowEntries] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedHotel, setSelectedHotel] = useState('ALL');
   const [successMessage, setSuccessMessage] = useState(null);
 
   // Modal state
@@ -52,27 +51,16 @@ const ManagementRoom = () => {
     }
   };
 
-  // Filter data
-  const filteredData = rooms.filter(item => {
-    const matchesSearch = 
-      item.room_number?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.room_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.hotel_name?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesHotel = selectedHotel === 'ALL' || item.hotel_name === selectedHotel;
-    
-    return matchesSearch && matchesHotel;
+  const {
+    searchTerm, setSearchTerm,
+    showEntries, setShowEntries,
+    currentPage, setCurrentPage,
+    selectedHotel, setSelectedHotel,
+    filteredItems: filteredData, currentData: currentItems,
+    totalPages, startIndex: indexOfFirstItem, endIndex: indexOfLastItem
+  } = usePaginatedTable(rooms, {
+    searchFields: ['room_number', 'room_type', 'hotel_name']
   });
-
-  // Pagination
-  const indexOfLastItem = currentPage * showEntries;
-  const indexOfFirstItem = indexOfLastItem - showEntries;
-  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredData.length / showEntries);
-
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
 
   // Check if user has edit permission
   const canEdit = () => {
@@ -211,88 +199,34 @@ const ManagementRoom = () => {
         </div>
       )}
 
-      {/* Header Controls */}
-      <div className="unified-header-controls">
-        {/* Top Row - Title and Hotel Filter */}
-        <div className="header-row header-row-top">
-          <div className="unified-header-left">
-            <h2 className="header-title">MANAGEMENT ROOM</h2>
-            {canEdit() && (
-              <button
-                onClick={handleAddClick}
-                className="btn-table-action"
-                style={{
-                  background: '#007bff',
-                  color: 'white',
-                  padding: '6px 16px',
-                  marginLeft: '20px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}
-              >
-                ADD
-              </button>
-            )}
-          </div>
-          <div className="unified-header-right">
-            <div className="hotel-select">
-              <label>Filter Hotel:</label>
-              <select 
-                className="header-hotel-select"
-                value={selectedHotel}
-                onChange={(e) => {
-                  setSelectedHotel(e.target.value);
-                  setCurrentPage(1);
-                }}
-              >
-                <option value="ALL">ALL</option>
-                {hotelNames.map(name => (
-                  <option key={name} value={name}>{name}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Row - Search and Entries */}
-        <div className="header-row header-row-bottom">
-          <div className="unified-header-left">
-            <div className="search-section">
-              <label>Search:</label>
-              <input
-                type="text"
-                className="search-input"
-                placeholder="Search here..."
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1);
-                }}
-              />
-            </div>
-          </div>
-          <div className="unified-header-right">
-            <div className="entries-control">
-              <span className="entries-label">Show entries:</span>
-              <select 
-                className="entries-select" 
-                value={showEntries} 
-                onChange={(e) => {
-                  setShowEntries(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
-              >
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
+      <UnifiedTableHeader
+        title="MANAGEMENT ROOM"
+        actions={canEdit() && (
+          <button
+            onClick={handleAddClick}
+            className="btn-table-action"
+            style={{
+              background: '#007bff',
+              color: 'white',
+              padding: '6px 16px',
+              marginLeft: '20px',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            ADD
+          </button>
+        )}
+        hotels={hotelNames.map(name => ({ id: name, name }))}
+        selectedHotel={selectedHotel}
+        onHotelChange={setSelectedHotel}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        showEntries={showEntries}
+        onEntriesChange={setShowEntries}
+      />
 
       {/* Table */}
       <div className="unified-table-wrapper">
@@ -363,47 +297,15 @@ const ManagementRoom = () => {
         </table>
       </div>
 
-      {/* Footer */}
-      <div className="unified-footer">
-        <div className="entries-info">
-          Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredData.length)} of {filteredData.length} entries
-        </div>
-        <div className="pagination">
-          <button
-            onClick={() => handlePageChange(1)}
-            disabled={currentPage === 1}
-          >
-            First
-          </button>
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          {[...Array(totalPages)].map((_, i) => (
-            <button
-              key={i + 1}
-              onClick={() => handlePageChange(i + 1)}
-              className={currentPage === i + 1 ? 'active' : ''}
-            >
-              {i + 1}
-            </button>
-          ))}
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
-          <button
-            onClick={() => handlePageChange(totalPages)}
-            disabled={currentPage === totalPages}
-          >
-            Last
-          </button>
-        </div>
-      </div>
+      <UnifiedTableFooter
+        startIndex={indexOfFirstItem}
+        endIndex={indexOfLastItem}
+        total={filteredData.length}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        showPageNumbers
+      />
       </div>
 
       {/* Add/Edit Modal */}

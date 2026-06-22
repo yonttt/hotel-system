@@ -47,6 +47,7 @@ const ReservasiPage = () => {
     guest_count_child: 0,
     extra_bed: 0,
     room_number: '',
+    room_type: '',
     transaction_status: 'Reservation',
     payment_method: '',
     notes: '',
@@ -80,9 +81,10 @@ const ReservasiPage = () => {
   }, [formData.arrival_date, formData.nights])
 
     useEffect(() => {
+        const nights = parseInt(formData.nights, 10) || 1;
         let basePrice = 0;
         if (pricingInfo && pricingInfo.current_rate) {
-            basePrice = parseFloat(pricingInfo.current_rate);
+            basePrice = parseFloat(pricingInfo.current_rate) * nights;
         }
 
         let calculatedDiscount = 0;
@@ -103,7 +105,7 @@ const ReservasiPage = () => {
             balance: balance,
         }));
 
-    }, [formData.market_segment, pricingInfo, marketSegments, formData.deposit]);
+    }, [formData.market_segment, formData.nights, pricingInfo, marketSegments, formData.deposit]);
 
     useEffect(() => {
         if (formData.category_market === 'Walkin') {
@@ -218,15 +220,18 @@ const ReservasiPage = () => {
 
   const handleInputChange = async (e) => {
     const { name, value } = e.target
-    
+
     setFormData(prev => ({ ...prev, [name]: value }))
-    
+
     if (name === 'room_number' && value) {
+      const selectedRoom = rooms.find(room => room.room_number === value)
+      setFormData(prev => ({ ...prev, room_type: selectedRoom?.room_type || '' }))
       await fetchPricingForRoom(value, formData.arrival_date)
     } else if (name === 'room_number' && !value) {
+      setFormData(prev => ({ ...prev, room_type: '' }))
       setPricingInfo(null)
     }
-    
+
     if (name === 'arrival_date' && value && formData.room_number) {
       await fetchPricingForRoom(formData.room_number, value)
     }

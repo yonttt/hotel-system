@@ -271,9 +271,12 @@ async def update_account_receivable(
             elif float(paid or 0) > 0:
                 update_data['status'] = 'Partial'
 
+        allowed_fields = set(AccountReceivableUpdate.__fields__.keys())
         update_fields = []
         update_values = []
         for field, value in update_data.items():
+            if field not in allowed_fields:
+                continue
             update_fields.append(f"{field} = %s")
             update_values.append(value)
 

@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../../../api/api';
 import Layout from '../../../ui/Layout';
+import UnifiedTableHeader from '../../../ui/UnifiedTableHeader';
+import UnifiedTableFooter from '../../../ui/UnifiedTableFooter';
 import { useAuth } from '../../../state/AuthContext';
 import useHotels from '../../../logic/useHotels';
+import usePaginatedTable from '../../../logic/usePaginatedTable';
+import { formatCurrencyIDR } from '../../../utils/formatters';
 import { useNotification } from '../../../state/NotificationContext';
 
 const NightAudit = () => {
@@ -12,14 +16,10 @@ const NightAudit = () => {
   const [audits, setAudits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedHotel, setSelectedHotel] = useState('ALL');
   const [selectedDate, setSelectedDate] = useState(() => {
     const today = new Date();
     return today.toISOString().split('T')[0];
   });
-  const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [showEntries, setShowEntries] = useState(20);
   const [successMessage, setSuccessMessage] = useState(null);
 
   // Add/Edit modal state
@@ -47,6 +47,18 @@ const NightAudit = () => {
   });
   const [processing, setProcessing] = useState(false);
 
+  const {
+    searchTerm, setSearchTerm,
+    showEntries, setShowEntries,
+    currentPage, setCurrentPage,
+    selectedHotel, setSelectedHotel,
+    filteredItems: filteredAudits, currentData,
+    totalPages, startIndex, endIndex
+  } = usePaginatedTable(audits, {
+    searchFields: ['room_number', 'guest_name'],
+    initialShowEntries: 20
+  });
+
   useEffect(() => {
     fetchAuditData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -54,7 +66,8 @@ const NightAudit = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, showEntries]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDate]);
 
   const fetchAuditData = async () => {
     try {
@@ -73,33 +86,6 @@ const NightAudit = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  // Filter audits
-  const filteredAudits = audits.filter(item => {
-    if (selectedHotel !== 'ALL' && item.hotel_name !== selectedHotel) {
-      return false;
-    }
-    if (searchTerm) {
-      const search = searchTerm.toLowerCase();
-      return (
-        item.room_number?.toLowerCase().includes(search) ||
-        item.guest_name?.toLowerCase().includes(search)
-      );
-    }
-    return true;
-  });
-
-  // Pagination
-  const totalPages = Math.max(1, Math.ceil(filteredAudits.length / showEntries));
-  const startIndex = (currentPage - 1) * showEntries;
-  const endIndex = startIndex + showEntries;
-  const currentData = filteredAudits.slice(startIndex, endIndex);
-
-  // Format currency
-  const formatCurrency = (amount) => {
-    if (!amount) return '0';
-    return new Intl.NumberFormat('id-ID').format(amount);
   };
 
   // Handle add new
@@ -236,51 +222,51 @@ const NightAudit = () => {
           </div>
         )}
 
-        <div className="unified-header-controls">
-          <div className="header-row header-row-top">
-            <div className="unified-header-left">
-              <div className="header-title" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                <span>Night Audit History</span>
-                <button
-                  onClick={handleAddNew}
-                  style={{
-                    padding: '8px 20px',
-                    backgroundColor: '#3498db',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '13px',
-                    fontWeight: '500',
-                    boxShadow: '0 2px 4px rgba(52, 152, 219, 0.3)'
-                  }}
-                  onMouseOver={(e) => e.target.style.backgroundColor = '#2980b9'}
-                  onMouseOut={(e) => e.target.style.backgroundColor = '#3498db'}
-                >
-                  + Tambah Data
-                </button>
-                <button
-                  onClick={handleProcessNightAudit}
-                  disabled={processing}
-                  style={{
-                    padding: '8px 20px',
-                    backgroundColor: '#e67e22',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: processing ? 'not-allowed' : 'pointer',
-                    fontSize: '13px',
-                    fontWeight: '500',
-                    boxShadow: '0 2px 4px rgba(230, 126, 34, 0.3)'
-                  }}
-                  onMouseOver={(e) => !processing && (e.target.style.backgroundColor = '#d35400')}
-                  onMouseOut={(e) => !processing && (e.target.style.backgroundColor = '#e67e22')}
-                >
-                  {processing ? 'Processing...' : 'Process Night Audit'}
-                </button>
-              </div>
-            </div>
-            <div className="unified-header-right" style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+        <UnifiedTableHeader
+          title="Night Audit History"
+          actions={(
+            <>
+              <button
+                onClick={handleAddNew}
+                style={{
+                  padding: '8px 20px',
+                  backgroundColor: '#3498db',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  boxShadow: '0 2px 4px rgba(52, 152, 219, 0.3)'
+                }}
+                onMouseOver={(e) => e.target.style.backgroundColor = '#2980b9'}
+                onMouseOut={(e) => e.target.style.backgroundColor = '#3498db'}
+              >
+                + Tambah Data
+              </button>
+              <button
+                onClick={handleProcessNightAudit}
+                disabled={processing}
+                style={{
+                  padding: '8px 20px',
+                  backgroundColor: '#e67e22',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: processing ? 'not-allowed' : 'pointer',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  boxShadow: '0 2px 4px rgba(230, 126, 34, 0.3)'
+                }}
+                onMouseOver={(e) => !processing && (e.target.style.backgroundColor = '#d35400')}
+                onMouseOut={(e) => !processing && (e.target.style.backgroundColor = '#e67e22')}
+              >
+                {processing ? 'Processing...' : 'Process Night Audit'}
+              </button>
+            </>
+          )}
+          topRightExtra={(
+            <>
               <div className="date-select" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <label>Date :</label>
                 <input
@@ -297,7 +283,7 @@ const NightAudit = () => {
               </div>
               <div className="hotel-select">
                 <label>Hotel :</label>
-                <select 
+                <select
                   className="header-hotel-select"
                   value={selectedHotel}
                   onChange={(e) => setSelectedHotel(e.target.value)}
@@ -310,39 +296,13 @@ const NightAudit = () => {
                   ))}
                 </select>
               </div>
-            </div>
-          </div>
-          <div className="header-row header-row-bottom">
-            <div className="unified-header-left">
-              <div className="search-section">
-                <label>Search :</label>
-                <input
-                  type="text"
-                  className="search-input"
-                  placeholder="Search here..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="unified-header-right">
-              <div className="entries-control">
-                <span className="entries-label">Show</span>
-                <select 
-                  className="entries-select" 
-                  value={showEntries} 
-                  onChange={(e) => setShowEntries(Number(e.target.value))}
-                >
-                  <option value={10}>10</option>
-                  <option value={20}>20</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
-                </select>
-                <span className="entries-label">entries</span>
-              </div>
-            </div>
-          </div>
-        </div>
+            </>
+          )}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          showEntries={showEntries}
+          onEntriesChange={setShowEntries}
+        />
 
         <div className="unified-table-wrapper">
           <table className="reservation-table">
@@ -394,19 +354,19 @@ const NightAudit = () => {
                   <tr key={item.id || index}>
                     <td>{startIndex + index + 1}</td>
                     <td title={item.room_number || '-'}>{item.room_number || '-'}</td>
-                    <td className="align-right">{formatCurrency(item.extra_bed)}</td>
-                    <td className="align-right">{formatCurrency(item.extra_bill)}</td>
-                    <td className="align-right">{formatCurrency(item.late_charge)}</td>
-                    <td className="align-right">{formatCurrency(item.discount)}</td>
-                    <td className="align-right">{formatCurrency(item.meeting_room)}</td>
-                    <td className="align-right">{formatCurrency(item.add_meeting_room)}</td>
-                    <td className="align-right">{formatCurrency(item.cash)}</td>
-                    <td className="align-right">{formatCurrency(item.debet)}</td>
-                    <td className="align-right">{formatCurrency(item.transfer)}</td>
-                    <td className="align-right">{formatCurrency(item.voucher)}</td>
-                    <td className="align-right">{formatCurrency(item.creditcard)}</td>
-                    <td className="align-right">{formatCurrency(item.guest_ledger_minus)}</td>
-                    <td className="align-right">{formatCurrency(item.guest_ledger_plus)}</td>
+                    <td className="align-right">{formatCurrencyIDR(item.extra_bed)}</td>
+                    <td className="align-right">{formatCurrencyIDR(item.extra_bill)}</td>
+                    <td className="align-right">{formatCurrencyIDR(item.late_charge)}</td>
+                    <td className="align-right">{formatCurrencyIDR(item.discount)}</td>
+                    <td className="align-right">{formatCurrencyIDR(item.meeting_room)}</td>
+                    <td className="align-right">{formatCurrencyIDR(item.add_meeting_room)}</td>
+                    <td className="align-right">{formatCurrencyIDR(item.cash)}</td>
+                    <td className="align-right">{formatCurrencyIDR(item.debet)}</td>
+                    <td className="align-right">{formatCurrencyIDR(item.transfer)}</td>
+                    <td className="align-right">{formatCurrencyIDR(item.voucher)}</td>
+                    <td className="align-right">{formatCurrencyIDR(item.creditcard)}</td>
+                    <td className="align-right">{formatCurrencyIDR(item.guest_ledger_minus)}</td>
+                    <td className="align-right">{formatCurrencyIDR(item.guest_ledger_plus)}</td>
                     <td className="align-center">
                       <div style={{ display: 'flex', gap: '5px', justifyContent: 'center' }}>
                         <button 
@@ -439,15 +399,15 @@ const NightAudit = () => {
           </table>
         </div>
 
-        <div className="unified-footer">
-          <div className="entries-info">
-            {`Showing ${filteredAudits.length > 0 ? startIndex + 1 : 0} to ${Math.min(endIndex, filteredAudits.length)} of ${filteredAudits.length} entries`}
-          </div>
-          <div className="pagination">
-            <button onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1}>Previous</button>
-            <button onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages}>Next</button>
-          </div>
-        </div>
+        <UnifiedTableFooter
+          startIndex={startIndex}
+          endIndex={endIndex}
+          total={filteredAudits.length}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          showFirstLast={false}
+        />
 
         {/* Add/Edit Modal */}
         {showModal && (

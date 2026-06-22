@@ -191,7 +191,7 @@ async def create_adjustment(
 ):
     """Create a new adjustment"""
     try:
-        valid_categories = ['food_beverage', 'inventory', 'kos', 'laundry', 'meeting_room', 'petty_cash']
+        valid_categories = ['front_office', 'food_beverage', 'inventory', 'kos', 'laundry', 'meeting_room', 'petty_cash']
         if adj.category not in valid_categories:
             raise HTTPException(
                 status_code=400,

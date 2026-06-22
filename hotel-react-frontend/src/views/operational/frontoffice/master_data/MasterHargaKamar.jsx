@@ -1,20 +1,19 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../../../../api/api';
 import Layout from '../../../../ui/Layout';
+import UnifiedTableHeader from '../../../../ui/UnifiedTableHeader';
+import UnifiedTableFooter from '../../../../ui/UnifiedTableFooter';
 import { useAuth } from '../../../../state/AuthContext';
 import useHotels from '../../../../logic/useHotels';
+import usePaginatedTable from '../../../../logic/usePaginatedTable';
+import { formatCurrencyIDR } from '../../../../utils/formatters';
 
 const MasterHargaKamar = () => {
   const { user } = useAuth();
   const { defaultHotel, hotels } = useHotels();
   const [rates, setRates] = useState([]);
-  const [filteredRates, setFilteredRates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedHotel, setSelectedHotel] = useState('ALL');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [showEntries, setShowEntries] = useState(10);
   const [successMessage, setSuccessMessage] = useState(null);
 
   // Modal states
@@ -39,16 +38,6 @@ const MasterHargaKamar = () => {
     fetchRates();
   }, []);
 
-  useEffect(() => {
-    filterRates();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rates, selectedHotel, searchTerm]);
-
-  // Reset to first page when search/filter changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, showEntries, selectedHotel]);
-
   const fetchMasterData = async () => {
     try {
       const roomTypesResponse = await apiService.getRoomTypesLookup();
@@ -72,33 +61,16 @@ const MasterHargaKamar = () => {
     }
   };
 
-  const filterRates = () => {
-    let filtered = rates;
-
-    // Filter by hotel
-    if (selectedHotel !== 'ALL') {
-      filtered = filtered.filter(rate => rate.hotel_name === selectedHotel);
-    }
-
-    // Filter by search term
-    if (searchTerm) {
-      const search = searchTerm.toLowerCase();
-      filtered = filtered.filter(rate => 
-        rate.rate_name?.toLowerCase().includes(search) ||
-        rate.room_type?.toLowerCase().includes(search) ||
-        String(rate.room_rate).includes(search) ||
-        rate.effective_date?.includes(search)
-      );
-    }
-
-    setFilteredRates(filtered);
-  };
-
-  // Format currency
-  const formatCurrency = (amount) => {
-    if (!amount) return '0';
-    return new Intl.NumberFormat('id-ID').format(amount);
-  };
+  const {
+    searchTerm, setSearchTerm,
+    showEntries, setShowEntries,
+    currentPage, setCurrentPage,
+    selectedHotel, setSelectedHotel,
+    filteredItems: filteredRates, currentData: currentRates,
+    totalPages, startIndex, endIndex
+  } = usePaginatedTable(rates, {
+    searchFields: ['rate_name', 'room_type', 'room_rate', 'effective_date']
+  });
 
   // Format date to Indonesian format
   const formatDate = (dateStr) => {
@@ -114,12 +86,6 @@ const MasterHargaKamar = () => {
       return dateStr;
     }
   };
-
-  // Pagination
-  const totalPages = Math.max(1, Math.ceil(filteredRates.length / showEntries));
-  const startIndex = (currentPage - 1) * showEntries;
-  const endIndex = startIndex + showEntries;
-  const currentRates = filteredRates.slice(startIndex, endIndex);
 
   // Check if user has edit permission (admin and manager only)
   const canEdit = () => {
@@ -235,78 +201,34 @@ const MasterHargaKamar = () => {
   return (
     <Layout>
       <div className="unified-reservation-container">
-        {/* Header Controls */}
-        <div className="unified-header-controls">
-          <div className="header-row header-row-top">
-            <div className="unified-header-left">
-              <div className="header-title">
-                <span>MASTER HARGA KAMAR</span>
-              </div>
-              {canEdit() && (
-                <button
-                  onClick={handleAddClick}
-                  className="btn-table-action"
-                  style={{
-                    background: '#007bff',
-                    color: 'white',
-                    padding: '6px 16px',
-                    marginLeft: '20px',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '14px'
-                  }}
-                >
-                  ADD
-                </button>
-              )}
-            </div>
-            <div className="unified-header-right">
-              <div className="hotel-select">
-                <label>Filter :</label>
-                <select 
-                  className="header-hotel-select"
-                  value={selectedHotel}
-                  onChange={(e) => setSelectedHotel(e.target.value)}
-                >
-                  <option value="ALL">ALL HOTELS</option>
-                  {hotels.map(hotel => (
-                    <option key={hotel.id} value={hotel.name}>{hotel.name}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-          <div className="header-row header-row-bottom">
-            <div className="unified-header-left">
-              <div className="search-section">
-                <label>Search :</label>
-                <input
-                  type="text"
-                  className="search-input"
-                  placeholder="Search here..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="unified-header-right">
-              <div className="entries-control">
-                <span className="entries-label">Show entries:</span>
-                <select
-                  className="entries-select"
-                  value={showEntries}
-                  onChange={(e) => setShowEntries(Number(e.target.value))}
-                >
-                  <option value={10}>10</option>
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
+        <UnifiedTableHeader
+          title="MASTER HARGA KAMAR"
+          actions={canEdit() && (
+            <button
+              onClick={handleAddClick}
+              className="btn-table-action"
+              style={{
+                background: '#007bff',
+                color: 'white',
+                padding: '6px 16px',
+                marginLeft: '20px',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              ADD
+            </button>
+          )}
+          hotels={hotels}
+          selectedHotel={selectedHotel}
+          onHotelChange={setSelectedHotel}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          showEntries={showEntries}
+          onEntriesChange={setShowEntries}
+        />
 
         {/* Success/Error Messages */}
         {successMessage && (
@@ -378,8 +300,8 @@ const MasterHargaKamar = () => {
                     <td>{rate.hotel_name || '-'}</td>
                     <td>{rate.rate_name}</td>
                     <td>{rate.room_type}</td>
-                    <td style={{ textAlign: 'right' }}>{formatCurrency(rate.room_rate)}</td>
-                    <td style={{ textAlign: 'right' }}>{formatCurrency(rate.extrabed)}</td>
+                    <td style={{ textAlign: 'right' }}>{formatCurrencyIDR(rate.room_rate)}</td>
+                    <td style={{ textAlign: 'right' }}>{formatCurrencyIDR(rate.extrabed)}</td>
                     <td>{formatDate(rate.effective_date)}</td>
                     <td style={{ textAlign: 'center' }}>
                       {canEdit() && (
@@ -408,61 +330,17 @@ const MasterHargaKamar = () => {
           </table>
         </div>
 
-        {/* Pagination */}
-        <div className="unified-footer">
-          <div className="entries-info">
-            Showing {filteredRates.length === 0 ? 0 : startIndex + 1} to {Math.min(endIndex, filteredRates.length)} of {filteredRates.length} entries
-            {searchTerm && ` (filtered from ${rates.length} total entries)`}
-          </div>
-          <div className="pagination">
-            <button
-              onClick={() => setCurrentPage(1)}
-              disabled={currentPage === 1}
-            >
-              First
-            </button>
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </button>
-            {[...Array(Math.min(5, totalPages))].map((_, i) => {
-              let pageNum;
-              if (totalPages <= 5) {
-                pageNum = i + 1;
-              } else if (currentPage <= 3) {
-                pageNum = i + 1;
-              } else if (currentPage >= totalPages - 2) {
-                pageNum = totalPages - 4 + i;
-              } else {
-                pageNum = currentPage - 2 + i;
-              }
-              
-              return (
-                <button
-                  key={pageNum}
-                  onClick={() => setCurrentPage(pageNum)}
-                  className={currentPage === pageNum ? 'active' : ''}
-                >
-                  {pageNum}
-                </button>
-              );
-            })}
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </button>
-            <button
-              onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage === totalPages}
-            >
-              Last
-            </button>
-          </div>
-        </div>
+        <UnifiedTableFooter
+          startIndex={startIndex}
+          endIndex={endIndex}
+          total={filteredRates.length}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          showPageNumbers
+          pageWindowSize={5}
+          extraInfo={searchTerm && ` (filtered from ${rates.length} total entries)`}
+        />
       </div>
 
       {/* Add/Edit Modal */}

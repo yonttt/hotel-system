@@ -32,7 +32,7 @@ export default function BookingPage() {
     email: '',
     phone: '',
     specialRequests: '',
-    paymentMethod: 'Credit Card',
+    paymentMethod: 'credit_card',
   })
   const { showNotification } = useNotification()
   const [submitted, setSubmitted] = useState(false)
@@ -136,7 +136,9 @@ export default function BookingPage() {
     return 1
   }, [formData.checkIn, formData.checkOut])
 
-  const totalPrice = selectedRoomData ? selectedRoomData.normal_rate * nights * Number(formData.rooms || 1) : 0
+  const totalPrice = selectedRoomData
+    ? (selectedRoomData.published_rate ?? selectedRoomData.normal_rate) * nights * Number(formData.rooms || 1)
+    : 0
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -154,15 +156,6 @@ export default function BookingPage() {
     setErrorMsg('')
 
     try {
-      const today = new Date()
-      // Reset time portion for accurate date comparison
-      today.setHours(0, 0, 0, 0)
-      
-      const checkInDate = new Date(formData.checkIn)
-      checkInDate.setHours(0, 0, 0, 0)
-
-      const isToday = checkInDate.getTime() === today.getTime()
-      
       const payload = {
         hotel_name: formData.destination,
         guest_name: `${formData.firstName} ${formData.lastName}`.trim(),
@@ -170,58 +163,62 @@ export default function BookingPage() {
         email: formData.email,
         mobile_phone: formData.phone,
         
-        arrival_date: new Date(formData.checkIn).toISOString(),
-        departure_date: new Date(formData.checkOut).toISOString(),
+        arrival_date: formData.checkIn,
+        departure_date: formData.checkOut,
+        arrival_time: "14:00",
         nights: nights,
         
         // Provide defaults for omitted fields so backend is happy
         nationality: 'INDONESIA',
         id_card_type: 'KTP',
-        guest_male: 1,
-        guest_female: 0,
-        guest_child: 0,
         
         note: `Website Booking for: ${selectedRoomData?.category_name || 'Room'} (${formData.rooms || 1} room/s). ` + (formData.specialRequests || ''),
+        room_type: selectedRoomData?.category_code || null,
         payment_method: formData.paymentMethod,
         payment_amount: totalPrice,
+        deposit: 0,
+        balance: totalPrice,
         
         transaction_by: 'Website',
         category_market: 'Website',
+        guest_type: 'Normal',
       }
 
-      if (isToday) {
-        // Create Guest Registration
-        payload.registration_no = `REG${Date.now().toString().slice(-8)}`
-        payload.transaction_status = "Registration"
-        payload.guest_count_male = payload.guest_male
-        payload.guest_count_female = payload.guest_female
-        payload.guest_count_child = payload.guest_child
-        // map names back if needed for backend validation matching
-        delete payload.guest_male
-        delete payload.guest_female
-        delete payload.guest_child
-        
-        if (payload.note !== undefined) {
-          payload.notes = payload.note
-          delete payload.note
+      // Fetch next sequential reservation number
+      let nextRes = `RSV${Date.now().toString().slice(-8)}`
+      try {
+        const numRes = await hotelAPI.getNextReservationNumber()
+        if (numRes.data && numRes.data.next_reservation_no) {
+          nextRes = numRes.data.next_reservation_no
         }
-        
-        await hotelAPI.createRegistration(payload)
-        setBookingId(payload.registration_no)
-      } else {
-        // Create Hotel Reservation
-        payload.reservation_no = `RSV${Date.now().toString().slice(-8)}`
-        payload.transaction_status = "Pending"
-        await hotelAPI.createReservation(payload)
-        setBookingId(payload.reservation_no)
+      } catch (e) {
+        console.warn('Could not fetch sequential reservation number, using fallback.')
       }
+
+      // Create Hotel Reservation
+      payload.reservation_no = nextRes
+      payload.transaction_status = "Pending"
+      payload.guest_male = 1
+      payload.guest_female = 0
+      payload.guest_child = 0
+      await hotelAPI.createReservation(payload)
+      setBookingId(payload.reservation_no)
 
       showNotification('success', 'Reservasi Berhasil! Silakan periksa detail pesanan Anda.')
       setSubmitted(true)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (error) {
       console.error('Error submitting booking:', error)
-      showNotification('error', 'Gagal melakukan pemesanan. Silakan coba lagi.')
+      let errorStr = 'Gagal melakukan pemesanan. Silakan coba lagi.'
+      if (error.response?.data?.detail) {
+        if (typeof error.response.data.detail === 'string') {
+          errorStr = error.response.data.detail
+        } else if (Array.isArray(error.response.data.detail)) {
+          errorStr = error.response.data.detail.map(d => `${d.loc?.join('.') || ''}: ${d.msg}`).join(', ')
+        }
+      }
+      showNotification('error', errorStr)
+      setErrorMsg(errorStr)
     } finally {
       setIsSubmitting(false)
     }
@@ -391,12 +388,23 @@ export default function BookingPage() {
                   >
                     <div className="relative h-48 overflow-hidden">
                       <img src={room.image} alt={room.category_name} className="w-full h-full object-cover" />
-                      <div className="absolute top-3 right-3 bg-gold-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                        {formatCurrency(room.normal_rate)}/malam
+                      {room.discount_percentage > 0 && (
+                        <div className="absolute top-3 left-3 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+                          DISKON {room.discount_percentage}%
+                        </div>
+                      )}
+                      <div className="absolute top-3 right-3 bg-gold-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5">
+                        {room.discount_percentage > 0 && (
+                          <span className="line-through text-white/70">{formatCurrency(room.normal_rate)}</span>
+                        )}
+                        {formatCurrency(room.published_rate ?? room.normal_rate)}/malam
                       </div>
                     </div>
                     <div className="p-5">
                       <h3 className="font-display font-bold text-lg text-hotel-dark mb-1">{room.category_name}</h3>
+                      {room.description && (
+                        <p className="text-xs text-gray-500 mb-2 line-clamp-2">{room.description}</p>
+                      )}
                       <div className="flex items-center gap-3 text-xs text-gray-400 mb-3">
                         <span className="flex items-center gap-1"><Maximize2 size={12} /> {room.size || '30 m²'}</span>
                         <span className="flex items-center gap-1"><Bed size={12} /> {room.bed || 'Queen/Twin Size'}</span>
@@ -453,6 +461,14 @@ export default function BookingPage() {
                             <option key={h.id || i} value={h.name}>{h.name}</option>
                           ))}
                         </select>
+                        {(() => {
+                          const selectedHotelInfo = dynamicHotels.find(h => h.name === formData.destination)
+                          return selectedHotelInfo?.phone ? (
+                            <p className="text-xs text-gray-400 mt-1">
+                              Ingin ganti tipe kamar? Hubungi {selectedHotelInfo.name}: <a href={`tel:${selectedHotelInfo.phone}`} className="text-gold-600 font-medium">{selectedHotelInfo.phone}</a>
+                            </p>
+                          ) : null
+                        })()}
                       </div>
                       <div>
                         <label className="block text-sm font-semibold text-hotel-dark mb-2">Jumlah Kamar</label>
@@ -563,22 +579,23 @@ export default function BookingPage() {
               {/* Order Summary Sidebar */}
               <div className="lg:col-span-1">
                 <div className="bg-white rounded-2xl shadow-md border border-gray-100 sticky top-24 overflow-hidden">
-                  <img src={selectedRoomData.image} alt={selectedRoomData.name} className="w-full h-48 object-cover" />
+                  <img src={selectedRoomData.image} alt={selectedRoomData.category_name} className="w-full h-48 object-cover" />
                   <div className="p-6">
                     <div className="flex items-center gap-1 mb-2">
                       {[1,2,3,4,5].map(s => <Star key={s} size={12} className="text-gold-400" fill="currentColor" />)}
                     </div>
-                    <h3 className="font-display font-bold text-xl text-hotel-dark mb-1">{selectedRoomData.name}</h3>
-                    <div className="flex items-center gap-3 text-xs text-gray-400 mb-4">
-                      <span className="flex items-center gap-1"><Maximize2 size={12} /> {selectedRoomData.size}</span>
-                      <span className="flex items-center gap-1"><Bed size={12} /> {selectedRoomData.bed}</span>
-                      <span className="flex items-center gap-1"><Users size={12} /> {selectedRoomData.guests}</span>
-                    </div>
+                    <h3 className="font-display font-bold text-xl text-hotel-dark mb-1">{selectedRoomData.category_name}</h3>
+                    <p className="text-xs text-gray-400 mb-4">{selectedRoomData.hotel_name}</p>
 
                     <div className="border-t border-gray-100 pt-4 space-y-3">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-500">Harga per malam</span>
-                        <span className="font-semibold">{formatCurrency(selectedRoomData.price)}</span>
+                        <span className="font-semibold flex items-center gap-2">
+                          {selectedRoomData.discount_percentage > 0 && (
+                            <span className="line-through text-gray-400 text-xs">{formatCurrency(selectedRoomData.normal_rate)}</span>
+                          )}
+                          {formatCurrency(selectedRoomData.published_rate ?? selectedRoomData.normal_rate)}
+                        </span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-500">Durasi</span>
@@ -608,5 +625,3 @@ export default function BookingPage() {
     </>
   )
 }
-
-

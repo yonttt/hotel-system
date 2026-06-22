@@ -2,7 +2,11 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../../../../state/AuthContext'
 import { apiService } from '../../../../api/api'
 import Layout from '../../../../ui/Layout'
+import UnifiedTableHeader from '../../../../ui/UnifiedTableHeader'
+import UnifiedTableFooter from '../../../../ui/UnifiedTableFooter'
 import useHotels from '../../../../logic/useHotels'
+import usePaginatedTable from '../../../../logic/usePaginatedTable'
+import { formatCurrencyFixed4 } from '../../../../utils/formatters'
 
 const GuestHistory = () => {
   const { user } = useAuth()
@@ -10,12 +14,8 @@ const GuestHistory = () => {
   const [registrations, setRegistrations] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [showEntries, setShowEntries] = useState(10)
-  const [currentPage, setCurrentPage] = useState(1)
   const [successMessage, setSuccessMessage] = useState(null)
-  const [selectedHotel, setSelectedHotel] = useState('ALL')
-  
+
   // Default date range: last 30 days to today
   const today = new Date().toISOString().split('T')[0]
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
@@ -34,11 +34,10 @@ const GuestHistory = () => {
   })
   const [processing, setProcessing] = useState(false)
 
-  useEffect(() => { 
-    loadRegistrations() 
+  useEffect(() => {
+    loadRegistrations()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateFrom, dateTo])
-  useEffect(() => { setCurrentPage(1) }, [searchTerm, showEntries, dateFrom, dateTo])
 
   const loadRegistrations = async () => {
     try {
@@ -67,29 +66,22 @@ const GuestHistory = () => {
     }
   }
 
-  const filteredRegistrations = registrations.filter(r => {
-    const term = searchTerm ? searchTerm.toLowerCase() : '';
-    
-    if (selectedHotel !== 'ALL' && r.hotel_name !== selectedHotel) {
-      return false;
-    }
-    
-    if (!term) return true;
-
-    return (
-      r.guest_name?.toLowerCase().includes(term) ||
-      r.registration_no?.toLowerCase().includes(term) ||
-      r.category_market?.toLowerCase().includes(term) ||
-      r.id_card_number?.toLowerCase().includes(term)
-    );
+  const {
+    searchTerm, setSearchTerm,
+    showEntries, setShowEntries,
+    currentPage, setCurrentPage,
+    selectedHotel, setSelectedHotel,
+    filteredItems: filteredRegistrations, currentData: currentRegistrations,
+    totalPages, startIndex, endIndex
+  } = usePaginatedTable(registrations, {
+    searchFields: ['guest_name', 'registration_no', 'category_market', 'id_card_number']
   })
 
-  const totalPages = Math.max(1, Math.ceil(filteredRegistrations.length / showEntries))
-  const startIndex = (currentPage - 1) * showEntries
-  const endIndex = startIndex + showEntries
-  const currentRegistrations = filteredRegistrations.slice(startIndex, endIndex)
+  useEffect(() => {
+    setCurrentPage(1)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dateFrom, dateTo])
 
-  const formatCurrency = (amount) => !amount ? '0.0000' : parseFloat(amount).toFixed(4)
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A'
     const date = new Date(dateString)
@@ -185,71 +177,34 @@ const GuestHistory = () => {
           </div>
         )}
 
-        <div className="unified-header-controls">
-          <div className="header-row header-row-top">
-            <div className="unified-header-left">
-              <div className="header-title">
-                <span>Guest History Information</span>
-              </div>
-              <div className="date-range-section">
-                <label>Date :</label>
-                <input
-                  type="date"
-                  className="date-input"
-                  value={dateFrom}
-                  onChange={(e) => setDateFrom(e.target.value)}
-                />
-                <span className="date-separator">To</span>
-                <input
-                  type="date"
-                  className="date-input"
-                  value={dateTo}
-                  onChange={(e) => setDateTo(e.target.value)}
-                />
-              </div>
+        <UnifiedTableHeader
+          title="Guest History Information"
+          actions={(
+            <div className="date-range-section">
+              <label>Date :</label>
+              <input
+                type="date"
+                className="date-input"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+              />
+              <span className="date-separator">To</span>
+              <input
+                type="date"
+                className="date-input"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+              />
             </div>
-            <div className="unified-header-right">
-              <div className="hotel-select">
-                <label>Hotel :</label>
-                <select 
-                  className="header-hotel-select"
-                  value={selectedHotel}
-                  onChange={(e) => setSelectedHotel(e.target.value)}
-                >
-                  <option value="ALL">ALL</option>
-                  {hotels.map(hotel => (
-                    <option key={hotel.id} value={hotel.name}>{hotel.name}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-          <div className="header-row header-row-bottom">
-            <div className="unified-header-left">
-              <div className="search-section">
-                <label>Search :</label>
-                <input
-                  type="text"
-                  className="search-input"
-                  placeholder="Search here..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="unified-header-right">
-              <div className="entries-control">
-                <span className="entries-label">Show entries:</span>
-                <select className="entries-select" value={showEntries} onChange={(e) => setShowEntries(Number(e.target.value))}>
-                  <option value={10}>10</option>
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
+          )}
+          hotels={hotels}
+          selectedHotel={selectedHotel}
+          onHotelChange={setSelectedHotel}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          showEntries={showEntries}
+          onEntriesChange={setShowEntries}
+        />
 
         <div className="unified-table-wrapper">
           <table className="reservation-table">
@@ -294,7 +249,7 @@ const GuestHistory = () => {
                     <td className="align-center">{registration.nights || calculateNights(registration.arrival_date, registration.departure_date)}</td>
                     <td>{formatDate(registration.arrival_date)}</td>
                     <td>{formatDate(registration.departure_date)}</td>
-                    <td className="align-right">{formatCurrency(registration.payment_amount || 0)}</td>
+                    <td className="align-right">{formatCurrencyFixed4(registration.payment_amount || 0)}</td>
                     <td className="align-center">
                       {canEdit() && (
                         <button 
@@ -313,15 +268,14 @@ const GuestHistory = () => {
           </table>
         </div>
 
-        <div className="unified-footer">
-          <div className="entries-info">{`Showing ${filteredRegistrations.length > 0 ? startIndex + 1 : 0} to ${Math.min(endIndex, filteredRegistrations.length)} of ${filteredRegistrations.length} entries`}</div>
-          <div className="pagination">
-            <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>First</button>
-            <button onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1}>Previous</button>
-            <button onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages}>Next</button>
-            <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages}>Last</button>
-          </div>
-        </div>
+        <UnifiedTableFooter
+          startIndex={startIndex}
+          endIndex={endIndex}
+          total={filteredRegistrations.length}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </div>
 
       {/* Detail/Edit Modal */}
@@ -360,7 +314,7 @@ const GuestHistory = () => {
                 <div style={{ marginBottom: '10px' }}><strong>Arrival:</strong> {formatDate(selectedItem?.arrival_date)}</div>
                 <div style={{ marginBottom: '10px' }}><strong>Departure:</strong> {formatDate(selectedItem?.departure_date)}</div>
                 <div style={{ marginBottom: '10px' }}><strong>Nights:</strong> {calculateNights(selectedItem?.arrival_date, selectedItem?.departure_date)}</div>
-                <div style={{ marginBottom: '10px' }}><strong>Payment:</strong> {formatCurrency(selectedItem?.payment_amount || 0)}</div>
+                <div style={{ marginBottom: '10px' }}><strong>Payment:</strong> {formatCurrencyFixed4(selectedItem?.payment_amount || 0)}</div>
                 <div style={{ marginBottom: '20px' }}><strong>Notes:</strong> {selectedItem?.notes || 'N/A'}</div>
                 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #ddd', paddingTop: '15px' }}>

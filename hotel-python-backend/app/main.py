@@ -1,5 +1,6 @@
 ﻿from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from slowapi.errors import RateLimitExceeded
 import os
 from app.routes import auth, users, hotel_rooms, room_pricing, guests, hotel_registrations, hotel_reservations, cities, nationalities, category_markets, market_segments, payment_methods, group_bookings, revenue_reports, master_data, room_rates, master_meja, kategori_menu_resto, checkin, checkout, night_audit, properties, laundry, account_receivable, adjustments, chatbot, public_website, cms
@@ -51,6 +52,9 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"],
     expose_headers=["X-RateLimit-Limit", "X-RateLimit-Remaining", "X-RateLimit-Reset"],
 )
+
+# Serve uploaded files (payment proofs, etc.) so the frontend can display them directly
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 # Health check endpoint
 @app.get("/health")

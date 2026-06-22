@@ -9,6 +9,7 @@ import ContactPage from './views/ContactPage'
 import OffersPage from './views/OffersPage'
 import GalleryPage from './views/GalleryPage'
 import BookingPage from './views/BookingPage'
+import BookingLookupPage from './views/BookingLookupPage'
 import HotelDetailPage from './views/HotelDetailPage'
 import LoginPage from './views/LoginPage'
 import RegisterPage from './views/RegisterPage'
@@ -29,6 +30,7 @@ function App() {
           <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/booking" element={<BookingPage />} />
+          <Route path="/cek-booking" element={<BookingLookupPage />} />
           <Route path="/hotels/:id" element={<HotelDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />

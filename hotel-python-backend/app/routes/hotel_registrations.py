@@ -4,7 +4,7 @@ from typing import List
 from app.config.database import get_db
 from app.config.auth import get_current_user, get_current_manager_or_admin_user, get_optional_user
 from app.config.room_utils import update_room_status
-from app.tables import User, HotelRegistration, Guest
+from app.tables import User, HotelRegistration, HotelReservation, Guest
 from app.rules import (
     GuestRegistrationCreate, 
     GuestRegistrationResponse, 
@@ -71,12 +71,36 @@ def create_guest_registration(
         # Update room status based on transaction_status
         if registration.room_number:
             if registration.transaction_status == 'Check-in':
+                # Validate guest details before allowing check-in status
+                missing_fields = []
+                if not registration_data.get('guest_name') or not str(registration_data.get('guest_name')).strip():
+                    missing_fields.append("Guest Name")
+                if not registration_data.get('id_card_number') or not str(registration_data.get('id_card_number')).strip():
+                    missing_fields.append("ID Card Number (KTP/Passport)")
+                if not registration_data.get('mobile_phone') or not str(registration_data.get('mobile_phone')).strip():
+                    missing_fields.append("Phone Number")
+                    
+                if missing_fields:
+                    raise HTTPException(
+                        status_code=422,
+                        detail=f"Cannot check-in. Missing required guest information: {', '.join(missing_fields)}."
+                    )
+
                 # OR = Occupied Ready (guest has checked in)
                 update_room_status(db, registration.room_number, 'OR')
             elif registration.transaction_status == 'Registration':
                 # AR = Arrival (registered but not yet checked in)
                 update_room_status(db, registration.room_number, 'AR')
-        
+
+        # If this registration was created from a reservation, close that
+        # reservation out so it stops showing up as pending/confirmed.
+        if registration.reservation_no:
+            source_reservation = db.query(HotelReservation).filter(
+                HotelReservation.reservation_no == registration.reservation_no
+            ).first()
+            if source_reservation and source_reservation.transaction_status not in ('Checked-in', 'Checked-out', 'Cancelled'):
+                source_reservation.transaction_status = 'Checked-in'
+
         db.commit()
         db.refresh(db_registration)
         return db_registration
@@ -146,6 +170,21 @@ def update_guest_registration(
     if 'transaction_status' in update_data and registration.room_number:
         new_status = update_data['transaction_status']
         if new_status == 'Check-in':
+            # Validate guest details before allowing check-in status
+            missing_fields = []
+            if not update_data.get('guest_name', registration.guest_name) or not str(update_data.get('guest_name', registration.guest_name)).strip():
+                missing_fields.append("Guest Name")
+            if not update_data.get('id_card_number', registration.id_card_number) or not str(update_data.get('id_card_number', registration.id_card_number)).strip():
+                missing_fields.append("ID Card Number (KTP/Passport)")
+            if not update_data.get('mobile_phone', registration.mobile_phone) or not str(update_data.get('mobile_phone', registration.mobile_phone)).strip():
+                missing_fields.append("Phone Number")
+                
+            if missing_fields:
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"Cannot check-in. Missing required guest information: {', '.join(missing_fields)}."
+                )
+
             update_room_status(db, registration.room_number, 'OR')  # Occupied Ready
         elif new_status == 'Check-out':
             update_room_status(db, registration.room_number, 'CO')  # Checkout
@@ -181,26 +220,29 @@ def delete_guest_registration(
 @router.get("/next/registration-number")
 def get_next_registration_number(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User | None = Depends(get_optional_user)
 ):
     """Generate next available registration number."""
     try:
         from sqlalchemy import text
+        import re
         # Get the latest registration number using raw SQL to avoid model mismatch issues
         result = db.execute(text("SELECT registration_no FROM hotel_registrations ORDER BY id DESC LIMIT 1")).fetchone()
 
         if result and result[0]:
             try:
-                # Extract number from the registration number (assuming 10-digit format like "0000000001")
-                int(result[0])
+                # Extract only digits from the registration number (e.g. REG00000001 -> 1)
+                num_str = re.sub(r'\D', '', result[0])
+                last_number = int(num_str) if num_str else 0
+                next_number = last_number + 1
             except ValueError:
                 # If parsing fails, start from 1
                 next_number = 1
         else:
             next_number = 1
         
-        # Format as 10 digits with leading zeros
-        next_registration_no = f"{next_number:010d}"
+        # Format with prefix and 8 digits
+        next_registration_no = f"REG{next_number:08d}"
         
         return {"next_registration_no": next_registration_no}
     except Exception as e:
@@ -211,15 +253,30 @@ def cancel_registration_by_number(
     registration_no: str,
     db: Session = Depends(get_db)
 ):
-    """Mark a registration as Cancelled due to payment timeout."""
+    """Mark a registration as Cancelled due to payment timeout.
+
+    Intentionally unauthenticated so the public booking site can self-cancel
+    its own timed-out registration. To limit abuse from anyone guessing/
+    enumerating registration numbers, this only works while the registration
+    is still in 'Registration' status - it can't be used to cancel a guest
+    who has already checked in or checked out.
+    """
     db_reg = db.query(HotelRegistration).filter(HotelRegistration.registration_no == registration_no).first()
     if db_reg is None:
         raise HTTPException(status_code=404, detail="Registration not found")
-    
-    if db_reg.transaction_status != 'Cancelled':
-        db_reg.transaction_status = 'Cancelled'
-        if db_reg.room_number:
-            update_room_status(db, db_reg.room_number, 'VR')
-        db.commit()
-    
+
+    if db_reg.transaction_status == 'Cancelled':
+        return {"message": "Registration cancelled successfully"}
+
+    if db_reg.transaction_status != 'Registration':
+        raise HTTPException(
+            status_code=409,
+            detail="Only a pending registration can be cancelled this way. Please contact the hotel."
+        )
+
+    db_reg.transaction_status = 'Cancelled'
+    if db_reg.room_number:
+        update_room_status(db, db_reg.room_number, 'VR')
+    db.commit()
+
     return {"message": "Registration cancelled successfully"}

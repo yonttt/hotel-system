@@ -18,9 +18,11 @@ class RoomCategoryResponse(BaseModel):
     normal_rate: float
     weekend_rate: float
     six_hours_rate: Optional[float] = None
+    photo_url: Optional[str] = None
+    discount_percentage: Optional[float] = 0
     is_active: bool
     hotel_name: Optional[str] = None
-    
+
     class Config:
         from_attributes = True
 
@@ -31,6 +33,8 @@ class RoomCategoryUpdate(BaseModel):
     normal_rate: Optional[float] = None
     weekend_rate: Optional[float] = None
     six_hours_rate: Optional[float] = None
+    photo_url: Optional[str] = None
+    discount_percentage: Optional[float] = None
     is_active: Optional[bool] = None
 
 class RoomPricingResponse(BaseModel):
@@ -52,20 +56,20 @@ def get_room_categories(
         if current_user.role == 'admin':
             categories = db.execute(
                 text("""
-                    SELECT id, category_code, category_name, description, 
-                           normal_rate, weekend_rate, six_hours_rate, is_active, hotel_name
-                    FROM room_categories 
-                    WHERE is_active = 1 
+                    SELECT id, category_code, category_name, description,
+                           normal_rate, weekend_rate, six_hours_rate, photo_url, discount_percentage, is_active, hotel_name
+                    FROM room_categories
+                    WHERE is_active = 1
                     ORDER BY category_code
                 """)
             ).fetchall()
         else:
             categories = db.execute(
                 text("""
-                    SELECT id, category_code, category_name, description, 
-                           normal_rate, weekend_rate, six_hours_rate, is_active, hotel_name
-                    FROM room_categories 
-                    WHERE is_active = 1 
+                    SELECT id, category_code, category_name, description,
+                           normal_rate, weekend_rate, six_hours_rate, photo_url, discount_percentage, is_active, hotel_name
+                    FROM room_categories
+                    WHERE is_active = 1
                       AND (hotel_name = :hotel_name OR hotel_name IS NULL)
                     ORDER BY category_code
                 """),
@@ -204,6 +208,8 @@ class RoomCategoryCreate(BaseModel):
     normal_rate: float = 0
     weekend_rate: float = 0
     six_hours_rate: Optional[float] = None
+    photo_url: Optional[str] = None
+    discount_percentage: Optional[float] = 0
     is_active: bool = True
 
 @router.post("/categories", response_model=RoomCategoryResponse)
@@ -228,8 +234,8 @@ def create_room_category(
         
         db.execute(
             text("""
-                INSERT INTO room_categories (category_code, category_name, description, normal_rate, weekend_rate, six_hours_rate, is_active, hotel_name)
-                VALUES (:code, :name, :desc, :normal, :weekend, :six_hours, :active, :h_name)
+                INSERT INTO room_categories (category_code, category_name, description, normal_rate, weekend_rate, six_hours_rate, photo_url, discount_percentage, is_active, hotel_name)
+                VALUES (:code, :name, :desc, :normal, :weekend, :six_hours, :photo_url, :discount, :active, :h_name)
             """),
             {
                 "code": category.category_code,
@@ -238,15 +244,17 @@ def create_room_category(
                 "normal": category.normal_rate,
                 "weekend": category.weekend_rate,
                 "six_hours": category.six_hours_rate,
+                "photo_url": category.photo_url,
+                "discount": category.discount_percentage or 0,
                 "active": category.is_active,
                 "h_name": current_user.hotel_name
             }
         )
         db.commit()
-        
+
         created = db.execute(
             text("""
-                SELECT id, category_code, category_name, description, normal_rate, weekend_rate, six_hours_rate, is_active, hotel_name
+                SELECT id, category_code, category_name, description, normal_rate, weekend_rate, six_hours_rate, photo_url, discount_percentage, is_active, hotel_name
                 FROM room_categories WHERE id = LAST_INSERT_ID()
             """)
         ).first()
@@ -338,7 +346,15 @@ def update_room_category(
         if category_update.six_hours_rate is not None:
             update_fields.append("six_hours_rate = :six_hours_rate")
             params["six_hours_rate"] = category_update.six_hours_rate
-            
+
+        if category_update.photo_url is not None:
+            update_fields.append("photo_url = :photo_url")
+            params["photo_url"] = category_update.photo_url
+
+        if category_update.discount_percentage is not None:
+            update_fields.append("discount_percentage = :discount_percentage")
+            params["discount_percentage"] = category_update.discount_percentage
+
         if category_update.is_active is not None:
             update_fields.append("is_active = :is_active")
             params["is_active"] = category_update.is_active
@@ -358,9 +374,9 @@ def update_room_category(
         # Get the updated category
         updated = db.execute(
             text("""
-                SELECT id, category_code, category_name, description, 
-                       normal_rate, weekend_rate, six_hours_rate, is_active
-                FROM room_categories 
+                SELECT id, category_code, category_name, description,
+                       normal_rate, weekend_rate, six_hours_rate, photo_url, discount_percentage, is_active, hotel_name
+                FROM room_categories
                 WHERE id = :id
             """),
             {"id": category_id}

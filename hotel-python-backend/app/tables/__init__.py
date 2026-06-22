@@ -107,6 +107,7 @@ class HotelReservation(Base):
     extra_bed_nights = Column(Integer, default=0)
     extra_bed_qty = Column(Integer, default=0)
     room_number = Column(String(20))
+    room_type = Column(String(50), nullable=True)
     payment_method = Column(String(100), default='Debit BCA 446')
     payment_amount = Column(DECIMAL(10, 2), default=0.00)
     discount = Column(DECIMAL(10, 2), default=0.00)
@@ -131,6 +132,7 @@ class HotelRegistration(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     registration_no = Column(String(20), unique=True)
+    reservation_no = Column(String(20), nullable=True)
     guest_id = Column(Integer, ForeignKey('guests.id'), nullable=True)
     category_market = Column(String(50), default='Normal')
     market_segment = Column(String(50), default='Normal')

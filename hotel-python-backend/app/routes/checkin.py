@@ -16,7 +16,7 @@ class CheckinResponse(BaseModel):
     id: int
     registration_no: Optional[str] = None
     hotel_name: Optional[str] = None
-    guest_name: str
+    guest_name: Optional[str] = None
     guest_type: Optional[str] = None
     market_segment: Optional[str] = None
     room_number: Optional[str] = None
@@ -88,19 +88,19 @@ def get_checkin_today(
                 "id": row[0],
                 "registration_no": row[1],
                 "hotel_name": row[2],
-                "guest_name": row[3],
+                "guest_name": str(row[3]) if row[3] else "Unknown Guest",
                 "guest_type": row[4],
                 "market_segment": row[5],
                 "room_number": row[6],
                 "nights": row[7] or 0,
-                "arrival_date": row[8],
-                "departure_date": row[9],
+                "arrival_date": str(row[8]) if row[8] else None,
+                "departure_date": str(row[9]) if row[9] else None,
                 "payment_amount": float(row[10] or 0),
                 "deposit": float(row[11] or 0),
                 "balance": float(row[12] or 0),
                 "transaction_status": row[13],
                 "transaction_by": row[14],
-                "created_at": row[15]
+                "created_at": str(row[15]) if row[15] else None
             })
         
         return checkins
@@ -128,7 +128,8 @@ def process_checkin(
                 SELECT 
                     id, registration_no, guest_name, room_number,
                     hotel_name,
-                    transaction_status
+                    transaction_status,
+                    id_card_number, mobile_phone, address
                 FROM hotel_registrations
                 WHERE id = :id AND transaction_status = 'Registration'
             """),
@@ -140,6 +141,21 @@ def process_checkin(
             raise HTTPException(
                 status_code=404,
                 detail="Registration not found or not in Registration status"
+            )
+            
+        # Validation: Ensure guest details are complete before checking in
+        missing_fields = []
+        if not row.guest_name or not row.guest_name.strip():
+            missing_fields.append("Guest Name")
+        if not row.id_card_number or not row.id_card_number.strip():
+            missing_fields.append("ID Card Number (KTP/Passport)")
+        if not row.mobile_phone or not row.mobile_phone.strip():
+            missing_fields.append("Phone Number")
+            
+        if missing_fields:
+            raise HTTPException(
+                status_code=422,
+                detail=f"Cannot check-in. Missing required guest information: {', '.join(missing_fields)}. Please update the guest details first."
             )
         
         checkin_by = checkin_data.checkin_by if checkin_data else current_user.username

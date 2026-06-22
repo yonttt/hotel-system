@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../../../../api/api';
 import Layout from '../../../../ui/Layout';
+import UnifiedTableHeader from '../../../../ui/UnifiedTableHeader';
+import UnifiedTableFooter from '../../../../ui/UnifiedTableFooter';
 import { useAuth } from '../../../../state/AuthContext';
 import useHotels from '../../../../logic/useHotels';
+import usePaginatedTable from '../../../../logic/usePaginatedTable';
 
 const MasterRoomType = () => {
   const { user } = useAuth();
@@ -10,10 +13,6 @@ const MasterRoomType = () => {
   const [roomTypes, setRoomTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showEntries, setShowEntries] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedHotel, setSelectedHotel] = useState('ALL');
   const [successMessage, setSuccessMessage] = useState(null);
 
   // Modal state
@@ -26,7 +25,9 @@ const MasterRoomType = () => {
     normal_rate: 0,
     weekend_rate: 0,
     six_hours_rate: 0,
-    description: ''
+    description: '',
+    photo_url: '',
+    discount_percentage: 0
   });
   const [processing, setProcessing] = useState(false);
 
@@ -50,29 +51,16 @@ const MasterRoomType = () => {
     }
   };
 
-  // Filter data
-  const filteredData = roomTypes.filter(item => {
-    const matchesSearch = 
-      item.category_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.category_name?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    // Check if the item belongs to the selected hotel (or globally shared if null)
-    let itemHotel = item.hotel_name;
-    if (!itemHotel) itemHotel = 'ALL';
-    const matchesHotel = selectedHotel === 'ALL' || itemHotel === selectedHotel;
-    
-    return matchesSearch && matchesHotel;
+  const {
+    searchTerm, setSearchTerm,
+    showEntries, setShowEntries,
+    currentPage, setCurrentPage,
+    selectedHotel, setSelectedHotel,
+    filteredItems, currentData: currentItems,
+    totalPages, startIndex: indexOfFirstItem, endIndex: indexOfLastItem
+  } = usePaginatedTable(roomTypes, {
+    searchFields: ['category_code', 'category_name']
   });
-
-  // Pagination
-  const indexOfLastItem = currentPage * showEntries;
-  const indexOfFirstItem = indexOfLastItem - showEntries;
-  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredData.length / showEntries);
-
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('id-ID', {
@@ -93,7 +81,9 @@ const MasterRoomType = () => {
       normal_rate: 0,
       weekend_rate: 0,
       six_hours_rate: 0,
-      description: ''
+      description: '',
+      photo_url: '',
+      discount_percentage: 0
     });
   };
 
@@ -115,7 +105,8 @@ const MasterRoomType = () => {
         ...formData,
         normal_rate: parseFloat(formData.normal_rate) || 0,
         weekend_rate: parseFloat(formData.weekend_rate) || 0,
-        six_hours_rate: parseFloat(formData.six_hours_rate) || null
+        six_hours_rate: parseFloat(formData.six_hours_rate) || null,
+        discount_percentage: parseFloat(formData.discount_percentage) || 0
       });
       setSuccessMessage(`Room type "${formData.category_name}" added successfully`);
       setShowAddModal(false);
@@ -140,7 +131,9 @@ const MasterRoomType = () => {
       normal_rate: item.normal_rate || 0,
       weekend_rate: item.weekend_rate || 0,
       six_hours_rate: item.six_hours_rate || 0,
-      description: item.description || ''
+      description: item.description || '',
+      photo_url: item.photo_url || '',
+      discount_percentage: item.discount_percentage || 0
     });
     setShowEditModal(true);
   };
@@ -157,7 +150,8 @@ const MasterRoomType = () => {
         ...formData,
         normal_rate: parseFloat(formData.normal_rate) || 0,
         weekend_rate: parseFloat(formData.weekend_rate) || 0,
-        six_hours_rate: parseFloat(formData.six_hours_rate) || null
+        six_hours_rate: parseFloat(formData.six_hours_rate) || null,
+        discount_percentage: parseFloat(formData.discount_percentage) || 0
       });
       setSuccessMessage(`Room type "${formData.category_name}" updated successfully`);
       setShowEditModal(false);
@@ -211,88 +205,34 @@ const MasterRoomType = () => {
         </div>
       )}
 
-      {/* Header Controls */}
-      <div className="unified-header-controls">
-        {/* Top Row - Title and Hotel Filter */}
-        <div className="header-row header-row-top">
-          <div className="unified-header-left">
-            <h2 className="header-title">MASTER ROOM TYPE</h2>
-            {canEdit() && (
-              <button
-                onClick={handleAddClick}
-                className="btn-table-action"
-                style={{
-                  background: '#007bff',
-                  color: 'white',
-                  padding: '6px 16px',
-                  marginLeft: '20px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}
-              >
-                ADD
-              </button>
-            )}
-          </div>
-          <div className="unified-header-right">
-            <div className="hotel-select">
-              <label>Filter Hotel:</label>
-              <select 
-                className="header-hotel-select"
-                value={selectedHotel}
-                onChange={(e) => {
-                  setSelectedHotel(e.target.value);
-                  setCurrentPage(1);
-                }}
-              >
-                <option value="ALL">ALL</option>
-                {hotelNames.map(name => (
-                  <option key={name} value={name}>{name}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Row - Search and Entries */}
-        <div className="header-row header-row-bottom">
-          <div className="unified-header-left">
-            <div className="search-section">
-              <label>Search:</label>
-              <input
-                type="text"
-                className="search-input"
-                placeholder="Search here..."
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1);
-                }}
-              />
-            </div>
-          </div>
-          <div className="unified-header-right">
-            <div className="entries-control">
-              <span className="entries-label">Show entries:</span>
-              <select 
-                className="entries-select" 
-                value={showEntries} 
-                onChange={(e) => {
-                  setShowEntries(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
-              >
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
+      <UnifiedTableHeader
+        title="MASTER ROOM TYPE"
+        actions={canEdit() && (
+          <button
+            onClick={handleAddClick}
+            className="btn-table-action"
+            style={{
+              background: '#007bff',
+              color: 'white',
+              padding: '6px 16px',
+              marginLeft: '20px',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            ADD
+          </button>
+        )}
+        hotels={hotelNames.map(name => ({ id: name, name }))}
+        selectedHotel={selectedHotel}
+        onHotelChange={setSelectedHotel}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        showEntries={showEntries}
+        onEntriesChange={setShowEntries}
+      />
 
       {/* Table */}
       <div className="unified-table-wrapper">
@@ -305,21 +245,23 @@ const MasterRoomType = () => {
               <th className="align-right">Normal Rate</th>
               <th className="align-right">Weekend Rate</th>
               <th className="align-right">6 Hours</th>
+              <th className="align-right">Discount</th>
+              <th>Photo</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="7" className="loading-spinner">Loading...</td>
+                <td colSpan="9" className="loading-spinner">Loading...</td>
               </tr>
             ) : error ? (
               <tr>
-                <td colSpan="7" className="error-message">{error}</td>
+                <td colSpan="9" className="error-message">{error}</td>
               </tr>
             ) : currentItems.length === 0 ? (
               <tr>
-                <td colSpan="7" className="no-data">No data available in table</td>
+                <td colSpan="9" className="no-data">No data available in table</td>
               </tr>
             ) : (
               currentItems.map((item, index) => (
@@ -330,6 +272,12 @@ const MasterRoomType = () => {
                   <td className="align-right">{formatCurrency(item.normal_rate || 0)}</td>
                   <td className="align-right">{formatCurrency(item.weekend_rate || 0)}</td>
                   <td className="align-right">{item.six_hours_rate ? formatCurrency(item.six_hours_rate) : '-'}</td>
+                  <td className="align-right">{item.discount_percentage ? `${item.discount_percentage}%` : '-'}</td>
+                  <td>
+                    {item.photo_url ? (
+                      <img src={item.photo_url} alt={item.category_name} style={{ width: '50px', height: '36px', objectFit: 'cover', borderRadius: '4px' }} />
+                    ) : '-'}
+                  </td>
                   <td>
                     {canEdit() && (
                       <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
@@ -357,47 +305,15 @@ const MasterRoomType = () => {
         </table>
       </div>
 
-      {/* Footer */}
-      <div className="unified-footer">
-        <div className="entries-info">
-          Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredData.length)} of {filteredData.length} entries
-        </div>
-        <div className="pagination">
-          <button
-            onClick={() => handlePageChange(1)}
-            disabled={currentPage === 1}
-          >
-            First
-          </button>
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          {[...Array(totalPages)].map((_, i) => (
-            <button
-              key={i + 1}
-              onClick={() => handlePageChange(i + 1)}
-              className={currentPage === i + 1 ? 'active' : ''}
-            >
-              {i + 1}
-            </button>
-          ))}
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
-          <button
-            onClick={() => handlePageChange(totalPages)}
-            disabled={currentPage === totalPages}
-          >
-            Last
-          </button>
-        </div>
-      </div>
+      <UnifiedTableFooter
+        startIndex={indexOfFirstItem}
+        endIndex={indexOfLastItem}
+        total={filteredItems.length}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        showPageNumbers
+      />
       </div>
 
       {/* Add/Edit Modal */}
@@ -477,12 +393,40 @@ const MasterRoomType = () => {
               </div>
             </div>
 
-            <div style={{ marginBottom: '20px' }}>
+            <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Description</label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
                 style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', minHeight: '80px' }}
+                placeholder="Tampil di website publik sebagai deskripsi kamar"
+              />
+            </div>
+
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Photo URL</label>
+              <input
+                type="text"
+                value={formData.photo_url}
+                onChange={(e) => setFormData({...formData, photo_url: e.target.value})}
+                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                placeholder="https://... (foto kamar yang tampil di website)"
+              />
+              {formData.photo_url && (
+                <img src={formData.photo_url} alt="preview" style={{ marginTop: '8px', width: '100%', maxHeight: '150px', objectFit: 'cover', borderRadius: '4px' }} />
+              )}
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Discount untuk Website (%)</label>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                value={formData.discount_percentage}
+                onChange={(e) => setFormData({...formData, discount_percentage: e.target.value})}
+                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                placeholder="0"
               />
             </div>
 

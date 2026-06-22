@@ -1,19 +1,19 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../../../api/api';
 import Layout from '../../../ui/Layout';
+import UnifiedTableHeader from '../../../ui/UnifiedTableHeader';
+import UnifiedTableFooter from '../../../ui/UnifiedTableFooter';
 import { useAuth } from '../../../state/AuthContext';
-  import useHotels from '../../../logic/useHotels';
+import useHotels from '../../../logic/useHotels';
+import usePaginatedTable from '../../../logic/usePaginatedTable';
+import { formatCurrencyIDR } from '../../../utils/formatters';
 
-  const PropertyList = () => {
-    const { user } = useAuth();
-    const { hotels } = useHotels();
-    const [selectedHotel, setSelectedHotel] = useState('ALL');
+const PropertyList = () => {
+  const { user } = useAuth();
+  const { hotels } = useHotels();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showEntries, setShowEntries] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
   const [successMessage, setSuccessMessage] = useState(null);
 
   // Modal state
@@ -48,10 +48,6 @@ import { useAuth } from '../../../state/AuthContext';
     fetchProperties();
   }, []);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, showEntries]);
-
   const fetchProperties = async () => {
     try {
       setLoading(true);
@@ -65,30 +61,17 @@ import { useAuth } from '../../../state/AuthContext';
     }
   };
 
-  const filteredProperties = properties.filter(prop => {
-    const term = searchTerm.toLowerCase();
-    const searchMatch = (
-      prop.name?.toLowerCase().includes(term) ||
-      prop.category?.toLowerCase().includes(term) ||
-      prop.address?.toLowerCase().includes(term) ||
-      prop.phone?.toLowerCase().includes(term) ||
-      prop.code?.toLowerCase().includes(term)
-    );
-    
-    const hotelMatch = selectedHotel === 'ALL' || prop.name === selectedHotel;
-    
-    return searchMatch && hotelMatch;
+  const {
+    searchTerm, setSearchTerm,
+    showEntries, setShowEntries,
+    currentPage, setCurrentPage,
+    selectedHotel, setSelectedHotel,
+    filteredItems: filteredProperties, currentData: currentProperties,
+    totalPages, startIndex, endIndex
+  } = usePaginatedTable(properties, {
+    searchFields: ['name', 'category', 'address', 'phone', 'code'],
+    hotelField: 'name'
   });
-
-  const totalPages = Math.max(1, Math.ceil(filteredProperties.length / showEntries));
-  const startIndex = (currentPage - 1) * showEntries;
-  const endIndex = startIndex + showEntries;
-  const currentProperties = filteredProperties.slice(startIndex, endIndex);
-
-  const formatNumber = (num) => {
-    if (!num) return '0';
-    return Number(num).toLocaleString('id-ID');
-  };
 
   const resetForm = () => {
     setFormData({
@@ -461,13 +444,10 @@ import { useAuth } from '../../../state/AuthContext';
   return (
     <Layout>
       <div className="unified-reservation-container">
-        {/* Header Controls */}
-        <div className="unified-header-controls">
-          <div className="header-row header-row-top">
-            <div className="unified-header-left">
-              <div className="header-title">
-                <span>PROFIL HOTEL</span>
-              </div>
+        <UnifiedTableHeader
+          title="PROFIL HOTEL"
+          actions={(
+            <>
               <button
                 onClick={() => { resetForm(); setShowAddModal(true); setSubmitError(null); }}
                 className="btn-table-action"
@@ -500,49 +480,16 @@ import { useAuth } from '../../../state/AuthContext';
               >
                 Print
               </button>
-            </div>
-            <div className="unified-header-right">
-              <div className="hotel-select">
-                <label>Hotel :</label>
-                <select className="header-hotel-select" value={selectedHotel} onChange={(e) => setSelectedHotel(e.target.value)}>
-                  <option value="ALL">ALL</option>
-                  {hotels.map(h => (
-                    <option key={h.id} value={h.name}>{h.name}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-          <div className="header-row header-row-bottom">
-            <div className="unified-header-left">
-              <div className="search-section">
-                <label>Search :</label>
-                <input
-                  type="text"
-                  className="search-input"
-                  placeholder="Search here..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="unified-header-right">
-              <div className="entries-control">
-                <span className="entries-label">Show entries:</span>
-                <select
-                  className="entries-select"
-                  value={showEntries}
-                  onChange={(e) => setShowEntries(Number(e.target.value))}
-                >
-                  <option value={10}>10</option>
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
+            </>
+          )}
+          hotels={hotels}
+          selectedHotel={selectedHotel}
+          onHotelChange={setSelectedHotel}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          showEntries={showEntries}
+          onEntriesChange={setShowEntries}
+        />
 
         {/* Success/Error Messages */}
         {successMessage && (
@@ -648,13 +595,13 @@ import { useAuth } from '../../../state/AuthContext';
                         <span style={{ color: '#aaa', fontSize: '11px' }}>No logo</span>
                       )}
                     </td>
-                    <td style={{ textAlign: 'right' }}>{formatNumber(prop.umh)}</td>
-                    <td style={{ textAlign: 'right' }}>{formatNumber(prop.umk)}</td>
+                    <td style={{ textAlign: 'right' }}>{formatCurrencyIDR(prop.umh)}</td>
+                    <td style={{ textAlign: 'right' }}>{formatCurrencyIDR(prop.umk)}</td>
                     <td style={{ textAlign: 'center' }}>{prop.plafon_covid}</td>
-                    <td style={{ textAlign: 'right' }}>{formatNumber(prop.sub_cabang)}</td>
-                    <td style={{ textAlign: 'right' }}>{formatNumber(prop.t_tetap)}</td>
-                    <td style={{ textAlign: 'right' }}>{formatNumber(prop.t_jabatan)}</td>
-                    <td style={{ textAlign: 'right' }}>{formatNumber(prop.t_penempatan)}</td>
+                    <td style={{ textAlign: 'right' }}>{formatCurrencyIDR(prop.sub_cabang)}</td>
+                    <td style={{ textAlign: 'right' }}>{formatCurrencyIDR(prop.t_tetap)}</td>
+                    <td style={{ textAlign: 'right' }}>{formatCurrencyIDR(prop.t_jabatan)}</td>
+                    <td style={{ textAlign: 'right' }}>{formatCurrencyIDR(prop.t_penempatan)}</td>
                     <td style={{ textAlign: 'right' }}>{prop.extrabed}</td>
                     <td style={{ textAlign: 'center' }}>
                       <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
@@ -691,39 +638,15 @@ import { useAuth } from '../../../state/AuthContext';
           </table>
         </div>
 
-        {/* Pagination */}
-        <div className="unified-footer">
-          <div className="entries-info">
-            Showing {startIndex + 1} to {Math.min(endIndex, filteredProperties.length)} of {filteredProperties.length} entries
-            {searchTerm && ` (filtered from ${properties.length} total entries)`}
-          </div>
-          <div className="pagination">
-            <button
-              onClick={() => setCurrentPage(1)}
-              disabled={currentPage === 1}
-            >
-              First
-            </button>
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </button>
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </button>
-            <button
-              onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage === totalPages}
-            >
-              Last
-            </button>
-          </div>
-        </div>
+        <UnifiedTableFooter
+          startIndex={startIndex}
+          endIndex={endIndex}
+          total={filteredProperties.length}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          extraInfo={searchTerm && ` (filtered from ${properties.length} total entries)`}
+        />
 
         {/* Modals */}
         {renderModal(false)}

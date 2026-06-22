@@ -9,6 +9,7 @@ const navLinks = [
   { name: 'Galeri', path: '/gallery' },
   { name: 'Tentang Kami', path: '/about' },
   { name: 'Kontak', path: '/contact' },
+  { name: 'Cek Booking', path: '/cek-booking' },
 ]
 
 export default function Navbar() {

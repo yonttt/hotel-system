@@ -3,9 +3,7 @@ import Layout from '../../ui/Layout'
 
 const AdjustmentPage = () => {
   const menuItems = [
-    { title: 'Front Office - Check In', description: 'Process and adjust guest check-ins', path: '/operational/adjustment/front-office/checkin', icon: '📝' },
-    { title: 'Front Office - Check Out', description: 'Process and adjust guest check-outs', path: '/operational/adjustment/front-office/checkout', icon: '🚪' },
-    { title: 'Front Office - Night Audit', description: 'Night audit adjustments and reconciliation', path: '/operational/adjustment/front-office/night-audit', icon: '🌙' },
+    { title: 'Front Office', description: 'Room charge, deposit, and stay detail corrections', path: '/operational/adjustment/front-office', icon: '🏨' },
     { title: 'Food & Beverage', description: 'F&B transaction adjustments and corrections', path: '/operational/adjustment/food-beverage', icon: '🍽️' },
     { title: 'Inventory', description: 'Stock adjustments and inventory corrections', path: '/operational/adjustment/inventory', icon: '📦' },
     { title: 'Kos', description: 'Boarding house adjustments', path: '/operational/adjustment/kos', icon: '🏠' },

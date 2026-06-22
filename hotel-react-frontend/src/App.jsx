@@ -77,9 +77,7 @@ import FoodBeveragePage from './views/operational/FoodBeveragePage';
 import LaundryPage from './views/operational/LaundryPage';
 
 // Operational - Adjustment
-import CheckInToday from './views/operational/adjustment/CheckInToday';
-import CheckOutToday from './views/operational/adjustment/CheckOutToday';
-import NightAudit from './views/operational/adjustment/NightAudit';
+import AdjFrontOffice from './views/operational/adjustment/AdjFrontOffice';
 import AdjFoodBeverage from './views/operational/adjustment/AdjFoodBeverage';
 import AdjInventory from './views/operational/adjustment/AdjInventory';
 import AdjKos from './views/operational/adjustment/AdjKos';
@@ -100,6 +98,11 @@ import ReservasiToday from './views/operational/frontoffice/informasi_reservasi/
 import CheckinToday from './views/operational/frontoffice/informasi_tamu/CheckinToday';
 import GuestHistory from './views/operational/frontoffice/informasi_tamu/GuestHistory';
 import InhouseGuest from './views/operational/frontoffice/informasi_tamu/InhouseGuest';
+
+// Operational - Front Office - Front Desk Actions
+import ProcessCheckIn from './views/operational/frontoffice/ProcessCheckIn';
+import ProcessCheckOut from './views/operational/frontoffice/ProcessCheckOut';
+import NightAudit from './views/operational/frontoffice/NightAudit';
 
 // Operational - Housekeeping - Master Data
 import MasterRoomType from './views/operational/housekeeping/master_data/MasterRoomType';
@@ -224,42 +227,16 @@ function App() {
               } 
             />
             
-            {/* Adjustment - Front Office - Check In */}
-            <Route 
-              path="/operational/adjustment/front-office/checkin" 
+            {/* Adjustment - Front Office */}
+            <Route
+              path="/operational/adjustment/front-office"
               element={
                 <ProtectedRoute>
-                  <ErrorBoundary>
-                    <CheckInToday />
-                  </ErrorBoundary>
+                  <AdjFrontOffice />
                 </ProtectedRoute>
-              } 
+              }
             />
-            
-            {/* Adjustment - Front Office - Checkout */}
-            <Route 
-              path="/operational/adjustment/front-office/checkout" 
-              element={
-                <ProtectedRoute>
-                  <ErrorBoundary>
-                    <CheckOutToday />
-                  </ErrorBoundary>
-                </ProtectedRoute>
-              } 
-            />
-            
-            {/* Adjustment - Front Office - Night Audit */}
-            <Route 
-              path="/operational/adjustment/front-office/night-audit" 
-              element={
-                <ProtectedRoute>
-                  <ErrorBoundary>
-                    <NightAudit />
-                  </ErrorBoundary>
-                </ProtectedRoute>
-              } 
-            />
-            
+
             {/* Adjustment - Food & Beverage */}
             <Route 
               path="/operational/adjustment/food-beverage" 
@@ -479,17 +456,49 @@ function App() {
                 </ProtectedRoute>
               } 
             />
-            <Route 
-              path="/operational/frontoffice/informasi-tamu/in-house-guest" 
+            <Route
+              path="/operational/frontoffice/informasi-tamu/in-house-guest"
               element={
                 <ProtectedRoute>
                   <ErrorBoundary>
                     <InhouseGuest />
                   </ErrorBoundary>
                 </ProtectedRoute>
-              } 
+              }
             />
-            
+
+            {/* Front Office - Front Desk Actions */}
+            <Route
+              path="/operational/frontoffice/front-desk/checkin"
+              element={
+                <ProtectedRoute>
+                  <ErrorBoundary>
+                    <ProcessCheckIn />
+                  </ErrorBoundary>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/operational/frontoffice/front-desk/checkout"
+              element={
+                <ProtectedRoute>
+                  <ErrorBoundary>
+                    <ProcessCheckOut />
+                  </ErrorBoundary>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/operational/frontoffice/front-desk/night-audit"
+              element={
+                <ProtectedRoute>
+                  <ErrorBoundary>
+                    <NightAudit />
+                  </ErrorBoundary>
+                </ProtectedRoute>
+              }
+            />
+
             {/* HRD Routes */}
             <Route 
               path="/hrd/account-receivable" 
