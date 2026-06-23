@@ -6,6 +6,7 @@ import Button from '../../../../ui/Button'
 import DataTable from '../../../../ui/DataTable'
 import UnifiedTableHeader from '../../../../ui/UnifiedTableHeader'
 import UnifiedTableFooter from '../../../../ui/UnifiedTableFooter'
+import { payReservation } from '../../../../logic/payment'
 import useHotels from '../../../../logic/useHotels'
 import usePaginatedTable from '../../../../logic/usePaginatedTable'
 import { formatDate, formatCurrencyFixed4 } from '../../../../utils/formatters'
@@ -164,10 +165,13 @@ const ReservasiDeposit = () => {
             { key: 'departure', header: 'Departure Date', render: (r) => formatDate(r.departure_date) },
             { key: 'deposit_by', header: 'Deposit By', render: (r) => r.payment_method || 'N/A' },
             { key: 'deposit', header: 'Deposit', align: 'right', render: (r) => formatCurrencyFixed4(r.deposit || 0) },
-            ...(canEdit() ? [{
-              key: 'action', header: 'Action', align: 'center', width: '100px',
-              render: (r) => <Button variant="ghost" size="sm" onClick={() => handleEditClick(r)}>Edit</Button>
-            }] : [])
+            { key: 'action', header: 'Action', align: 'center', width: '170px',
+              render: (r) => (
+                <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                  <Button variant="success" size="sm" onClick={() => payReservation(r.id, { onPaid: () => loadReservations() })}>Pay</Button>
+                  {canEdit() && <Button variant="ghost" size="sm" onClick={() => handleEditClick(r)}>Edit</Button>}
+                </div>
+              ) }
           ]}
         />
 

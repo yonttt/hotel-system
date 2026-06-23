@@ -265,6 +265,21 @@ class ApiService {
     return this.client.get('/hotel-reservations/next/reservation-number')
   }
 
+  // ==================== MIDTRANS PAYMENT APIs ====================
+
+  // Create a Midtrans Snap transaction for a reservation; returns { token, ... }
+  async createPayment(reservationId, amount = null) {
+    return this.client.post('/payments/create', {
+      reservation_id: reservationId,
+      amount,
+    })
+  }
+
+  // Get the current payment status for a reservation
+  async getPaymentStatus(reservationId) {
+    return this.client.get(`/payments/status/${reservationId}`)
+  }
+
   // Cities endpoints
   async getCities() {
     return this.client.get('/cities/')

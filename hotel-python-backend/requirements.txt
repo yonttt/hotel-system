@@ -12,3 +12,4 @@ python-multipart
 apscheduler
 email-validator
 requests
+midtransclient

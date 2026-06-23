@@ -26,6 +26,37 @@ def get_db():
     finally:
         db.close()
 
+def ensure_payment_columns():
+    """Idempotently add Midtrans columns to hotel_reservations.
+
+    SQLAlchemy's create_all() only creates missing tables, never adds columns
+    to existing ones, so we add them here via information_schema checks.
+    """
+    from sqlalchemy import text
+    columns = {
+        "midtrans_order_id": "VARCHAR(100) NULL",
+        "midtrans_payment_status": "VARCHAR(30) NULL",
+        "midtrans_snap_token": "VARCHAR(255) NULL",
+    }
+    try:
+        with engine.begin() as conn:
+            for name, ddl in columns.items():
+                exists = conn.execute(text(
+                    """
+                    SELECT COUNT(*) FROM information_schema.columns
+                    WHERE table_schema = DATABASE()
+                      AND table_name = 'hotel_reservations'
+                      AND column_name = :col
+                    """
+                ), {"col": name}).scalar()
+                if not exists:
+                    conn.execute(text(
+                        f"ALTER TABLE hotel_reservations ADD COLUMN {name} {ddl}"
+                    ))
+                    logger.info(f"Added column hotel_reservations.{name}")
+    except Exception as e:
+        logger.error(f"ensure_payment_columns failed: {e}")
+
 def get_db_connection():
     """Get direct MySQL connection for raw queries"""
     try:

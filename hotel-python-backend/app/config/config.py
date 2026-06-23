@@ -70,6 +70,12 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str = os.getenv("SMTP_PASSWORD", "")
     SMTP_TITLE: str = os.getenv("SMTP_TITLE", "Eva Group Hotel")
     ADMIN_EMAIL: str = os.getenv("ADMIN_EMAIL", "yonathantambani109@gmail.com")
+
+    # Midtrans Payment Gateway
+    MIDTRANS_MERCHANT_ID: str = os.getenv("MIDTRANS_MERCHANT_ID", "")
+    MIDTRANS_CLIENT_KEY: str = os.getenv("MIDTRANS_CLIENT_KEY", "")
+    MIDTRANS_SERVER_KEY: str = os.getenv("MIDTRANS_SERVER_KEY", "")
+    MIDTRANS_IS_PRODUCTION: bool = os.getenv("MIDTRANS_IS_PRODUCTION", "false").lower() == "true"
     
     class Config:
         case_sensitive = True

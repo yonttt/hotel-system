@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from slowapi.errors import RateLimitExceeded
-from app.routes import auth, users, hotel_rooms, room_pricing, guests, hotel_registrations, hotel_reservations, cities, nationalities, category_markets, market_segments, payment_methods, group_bookings, revenue_reports, master_data, room_rates, master_meja, kategori_menu_resto, checkin, checkout, night_audit, properties, laundry, account_receivable, adjustments, chatbot, public_website, cms
+from app.routes import auth, users, hotel_rooms, room_pricing, guests, hotel_registrations, hotel_reservations, cities, nationalities, category_markets, market_segments, payment_methods, group_bookings, revenue_reports, master_data, room_rates, master_meja, kategori_menu_resto, checkin, checkout, night_audit, properties, laundry, account_receivable, adjustments, chatbot, public_website, cms, payments
 from app.config.security_middleware import (
     limiter,
     SecurityHeadersMiddleware,
@@ -21,9 +21,10 @@ async def lifespan(app: FastAPI):
     """Application startup/shutdown. Initializes DB tables and the background scheduler."""
     # --- Startup ---
     try:
-        from app.config.database import engine
+        from app.config.database import engine, ensure_payment_columns
         from app.tables import Base
         Base.metadata.create_all(bind=engine)
+        ensure_payment_columns()
         logger.info("Database tables created successfully")
     except Exception as e:
         logger.error(f"Database initialization failed: {e}")
@@ -119,6 +120,7 @@ app.include_router(adjustments.router, prefix="", tags=["adjustments"])
 app.include_router(chatbot.router, prefix="/chatbot", tags=["chatbot"])
 app.include_router(public_website.router, prefix="/public", tags=["public-website"])
 app.include_router(cms.router, prefix="/cms", tags=["cms"])
+app.include_router(payments.router, prefix="/payments", tags=["payments"])
 
 from fastapi.responses import RedirectResponse
 

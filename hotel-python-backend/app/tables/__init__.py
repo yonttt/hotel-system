@@ -118,6 +118,10 @@ class HotelReservation(Base):
     payment_proof = Column(String(255), nullable=True)
     payment_proof_at = Column(DateTime, nullable=True)
     payment_deadline = Column(DateTime, nullable=True)
+    # Midtrans payment gateway fields
+    midtrans_order_id = Column(String(100), nullable=True, index=True)
+    midtrans_payment_status = Column(String(30), nullable=True)  # pending/paid/failed/expired
+    midtrans_snap_token = Column(String(255), nullable=True)
     note = Column(Text)
     hotel_name = Column(String(100), nullable=True)
     created_by = Column(Integer)
