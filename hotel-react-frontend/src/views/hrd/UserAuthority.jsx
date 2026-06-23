@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import Layout from '../../ui/Layout';
+import Button from '../../ui/Button';
+import DataTable from '../../ui/DataTable';
+import UnifiedTableFooter from '../../ui/UnifiedTableFooter';
 import { useAuth } from '../../state/AuthContext';
 import { apiService } from '../../api/api';
 
@@ -158,14 +161,8 @@ const UserAuthority = () => {
     return (
       <Layout>
         <div className="content-wrapper">
-          <div style={{ 
-            padding: '40px', 
-            textAlign: 'center',
-            background: 'white',
-            borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-          }}>
-            <h2 style={{ color: '#dc3545' }}>Access Denied</h2>
+          <div style={{ padding: '40px', textAlign: 'center', background: 'var(--color-surface)', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow-sm)' }}>
+            <h2 style={{ color: 'var(--color-danger)' }}>Access Denied</h2>
             <p>You do not have permission to access this page.</p>
           </div>
         </div>
@@ -185,21 +182,7 @@ const UserAuthority = () => {
               </div>
             </div>
             <div className="unified-header-right">
-              <button
-                onClick={handleSavePermissions}
-                className="btn-table-action"
-                style={{
-                  background: '#28a745',
-                  color: 'white',
-                  padding: '6px 16px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}
-              >
-                Save Changes
-              </button>
+              <Button variant="success" size="sm" onClick={handleSavePermissions}>Save Changes</Button>
             </div>
           </div>
           <div className="header-row header-row-bottom">
@@ -235,115 +218,38 @@ const UserAuthority = () => {
 
         {/* Success Message */}
         {successMessage && (
-          <div style={{
-            background: '#d4edda',
-            border: '1px solid #c3e6cb',
-            color: '#155724',
-            padding: '12px 16px',
-            borderRadius: '4px',
-            marginBottom: '20px'
-          }}>
-            {successMessage}
-          </div>
+          <div className="alert alert--success">{successMessage}</div>
         )}
 
         {/* Table Section */}
-        <div className="unified-table-wrapper">
-          <table className="reservation-table">
-            <colgroup>
-              <col style={{ width: '60px' }} />   {/* No */}
-              <col style={{ width: '200px' }} />  {/* Role */}
-              <col style={{ width: '100px' }} />  {/* View */}
-              <col style={{ width: '100px' }} />  {/* Create */}
-              <col style={{ width: '100px' }} />  {/* Edit */}
-              <col style={{ width: '100px' }} />  {/* Delete */}
-            </colgroup>
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>Level</th>
-                <th style={{ textAlign: 'center' }}>View</th>
-                <th style={{ textAlign: 'center' }}>Create</th>
-                <th style={{ textAlign: 'center' }}>Edit</th>
-                <th style={{ textAlign: 'center' }}>Delete</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentRoles.length === 0 ? (
-                <tr>
-                  <td colSpan="6" className="no-data">
-                    No data available in table
-                  </td>
-                </tr>
-              ) : (
-                currentRoles.map((roleItem, index) => (
-                  <tr key={roleItem.id}>
-                    <td>{startIndex + index + 1}</td>
-                    <td>{roleItem.label}</td>
-                    <td style={{ textAlign: 'center' }}>
-                      <ModernSwitch
-                        checked={rolePermissions[roleItem.role]?.canView || false}
-                        onChange={() => handlePermissionChange(roleItem.role, 'canView')}
-                      />
-                    </td>
-                    <td style={{ textAlign: 'center' }}>
-                      <ModernSwitch
-                        checked={rolePermissions[roleItem.role]?.canCreate || false}
-                        onChange={() => handlePermissionChange(roleItem.role, 'canCreate')}
-                      />
-                    </td>
-                    <td style={{ textAlign: 'center' }}>
-                      <ModernSwitch
-                        checked={rolePermissions[roleItem.role]?.canEdit || false}
-                        onChange={() => handlePermissionChange(roleItem.role, 'canEdit')}
-                      />
-                    </td>
-                    <td style={{ textAlign: 'center' }}>
-                      <ModernSwitch
-                        checked={rolePermissions[roleItem.role]?.canDelete || false}
-                        onChange={() => handlePermissionChange(roleItem.role, 'canDelete')}
-                      />
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          data={currentRoles}
+          emptyText="No data available in table"
+          rowKey={(roleItem) => roleItem.id}
+          columns={[
+            { key: 'no', header: 'No', align: 'center', width: '60px',
+              render: (_r, i) => startIndex + i + 1 },
+            { key: 'level', header: 'Level', render: (r) => r.label },
+            { key: 'view', header: 'View', align: 'center',
+              render: (r) => <ModernSwitch checked={rolePermissions[r.role]?.canView || false} onChange={() => handlePermissionChange(r.role, 'canView')} /> },
+            { key: 'create', header: 'Create', align: 'center',
+              render: (r) => <ModernSwitch checked={rolePermissions[r.role]?.canCreate || false} onChange={() => handlePermissionChange(r.role, 'canCreate')} /> },
+            { key: 'edit', header: 'Edit', align: 'center',
+              render: (r) => <ModernSwitch checked={rolePermissions[r.role]?.canEdit || false} onChange={() => handlePermissionChange(r.role, 'canEdit')} /> },
+            { key: 'delete', header: 'Delete', align: 'center',
+              render: (r) => <ModernSwitch checked={rolePermissions[r.role]?.canDelete || false} onChange={() => handlePermissionChange(r.role, 'canDelete')} /> }
+          ]}
+        />
 
-        {/* Pagination */}
-        <div className="unified-footer">
-          <div className="entries-info">
-            Showing {startIndex + 1} to {Math.min(endIndex, filteredRoles.length)} of {filteredRoles.length} entries
-            {searchTerm && ` (filtered from ${systemRoles.length} total entries)`}
-          </div>
-          <div className="pagination">
-            <button
-              onClick={() => setCurrentPage(1)}
-              disabled={currentPage === 1}
-            >
-              First
-            </button>
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </button>
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </button>
-            <button
-              onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage === totalPages}
-            >
-              Last
-            </button>
-          </div>
-        </div>
+        <UnifiedTableFooter
+          startIndex={startIndex}
+          endIndex={endIndex}
+          total={filteredRoles.length}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          extraInfo={searchTerm && ` (filtered from ${systemRoles.length} total entries)`}
+        />
       </div>
     </Layout>
   );

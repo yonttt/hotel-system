@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Layout from '../../ui/Layout';
+import Button from '../../ui/Button';
 import { useAuth } from '../../state/AuthContext';
 import apiService from '../../api/api';
 
@@ -134,21 +135,7 @@ const LaporanGlobal = () => {
                   style={{ padding: '6px 12px' }}
                 />
               </div>
-              <button
-                className="btn-table-action"
-                style={{
-                  background: '#28a745',
-                  color: 'white',
-                  padding: '8px 20px',
-                  marginLeft: '10px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}
-              >
-                Cetak
-              </button>
+              <Button variant="success" size="sm" onClick={() => window.print()} style={{ marginLeft: '10px' }}>Cetak</Button>
             </div>
           </div>
         </div>

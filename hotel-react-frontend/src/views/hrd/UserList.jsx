@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../../api/api';
 import Layout from '../../ui/Layout';
+import Button from '../../ui/Button';
+import DataTable from '../../ui/DataTable';
 import UnifiedTableHeader from '../../ui/UnifiedTableHeader';
 import UnifiedTableFooter from '../../ui/UnifiedTableFooter';
 import { useAuth } from '../../state/AuthContext';
@@ -26,7 +28,6 @@ const UserList = () => {
   });
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(null);
 
   useEffect(() => {
     if (user?.role === 'admin') {
@@ -101,7 +102,6 @@ const UserList = () => {
     e.preventDefault();
     setSubmitLoading(true);
     setSubmitError(null);
-    setSuccessMessage(null);
 
     try {
       await apiService.registerUser(formData);
@@ -148,14 +148,8 @@ const UserList = () => {
     return (
       <Layout>
         <div className="content-wrapper">
-          <div style={{ 
-            padding: '40px', 
-            textAlign: 'center',
-            background: 'white',
-            borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-          }}>
-            <h2 style={{ color: '#dc3545' }}>Access Denied</h2>
+          <div style={{ padding: '40px', textAlign: 'center', background: 'var(--color-surface)', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow-sm)' }}>
+            <h2 style={{ color: 'var(--color-danger)' }}>Access Denied</h2>
             <p>You do not have permission to access this page.</p>
           </div>
         </div>
@@ -169,22 +163,7 @@ const UserList = () => {
         <UnifiedTableHeader
           title="MASTER USER"
           actions={(
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="btn-table-action"
-              style={{
-                background: '#007bff',
-                color: 'white',
-                padding: '6px 16px',
-                marginLeft: '20px',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '14px'
-              }}
-            >
-              ADD
-            </button>
+            <Button variant="primary" size="sm" onClick={() => setShowAddModal(true)}>+ Add User</Button>
           )}
           hotels={hotelNames.map(name => ({ id: name, name }))}
           selectedHotel={selectedHotel}
@@ -227,109 +206,42 @@ const UserList = () => {
 
         {/* Error Messages */}
         {error && (
-          <div style={{
-            background: '#f8d7da',
-            border: '1px solid #f5c6cb',
-            color: '#721c24',
-            padding: '12px 16px',
-            borderRadius: '4px',
-            marginBottom: '20px'
-          }}>
-            {error}
-          </div>
+          <div className="alert alert--error">{error}</div>
         )}
 
         {/* Table Section */}
-        <div className="unified-table-wrapper">
-          <table className="reservation-table">
-            <colgroup>
-              <col style={{ width: '60px' }} />   {/* No */}
-              <col style={{ width: '150px' }} />  {/* Hotel Name */}
-              <col style={{ width: '100px' }} />  {/* User Code */}
-              <col style={{ width: '150px' }} />  {/* Username */}
-              <col style={{ width: '180px' }} />  {/* Name */}
-              <col style={{ width: '180px' }} />  {/* Title */}
-              <col style={{ width: '150px' }} />  {/* Access */}
-              <col style={{ width: '80px' }} />   {/* Blokir */}
-              <col style={{ width: '180px' }} />  {/* Last Login */}
-              <col style={{ width: '150px' }} />  {/* Account Type */}
-              <col style={{ width: '100px' }} />  {/* Action */}
-            </colgroup>
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>Hotel Name</th>
-                <th>User Code</th>
-                <th>Username</th>
-                <th>Name</th>
-                <th>Title</th>
-                <th>Acces</th>
-                <th>Blokir</th>
-                <th>Last Login</th>
-                <th>Account Type</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan="11" className="no-data">Loading...</td>
-                </tr>
-              ) : currentUsers.length === 0 ? (
-                <tr>
-                  <td colSpan="11" className="no-data">
-                    No data available in table
-                  </td>
-                </tr>
-              ) : (
-                currentUsers.map((usr, index) => (
-                  <tr key={usr.id}>
-                    <td>{startIndex + index + 1}</td>
-                    <td>{usr.hotel_name || '-'}</td>
-                    <td>{usr.id}</td>
-                    <td title={usr.username}>{usr.username}</td>
-                    <td>{usr.full_name || usr.username.toUpperCase()}</td>
-                    <td>{usr.title || (usr.role === 'admin' ? 'Admin Hotel' : 
-                        usr.role === 'manager' ? 'Finance Hotel' : 
-                        usr.role === 'frontoffice' ? 'Operational Front Office' :
-                        usr.role === 'housekeeping' ? 'Leader Housekeeping' : 
-                        usr.role)}</td>
-                    <td>{usr.role}</td>
-                    <td>{usr.is_blocked ? 'Y' : 'N'}</td>
-                    <td>
-                      {usr.last_login ? 
-                        new Date(usr.last_login).toLocaleString('en-GB', {
-                          year: 'numeric',
-                          month: '2-digit',
-                          day: '2-digit',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          second: '2-digit',
-                          hour12: false
-                        }).replace(/\//g, '-').replace(',', '') : 
-                        '0000-00-00 00:00:00'}
-                    </td>
-                    <td>{usr.account_type || (usr.role === 'admin' || usr.role === 'manager' ? 'Management' : 'Non Management')}</td>
-                    <td>
-                      <button
-                        onClick={() => handleDeleteUser(usr.id, usr.username)}
-                        className="btn-table-action"
-                        style={{
-                          background: '#dc3545',
-                          color: 'white',
-                          padding: '4px 12px',
-                          fontSize: '12px'
-                        }}
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          data={currentUsers}
+          loading={loading}
+          emptyText="No data available in table"
+          rowKey={(usr) => usr.id}
+          columns={[
+            { key: 'no', header: 'No', align: 'center', width: '60px',
+              render: (_u, i) => startIndex + i + 1 },
+            { key: 'hotel', header: 'Hotel Name', render: (u) => u.hotel_name || '-' },
+            { key: 'code', header: 'User Code', render: (u) => u.id },
+            { key: 'username', header: 'Username', render: (u) => u.username },
+            { key: 'name', header: 'Name', render: (u) => u.full_name || u.username.toUpperCase() },
+            { key: 'title', header: 'Title',
+              render: (u) => u.title || (u.role === 'admin' ? 'Admin Hotel' :
+                u.role === 'manager' ? 'Finance Hotel' :
+                u.role === 'frontoffice' ? 'Operational Front Office' :
+                u.role === 'housekeeping' ? 'Leader Housekeeping' : u.role) },
+            { key: 'access', header: 'Acces', render: (u) => u.role },
+            { key: 'blokir', header: 'Blokir', align: 'center', render: (u) => u.is_blocked ? 'Y' : 'N' },
+            { key: 'last_login', header: 'Last Login',
+              render: (u) => u.last_login
+                ? new Date(u.last_login).toLocaleString('en-GB', {
+                    year: 'numeric', month: '2-digit', day: '2-digit',
+                    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+                  }).replace(/\//g, '-').replace(',', '')
+                : '0000-00-00 00:00:00' },
+            { key: 'account_type', header: 'Account Type',
+              render: (u) => u.account_type || (u.role === 'admin' || u.role === 'manager' ? 'Management' : 'Non Management') },
+            { key: 'action', header: 'Action', align: 'center', width: '100px',
+              render: (u) => <Button variant="danger" size="sm" onClick={() => handleDeleteUser(u.id, u.username)}>Delete</Button> }
+          ]}
+        />
 
         <UnifiedTableFooter
           startIndex={startIndex}
@@ -343,46 +255,17 @@ const UserList = () => {
 
         {/* Add User Modal */}
         {showAddModal && (
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000
-          }}>
-            <div style={{
-              background: 'white',
-              padding: '30px',
-              borderRadius: '8px',
-              width: '90%',
-              maxWidth: '500px',
-              maxHeight: '90vh',
-              overflow: 'auto'
-            }}>
+          <div className="app-modal-overlay">
+            <div className="app-modal-card" style={{ maxWidth: '500px' }}>
               <h2 style={{ marginTop: 0, marginBottom: '20px' }}>Add New User</h2>
 
               {submitError && (
-                <div style={{
-                  background: '#f8d7da',
-                  border: '1px solid #f5c6cb',
-                  color: '#721c24',
-                  padding: '10px',
-                  borderRadius: '4px',
-                  marginBottom: '15px',
-                  fontSize: '14px'
-                }}>
-                  {submitError}
-                </div>
+                <div className="alert alert--error">{submitError}</div>
               )}
 
               <form onSubmit={handleAddUser}>
                 <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                  <label className="field-label">
                     Username *
                   </label>
                   <input
@@ -392,13 +275,12 @@ const UserList = () => {
                     onChange={handleInputChange}
                     required
                     className="form-input"
-                    style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
                     placeholder="Enter username"
                   />
                 </div>
 
                 <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                  <label className="field-label">
                     Email
                   </label>
                   <input
@@ -407,13 +289,12 @@ const UserList = () => {
                     value={formData.email}
                     onChange={handleInputChange}
                     className="form-input"
-                    style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
                     placeholder="Enter email (optional)"
                   />
                 </div>
 
                 <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                  <label className="field-label">
                     Password *
                   </label>
                   <input
@@ -423,13 +304,12 @@ const UserList = () => {
                     onChange={handleInputChange}
                     required
                     className="form-input"
-                    style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
                     placeholder="Enter password"
                   />
                 </div>
 
                 <div style={{ marginBottom: '20px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                  <label className="field-label">
                     Role *
                   </label>
                   <select
@@ -438,7 +318,6 @@ const UserList = () => {
                     onChange={handleInputChange}
                     required
                     className="form-input"
-                    style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
                   >
                     <option value="frontoffice">Front Office</option>
                     <option value="housekeeping">Housekeeping</option>
@@ -448,37 +327,19 @@ const UserList = () => {
                 </div>
 
                 <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                  <button
+                  <Button
                     type="button"
+                    variant="secondary"
                     onClick={() => {
                       setShowAddModal(false);
                       setSubmitError(null);
                     }}
-                    style={{
-                      padding: '10px 20px',
-                      border: '1px solid #ddd',
-                      background: 'white',
-                      borderRadius: '4px',
-                      cursor: 'pointer'
-                    }}
                   >
                     Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={submitLoading}
-                    style={{
-                      padding: '10px 20px',
-                      border: 'none',
-                      background: submitLoading ? '#6c757d' : '#28a745',
-                      color: 'white',
-                      borderRadius: '4px',
-                      cursor: submitLoading ? 'not-allowed' : 'pointer',
-                      fontWeight: '500'
-                    }}
-                  >
+                  </Button>
+                  <Button type="submit" variant="success" disabled={submitLoading}>
                     {submitLoading ? 'Adding...' : 'Add User'}
-                  </button>
+                  </Button>
                 </div>
               </form>
             </div>

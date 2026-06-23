@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { apiService } from '../../api/api';
 import Layout from '../../ui/Layout';
+import Button from '../../ui/Button';
+import DataTable from '../../ui/DataTable';
 import { useAuth } from '../../state/AuthContext';
 
 const UserManagement = () => {
@@ -194,7 +196,7 @@ const UserManagement = () => {
       <Layout>
         <div className="page-container">
           <div className="content-card">
-            <h2 style={{ color: '#dc3545' }}>Access Denied</h2>
+            <h2 style={{ color: 'var(--color-danger)' }}>Access Denied</h2>
             <p>You do not have permission to access this page.</p>
           </div>
         </div>
@@ -226,54 +228,12 @@ const UserManagement = () => {
             </div>
             <div className="unified-header-right">
               {activeTab === 'users' && user?.role === 'admin' && (
-                <button 
-                  className="btn-add-new"
-                  onClick={() => setShowAddModal(true)}
-                  style={{
-                    background: '#28a745',
-                    color: 'white',
-                    border: 'none',
-                    padding: '10px 20px',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontWeight: '500'
-                  }}
-                >
-                  + Add New User
-                </button>
+                <Button variant="success" size="sm" onClick={() => setShowAddModal(true)}>+ Add New User</Button>
               )}
               {activeTab === 'authorities' && (
                 <div style={{ display: 'flex', gap: '10px' }}>
-                  <button 
-                    className="btn-add-new"
-                    onClick={handleResetAuthorities}
-                    style={{
-                      background: '#6c757d',
-                      color: 'white',
-                      border: 'none',
-                      padding: '10px 20px',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      fontWeight: '500'
-                    }}
-                  >
-                    Reset ke Default
-                  </button>
-                  <button 
-                    className="btn-add-new"
-                    onClick={handleSaveAuthorities}
-                    style={{
-                      background: '#28a745',
-                      color: 'white',
-                      border: 'none',
-                      padding: '10px 20px',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      fontWeight: '500'
-                    }}
-                  >
-                    💾 Simpan Perubahan
-                  </button>
+                  <Button variant="secondary" size="sm" onClick={handleResetAuthorities}>Reset ke Default</Button>
+                  <Button variant="success" size="sm" onClick={handleSaveAuthorities}>💾 Simpan Perubahan</Button>
                 </div>
               )}
             </div>
@@ -328,130 +288,39 @@ const UserManagement = () => {
 
         {/* Success/Error Messages */}
         {successMessage && (
-          <div style={{
-            background: '#d4edda',
-            border: '1px solid #c3e6cb',
-            color: '#155724',
-            padding: '12px 16px',
-            borderRadius: '4px',
-            marginBottom: '20px'
-          }}>
-            {successMessage}
-          </div>
+          <div className="alert alert--success">{successMessage}</div>
         )}
 
         {error && (
-          <div style={{
-            background: '#f8d7da',
-            border: '1px solid #f5c6cb',
-            color: '#721c24',
-            padding: '12px 16px',
-            borderRadius: '4px',
-            marginBottom: '20px'
-          }}>
-            {error}
-          </div>
+          <div className="alert alert--error">{error}</div>
         )}
 
         {/* Users Tab Content */}
         {activeTab === 'users' && (
-          <div style={{
-            background: 'white',
-            borderRadius: '12px',
-            padding: '24px',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-            border: '1px solid #e8e8e8'
-          }}>
-          <table className="reservation-table" style={{
-            width: '100%',
-            borderCollapse: 'collapse'
-          }}>
-            <thead>
-              <tr style={{
-                background: '#f8f9fa',
-                borderBottom: '2px solid #dee2e6'
-              }}>
-                <th style={{ padding: '12px', textAlign: 'left' }}>ID</th>
-                <th style={{ padding: '12px', textAlign: 'left' }}>Username</th>
-                <th style={{ padding: '12px', textAlign: 'left' }}>Email</th>
-                <th style={{ padding: '12px', textAlign: 'left' }}>Role</th>
-                <th style={{ padding: '12px', textAlign: 'left' }}>Created Date</th>
-                <th style={{ padding: '12px', textAlign: 'center' }}>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan="6" style={{ 
-                    padding: '40px', 
-                    textAlign: 'center'
-                  }}>
-                    Loading...
-                  </td>
-                </tr>
-              ) : users.length === 0 ? (
-                <tr>
-                  <td colSpan="6" style={{ 
-                    padding: '40px', 
-                    textAlign: 'center',
-                    color: '#6c757d'
-                  }}>
-                    No users found
-                  </td>
-                </tr>
-              ) : (
-                users.map((usr) => (
-                  <tr key={usr.id} style={{
-                    borderBottom: '1px solid #dee2e6'
-                  }}>
-                    <td style={{ padding: '12px' }}>{usr.id}</td>
-                    <td style={{ padding: '12px', fontWeight: '500' }}>{usr.username}</td>
-                    <td style={{ padding: '12px' }}>{usr.email || 'N/A'}</td>
-                    <td style={{ padding: '12px' }}>
-                      <span style={{
-                        display: 'inline-block',
-                        padding: '4px 12px',
-                        borderRadius: '4px',
-                        fontSize: '12px',
-                        fontWeight: '600',
-                        color: 'white',
-                        background: getRoleBadgeColor(usr.role)
-                      }}>
-                        {usr.role}
-                      </span>
-                    </td>
-                    <td style={{ padding: '12px' }}>{new Date(usr.created_at).toLocaleDateString('id-ID', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}</td>
-                    <td style={{ padding: '12px', textAlign: 'center' }}>
-                      {usr.id !== user.id && (
-                        <button 
-                          className="btn-table-action"
-                          onClick={() => handleDeleteUser(usr.id, usr.username)}
-                          style={{ 
-                            background: '#dc3545', 
-                            border: 'none',
-                            color: 'white',
-                            padding: '6px 16px',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontSize: '13px'
-                          }}
-                        >
-                          Delete
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+          <DataTable
+            data={users}
+            loading={loading}
+            emptyText="No users found"
+            rowKey={(usr) => usr.id}
+            columns={[
+              { key: 'id', header: 'ID', render: (u) => u.id },
+              { key: 'username', header: 'Username',
+                render: (u) => <span style={{ fontWeight: 500 }}>{u.username}</span> },
+              { key: 'email', header: 'Email', render: (u) => u.email || 'N/A' },
+              { key: 'role', header: 'Role',
+                render: (u) => (
+                  <span className="status-pill" style={{ color: 'white', background: getRoleBadgeColor(u.role) }}>{u.role}</span>
+                ) },
+              { key: 'created', header: 'Created Date',
+                render: (u) => new Date(u.created_at).toLocaleDateString('id-ID', {
+                  year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                }) },
+              { key: 'action', header: 'Action', align: 'center', width: '100px',
+                render: (u) => u.id !== user.id
+                  ? <Button variant="danger" size="sm" onClick={() => handleDeleteUser(u.id, u.username)}>Delete</Button>
+                  : null }
+            ]}
+          />
         )}
 
         {/* Authorities Tab Content */}
@@ -582,44 +451,17 @@ const UserManagement = () => {
 
         {/* Add User Modal */}
         {showAddModal && (
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0,0,0,0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000
-          }}>
-            <div style={{
-              background: 'white',
-              padding: '30px',
-              borderRadius: '8px',
-              width: '500px',
-              maxWidth: '90%'
-            }}>
+          <div className="app-modal-overlay">
+            <div className="app-modal-card" style={{ maxWidth: '500px' }}>
               <h3 style={{ marginTop: 0, marginBottom: '20px' }}>Add New User</h3>
-              
+
               {submitError && (
-                <div style={{
-                  background: '#f8d7da',
-                  border: '1px solid #f5c6cb',
-                  color: '#721c24',
-                  padding: '10px',
-                  borderRadius: '4px',
-                  marginBottom: '15px',
-                  fontSize: '14px'
-                }}>
-                  {submitError}
-                </div>
+                <div className="alert alert--error">{submitError}</div>
               )}
 
               <form onSubmit={handleAddUser}>
                 <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                  <label className="field-label">
                     Username *
                   </label>
                   <input
@@ -629,13 +471,12 @@ const UserManagement = () => {
                     onChange={handleInputChange}
                     required
                     className="form-input"
-                    style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
                     placeholder="Enter username"
                   />
                 </div>
 
                 <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                  <label className="field-label">
                     Email
                   </label>
                   <input
@@ -644,13 +485,12 @@ const UserManagement = () => {
                     value={formData.email}
                     onChange={handleInputChange}
                     className="form-input"
-                    style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
                     placeholder="Enter email (optional)"
                   />
                 </div>
 
                 <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                  <label className="field-label">
                     Password *
                   </label>
                   <input
@@ -660,13 +500,12 @@ const UserManagement = () => {
                     onChange={handleInputChange}
                     required
                     className="form-input"
-                    style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
                     placeholder="Enter password"
                   />
                 </div>
 
                 <div style={{ marginBottom: '20px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                  <label className="field-label">
                     Role *
                   </label>
                   <select
@@ -675,7 +514,6 @@ const UserManagement = () => {
                     onChange={handleInputChange}
                     required
                     className="form-input"
-                    style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
                   >
                     <option value="frontoffice">Front Office</option>
                     <option value="housekeeping">Housekeeping</option>
@@ -685,8 +523,9 @@ const UserManagement = () => {
                 </div>
 
                 <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                  <button
+                  <Button
                     type="button"
+                    variant="secondary"
                     onClick={() => {
                       setShowAddModal(false);
                       setSubmitError(null);
@@ -697,31 +536,12 @@ const UserManagement = () => {
                         role: 'frontoffice'
                       });
                     }}
-                    style={{
-                      padding: '10px 20px',
-                      border: '1px solid #ddd',
-                      background: 'white',
-                      borderRadius: '4px',
-                      cursor: 'pointer'
-                    }}
                   >
                     Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={submitLoading}
-                    style={{
-                      padding: '10px 20px',
-                      border: 'none',
-                      background: submitLoading ? '#6c757d' : '#28a745',
-                      color: 'white',
-                      borderRadius: '4px',
-                      cursor: submitLoading ? 'not-allowed' : 'pointer',
-                      fontWeight: '500'
-                    }}
-                  >
+                  </Button>
+                  <Button type="submit" variant="success" disabled={submitLoading}>
                     {submitLoading ? 'Adding...' : 'Add User'}
-                  </button>
+                  </Button>
                 </div>
               </form>
             </div>
