@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../../../../api/api';
 import Layout from '../../../../ui/Layout';
+import Button from '../../../../ui/Button';
+import DataTable from '../../../../ui/DataTable';
 import UnifiedTableHeader from '../../../../ui/UnifiedTableHeader';
 import UnifiedTableFooter from '../../../../ui/UnifiedTableFooter';
 import { useAuth } from '../../../../state/AuthContext';
@@ -187,37 +189,13 @@ const ManagementRoom = () => {
       <div className="unified-reservation-container">
       {/* Success Message */}
       {successMessage && (
-        <div style={{
-          background: '#d4edda',
-          border: '1px solid #c3e6cb',
-          color: '#155724',
-          padding: '12px 16px',
-          borderRadius: '4px',
-          marginBottom: '20px'
-        }}>
-          {successMessage}
-        </div>
+        <div className="alert alert--success">{successMessage}</div>
       )}
 
       <UnifiedTableHeader
         title="MANAGEMENT ROOM"
         actions={canEdit() && (
-          <button
-            onClick={handleAddClick}
-            className="btn-table-action"
-            style={{
-              background: '#007bff',
-              color: 'white',
-              padding: '6px 16px',
-              marginLeft: '20px',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '14px'
-            }}
-          >
-            ADD
-          </button>
+          <Button variant="primary" size="sm" onClick={handleAddClick}>+ Add Room</Button>
         )}
         hotels={hotelNames.map(name => ({ id: name, name }))}
         selectedHotel={selectedHotel}
@@ -229,73 +207,34 @@ const ManagementRoom = () => {
       />
 
       {/* Table */}
-      <div className="unified-table-wrapper">
-        <table className="reservation-table">
-          <thead>
-            <tr>
-              <th>No</th>
-              <th>NAMA HOTEL</th>
-              <th>Type</th>
-              <th>Room No</th>
-              <th>Floor</th>
-              <th>VIP</th>
-              <th>Smoking</th>
-              <th>Status Pajak</th>
-              <th>Hit</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan="10" className="loading-spinner">Loading...</td>
-              </tr>
-            ) : error ? (
-              <tr>
-                <td colSpan="10" className="error-message">{error}</td>
-              </tr>
-            ) : currentItems.length === 0 ? (
-              <tr>
-                <td colSpan="10" className="no-data">No data available in table</td>
-              </tr>
-            ) : (
-              currentItems.map((item, index) => (
-                <tr key={item.id || index}>
-                  <td>{indexOfFirstItem + index + 1}</td>
-                  <td>{item.hotel_name || '-'}</td>
-                  <td>{item.room_type || '-'}</td>
-                  <td>{item.room_number || '-'}</td>
-                  <td>{item.floor || '-'}</td>
-                  <td>{item.is_vip ? 'YES' : 'NO'}</td>
-                  <td>{item.smoking_allowed ? 'Yes' : 'No'}</td>
-                  <td>{item.tax_status || 'TIDAK'}</td>
-                  <td>{item.hit_count || 0}</td>
-                  <td>
-                    {canEdit() && (
-                      <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
-                        <button 
-                          className="btn-table-action"
-                          style={{ background: '#ffc107', color: '#212529', padding: '4px 10px', fontSize: '12px' }}
-                          onClick={() => handleEditClick(item)}
-                        >
-                          Edit
-                        </button>
-                        <button 
-                          className="btn-table-action"
-                          style={{ background: '#dc3545', color: 'white', padding: '4px 10px', fontSize: '12px' }}
-                          onClick={() => handleDelete(item)}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      <DataTable
+        data={currentItems}
+        loading={loading}
+        error={error}
+        emptyText="No data available in table"
+        rowKey={(item) => item.id || item.room_number}
+        columns={[
+          { key: 'no', header: 'No', align: 'center', width: '60px',
+            render: (_i, idx) => indexOfFirstItem + idx + 1 },
+          { key: 'hotel', header: 'Nama Hotel', render: (i) => i.hotel_name || '-' },
+          { key: 'type', header: 'Type', render: (i) => i.room_type || '-' },
+          { key: 'room_no', header: 'Room No', render: (i) => i.room_number || '-' },
+          { key: 'floor', header: 'Floor', align: 'center', render: (i) => i.floor || '-' },
+          { key: 'vip', header: 'VIP', align: 'center', render: (i) => i.is_vip ? 'YES' : 'NO' },
+          { key: 'smoking', header: 'Smoking', align: 'center', render: (i) => i.smoking_allowed ? 'Yes' : 'No' },
+          { key: 'tax', header: 'Status Pajak', align: 'center', render: (i) => i.tax_status || 'TIDAK' },
+          { key: 'hit', header: 'Hit', align: 'center', render: (i) => i.hit_count || 0 },
+          ...(canEdit() ? [{
+            key: 'action', header: 'Action', align: 'center', width: '160px',
+            render: (i) => (
+              <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                <Button variant="ghost" size="sm" onClick={() => handleEditClick(i)}>Edit</Button>
+                <Button variant="danger" size="sm" onClick={() => handleDelete(i)}>Delete</Button>
+              </div>
+            )
+          }] : [])
+        ]}
+      />
 
       <UnifiedTableFooter
         startIndex={indexOfFirstItem}
@@ -336,11 +275,11 @@ const ManagementRoom = () => {
             </h3>
             
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Hotel</label>
+              <label className="field-label">Hotel</label>
               <select
                 value={formData.hotel_name}
                 onChange={(e) => setFormData({...formData, hotel_name: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
               >
                 <option value="">Select Hotel</option>
                 {hotelNames.map(name => (
@@ -351,23 +290,23 @@ const ManagementRoom = () => {
 
             {showAddModal && (
               <div style={{ marginBottom: '15px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Room Number <span style={{color: 'red'}}>*</span></label>
+                <label className="field-label">Room Number <span style={{color: 'red'}}>*</span></label>
                 <input
                   type="text"
                   value={formData.room_number}
                   onChange={(e) => setFormData({...formData, room_number: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                   placeholder="e.g., 101"
                 />
               </div>
             )}
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Room Type <span style={{color: 'red'}}>*</span></label>
+              <label className="field-label">Room Type <span style={{color: 'red'}}>*</span></label>
               <select
                 value={formData.room_type}
                 onChange={(e) => setFormData({...formData, room_type: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
               >
                 <option value="">Select Room Type</option>
                 {roomTypeOptions.map(type => (
@@ -377,33 +316,33 @@ const ManagementRoom = () => {
             </div>
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Floor</label>
+              <label className="field-label">Floor</label>
               <input
                 type="number"
                 value={formData.floor_number}
                 onChange={(e) => setFormData({...formData, floor_number: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
               />
             </div>
 
             <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>VIP Status</label>
+                <label className="field-label">VIP Status</label>
                 <select
                   value={formData.vip_status}
                   onChange={(e) => setFormData({...formData, vip_status: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                 >
                   <option value="NO">NO</option>
                   <option value="YES">YES</option>
                 </select>
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Smoking</label>
+                <label className="field-label">Smoking</label>
                 <select
                   value={formData.smoking_allowed}
                   onChange={(e) => setFormData({...formData, smoking_allowed: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                 >
                   <option value="No">No</option>
                   <option value="Yes">Yes</option>
@@ -412,11 +351,11 @@ const ManagementRoom = () => {
             </div>
 
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Status Pajak</label>
+              <label className="field-label">Status Pajak</label>
               <select
                 value={formData.tax_status}
                 onChange={(e) => setFormData({...formData, tax_status: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
               >
                 <option value="TIDAK">TIDAK</option>
                 <option value="YA">YA</option>
@@ -424,33 +363,10 @@ const ManagementRoom = () => {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #ddd', paddingTop: '15px' }}>
-              <button
-                onClick={handleCloseModal}
-                style={{
-                  padding: '8px 20px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  backgroundColor: '#f5f5f5',
-                  cursor: 'pointer'
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={showEditModal ? handleSaveEdit : handleAddSave}
-                disabled={processing}
-                style={{
-                  padding: '8px 20px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  backgroundColor: showEditModal ? '#4CAF50' : '#007bff',
-                  color: 'white',
-                  cursor: processing ? 'not-allowed' : 'pointer',
-                  opacity: processing ? 0.7 : 1
-                }}
-              >
+              <Button variant="secondary" onClick={handleCloseModal}>Cancel</Button>
+              <Button variant={showEditModal ? 'success' : 'primary'} onClick={showEditModal ? handleSaveEdit : handleAddSave} disabled={processing}>
                 {processing ? 'Saving...' : (showEditModal ? 'Save Changes' : 'Add Room')}
-              </button>
+              </Button>
             </div>
           </div>
         </div>

@@ -8,10 +8,9 @@ import {
   ChevronDownIcon,
   UserIcon,
   ArrowRightOnRectangleIcon,
-  InformationCircleIcon,
-  EnvelopeIcon,
   ArrowPathIcon
 } from '@heroicons/react/24/outline'
+import Button from './Button'
 
 const Header = () => {
   const [showUserMenu, setShowUserMenu] = useState(false)
@@ -53,15 +52,15 @@ const Header = () => {
       {/* Right side - User menu and logout */}
       <div className="header-right">
         {/* Refresh Button */}
-        <button 
-          className="header-action-btn" 
+        <Button
+          variant="primary"
+          size="sm"
           onClick={handleRefreshClick}
           title="Refresh Current Page"
-          style={{ backgroundColor: '#007bff', borderColor: '#0056b3' }}
+          icon={<ArrowPathIcon className="w-4 h-4" />}
         >
-          <ArrowPathIcon className="w-2.5 h-2.5" />
-          <span>Refresh</span>
-        </button>
+          Refresh
+        </Button>
 
         {/* User Menu */}
         <div className="header-user-menu">
@@ -124,10 +123,14 @@ const Header = () => {
         </div>
 
         {/* Logout Button */}
-        <button className="header-action-btn logout-btn" onClick={handleLogout}>
-          <ArrowRightOnRectangleIcon className="w-2.5 h-2.5" />
-          <span>Logout</span>
-        </button>
+        <Button
+          variant="danger"
+          size="sm"
+          onClick={handleLogout}
+          icon={<ArrowRightOnRectangleIcon className="w-4 h-4" />}
+        >
+          Logout
+        </Button>
       </div>
     </header>
   )

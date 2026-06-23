@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../../../../api/api';
 import Layout from '../../../../ui/Layout';
+import Button from '../../../../ui/Button';
+import DataTable from '../../../../ui/DataTable';
 import UnifiedTableHeader from '../../../../ui/UnifiedTableHeader';
+import UnifiedTableFooter from '../../../../ui/UnifiedTableFooter';
 import { useAuth } from '../../../../state/AuthContext';
 import useHotels from '../../../../logic/useHotels';
 import usePaginatedTable from '../../../../logic/usePaginatedTable';
@@ -148,22 +151,9 @@ const KategoriMenuResto = () => {
     <Layout>
       <div className="unified-reservation-container">
         <UnifiedTableHeader
-          title=""
+          title="KATEGORI MENU RESTO"
           actions={canEdit() && (
-            <button
-              onClick={handleAddClick}
-              style={{
-                padding: '8px 16px',
-                backgroundColor: '#2196F3',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontWeight: '500'
-              }}
-            >
-              New Table
-            </button>
+            <Button variant="primary" size="sm" onClick={handleAddClick}>+ New Category</Button>
           )}
           hotels={hotels}
           selectedHotel={selectedHotel}
@@ -175,101 +165,39 @@ const KategoriMenuResto = () => {
         />
 
         {/* Table Section */}
-        <div className="unified-table-wrapper">
-          <table className="reservation-table">
-            <colgroup>
-              <col style={{ width: '80px' }} />
-              <col style={{ width: 'auto' }} />
-              <col style={{ width: '150px' }} />
-            </colgroup>
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>Nama Katgori</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan="3" className="no-data">Loading...</td>
-                </tr>
-              ) : error ? (
-                <tr>
-                  <td colSpan="3" className="no-data">{error}</td>
-                </tr>
-              ) : currentCategories.length === 0 ? (
-                <tr>
-                  <td colSpan="3" className="no-data">No data available in table</td>
-                </tr>
-              ) : (
-                currentCategories.map((category, index) => (
-                  <tr key={category.id}>
-                    <td>{indexOfFirstItem + index + 1}</td>
-                    <td style={{ color: '#1976D2' }}>{category.nama_kategori}</td>
-                    <td>
-                      {canEdit() && (
-                        <div style={{ display: 'flex', gap: '5px' }}>
-                          <button 
-                            className="btn-table-action" 
-                            onClick={() => handleEditClick(category)}
-                            title="Edit"
-                          >
-                            Edit
-                          </button>
-                          <button 
-                            className="btn-table-action" 
-                            onClick={() => handleDelete(category)}
-                            title="Delete"
-                            style={{ backgroundColor: '#f44336', color: 'white' }}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          data={currentCategories}
+          loading={loading}
+          error={error}
+          emptyText="No data available in table"
+          rowKey={(category) => category.id}
+          columns={[
+            { key: 'no', header: 'No', align: 'center', width: '80px',
+              render: (_c, i) => indexOfFirstItem + i + 1 },
+            { key: 'nama_kategori', header: 'Nama Kategori',
+              render: (c) => <span style={{ fontWeight: 500 }}>{c.nama_kategori}</span> },
+            ...(canEdit() ? [{
+              key: 'aksi', header: 'Aksi', align: 'center', width: '160px',
+              render: (c) => (
+                <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                  <Button variant="ghost" size="sm" onClick={() => handleEditClick(c)}>Edit</Button>
+                  <Button variant="danger" size="sm" onClick={() => handleDelete(c)}>Delete</Button>
+                </div>
+              )
+            }] : [])
+          ]}
+        />
 
-        {/* Footer */}
-        <div className="unified-footer">
-          <div className="entries-info">
-            {`Showing ${filteredCategories.length > 0 ? indexOfFirstItem + 1 : 0} to ${Math.min(indexOfLastItem, filteredCategories.length)} of ${filteredCategories.length} entries`}
-          </div>
-          <div className="pagination">
-            <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>First</button>
-            <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>Previous</button>
-            
-            {[...Array(totalPages)].map((_, idx) => {
-              const pageNum = idx + 1;
-              if (
-                pageNum === 1 ||
-                pageNum === totalPages ||
-                (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
-              ) {
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => setCurrentPage(pageNum)}
-                    className={currentPage === pageNum ? 'active' : ''}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              } else if (pageNum === currentPage - 2 || pageNum === currentPage + 2) {
-                return <span key={pageNum}>...</span>;
-              }
-              return null;
-            })}
-
-            <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages || totalPages === 0}>Next</button>
-            <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages || totalPages === 0}>Last</button>
-          </div>
-        </div>
+        <UnifiedTableFooter
+          startIndex={indexOfFirstItem}
+          endIndex={indexOfLastItem}
+          total={filteredCategories.length}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          showPageNumbers
+          pageWindowSize={5}
+        />
       </div>
 
       {/* Success Message */}
@@ -316,57 +244,41 @@ const KategoriMenuResto = () => {
             </h3>
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Hotel</label>
+              <label className="field-label">Hotel</label>
               <input
                 type="text"
                 value={formData.hotel_name}
                 onChange={(e) => setFormData({...formData, hotel_name: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
               />
             </div>
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Nama Kategori *</label>
+              <label className="field-label">Nama Kategori *</label>
               <input
                 type="text"
                 value={formData.nama_kategori}
                 onChange={(e) => setFormData({...formData, nama_kategori: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
                 placeholder="e.g., Food, Beverage, Paket..."
               />
             </div>
 
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Description</label>
+              <label className="field-label">Description</label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', minHeight: '60px' }}
+                className="form-input"
+                style={{ minHeight: '60px' }}
               />
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #ddd', paddingTop: '15px' }}>
-              <button
-                onClick={handleCloseModal}
-                style={{ padding: '8px 20px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#f5f5f5', cursor: 'pointer' }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddSave}
-                disabled={processing}
-                style={{
-                  padding: '8px 20px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  backgroundColor: '#4CAF50',
-                  color: 'white',
-                  cursor: processing ? 'not-allowed' : 'pointer',
-                  opacity: processing ? 0.7 : 1
-                }}
-              >
+              <Button variant="secondary" onClick={handleCloseModal}>Cancel</Button>
+              <Button variant="success" onClick={handleAddSave} disabled={processing}>
                 {processing ? 'Saving...' : 'Add Category'}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -399,14 +311,14 @@ const KategoriMenuResto = () => {
             </h3>
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Hotel</label>
+              <label className="field-label">Hotel</label>
               <select
                 value={formData.hotel_name}
                 onChange={(e) => {
                   const selected = hotels.find(h => h.name === e.target.value);
                   setFormData({...formData, hotel_name: e.target.value, hotel_id: selected?.id || ''});
                 }}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
               >
                 <option value="">Select Hotel</option>
                 {hotels.map(h => (
@@ -416,46 +328,30 @@ const KategoriMenuResto = () => {
             </div>
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Nama Kategori *</label>
+              <label className="field-label">Nama Kategori *</label>
               <input
                 type="text"
                 value={formData.nama_kategori}
                 onChange={(e) => setFormData({...formData, nama_kategori: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
               />
             </div>
 
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Description</label>
+              <label className="field-label">Description</label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', minHeight: '60px' }}
+                className="form-input"
+                style={{ minHeight: '60px' }}
               />
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #ddd', paddingTop: '15px' }}>
-              <button
-                onClick={handleCloseModal}
-                style={{ padding: '8px 20px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#f5f5f5', cursor: 'pointer' }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleEditSave}
-                disabled={processing}
-                style={{
-                  padding: '8px 20px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  backgroundColor: '#4CAF50',
-                  color: 'white',
-                  cursor: processing ? 'not-allowed' : 'pointer',
-                  opacity: processing ? 0.7 : 1
-                }}
-              >
+              <Button variant="secondary" onClick={handleCloseModal}>Cancel</Button>
+              <Button variant="success" onClick={handleEditSave} disabled={processing}>
                 {processing ? 'Saving...' : 'Save Changes'}
-              </button>
+              </Button>
             </div>
           </div>
         </div>

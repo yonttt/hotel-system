@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../../../../api/api';
 import Layout from '../../../../ui/Layout';
+import Button from '../../../../ui/Button';
+import DataTable from '../../../../ui/DataTable';
 import UnifiedTableHeader from '../../../../ui/UnifiedTableHeader';
+import UnifiedTableFooter from '../../../../ui/UnifiedTableFooter';
 import { useAuth } from '../../../../state/AuthContext';
 import useHotels from '../../../../logic/useHotels';
 import usePaginatedTable from '../../../../logic/usePaginatedTable';
@@ -153,13 +156,13 @@ const MasterMeja = () => {
     setEditingItem(null);
   };
 
-  const getStatusClass = (status) => {
+  const getStatusPill = (status) => {
     switch (status?.toLowerCase()) {
-      case 'tersedia': return 'status-available';
-      case 'terpakai': return 'status-occupied';
-      case 'reserved': return 'status-reserved';
-      case 'maintenance': return 'status-maintenance';
-      default: return '';
+      case 'tersedia': return 'status-pill--approved';
+      case 'terpakai': return 'status-pill--rejected';
+      case 'reserved': return 'status-pill--pending';
+      case 'maintenance': return 'status-pill--default';
+      default: return 'status-pill--default';
     }
   };
 
@@ -167,22 +170,9 @@ const MasterMeja = () => {
     <Layout>
       <div className="unified-reservation-container">
         <UnifiedTableHeader
-          title=""
+          title="MASTER MEJA"
           actions={canEdit() && (
-            <button
-              onClick={handleAddClick}
-              style={{
-                padding: '8px 16px',
-                backgroundColor: '#2196F3',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontWeight: '500'
-              }}
-            >
-              New Table
-            </button>
+            <Button variant="primary" size="sm" onClick={handleAddClick}>+ New Table</Button>
           )}
           hotels={hotels}
           selectedHotel={selectedHotel}
@@ -194,117 +184,44 @@ const MasterMeja = () => {
         />
 
         {/* Table Section */}
-        <div className="unified-table-wrapper">
-          <table className="reservation-table">
-            <colgroup>
-              <col style={{ width: '60px' }} />
-              <col style={{ width: '120px' }} />
-              <col style={{ width: '100px' }} />
-              <col style={{ width: '100px' }} />
-              <col style={{ width: '120px' }} />
-              <col style={{ width: '80px' }} />
-              <col style={{ width: '120px' }} />
-            </colgroup>
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>No meja</th>
-                <th>Lantai</th>
-                <th>Kursi</th>
-                <th>Status</th>
-                <th>Hit</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan="7" className="no-data">Loading...</td>
-                </tr>
-              ) : error ? (
-                <tr>
-                  <td colSpan="7" className="no-data">{error}</td>
-                </tr>
-              ) : currentTables.length === 0 ? (
-                <tr>
-                  <td colSpan="7" className="no-data">No data available in table</td>
-                </tr>
-              ) : (
-                currentTables.map((table, index) => (
-                  <tr key={table.id}>
-                    <td>{indexOfFirstItem + index + 1}</td>
-                    <td style={{ fontWeight: '500', color: '#1976D2' }}>{table.no_meja}</td>
-                    <td style={{ color: '#1976D2' }}>{table.lantai}</td>
-                    <td style={{ color: '#1976D2' }}>{table.kursi}</td>
-                    <td>
-                      <span className={getStatusClass(table.status)}>
-                        {table.status}
-                      </span>
-                    </td>
-                    <td style={{ color: '#1976D2' }}>{table.hit}</td>
-                    <td>
-                      {canEdit() && (
-                        <div style={{ display: 'flex', gap: '5px' }}>
-                          <button 
-                            className="btn-table-action" 
-                            onClick={() => handleEditClick(table)}
-                            title="Edit"
-                          >
-                            Edit
-                          </button>
-                          <button 
-                            className="btn-table-action" 
-                            onClick={() => handleDelete(table)}
-                            title="Delete"
-                            style={{ backgroundColor: '#f44336', color: 'white' }}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          data={currentTables}
+          loading={loading}
+          error={error}
+          emptyText="No data available in table"
+          rowKey={(table) => table.id}
+          columns={[
+            { key: 'no', header: 'No', align: 'center', width: '60px',
+              render: (_t, i) => indexOfFirstItem + i + 1 },
+            { key: 'no_meja', header: 'No Meja',
+              render: (t) => <span style={{ fontWeight: 500 }}>{t.no_meja}</span> },
+            { key: 'lantai', header: 'Lantai', align: 'center', render: (t) => t.lantai },
+            { key: 'kursi', header: 'Kursi', align: 'center', render: (t) => t.kursi },
+            { key: 'status', header: 'Status', align: 'center',
+              render: (t) => <span className={`status-pill ${getStatusPill(t.status)}`}>{t.status}</span> },
+            { key: 'hit', header: 'Hit', align: 'center', render: (t) => t.hit ?? 0 },
+            ...(canEdit() ? [{
+              key: 'aksi', header: 'Aksi', align: 'center', width: '160px',
+              render: (t) => (
+                <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                  <Button variant="ghost" size="sm" onClick={() => handleEditClick(t)}>Edit</Button>
+                  <Button variant="danger" size="sm" onClick={() => handleDelete(t)}>Delete</Button>
+                </div>
+              )
+            }] : [])
+          ]}
+        />
 
-        {/* Footer */}
-        <div className="unified-footer">
-          <div className="entries-info">
-            {`Showing ${filteredTables.length > 0 ? indexOfFirstItem + 1 : 0} to ${Math.min(indexOfLastItem, filteredTables.length)} of ${filteredTables.length} entries`}
-          </div>
-          <div className="pagination">
-            <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>First</button>
-            <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>Previous</button>
-            
-            {[...Array(totalPages)].map((_, idx) => {
-              const pageNum = idx + 1;
-              if (
-                pageNum === 1 ||
-                pageNum === totalPages ||
-                (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
-              ) {
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => setCurrentPage(pageNum)}
-                    className={currentPage === pageNum ? 'active' : ''}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              } else if (pageNum === currentPage - 2 || pageNum === currentPage + 2) {
-                return <span key={pageNum}>...</span>;
-              }
-              return null;
-            })}
-
-            <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>Next</button>
-            <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages}>Last</button>
-          </div>
-        </div>
+        <UnifiedTableFooter
+          startIndex={indexOfFirstItem}
+          endIndex={indexOfLastItem}
+          total={filteredTables.length}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          showPageNumbers
+          pageWindowSize={5}
+        />
       </div>
 
       {/* Success Message */}
@@ -351,14 +268,14 @@ const MasterMeja = () => {
             </h3>
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Hotel</label>
+              <label className="field-label">Hotel</label>
               <select
                 value={formData.hotel_name}
                 onChange={(e) => {
                   const selected = hotels.find(h => h.name === e.target.value);
                   setFormData({...formData, hotel_name: e.target.value, hotel_id: selected?.id || ''});
                 }}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
               >
                 <option value="">Select Hotel</option>
                 {hotels.map(h => (
@@ -368,45 +285,45 @@ const MasterMeja = () => {
             </div>
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>No Meja *</label>
+              <label className="field-label">No Meja *</label>
               <input
                 type="text"
                 value={formData.no_meja}
                 onChange={(e) => setFormData({...formData, no_meja: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
                 placeholder="e.g., 01, 02, 03..."
               />
             </div>
 
             <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Lantai</label>
+                <label className="field-label">Lantai</label>
                 <input
                   type="number"
                   value={formData.lantai}
                   onChange={(e) => setFormData({...formData, lantai: parseInt(e.target.value) || 1})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                   min="1"
                 />
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Kursi</label>
+                <label className="field-label">Kursi</label>
                 <input
                   type="number"
                   value={formData.kursi}
                   onChange={(e) => setFormData({...formData, kursi: parseInt(e.target.value) || 1})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                   min="1"
                 />
               </div>
             </div>
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Status</label>
+              <label className="field-label">Status</label>
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({...formData, status: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
               >
                 <option value="Tersedia">Tersedia</option>
                 <option value="Terpakai">Terpakai</option>
@@ -416,36 +333,20 @@ const MasterMeja = () => {
             </div>
 
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Description</label>
+              <label className="field-label">Description</label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', minHeight: '60px' }}
+                className="form-input"
+                style={{ minHeight: '60px' }}
               />
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #ddd', paddingTop: '15px' }}>
-              <button
-                onClick={handleCloseModal}
-                style={{ padding: '8px 20px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#f5f5f5', cursor: 'pointer' }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddSave}
-                disabled={processing}
-                style={{
-                  padding: '8px 20px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  backgroundColor: '#4CAF50',
-                  color: 'white',
-                  cursor: processing ? 'not-allowed' : 'pointer',
-                  opacity: processing ? 0.7 : 1
-                }}
-              >
+              <Button variant="secondary" onClick={handleCloseModal}>Cancel</Button>
+              <Button variant="success" onClick={handleAddSave} disabled={processing}>
                 {processing ? 'Saving...' : 'Add Table'}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -478,14 +379,14 @@ const MasterMeja = () => {
             </h3>
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Hotel</label>
+              <label className="field-label">Hotel</label>
               <select
                 value={formData.hotel_name}
                 onChange={(e) => {
                   const selected = hotels.find(h => h.name === e.target.value);
                   setFormData({...formData, hotel_name: e.target.value, hotel_id: selected?.id || ''});
                 }}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
               >
                 <option value="">Select Hotel</option>
                 {hotels.map(h => (
@@ -495,44 +396,44 @@ const MasterMeja = () => {
             </div>
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>No Meja *</label>
+              <label className="field-label">No Meja *</label>
               <input
                 type="text"
                 value={formData.no_meja}
                 onChange={(e) => setFormData({...formData, no_meja: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
               />
             </div>
 
             <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Lantai</label>
+                <label className="field-label">Lantai</label>
                 <input
                   type="number"
                   value={formData.lantai}
                   onChange={(e) => setFormData({...formData, lantai: parseInt(e.target.value) || 1})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                   min="1"
                 />
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Kursi</label>
+                <label className="field-label">Kursi</label>
                 <input
                   type="number"
                   value={formData.kursi}
                   onChange={(e) => setFormData({...formData, kursi: parseInt(e.target.value) || 1})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                   min="1"
                 />
               </div>
             </div>
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Status</label>
+              <label className="field-label">Status</label>
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({...formData, status: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
               >
                 <option value="Tersedia">Tersedia</option>
                 <option value="Terpakai">Terpakai</option>
@@ -542,36 +443,20 @@ const MasterMeja = () => {
             </div>
 
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Description</label>
+              <label className="field-label">Description</label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', minHeight: '60px' }}
+                className="form-input"
+                style={{ minHeight: '60px' }}
               />
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #ddd', paddingTop: '15px' }}>
-              <button
-                onClick={handleCloseModal}
-                style={{ padding: '8px 20px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#f5f5f5', cursor: 'pointer' }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleEditSave}
-                disabled={processing}
-                style={{
-                  padding: '8px 20px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  backgroundColor: '#4CAF50',
-                  color: 'white',
-                  cursor: processing ? 'not-allowed' : 'pointer',
-                  opacity: processing ? 0.7 : 1
-                }}
-              >
+              <Button variant="secondary" onClick={handleCloseModal}>Cancel</Button>
+              <Button variant="success" onClick={handleEditSave} disabled={processing}>
                 {processing ? 'Saving...' : 'Save Changes'}
-              </button>
+              </Button>
             </div>
           </div>
         </div>

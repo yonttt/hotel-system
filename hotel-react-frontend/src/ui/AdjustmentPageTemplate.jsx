@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../api/api';
 import Layout from './Layout';
+import Button from './Button';
+import DataTable from './DataTable';
 import { useAuth } from '../state/AuthContext';
 import useHotels from '../logic/useHotels';
 
@@ -204,14 +206,14 @@ const AdjustmentPageTemplate = ({ category, title, subtitle, icon, adjTypes = []
     }
   };
 
-  const getStatusBadge = (status) => {
-    const styles = {
-      'Pending': 'bg-yellow-100 text-yellow-800',
-      'Approved': 'bg-green-100 text-green-800',
-      'Rejected': 'bg-red-100 text-red-800',
-      'Completed': 'bg-blue-100 text-blue-800'
+  const getStatusPill = (status) => {
+    const map = {
+      'Pending': 'status-pill--pending',
+      'Approved': 'status-pill--approved',
+      'Rejected': 'status-pill--rejected',
+      'Completed': 'status-pill--completed'
     };
-    return styles[status] || 'bg-gray-100 text-gray-800';
+    return map[status] || 'status-pill--default';
   };
 
   const renderFormModal = (modalTitle, onSave, onClose) => (
@@ -380,10 +382,10 @@ const AdjustmentPageTemplate = ({ category, title, subtitle, icon, adjTypes = []
           </div>
 
           <div className="flex justify-end gap-3 mt-6">
-            <button onClick={onClose} className="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50">Cancel</button>
-            <button onClick={onSave} disabled={processing} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
+            <Button variant="secondary" onClick={onClose}>Cancel</Button>
+            <Button variant="primary" onClick={onSave} disabled={processing}>
               {processing ? 'Saving...' : 'Save'}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -434,81 +436,65 @@ const AdjustmentPageTemplate = ({ category, title, subtitle, icon, adjTypes = []
             <div className="flex items-center gap-3">
               <input type="text" placeholder="Search..." className="border border-gray-300 rounded px-3 py-1 text-sm" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
               {canEdit() && (
-                <button onClick={handleAddClick} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">+ Add Adjustment</button>
+                <Button variant="primary" size="sm" onClick={handleAddClick}>+ Add Adjustment</Button>
               )}
             </div>
           </div>
 
           {/* Table */}
-          {loading ? (
-            <div className="text-center py-8 text-gray-500">Loading adjustments...</div>
-          ) : error ? (
-            <div className="text-center py-8 text-red-500">{error}</div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-gray-50 border-b">
-                    <th className="text-left px-4 py-3 font-semibold text-gray-600">No</th>
-                    <th className="text-left px-4 py-3 font-semibold text-gray-600">Date</th>
-                    <th className="text-left px-4 py-3 font-semibold text-gray-600">Hotel</th>
-                    <th className="text-left px-4 py-3 font-semibold text-gray-600">Type</th>
-                    <th className="text-left px-4 py-3 font-semibold text-gray-600">Ref No</th>
-                    <th className="text-left px-4 py-3 font-semibold text-gray-600">Description</th>
-                    <th className="text-right px-4 py-3 font-semibold text-gray-600">Original</th>
-                    <th className="text-right px-4 py-3 font-semibold text-gray-600">Adjusted</th>
-                    <th className="text-right px-4 py-3 font-semibold text-gray-600">Diff</th>
-                    <th className="text-center px-4 py-3 font-semibold text-gray-600">Status</th>
-                    {canEdit() && <th className="text-center px-4 py-3 font-semibold text-gray-600">Actions</th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentRecords.length === 0 ? (
-                    <tr><td colSpan={canEdit() ? 11 : 10} className="text-center py-8 text-gray-500">No adjustments found</td></tr>
-                  ) : (
-                    currentRecords.map((record, index) => (
-                      <tr key={record.id} className="border-b hover:bg-gray-50">
-                        <td className="px-4 py-3">{indexOfFirstItem + index + 1}</td>
-                        <td className="px-4 py-3">{formatDate(record.adj_date)}</td>
-                        <td className="px-4 py-3">{record.hotel_name || '-'}</td>
-                        <td className="px-4 py-3">{record.adj_type || '-'}</td>
-                        <td className="px-4 py-3">{record.reference_no || '-'}</td>
-                        <td className="px-4 py-3 max-w-[200px] truncate">{record.description || record.item_name || '-'}</td>
-                        <td className="px-4 py-3 text-right">{formatCurrency(record.original_amount)}</td>
-                        <td className="px-4 py-3 text-right">{formatCurrency(record.adjusted_amount)}</td>
-                        <td className="px-4 py-3 text-right font-medium">
-                          <span className={parseFloat(record.difference) >= 0 ? 'text-green-600' : 'text-red-600'}>
-                            {parseFloat(record.difference) >= 0 ? '+' : ''}{formatCurrency(record.difference)}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(record.status)}`}>{record.status}</span>
-                        </td>
-                        {canEdit() && (
-                          <td className="px-4 py-3 text-center">
-                            <button onClick={() => handleEditClick(record)} className="text-blue-600 hover:text-blue-800 mr-2 text-xs">Edit</button>
-                            <button onClick={() => handleDelete(record)} className="text-red-600 hover:text-red-800 text-xs">Delete</button>
-                          </td>
-                        )}
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          )}
+          <DataTable
+            data={currentRecords}
+            loading={loading}
+            error={error}
+            loadingText="Loading adjustments..."
+            emptyText="No adjustments found"
+            rowKey={(record) => record.id}
+            columns={[
+              { key: 'no', header: 'No', align: 'center', width: '60px',
+                render: (_r, i) => indexOfFirstItem + i + 1 },
+              { key: 'date', header: 'Date', render: (r) => formatDate(r.adj_date) },
+              { key: 'hotel', header: 'Hotel', render: (r) => r.hotel_name || '-' },
+              { key: 'type', header: 'Type', render: (r) => r.adj_type || '-' },
+              { key: 'ref', header: 'Ref No', render: (r) => r.reference_no || '-' },
+              { key: 'desc', header: 'Description',
+                render: (r) => r.description || r.item_name || '-' },
+              { key: 'original', header: 'Original', align: 'right',
+                render: (r) => formatCurrency(r.original_amount) },
+              { key: 'adjusted', header: 'Adjusted', align: 'right',
+                render: (r) => formatCurrency(r.adjusted_amount) },
+              { key: 'diff', header: 'Diff', align: 'right',
+                render: (r) => (
+                  <span style={{ fontWeight: 500, color: parseFloat(r.difference) >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }}>
+                    {parseFloat(r.difference) >= 0 ? '+' : ''}{formatCurrency(r.difference)}
+                  </span>
+                ) },
+              { key: 'status', header: 'Status', align: 'center',
+                render: (r) => (
+                  <span className={`status-pill ${getStatusPill(r.status)}`}>{r.status}</span>
+                ) },
+              ...(canEdit() ? [{
+                key: 'actions', header: 'Actions', align: 'center',
+                render: (r) => (
+                  <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                    <Button variant="ghost" size="sm" onClick={() => handleEditClick(r)}>Edit</Button>
+                    <Button variant="danger" size="sm" onClick={() => handleDelete(r)}>Delete</Button>
+                  </div>
+                )
+              }] : [])
+            ]}
+          />
 
           {/* Pagination */}
           <div className="flex justify-between items-center mt-4 text-sm text-gray-600">
             <span>Showing {filteredRecords.length === 0 ? 0 : indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredRecords.length)} of {filteredRecords.length} entries</span>
             <div className="flex gap-1">
-              <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="px-3 py-1 border rounded disabled:opacity-50">Prev</button>
+              <Button variant="secondary" size="sm" onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>Prev</Button>
               {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
                 const page = currentPage <= 3 ? i + 1 : currentPage - 2 + i;
                 if (page > totalPages) return null;
-                return (<button key={page} onClick={() => setCurrentPage(page)} className={`px-3 py-1 border rounded ${currentPage === page ? 'bg-blue-600 text-white' : ''}`}>{page}</button>);
+                return (<Button key={page} variant={currentPage === page ? 'primary' : 'secondary'} size="sm" onClick={() => setCurrentPage(page)}>{page}</Button>);
               })}
-              <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} className="px-3 py-1 border rounded disabled:opacity-50">Next</button>
+              <Button variant="secondary" size="sm" onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>Next</Button>
             </div>
           </div>
         </div>

@@ -452,19 +452,6 @@ const Sidebar = () => {
       >
         {item.icon && <item.icon className="sidebar-icon" />}
         <span className="sidebar-text">{item.title}</span>
-        {item.hasRefresh && (
-          <button 
-            className="refresh-btn"
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              window.location.reload()
-            }}
-            title="Refresh Status Kamar"
-          >
-            â†»
-          </button>
-        )}
       </Link>
     )
   }

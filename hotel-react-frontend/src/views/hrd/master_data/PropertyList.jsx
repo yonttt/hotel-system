@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../../../api/api';
 import Layout from '../../../ui/Layout';
+import Button from '../../../ui/Button';
 import UnifiedTableHeader from '../../../ui/UnifiedTableHeader';
 import UnifiedTableFooter from '../../../ui/UnifiedTableFooter';
 import { useAuth } from '../../../state/AuthContext';
@@ -188,41 +189,14 @@ const PropertyList = () => {
     if (!isOpen) return null;
 
     return (
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(0, 0, 0, 0.5)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 1000
-      }}>
-        <div style={{
-          background: 'white',
-          padding: '30px',
-          borderRadius: '8px',
-          width: '90%',
-          maxWidth: '700px',
-          maxHeight: '90vh',
-          overflow: 'auto'
-        }}>
+      <div className="app-modal-overlay">
+        <div className="app-modal-card">
           <h2 style={{ marginTop: 0, marginBottom: '20px' }}>
             {isEdit ? 'Edit Property' : 'Add New Property'}
           </h2>
 
           {submitError && (
-            <div style={{
-              background: '#f8d7da',
-              border: '1px solid #f5c6cb',
-              color: '#721c24',
-              padding: '10px',
-              borderRadius: '4px',
-              marginBottom: '15px',
-              fontSize: '14px'
-            }}>
+            <div className="alert alert--error">
               {submitError}
             </div>
           )}
@@ -230,43 +204,39 @@ const PropertyList = () => {
           <form onSubmit={isEdit ? handleUpdateProperty : handleAddProperty}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Code</label>
+                <label className="field-label">Code</label>
                 <input type="text" name="code" value={formData.code}
                   onChange={handleInputChange}
-                  className="form-input"
-                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }} />
+                  className="form-input" />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Property Name *</label>
+                <label className="field-label">Property Name *</label>
                 <input type="text" name="name" value={formData.name}
                   onChange={handleInputChange} required
-                  className="form-input"
-                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }} />
+                  className="form-input" />
               </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Category</label>
+                <label className="field-label">Category</label>
                 <select name="category" value={formData.category}
                   onChange={handleInputChange}
-                  className="form-input"
-                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}>
+                  className="form-input">
                   <option value="HOTEL">HOTEL</option>
                   <option value="NON HOTEL">NON HOTEL</option>
                 </select>
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Email</label>
+                <label className="field-label">Email</label>
                 <input type="email" name="email" value={formData.email}
                   onChange={handleInputChange}
-                  className="form-input"
-                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }} />
+                  className="form-input" />
               </div>
             </div>
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Address</label>
+              <label className="field-label">Address</label>
               <input type="text" name="address" value={formData.address}
                 onChange={handleInputChange}
                 className="form-input"
@@ -275,100 +245,88 @@ const PropertyList = () => {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Phone</label>
+                <label className="field-label">Phone</label>
                 <input type="text" name="phone" value={formData.phone}
                   onChange={handleInputChange}
-                  className="form-input"
-                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }} />
+                  className="form-input" />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Fax</label>
+                <label className="field-label">Fax</label>
                 <input type="text" name="fax" value={formData.fax}
                   onChange={handleInputChange}
-                  className="form-input"
-                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }} />
+                  className="form-input" />
               </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Photo URL</label>
+                <label className="field-label">Photo URL</label>
                 <input type="text" name="photo_url" value={formData.photo_url}
                   onChange={handleInputChange}
-                  className="form-input"
-                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }} />
+                  className="form-input" />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Logo URL</label>
+                <label className="field-label">Logo URL</label>
                 <input type="text" name="logo_url" value={formData.logo_url}
                   onChange={handleInputChange}
-                  className="form-input"
-                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }} />
+                  className="form-input" />
               </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px', marginBottom: '15px' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>UMH</label>
+                <label className="field-label">UMH</label>
                 <input type="number" name="umh" value={formData.umh}
                   onChange={handleInputChange}
-                  className="form-input"
-                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }} />
+                  className="form-input" />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>UMK</label>
+                <label className="field-label">UMK</label>
                 <input type="number" name="umk" value={formData.umk}
                   onChange={handleInputChange}
-                  className="form-input"
-                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }} />
+                  className="form-input" />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Plafon Covid</label>
+                <label className="field-label">Plafon Covid</label>
                 <input type="text" name="plafon_covid" value={formData.plafon_covid}
                   onChange={handleInputChange}
-                  className="form-input"
-                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }} />
+                  className="form-input" />
               </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '15px', marginBottom: '15px' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Sub Cabang</label>
+                <label className="field-label">Sub Cabang</label>
                 <input type="number" name="sub_cabang" value={formData.sub_cabang}
                   onChange={handleInputChange}
-                  className="form-input"
-                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }} />
+                  className="form-input" />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>T. Tetap</label>
+                <label className="field-label">T. Tetap</label>
                 <input type="number" name="t_tetap" value={formData.t_tetap}
                   onChange={handleInputChange}
-                  className="form-input"
-                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }} />
+                  className="form-input" />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>T. Jabatan</label>
+                <label className="field-label">T. Jabatan</label>
                 <input type="number" name="t_jabatan" value={formData.t_jabatan}
                   onChange={handleInputChange}
-                  className="form-input"
-                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }} />
+                  className="form-input" />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>T. Penempatan</label>
+                <label className="field-label">T. Penempatan</label>
                 <input type="number" name="t_penempatan" value={formData.t_penempatan}
                   onChange={handleInputChange}
-                  className="form-input"
-                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }} />
+                  className="form-input" />
               </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Extrabed</label>
+                <label className="field-label">Extrabed</label>
                 <input type="number" name="extrabed" value={formData.extrabed}
                   onChange={handleInputChange}
-                  className="form-input"
-                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }} />
+                  className="form-input" />
               </div>
               <div style={{ display: 'flex', alignItems: 'flex-end' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500' }}>
@@ -381,39 +339,21 @@ const PropertyList = () => {
             </div>
 
             <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-              <button
+              <Button
                 type="button"
+                variant="secondary"
                 onClick={() => {
                   if (isEdit) setShowEditModal(false);
                   else setShowAddModal(false);
                   resetForm();
                   setSubmitError(null);
                 }}
-                style={{
-                  padding: '10px 20px',
-                  border: '1px solid #ddd',
-                  background: 'white',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
               >
                 Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={submitLoading}
-                style={{
-                  padding: '10px 20px',
-                  border: 'none',
-                  background: submitLoading ? '#6c757d' : '#28a745',
-                  color: 'white',
-                  borderRadius: '4px',
-                  cursor: submitLoading ? 'not-allowed' : 'pointer',
-                  fontWeight: '500'
-                }}
-              >
+              </Button>
+              <Button type="submit" variant="success" disabled={submitLoading}>
                 {submitLoading ? 'Saving...' : (isEdit ? 'Update' : 'Add Property')}
-              </button>
+              </Button>
             </div>
           </form>
         </div>
@@ -426,14 +366,8 @@ const PropertyList = () => {
     return (
       <Layout>
         <div className="content-wrapper">
-          <div style={{ 
-            padding: '40px', 
-            textAlign: 'center',
-            background: 'white',
-            borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-          }}>
-            <h2 style={{ color: '#dc3545' }}>Access Denied</h2>
+          <div style={{ padding: '40px', textAlign: 'center', background: 'var(--color-surface)', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow-sm)' }}>
+            <h2 style={{ color: 'var(--color-danger)' }}>Access Denied</h2>
             <p>You do not have permission to access this page.</p>
           </div>
         </div>
@@ -448,38 +382,8 @@ const PropertyList = () => {
           title="PROFIL HOTEL"
           actions={(
             <>
-              <button
-                onClick={() => { resetForm(); setShowAddModal(true); setSubmitError(null); }}
-                className="btn-table-action"
-                style={{
-                  background: '#007bff',
-                  color: 'white',
-                  padding: '6px 16px',
-                  marginLeft: '20px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}
-              >
-                ADD
-              </button>
-              <button
-                onClick={handlePrint}
-                className="btn-table-action"
-                style={{
-                  background: '#6c757d',
-                  color: 'white',
-                  padding: '6px 16px',
-                  marginLeft: '10px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}
-              >
-                Print
-              </button>
+              <Button variant="primary" size="sm" onClick={() => { resetForm(); setShowAddModal(true); setSubmitError(null); }}>ADD</Button>
+              <Button variant="secondary" size="sm" onClick={handlePrint}>Print</Button>
             </>
           )}
           hotels={hotels}
@@ -493,29 +397,11 @@ const PropertyList = () => {
 
         {/* Success/Error Messages */}
         {successMessage && (
-          <div style={{
-            background: '#d4edda',
-            border: '1px solid #c3e6cb',
-            color: '#155724',
-            padding: '12px 16px',
-            borderRadius: '4px',
-            marginBottom: '20px'
-          }}>
-            {successMessage}
-          </div>
+          <div className="alert alert--success">{successMessage}</div>
         )}
 
         {error && (
-          <div style={{
-            background: '#f8d7da',
-            border: '1px solid #f5c6cb',
-            color: '#721c24',
-            padding: '12px 16px',
-            borderRadius: '4px',
-            marginBottom: '20px'
-          }}>
-            {error}
-          </div>
+          <div className="alert alert--error">{error}</div>
         )}
 
         {/* Table Section */}
@@ -605,30 +491,8 @@ const PropertyList = () => {
                     <td style={{ textAlign: 'right' }}>{prop.extrabed}</td>
                     <td style={{ textAlign: 'center' }}>
                       <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
-                        <button
-                          onClick={() => handleEditClick(prop)}
-                          className="btn-table-action"
-                          style={{
-                            background: '#ffc107',
-                            color: '#212529',
-                            padding: '4px 10px',
-                            fontSize: '12px'
-                          }}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDeleteProperty(prop.id, prop.name)}
-                          className="btn-table-action"
-                          style={{
-                            background: '#dc3545',
-                            color: 'white',
-                            padding: '4px 10px',
-                            fontSize: '12px'
-                          }}
-                        >
-                          Delete
-                        </button>
+                        <Button variant="ghost" size="sm" onClick={() => handleEditClick(prop)}>Edit</Button>
+                        <Button variant="danger" size="sm" onClick={() => handleDeleteProperty(prop.id, prop.name)}>Delete</Button>
                       </div>
                     </td>
                   </tr>

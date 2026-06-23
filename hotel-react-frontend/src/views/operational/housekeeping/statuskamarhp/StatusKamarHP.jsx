@@ -335,16 +335,6 @@ const StatusKamarHP = () => {
                   ))}
                 </select>
               </div>
-              <div className="filter-group">
-                <button 
-                  className="btn-refresh-data"
-                  onClick={fetchRooms}
-                  disabled={loading}
-                  title="Refresh room data"
-                >
-                  🔄 {loading ? 'Updating...' : 'Update Data'}
-                </button>
-              </div>
             </div>
 
             {/* Room Grid */}

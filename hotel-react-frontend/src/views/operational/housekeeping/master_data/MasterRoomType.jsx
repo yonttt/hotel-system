@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../../../../api/api';
 import Layout from '../../../../ui/Layout';
+import Button from '../../../../ui/Button';
+import DataTable from '../../../../ui/DataTable';
 import UnifiedTableHeader from '../../../../ui/UnifiedTableHeader';
 import UnifiedTableFooter from '../../../../ui/UnifiedTableFooter';
 import { useAuth } from '../../../../state/AuthContext';
@@ -193,37 +195,13 @@ const MasterRoomType = () => {
       <div className="unified-reservation-container">
       {/* Success Message */}
       {successMessage && (
-        <div style={{
-          background: '#d4edda',
-          border: '1px solid #c3e6cb',
-          color: '#155724',
-          padding: '12px 16px',
-          borderRadius: '4px',
-          marginBottom: '20px'
-        }}>
-          {successMessage}
-        </div>
+        <div className="alert alert--success">{successMessage}</div>
       )}
 
       <UnifiedTableHeader
         title="MASTER ROOM TYPE"
         actions={canEdit() && (
-          <button
-            onClick={handleAddClick}
-            className="btn-table-action"
-            style={{
-              background: '#007bff',
-              color: 'white',
-              padding: '6px 16px',
-              marginLeft: '20px',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '14px'
-            }}
-          >
-            ADD
-          </button>
+          <Button variant="primary" size="sm" onClick={handleAddClick}>+ Add Room Type</Button>
         )}
         hotels={hotelNames.map(name => ({ id: name, name }))}
         selectedHotel={selectedHotel}
@@ -235,75 +213,36 @@ const MasterRoomType = () => {
       />
 
       {/* Table */}
-      <div className="unified-table-wrapper">
-        <table className="reservation-table">
-          <thead>
-            <tr>
-              <th>No</th>
-              <th>Code</th>
-              <th>Type</th>
-              <th className="align-right">Normal Rate</th>
-              <th className="align-right">Weekend Rate</th>
-              <th className="align-right">6 Hours</th>
-              <th className="align-right">Discount</th>
-              <th>Photo</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan="9" className="loading-spinner">Loading...</td>
-              </tr>
-            ) : error ? (
-              <tr>
-                <td colSpan="9" className="error-message">{error}</td>
-              </tr>
-            ) : currentItems.length === 0 ? (
-              <tr>
-                <td colSpan="9" className="no-data">No data available in table</td>
-              </tr>
-            ) : (
-              currentItems.map((item, index) => (
-                <tr key={item.id || index}>
-                  <td>{indexOfFirstItem + index + 1}</td>
-                  <td>{item.category_code || '-'}</td>
-                  <td>{item.category_name || '-'}</td>
-                  <td className="align-right">{formatCurrency(item.normal_rate || 0)}</td>
-                  <td className="align-right">{formatCurrency(item.weekend_rate || 0)}</td>
-                  <td className="align-right">{item.six_hours_rate ? formatCurrency(item.six_hours_rate) : '-'}</td>
-                  <td className="align-right">{item.discount_percentage ? `${item.discount_percentage}%` : '-'}</td>
-                  <td>
-                    {item.photo_url ? (
-                      <img src={item.photo_url} alt={item.category_name} style={{ width: '50px', height: '36px', objectFit: 'cover', borderRadius: '4px' }} />
-                    ) : '-'}
-                  </td>
-                  <td>
-                    {canEdit() && (
-                      <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
-                        <button 
-                          className="btn-table-action"
-                          style={{ background: '#ffc107', color: '#212529', padding: '4px 10px', fontSize: '12px' }}
-                          onClick={() => handleEditClick(item)}
-                        >
-                          Edit
-                        </button>
-                        <button 
-                          className="btn-table-action"
-                          style={{ background: '#dc3545', color: 'white', padding: '4px 10px', fontSize: '12px' }}
-                          onClick={() => handleDelete(item)}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      <DataTable
+        data={currentItems}
+        loading={loading}
+        error={error}
+        emptyText="No data available in table"
+        rowKey={(item) => item.id}
+        columns={[
+          { key: 'no', header: 'No', align: 'center', width: '60px',
+            render: (_i, idx) => indexOfFirstItem + idx + 1 },
+          { key: 'code', header: 'Code', render: (i) => i.category_code || '-' },
+          { key: 'type', header: 'Type', render: (i) => i.category_name || '-' },
+          { key: 'normal', header: 'Normal Rate', align: 'right', render: (i) => formatCurrency(i.normal_rate || 0) },
+          { key: 'weekend', header: 'Weekend Rate', align: 'right', render: (i) => formatCurrency(i.weekend_rate || 0) },
+          { key: 'six', header: '6 Hours', align: 'right', render: (i) => i.six_hours_rate ? formatCurrency(i.six_hours_rate) : '-' },
+          { key: 'disc', header: 'Discount', align: 'right', render: (i) => i.discount_percentage ? `${i.discount_percentage}%` : '-' },
+          { key: 'photo', header: 'Photo', align: 'center',
+            render: (i) => i.photo_url
+              ? <img src={i.photo_url} alt={i.category_name} style={{ width: '50px', height: '36px', objectFit: 'cover', borderRadius: '4px' }} />
+              : '-' },
+          ...(canEdit() ? [{
+            key: 'action', header: 'Action', align: 'center', width: '160px',
+            render: (i) => (
+              <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                <Button variant="ghost" size="sm" onClick={() => handleEditClick(i)}>Edit</Button>
+                <Button variant="danger" size="sm" onClick={() => handleDelete(i)}>Delete</Button>
+              </div>
+            )
+          }] : [])
+        ]}
+      />
 
       <UnifiedTableFooter
         startIndex={indexOfFirstItem}
@@ -344,72 +283,73 @@ const MasterRoomType = () => {
             </h3>
             
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Code <span style={{color: 'red'}}>*</span></label>
+              <label className="field-label">Code <span style={{color: 'red'}}>*</span></label>
               <input
                 type="text"
                 value={formData.category_code}
                 onChange={(e) => setFormData({...formData, category_code: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
               />
             </div>
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Type Name <span style={{color: 'red'}}>*</span></label>
+              <label className="field-label">Type Name <span style={{color: 'red'}}>*</span></label>
               <input
                 type="text"
                 value={formData.category_name}
                 onChange={(e) => setFormData({...formData, category_name: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
               />
             </div>
 
             <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Normal Rate</label>
+                <label className="field-label">Normal Rate</label>
                 <input
                   type="number"
                   value={formData.normal_rate}
                   onChange={(e) => setFormData({...formData, normal_rate: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                 />
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Weekend Rate</label>
+                <label className="field-label">Weekend Rate</label>
                   <input
                     type="number"
                     value={formData.weekend_rate}
                     onChange={(e) => setFormData({...formData, weekend_rate: e.target.value})}
-                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                    className="form-input"
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>6 Hours Rate</label>
+                  <label className="field-label">6 Hours Rate</label>
                   <input
                     type="number"
                     value={formData.six_hours_rate}
                     onChange={(e) => setFormData({...formData, six_hours_rate: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                 />
               </div>
             </div>
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Description</label>
+              <label className="field-label">Description</label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', minHeight: '80px' }}
+                className="form-input"
+                style={{ minHeight: '80px' }}
                 placeholder="Tampil di website publik sebagai deskripsi kamar"
               />
             </div>
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Photo URL</label>
+              <label className="field-label">Photo URL</label>
               <input
                 type="text"
                 value={formData.photo_url}
                 onChange={(e) => setFormData({...formData, photo_url: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
                 placeholder="https://... (foto kamar yang tampil di website)"
               />
               {formData.photo_url && (
@@ -418,46 +358,23 @@ const MasterRoomType = () => {
             </div>
 
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Discount untuk Website (%)</label>
+              <label className="field-label">Discount untuk Website (%)</label>
               <input
                 type="number"
                 min="0"
                 max="100"
                 value={formData.discount_percentage}
                 onChange={(e) => setFormData({...formData, discount_percentage: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
                 placeholder="0"
               />
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #ddd', paddingTop: '15px' }}>
-              <button
-                onClick={handleCloseModal}
-                style={{
-                  padding: '8px 20px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  backgroundColor: '#f5f5f5',
-                  cursor: 'pointer'
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={showEditModal ? handleSaveEdit : handleAddSave}
-                disabled={processing}
-                style={{
-                  padding: '8px 20px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  backgroundColor: showEditModal ? '#4CAF50' : '#007bff',
-                  color: 'white',
-                  cursor: processing ? 'not-allowed' : 'pointer',
-                  opacity: processing ? 0.7 : 1
-                }}
-              >
+              <Button variant="secondary" onClick={handleCloseModal}>Cancel</Button>
+              <Button variant={showEditModal ? 'success' : 'primary'} onClick={showEditModal ? handleSaveEdit : handleAddSave} disabled={processing}>
                 {processing ? 'Saving...' : (showEditModal ? 'Save Changes' : 'Add Room Type')}
-              </button>
+              </Button>
             </div>
           </div>
         </div>

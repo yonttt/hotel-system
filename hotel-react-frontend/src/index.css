@@ -26,6 +26,202 @@
    =================================== */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+/* ===================================
+   DESIGN TOKENS (single source of truth)
+   Use these variables instead of hardcoded hex values so colors,
+   spacing and radii stay consistent across every page.
+   =================================== */
+:root {
+  /* Brand / primary */
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-light: #dbeafe;
+
+  /* Semantic */
+  --color-success: #16a34a;
+  --color-success-hover: #15803d;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
+  --color-danger-hover: #b91c1c;
+  --color-info: #0891b2;
+
+  /* Neutrals */
+  --color-text: #1f2937;
+  --color-text-muted: #6b7280;
+  --color-border: #e5e7eb;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f9fafb;
+
+  /* Spacing scale */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+
+  /* Radius & elevation */
+  --radius-sm: 4px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* ===================================
+   SHARED BUTTON SYSTEM (.btn + variants)
+   Used by: <Button> component (src/ui/Button.jsx)
+   =================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.05s;
+  white-space: nowrap;
+}
+/* Keep icon + label perfectly centered: kill the inline-SVG baseline gap,
+   size the icon relative to the label, and stop the text riding high. */
+.btn > svg {
+  display: block;
+  flex-shrink: 0;
+  width: 1.1em;
+  height: 1.1em;
+}
+.btn > span { display: inline-flex; align-items: center; line-height: 1; }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.btn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
+.btn-sm { padding: 4px 10px; font-size: 0.8rem; }
+.btn-lg { padding: 10px 20px; font-size: 0.95rem; }
+
+.btn--primary { background: var(--color-primary); color: #fff; }
+.btn--primary:hover:not(:disabled) { background: var(--color-primary-hover); }
+
+.btn--secondary { background: var(--color-surface); color: var(--color-text); border-color: var(--color-border); }
+.btn--secondary:hover:not(:disabled) { background: var(--color-surface-alt); }
+
+.btn--danger { background: var(--color-danger); color: #fff; }
+.btn--danger:hover:not(:disabled) { background: var(--color-danger-hover); }
+
+.btn--success { background: var(--color-success); color: #fff; }
+.btn--success:hover:not(:disabled) { background: var(--color-success-hover); }
+
+.btn--ghost { background: transparent; color: var(--color-primary); }
+.btn--ghost:hover:not(:disabled) { background: var(--color-primary-light); }
+
+/* ===================================
+   SHARED DATA TABLE (.data-table)
+   Used by: <DataTable> component (src/ui/DataTable.jsx)
+   =================================== */
+.data-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  color: var(--color-text);
+}
+.data-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--color-surface-alt);
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+.data-table tbody td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table tbody tr:nth-child(even) { background: var(--color-surface-alt); }
+.data-table tbody tr:hover { background: var(--color-primary-light); }
+
+.dt-left   { text-align: left; }
+.dt-center { text-align: center; }
+.dt-right  { text-align: right; }
+
+.dt-state {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--color-text-muted);
+}
+.dt-error { color: var(--color-danger); }
+
+/* Shared status pill */
+.status-pill {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.6;
+}
+.status-pill--pending   { background: #fef3c7; color: #92400e; }
+.status-pill--approved  { background: #dcfce7; color: #166534; }
+.status-pill--rejected  { background: #fee2e2; color: #991b1b; }
+.status-pill--completed { background: var(--color-primary-light); color: #1e40af; }
+.status-pill--default   { background: #f3f4f6; color: #374151; }
+
+/* ===================================
+   SHARED MODAL SHELL + FORM HELPERS + ALERTS
+   Used by: PropertyList and other modal forms
+   =================================== */
+.app-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--space-md);
+}
+.app-modal-card {
+  background: var(--color-surface);
+  padding: 30px;
+  border-radius: var(--radius);
+  width: 90%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: var(--shadow);
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: var(--color-text);
+  font-size: 0.875rem;
+}
+
+.alert {
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-md);
+  font-size: 0.875rem;
+  border: 1px solid transparent;
+}
+.alert--success { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+.alert--error   { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+
 /* Global reset and base font family */
 * {
   margin: 0;

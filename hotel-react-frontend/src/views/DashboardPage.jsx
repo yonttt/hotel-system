@@ -1,9 +1,14 @@
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import Layout from '../ui/Layout'
 
 const DashboardPage = () => {
+  const [now, setNow] = useState(new Date())
+
+  // Live clock so the dashboard always shows the current time.
+  // Use the global Refresh button in the top header bar to refresh page data.
   useEffect(() => {
-    // fetchDashboardData()
+    const timer = setInterval(() => setNow(new Date()), 1000)
+    return () => clearInterval(timer)
   }, [])
 
   return (
@@ -22,11 +27,11 @@ const DashboardPage = () => {
           <div className="welcome-section">
             <h2>Welcome to Eva Group Hotel Management</h2>
             <p>This is your central dashboard for managing hotel operations.</p>
-            
+
             <div className="system-status">
               <p><strong>System Status:</strong> Online and Ready</p>
-              <p><strong>Current Date:</strong> {new Date().toLocaleDateString()}</p>
-              <p><strong>Current Time:</strong> {new Date().toLocaleTimeString()}</p>
+              <p><strong>Current Date:</strong> {now.toLocaleDateString()}</p>
+              <p><strong>Current Time:</strong> {now.toLocaleTimeString()}</p>
             </div>
           </div>
         </div>
