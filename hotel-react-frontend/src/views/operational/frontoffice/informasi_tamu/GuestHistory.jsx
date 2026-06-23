@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../../../../state/AuthContext'
 import { apiService } from '../../../../api/api'
 import Layout from '../../../../ui/Layout'
+import Button from '../../../../ui/Button'
+import DataTable from '../../../../ui/DataTable'
 import UnifiedTableHeader from '../../../../ui/UnifiedTableHeader'
 import UnifiedTableFooter from '../../../../ui/UnifiedTableFooter'
 import useHotels from '../../../../logic/useHotels'
@@ -165,16 +167,7 @@ const GuestHistory = () => {
       <div className="unified-reservation-container">
         {/* Success Message */}
         {successMessage && (
-          <div style={{
-            background: '#d4edda',
-            border: '1px solid #c3e6cb',
-            color: '#155724',
-            padding: '12px 16px',
-            borderRadius: '4px',
-            marginBottom: '20px'
-          }}>
-            {successMessage}
-          </div>
+          <div className="alert alert--success">{successMessage}</div>
         )}
 
         <UnifiedTableHeader
@@ -206,67 +199,29 @@ const GuestHistory = () => {
           onEntriesChange={setShowEntries}
         />
 
-        <div className="unified-table-wrapper">
-          <table className="reservation-table">
-            <colgroup>
-              <col style={{ width: '60px' }} />   {/* No */}
-              <col style={{ width: '140px' }} />  {/* ID Card */}
-              <col style={{ width: '180px' }} />  {/* Guest Name */}
-              <col style={{ width: '120px' }} />  {/* Market */}
-              <col style={{ width: '80px' }} />   {/* Nights */}
-              <col style={{ width: '110px' }} />  {/* Arrival */}
-              <col style={{ width: '110px' }} />  {/* Departure */}
-              <col style={{ width: '120px' }} />  {/* Total C/I */}
-              <col style={{ width: '100px' }} />  {/* Detail */}
-            </colgroup>
-            <thead>
-              <tr>
-                <th>NO</th>
-                <th>ID CARD</th>
-                <th>GUEST NAME</th>
-                <th>MARKET</th>
-                <th>NIGHTS</th>
-                <th>ARRIVAL</th>
-                <th>DEPARTURE</th>
-                <th>TOTAL C/I</th>
-                <th>DETAIL</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr><td colSpan="9" className="no-data">Loading...</td></tr>
-              ) : error ? (
-                <tr><td colSpan="9" className="no-data">{error}</td></tr>
-              ) : currentRegistrations.length === 0 ? (
-                <tr><td colSpan="9" className="no-data">No data available in table</td></tr>
-              ) : (
-                currentRegistrations.map((registration, index) => (
-                  <tr key={registration.id}>
-                    <td>{startIndex + index + 1}</td>
-                    <td title={registration.id_card_number || 'N/A'}>{registration.id_card_number || 'N/A'}</td>
-                    <td title={registration.guest_name || 'N/A'}>{registration.guest_name || 'N/A'}</td>
-                    <td title={registration.category_market || 'N/A'}>{registration.category_market || 'N/A'}</td>
-                    <td className="align-center">{registration.nights || calculateNights(registration.arrival_date, registration.departure_date)}</td>
-                    <td>{formatDate(registration.arrival_date)}</td>
-                    <td>{formatDate(registration.departure_date)}</td>
-                    <td className="align-right">{formatCurrencyFixed4(registration.payment_amount || 0)}</td>
-                    <td className="align-center">
-                      {canEdit() && (
-                        <button 
-                          className="btn-table-action" 
-                          title="View Details"
-                          onClick={() => handleDetailClick(registration)}
-                        >
-                          Detail
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          data={currentRegistrations}
+          loading={loading}
+          error={error}
+          emptyText="No data available in table"
+          rowKey={(r) => r.id}
+          columns={[
+            { key: 'no', header: 'No', align: 'center', width: '60px',
+              render: (_r, i) => startIndex + i + 1 },
+            { key: 'id_card', header: 'ID Card', render: (r) => r.id_card_number || 'N/A' },
+            { key: 'name', header: 'Guest Name', render: (r) => r.guest_name || 'N/A' },
+            { key: 'market', header: 'Market', render: (r) => r.category_market || 'N/A' },
+            { key: 'nights', header: 'Nights', align: 'center',
+              render: (r) => r.nights || calculateNights(r.arrival_date, r.departure_date) },
+            { key: 'arrival', header: 'Arrival', render: (r) => formatDate(r.arrival_date) },
+            { key: 'departure', header: 'Departure', render: (r) => formatDate(r.departure_date) },
+            { key: 'total', header: 'Total C/I', align: 'right', render: (r) => formatCurrencyFixed4(r.payment_amount || 0) },
+            ...(canEdit() ? [{
+              key: 'detail', header: 'Detail', align: 'center', width: '100px',
+              render: (r) => <Button variant="ghost" size="sm" onClick={() => handleDetailClick(r)}>Detail</Button>
+            }] : [])
+          ]}
+        />
 
         <UnifiedTableFooter
           startIndex={startIndex}
@@ -280,27 +235,8 @@ const GuestHistory = () => {
 
       {/* Detail/Edit Modal */}
       {showDetailModal && (
-        <div className="modal-overlay" style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 1000
-        }}>
-          <div className="modal-content" style={{
-            backgroundColor: 'white',
-            padding: '20px',
-            borderRadius: '8px',
-            width: '500px',
-            maxWidth: '90%',
-            maxHeight: '90vh',
-            overflow: 'auto'
-          }}>
+        <div className="app-modal-overlay">
+          <div className="app-modal-card" style={{ maxWidth: '500px' }}>
             <h3 style={{ marginBottom: '20px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
               Guest Details: {selectedItem?.registration_no}
             </h3>
@@ -318,83 +254,57 @@ const GuestHistory = () => {
                 <div style={{ marginBottom: '20px' }}><strong>Notes:</strong> {selectedItem?.notes || 'N/A'}</div>
                 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #ddd', paddingTop: '15px' }}>
-                  <button
-                    onClick={handleCloseModal}
-                    style={{ padding: '8px 20px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#f5f5f5', cursor: 'pointer' }}
-                  >
-                    Close
-                  </button>
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    style={{ padding: '8px 20px', border: 'none', borderRadius: '4px', backgroundColor: '#2196F3', color: 'white', cursor: 'pointer' }}
-                  >
-                    Edit
-                  </button>
+                  <Button variant="secondary" onClick={handleCloseModal}>Close</Button>
+                  <Button variant="primary" onClick={() => setIsEditing(true)}>Edit</Button>
                 </div>
               </>
             ) : (
               <>
                 <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Guest Name <span style={{color: 'red'}}>*</span></label>
+                  <label className="field-label">Guest Name <span style={{color: 'red'}}>*</span></label>
                   <input
                     type="text"
                     value={editFormData.guest_name}
                     onChange={(e) => setEditFormData({...editFormData, guest_name: e.target.value})}
-                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                    className="form-input"
                   />
                 </div>
 
                 <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>ID Card Number</label>
+                  <label className="field-label">ID Card Number</label>
                   <input
                     type="text"
                     value={editFormData.id_card_number}
                     onChange={(e) => setEditFormData({...editFormData, id_card_number: e.target.value})}
-                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                    className="form-input"
                   />
                 </div>
 
                 <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Payment Amount</label>
+                  <label className="field-label">Payment Amount</label>
                   <input
                     type="number"
                     value={editFormData.payment_amount}
                     onChange={(e) => setEditFormData({...editFormData, payment_amount: e.target.value})}
-                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                    className="form-input"
                   />
                 </div>
 
                 <div style={{ marginBottom: '20px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Notes</label>
+                  <label className="field-label">Notes</label>
                   <textarea
                     value={editFormData.notes}
                     onChange={(e) => setEditFormData({...editFormData, notes: e.target.value})}
-                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', minHeight: '80px' }}
+                    className="form-input"
+                    style={{ minHeight: '80px' }}
                   />
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #ddd', paddingTop: '15px' }}>
-                  <button
-                    onClick={() => setIsEditing(false)}
-                    style={{ padding: '8px 20px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#f5f5f5', cursor: 'pointer' }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSaveEdit}
-                    disabled={processing}
-                    style={{
-                      padding: '8px 20px',
-                      border: 'none',
-                      borderRadius: '4px',
-                      backgroundColor: '#4CAF50',
-                      color: 'white',
-                      cursor: processing ? 'not-allowed' : 'pointer',
-                      opacity: processing ? 0.7 : 1
-                    }}
-                  >
+                  <Button variant="secondary" onClick={() => setIsEditing(false)}>Cancel</Button>
+                  <Button variant="success" onClick={handleSaveEdit} disabled={processing}>
                     {processing ? 'Saving...' : 'Save Changes'}
-                  </button>
+                  </Button>
                 </div>
               </>
             )}
