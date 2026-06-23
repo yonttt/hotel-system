@@ -5,6 +5,7 @@ import { apiService } from '../../../../api/api'
 import Layout from '../../../../ui/Layout'
 import SearchableSelect from '../../../../ui/SearchableSelect'
 import useHotels from '../../../../logic/useHotels'
+import { payReservation } from '../../../../logic/payment'
 
 import { formatCountriesOptions, formatCitiesOptions, formatPaymentMethodsOptions } from '../../../../helpers/dropdownFormatters';
 
@@ -330,9 +331,15 @@ const ReservasiPage = () => {
           console.error('Failed to update room status:', roomError)
           // Don't fail the reservation if room update fails
         }
-        
-        alert('Proses reservasi kamar berhasil')
-        loadInitialData() 
+
+        const reservationId = response.data.id
+        // Offer to take payment immediately via Midtrans.
+        if (reservationId && window.confirm('Reservasi berhasil. Proses pembayaran via Midtrans sekarang?')) {
+          payReservation(reservationId, { onPaid: () => loadInitialData() })
+        } else {
+          alert('Proses reservasi kamar berhasil')
+          loadInitialData()
+        }
       }
     } catch (error) {
       console.error('Error submitting reservation:', error)

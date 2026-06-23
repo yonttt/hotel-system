@@ -49,6 +49,12 @@ export const hotelAPI = {
 
   // Guest Registration
   registerGuest: (data) => api.post('/guests/', data),
+
+  // Next sequential reservation number
+  getNextReservationNumber: () => api.get('/hotel-reservations/next/reservation-number'),
+
+  // Midtrans payment
+  createPayment: (reservationId, amount = null) => api.post('/payments/create', { reservation_id: reservationId, amount }),
 }
 
 export default api

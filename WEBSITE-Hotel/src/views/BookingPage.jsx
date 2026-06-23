@@ -201,8 +201,44 @@ export default function BookingPage() {
       payload.guest_male = 1
       payload.guest_female = 0
       payload.guest_child = 0
-      await hotelAPI.createReservation(payload)
+      const created = await hotelAPI.createReservation(payload)
+      const reservationId = created.data?.id
       setBookingId(payload.reservation_no)
+
+      // For online payment methods, open the Midtrans popup immediately.
+      // "Bayar di Hotel" skips online payment (pay at the front desk).
+      if (formData.paymentMethod !== 'pay_at_hotel' && reservationId) {
+        try {
+          const payRes = await hotelAPI.createPayment(reservationId)
+          const token = payRes.data?.token
+          if (token && window.snap) {
+            window.snap.pay(token, {
+              onSuccess: () => {
+                showNotification('success', 'Pembayaran berhasil! Reservasi Anda dikonfirmasi.')
+                setSubmitted(true)
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+              },
+              onPending: () => {
+                showNotification('success', 'Reservasi dibuat. Selesaikan pembayaran Anda.')
+                setSubmitted(true)
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+              },
+              onError: () => {
+                showNotification('error', 'Pembayaran gagal. Silakan coba lagi.')
+              },
+              onClose: () => {
+                showNotification('error', 'Anda menutup pembayaran. Reservasi tersimpan, selesaikan pembayaran sebelum batas waktu.')
+                setSubmitted(true)
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+              },
+            })
+            return // popup handles the rest
+          }
+        } catch (payErr) {
+          console.error('Failed to start Midtrans payment:', payErr)
+          // Booking is still created; fall through to the success screen.
+        }
+      }
 
       showNotification('success', 'Reservasi Berhasil! Silakan periksa detail pesanan Anda.')
       setSubmitted(true)
