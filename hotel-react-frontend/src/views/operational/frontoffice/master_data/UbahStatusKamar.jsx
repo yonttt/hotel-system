@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../../../../api/api';
 import Layout from '../../../../ui/Layout';
+import Button from '../../../../ui/Button';
+import DataTable from '../../../../ui/DataTable';
 import UnifiedTableHeader from '../../../../ui/UnifiedTableHeader';
 import UnifiedTableFooter from '../../../../ui/UnifiedTableFooter';
 import { useAuth } from '../../../../state/AuthContext';
@@ -220,22 +222,7 @@ const UbahStatusKamar = () => {
         <UnifiedTableHeader
           title="UBAH STATUS KAMAR"
           actions={canEdit() && (
-            <button
-              onClick={handleAddClick}
-              className="btn-table-action"
-              style={{
-                background: '#007bff',
-                color: 'white',
-                padding: '6px 16px',
-                marginLeft: '20px',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '14px'
-              }}
-            >
-              ADD
-            </button>
+            <Button variant="primary" size="sm" onClick={handleAddClick}>+ Add Room</Button>
           )}
           hotels={hotels}
           selectedHotel={selectedHotel}
@@ -248,96 +235,35 @@ const UbahStatusKamar = () => {
 
         {/* Error Messages */}
         {error && (
-          <div style={{
-            background: '#f8d7da',
-            border: '1px solid #f5c6cb',
-            color: '#721c24',
-            padding: '12px 16px',
-            borderRadius: '4px',
-            marginBottom: '20px'
-          }}>
-            {error}
-          </div>
+          <div className="alert alert--error">{error}</div>
         )}
 
         {/* Table Section */}
-        <div className="unified-table-wrapper">
-          <table className="reservation-table">
-            <colgroup>
-              <col style={{ width: '50px' }} />   {/* No */}
-              <col style={{ width: '180px' }} />  {/* NAMA HOTEL */}
-              <col style={{ width: '80px' }} />   {/* Type */}
-              <col style={{ width: '80px' }} />   {/* Room No */}
-              <col style={{ width: '60px' }} />   {/* Floor */}
-              <col style={{ width: '50px' }} />   {/* VIP */}
-              <col style={{ width: '80px' }} />   {/* Smoking */}
-              <col style={{ width: '150px' }} />  {/* Status */}
-              <col style={{ width: '50px' }} />   {/* Hit */}
-              <col style={{ width: '80px' }} />   {/* Action */}
-            </colgroup>
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>NAMA HOTEL</th>
-                <th>Type</th>
-                <th>Room No</th>
-                <th>Floor</th>
-                <th>VIP</th>
-                <th>Smoking</th>
-                <th>Status</th>
-                <th>Hit</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan="10" className="no-data">Loading...</td>
-                </tr>
-              ) : currentRooms.length === 0 ? (
-                <tr>
-                  <td colSpan="10" className="no-data">
-                    No data available in table
-                  </td>
-                </tr>
-              ) : (
-                currentRooms.map((room, index) => (
-                  <tr key={room.id}>
-                    <td style={{ textAlign: 'center' }}>{startIndex + index + 1}</td>
-                    <td>{room.hotel_name || '-'}</td>
-                    <td>{room.room_type}</td>
-                    <td>{room.room_number}</td>
-                    <td style={{ textAlign: 'center' }}>{room.floor_number}</td>
-                    <td style={{ textAlign: 'center' }}>{room.is_vip ? 'Yes' : ''}</td>
-                    <td style={{ textAlign: 'center' }}>{room.is_smoking ? 'Yes' : 'No'}</td>
-                    <td>{getStatusDisplayName(room.status)}</td>
-                    <td style={{ textAlign: 'center' }}>{room.hit_count || 0}</td>
-                    <td style={{ textAlign: 'center' }}>
-                      <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
-                        <button
-                          onClick={() => handleEditClick(room)}
-                          className="btn-table-action"
-                          style={{ background: '#ffc107', color: '#212529', padding: '4px 10px', fontSize: '12px' }}
-                        >
-                          Edit
-                        </button>
-                        {canEdit() && (
-                          <button
-                            onClick={() => handleDelete(room)}
-                            className="btn-table-action"
-                            style={{ background: '#dc3545', color: 'white', padding: '4px 10px', fontSize: '12px' }}
-                          >
-                            Delete
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          data={currentRooms}
+          loading={loading}
+          emptyText="No data available in table"
+          rowKey={(room) => room.id}
+          columns={[
+            { key: 'no', header: 'No', align: 'center', width: '50px',
+              render: (_r, i) => startIndex + i + 1 },
+            { key: 'hotel', header: 'Nama Hotel', render: (r) => r.hotel_name || '-' },
+            { key: 'type', header: 'Type', render: (r) => r.room_type },
+            { key: 'room_no', header: 'Room No', render: (r) => r.room_number },
+            { key: 'floor', header: 'Floor', align: 'center', render: (r) => r.floor_number },
+            { key: 'vip', header: 'VIP', align: 'center', render: (r) => r.is_vip ? 'Yes' : '' },
+            { key: 'smoking', header: 'Smoking', align: 'center', render: (r) => r.is_smoking ? 'Yes' : 'No' },
+            { key: 'status', header: 'Status', render: (r) => getStatusDisplayName(r.status) },
+            { key: 'hit', header: 'Hit', align: 'center', render: (r) => r.hit_count || 0 },
+            { key: 'action', header: 'Action', align: 'center', width: '160px',
+              render: (r) => (
+                <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                  <Button variant="ghost" size="sm" onClick={() => handleEditClick(r)}>Edit</Button>
+                  {canEdit() && <Button variant="danger" size="sm" onClick={() => handleDelete(r)}>Delete</Button>}
+                </div>
+              ) }
+          ]}
+        />
 
         <UnifiedTableFooter
           startIndex={startIndex}
@@ -353,118 +279,66 @@ const UbahStatusKamar = () => {
 
         {/* Edit Modal */}
         {showEditModal && editingRoom && (
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000
-          }}>
-            <div style={{
-              background: 'white',
-              padding: '30px',
-              borderRadius: '8px',
-              width: '90%',
-              maxWidth: '450px',
-              maxHeight: '90vh',
-              overflow: 'auto'
-            }}>
+          <div className="app-modal-overlay">
+            <div className="app-modal-card" style={{ maxWidth: '450px' }}>
               <h2 style={{ marginTop: 0, marginBottom: '20px' }}>Edit Room Status - {editingRoom.room_number}</h2>
 
               <div style={{ marginBottom: '15px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                <label className="field-label">
                   Hotel
                 </label>
                 <input
                   type="text"
                   value={editingRoom.hotel_name || defaultHotel}
                   disabled
-                  style={{ 
-                    width: '100%', 
-                    padding: '8px', 
-                    borderRadius: '4px', 
-                    border: '1px solid #ddd',
-                    background: '#f5f5f5',
-                    color: '#666'
-                  }}
+                  className="form-input"
                 />
               </div>
 
               <div style={{ marginBottom: '15px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                <label className="field-label">
                   Room Type
                 </label>
                 <input
                   type="text"
                   value={editingRoom.room_type}
                   disabled
-                  style={{ 
-                    width: '100%', 
-                    padding: '8px', 
-                    borderRadius: '4px', 
-                    border: '1px solid #ddd',
-                    background: '#f5f5f5',
-                    color: '#666'
-                  }}
+                  className="form-input"
                 />
               </div>
 
               <div style={{ marginBottom: '15px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                <label className="field-label">
                   Room Number
                 </label>
                 <input
                   type="text"
                   value={editingRoom.room_number}
                   disabled
-                  style={{ 
-                    width: '100%', 
-                    padding: '8px', 
-                    borderRadius: '4px', 
-                    border: '1px solid #ddd',
-                    background: '#f5f5f5',
-                    color: '#666'
-                  }}
+                  className="form-input"
                 />
               </div>
 
               <div style={{ marginBottom: '15px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                <label className="field-label">
                   Floor
                 </label>
                 <input
                   type="text"
                   value={editingRoom.floor_number}
                   disabled
-                  style={{ 
-                    width: '100%', 
-                    padding: '8px', 
-                    borderRadius: '4px', 
-                    border: '1px solid #ddd',
-                    background: '#f5f5f5',
-                    color: '#666'
-                  }}
+                  className="form-input"
                 />
               </div>
 
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                <label className="field-label">
                   Status <span style={{ color: '#dc3545' }}>*</span>
                 </label>
                 <select
                   value={editStatus}
                   onChange={(e) => setEditStatus(e.target.value)}
-                  style={{ 
-                    width: '100%', 
-                    padding: '8px', 
-                    borderRadius: '4px', 
-                    border: '1px solid #ddd'
-                  }}
+                  className="form-input"
                 >
                   <option value="">-- Select Status --</option>
                   {statusOptions.map(opt => (
@@ -476,35 +350,10 @@ const UbahStatusKamar = () => {
               </div>
 
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  style={{
-                    padding: '10px 20px',
-                    border: '1px solid #ddd',
-                    background: 'white',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSaveEdit}
-                  disabled={processing}
-                  style={{
-                    padding: '10px 20px',
-                    border: 'none',
-                    background: processing ? '#6c757d' : '#28a745',
-                    color: 'white',
-                    borderRadius: '4px',
-                    cursor: processing ? 'not-allowed' : 'pointer',
-                    fontWeight: '500'
-                  }}
-                >
+                <Button type="button" variant="secondary" onClick={handleCloseModal}>Cancel</Button>
+                <Button type="button" variant="success" onClick={handleSaveEdit} disabled={processing}>
                   {processing ? 'Saving...' : 'Save'}
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -512,35 +361,16 @@ const UbahStatusKamar = () => {
 
         {/* Add Modal */}
         {showAddModal && (
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000
-          }}>
-            <div style={{
-              background: 'white',
-              padding: '30px',
-              borderRadius: '8px',
-              width: '90%',
-              maxWidth: '500px',
-              maxHeight: '90vh',
-              overflow: 'auto'
-            }}>
+          <div className="app-modal-overlay">
+            <div className="app-modal-card" style={{ maxWidth: '500px' }}>
               <h2 style={{ marginTop: 0, marginBottom: '20px' }}>Add New Room</h2>
 
               <div style={{ marginBottom: '15px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Hotel</label>
+                <label className="field-label">Hotel</label>
                 <select
                   value={addFormData.hotel_name}
                   onChange={(e) => setAddFormData({...addFormData, hotel_name: e.target.value})}
-                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
+                  className="form-input"
                 >
                   {hotels.map(hotel => (
                     <option key={hotel.id} value={hotel.name}>{hotel.name}</option>
@@ -549,7 +379,7 @@ const UbahStatusKamar = () => {
               </div>
 
               <div style={{ marginBottom: '15px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                <label className="field-label">
                   Room Number <span style={{ color: '#dc3545' }}>*</span>
                 </label>
                 <input
@@ -557,18 +387,18 @@ const UbahStatusKamar = () => {
                   value={addFormData.room_number}
                   onChange={(e) => setAddFormData({...addFormData, room_number: e.target.value})}
                   placeholder="e.g., 101"
-                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
+                  className="form-input"
                 />
               </div>
 
               <div style={{ marginBottom: '15px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                <label className="field-label">
                   Room Type <span style={{ color: '#dc3545' }}>*</span>
                 </label>
                 <select
                   value={addFormData.room_type}
                   onChange={(e) => setAddFormData({...addFormData, room_type: e.target.value})}
-                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
+                  className="form-input"
                 >
                   <option value="">Select Room Type</option>
                   {roomTypeOptions.map(rt => (
@@ -578,21 +408,21 @@ const UbahStatusKamar = () => {
               </div>
 
               <div style={{ marginBottom: '15px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Floor</label>
+                <label className="field-label">Floor</label>
                 <input
                   type="number"
                   value={addFormData.floor_number}
                   onChange={(e) => setAddFormData({...addFormData, floor_number: e.target.value})}
-                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
+                  className="form-input"
                 />
               </div>
 
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Initial Status</label>
+                <label className="field-label">Initial Status</label>
                 <select
                   value={addFormData.status}
                   onChange={(e) => setAddFormData({...addFormData, status: e.target.value})}
-                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
+                  className="form-input"
                 >
                   {statusOptions.map(opt => (
                     <option key={opt.code} value={opt.code}>{opt.name}</option>
@@ -601,35 +431,10 @@ const UbahStatusKamar = () => {
               </div>
 
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  style={{
-                    padding: '10px 20px',
-                    border: '1px solid #ddd',
-                    background: 'white',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleAddSave}
-                  disabled={processing}
-                  style={{
-                    padding: '10px 20px',
-                    border: 'none',
-                    background: processing ? '#6c757d' : '#007bff',
-                    color: 'white',
-                    borderRadius: '4px',
-                    cursor: processing ? 'not-allowed' : 'pointer',
-                    fontWeight: '500'
-                  }}
-                >
+                <Button type="button" variant="secondary" onClick={handleCloseModal}>Cancel</Button>
+                <Button type="button" variant="primary" onClick={handleAddSave} disabled={processing}>
                   {processing ? 'Saving...' : 'Add Room'}
-                </button>
+                </Button>
               </div>
             </div>
           </div>

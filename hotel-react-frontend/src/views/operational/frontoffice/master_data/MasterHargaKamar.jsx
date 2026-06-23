@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../../../../api/api';
 import Layout from '../../../../ui/Layout';
+import Button from '../../../../ui/Button';
+import DataTable from '../../../../ui/DataTable';
 import UnifiedTableHeader from '../../../../ui/UnifiedTableHeader';
 import UnifiedTableFooter from '../../../../ui/UnifiedTableFooter';
 import { useAuth } from '../../../../state/AuthContext';
@@ -204,22 +206,7 @@ const MasterHargaKamar = () => {
         <UnifiedTableHeader
           title="MASTER HARGA KAMAR"
           actions={canEdit() && (
-            <button
-              onClick={handleAddClick}
-              className="btn-table-action"
-              style={{
-                background: '#007bff',
-                color: 'white',
-                padding: '6px 16px',
-                marginLeft: '20px',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '14px'
-              }}
-            >
-              ADD
-            </button>
+            <Button variant="primary" size="sm" onClick={handleAddClick}>+ Add Rate</Button>
           )}
           hotels={hotels}
           selectedHotel={selectedHotel}
@@ -232,103 +219,39 @@ const MasterHargaKamar = () => {
 
         {/* Success/Error Messages */}
         {successMessage && (
-          <div style={{
-            background: '#d4edda',
-            border: '1px solid #c3e6cb',
-            color: '#155724',
-            padding: '12px 16px',
-            borderRadius: '4px',
-            marginBottom: '20px'
-          }}>
-            {successMessage}
-          </div>
+          <div className="alert alert--success">{successMessage}</div>
         )}
 
         {error && (
-          <div style={{
-            background: '#f8d7da',
-            border: '1px solid #f5c6cb',
-            color: '#721c24',
-            padding: '12px 16px',
-            borderRadius: '4px',
-            marginBottom: '20px'
-          }}>
-            {error}
-          </div>
+          <div className="alert alert--error">{error}</div>
         )}
 
         {/* Table Section */}
-        <div className="unified-table-wrapper">
-          <table className="reservation-table">
-            <colgroup>
-              <col style={{ width: '50px' }} />   {/* No */}
-              <col style={{ width: '180px' }} />  {/* Hotel */}
-              <col style={{ width: '200px' }} />  {/* Rate Name */}
-              <col style={{ width: '120px' }} />  {/* Room Type */}
-              <col style={{ width: '120px' }} />  {/* Room Rate */}
-              <col style={{ width: '100px' }} />  {/* Extrabed */}
-              <col style={{ width: '150px' }} />  {/* Date */}
-              <col style={{ width: '80px' }} />   {/* Action */}
-            </colgroup>
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>Hotel</th>
-                <th>Rate Name</th>
-                <th>Room Type</th>
-                <th>Room Rate</th>
-                <th>Extrabed</th>
-                <th>Date</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan="8" className="no-data">Loading...</td>
-                </tr>
-              ) : currentRates.length === 0 ? (
-                <tr>
-                  <td colSpan="8" className="no-data">
-                    No data available in table
-                  </td>
-                </tr>
-              ) : (
-                currentRates.map((rate, index) => (
-                  <tr key={rate.id}>
-                    <td style={{ textAlign: 'center' }}>{startIndex + index + 1}</td>
-                    <td>{rate.hotel_name || '-'}</td>
-                    <td>{rate.rate_name}</td>
-                    <td>{rate.room_type}</td>
-                    <td style={{ textAlign: 'right' }}>{formatCurrencyIDR(rate.room_rate)}</td>
-                    <td style={{ textAlign: 'right' }}>{formatCurrencyIDR(rate.extrabed)}</td>
-                    <td>{formatDate(rate.effective_date)}</td>
-                    <td style={{ textAlign: 'center' }}>
-                      {canEdit() && (
-                        <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
-                          <button
-                            className="btn-table-action"
-                            style={{ background: '#ffc107', color: '#212529', padding: '4px 10px', fontSize: '12px' }}
-                            onClick={() => handleEditClick(rate)}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            className="btn-table-action"
-                            style={{ background: '#dc3545', color: 'white', padding: '4px 10px', fontSize: '12px' }}
-                            onClick={() => handleDelete(rate)}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          data={currentRates}
+          loading={loading}
+          emptyText="No data available in table"
+          rowKey={(rate) => rate.id}
+          columns={[
+            { key: 'no', header: 'No', align: 'center', width: '50px',
+              render: (_r, i) => startIndex + i + 1 },
+            { key: 'hotel', header: 'Hotel', render: (r) => r.hotel_name || '-' },
+            { key: 'rate_name', header: 'Rate Name', render: (r) => r.rate_name },
+            { key: 'room_type', header: 'Room Type', render: (r) => r.room_type },
+            { key: 'room_rate', header: 'Room Rate', align: 'right', render: (r) => formatCurrencyIDR(r.room_rate) },
+            { key: 'extrabed', header: 'Extrabed', align: 'right', render: (r) => formatCurrencyIDR(r.extrabed) },
+            { key: 'date', header: 'Date', render: (r) => formatDate(r.effective_date) },
+            ...(canEdit() ? [{
+              key: 'action', header: 'Action', align: 'center', width: '160px',
+              render: (r) => (
+                <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                  <Button variant="ghost" size="sm" onClick={() => handleEditClick(r)}>Edit</Button>
+                  <Button variant="danger" size="sm" onClick={() => handleDelete(r)}>Delete</Button>
+                </div>
+              )
+            }] : [])
+          ]}
+        />
 
         <UnifiedTableFooter
           startIndex={startIndex}
@@ -345,37 +268,18 @@ const MasterHargaKamar = () => {
 
       {/* Add/Edit Modal */}
       {(showAddModal || showEditModal) && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            padding: '20px',
-            borderRadius: '8px',
-            width: '500px',
-            maxWidth: '90%',
-            maxHeight: '90vh',
-            overflow: 'auto'
-          }}>
+        <div className="app-modal-overlay">
+          <div className="app-modal-card" style={{ maxWidth: '500px' }}>
             <h3 style={{ marginBottom: '20px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
               {showEditModal ? 'Edit Room Rate' : 'Add New Room Rate'}
             </h3>
             
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Hotel</label>
+              <label className="field-label">Hotel</label>
               <select
                 value={formData.hotel_name}
                 onChange={(e) => setFormData({...formData, hotel_name: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
               >
                 {hotels.map(hotel => (
                   <option key={hotel.id} value={hotel.name}>{hotel.name}</option>
@@ -384,22 +288,22 @@ const MasterHargaKamar = () => {
             </div>
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Rate Name <span style={{color: 'red'}}>*</span></label>
+              <label className="field-label">Rate Name <span style={{color: 'red'}}>*</span></label>
               <input
                 type="text"
                 value={formData.rate_name}
                 onChange={(e) => setFormData({...formData, rate_name: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
                 placeholder="e.g., Libur Keagamaan 2025"
               />
             </div>
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Room Type <span style={{color: 'red'}}>*</span></label>
+              <label className="field-label">Room Type <span style={{color: 'red'}}>*</span></label>
               <select
                 value={formData.room_type}
                 onChange={(e) => setFormData({...formData, room_type: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
               >
                 <option value="">Select Room Type</option>
                 {roomTypes.map(rt => (
@@ -410,63 +314,40 @@ const MasterHargaKamar = () => {
 
             <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Room Rate</label>
+                <label className="field-label">Room Rate</label>
                 <input
                   type="number"
                   value={formData.room_rate}
                   onChange={(e) => setFormData({...formData, room_rate: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                 />
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Extrabed</label>
+                <label className="field-label">Extrabed</label>
                 <input
                   type="number"
                   value={formData.extrabed}
                   onChange={(e) => setFormData({...formData, extrabed: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                 />
               </div>
             </div>
 
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Effective Date</label>
+              <label className="field-label">Effective Date</label>
               <input
                 type="date"
                 value={formData.effective_date}
                 onChange={(e) => setFormData({...formData, effective_date: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
               />
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #ddd', paddingTop: '15px' }}>
-              <button
-                onClick={handleCloseModal}
-                style={{
-                  padding: '8px 20px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  backgroundColor: '#f5f5f5',
-                  cursor: 'pointer'
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={showEditModal ? handleSaveEdit : handleAddSave}
-                disabled={processing}
-                style={{
-                  padding: '8px 20px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  backgroundColor: showEditModal ? '#4CAF50' : '#007bff',
-                  color: 'white',
-                  cursor: processing ? 'not-allowed' : 'pointer',
-                  opacity: processing ? 0.7 : 1
-                }}
-              >
+              <Button variant="secondary" onClick={handleCloseModal}>Cancel</Button>
+              <Button variant={showEditModal ? 'success' : 'primary'} onClick={showEditModal ? handleSaveEdit : handleAddSave} disabled={processing}>
                 {processing ? 'Saving...' : (showEditModal ? 'Save Changes' : 'Add Rate')}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
