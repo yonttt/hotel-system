@@ -114,6 +114,9 @@
 .btn--success { background: var(--color-success); color: #fff; }
 .btn--success:hover:not(:disabled) { background: var(--color-success-hover); }
 
+.btn--warning { background: var(--color-warning); color: #fff; }
+.btn--warning:hover:not(:disabled) { background: #b45309; }
+
 .btn--ghost { background: transparent; color: var(--color-primary); }
 .btn--ghost:hover:not(:disabled) { background: var(--color-primary-light); }
 

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../../../api/api';
 import Layout from '../../../ui/Layout';
+import Button from '../../../ui/Button';
+import DataTable from '../../../ui/DataTable';
 import UnifiedTableHeader from '../../../ui/UnifiedTableHeader';
 import UnifiedTableFooter from '../../../ui/UnifiedTableFooter';
 import { useAuth } from '../../../state/AuthContext';
@@ -20,7 +22,6 @@ const NightAudit = () => {
     const today = new Date();
     return today.toISOString().split('T')[0];
   });
-  const [successMessage, setSuccessMessage] = useState(null);
 
   // Add/Edit modal state
   const [showModal, setShowModal] = useState(false);
@@ -210,59 +211,17 @@ const NightAudit = () => {
       <div className="unified-reservation-container">
         {/* Error Message */}
         {error && (
-          <div style={{
-            background: '#f8d7da',
-            border: '1px solid #f5c6cb',
-            color: '#721c24',
-            padding: '12px 16px',
-            borderRadius: '4px',
-            marginBottom: '20px'
-          }}>
-            {error}
-          </div>
+          <div className="alert alert--error">{error}</div>
         )}
 
         <UnifiedTableHeader
           title="Night Audit History"
           actions={(
             <>
-              <button
-                onClick={handleAddNew}
-                style={{
-                  padding: '8px 20px',
-                  backgroundColor: '#3498db',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '13px',
-                  fontWeight: '500',
-                  boxShadow: '0 2px 4px rgba(52, 152, 219, 0.3)'
-                }}
-                onMouseOver={(e) => e.target.style.backgroundColor = '#2980b9'}
-                onMouseOut={(e) => e.target.style.backgroundColor = '#3498db'}
-              >
-                + Tambah Data
-              </button>
-              <button
-                onClick={handleProcessNightAudit}
-                disabled={processing}
-                style={{
-                  padding: '8px 20px',
-                  backgroundColor: '#e67e22',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: processing ? 'not-allowed' : 'pointer',
-                  fontSize: '13px',
-                  fontWeight: '500',
-                  boxShadow: '0 2px 4px rgba(230, 126, 34, 0.3)'
-                }}
-                onMouseOver={(e) => !processing && (e.target.style.backgroundColor = '#d35400')}
-                onMouseOut={(e) => !processing && (e.target.style.backgroundColor = '#e67e22')}
-              >
+              <Button variant="primary" size="sm" onClick={handleAddNew}>+ Tambah Data</Button>
+              <Button variant="warning" size="sm" onClick={handleProcessNightAudit} disabled={processing}>
                 {processing ? 'Processing...' : 'Process Night Audit'}
-              </button>
+              </Button>
             </>
           )}
           topRightExtra={(
@@ -304,100 +263,37 @@ const NightAudit = () => {
           onEntriesChange={setShowEntries}
         />
 
-        <div className="unified-table-wrapper">
-          <table className="reservation-table">
-            <colgroup>
-              <col style={{ width: '50px' }} />   {/* No */}
-              <col style={{ width: '70px' }} />   {/* Room */}
-              <col style={{ width: '80px' }} />   {/* Extra Bed */}
-              <col style={{ width: '80px' }} />   {/* Extra Bill */}
-              <col style={{ width: '90px' }} />   {/* Late Charge */}
-              <col style={{ width: '80px' }} />   {/* Discount */}
-              <col style={{ width: '100px' }} />  {/* Meeting Room */}
-              <col style={{ width: '110px' }} />  {/* Add. Meeting Room */}
-              <col style={{ width: '80px' }} />   {/* Cash */}
-              <col style={{ width: '70px' }} />   {/* Debet */}
-              <col style={{ width: '80px' }} />   {/* Transfer */}
-              <col style={{ width: '80px' }} />   {/* Voucher */}
-              <col style={{ width: '90px' }} />   {/* Creditcard */}
-              <col style={{ width: '100px' }} />  {/* Guest Ledger - */}
-              <col style={{ width: '100px' }} />  {/* Guest Ledger + */}
-              <col style={{ width: '80px' }} />   {/* Action */}
-            </colgroup>
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>Room</th>
-                <th>Extra Bed</th>
-                <th>Extra Bill</th>
-                <th>Late Charge</th>
-                <th>Discount</th>
-                <th>Meeting Room</th>
-                <th>Add. Meeting Room</th>
-                <th>Cash</th>
-                <th>Debet</th>
-                <th>Transfer</th>
-                <th>Voucher</th>
-                <th>Creditcard</th>
-                <th>Guest Ledger -</th>
-                <th>Guest Ledger +</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr><td colSpan="16" className="no-data">Loading...</td></tr>
-              ) : currentData.length === 0 ? (
-                <tr><td colSpan="16" className="no-data">No data available in table</td></tr>
-              ) : (
-                currentData.map((item, index) => (
-                  <tr key={item.id || index}>
-                    <td>{startIndex + index + 1}</td>
-                    <td title={item.room_number || '-'}>{item.room_number || '-'}</td>
-                    <td className="align-right">{formatCurrencyIDR(item.extra_bed)}</td>
-                    <td className="align-right">{formatCurrencyIDR(item.extra_bill)}</td>
-                    <td className="align-right">{formatCurrencyIDR(item.late_charge)}</td>
-                    <td className="align-right">{formatCurrencyIDR(item.discount)}</td>
-                    <td className="align-right">{formatCurrencyIDR(item.meeting_room)}</td>
-                    <td className="align-right">{formatCurrencyIDR(item.add_meeting_room)}</td>
-                    <td className="align-right">{formatCurrencyIDR(item.cash)}</td>
-                    <td className="align-right">{formatCurrencyIDR(item.debet)}</td>
-                    <td className="align-right">{formatCurrencyIDR(item.transfer)}</td>
-                    <td className="align-right">{formatCurrencyIDR(item.voucher)}</td>
-                    <td className="align-right">{formatCurrencyIDR(item.creditcard)}</td>
-                    <td className="align-right">{formatCurrencyIDR(item.guest_ledger_minus)}</td>
-                    <td className="align-right">{formatCurrencyIDR(item.guest_ledger_plus)}</td>
-                    <td className="align-center">
-                      <div style={{ display: 'flex', gap: '5px', justifyContent: 'center' }}>
-                        <button 
-                          className="btn-table-action"
-                          title="Edit"
-                          onClick={() => handleEdit(item)}
-                          style={{ padding: '3px 8px', fontSize: '11px' }}
-                        >
-                          Edit
-                        </button>
-                        <button 
-                          className="btn-table-action"
-                          title="Delete"
-                          onClick={() => handleDelete(item)}
-                          style={{ 
-                            padding: '3px 8px', 
-                            fontSize: '11px',
-                            backgroundColor: '#dc3545',
-                            borderColor: '#dc3545'
-                          }}
-                        >
-                          Del
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          data={currentData}
+          loading={loading}
+          emptyText="No data available in table"
+          rowKey={(item) => item.id}
+          columns={[
+            { key: 'no', header: 'No', align: 'center', width: '50px',
+              render: (_i, idx) => startIndex + idx + 1 },
+            { key: 'room', header: 'Room', render: (i) => i.room_number || '-' },
+            { key: 'extra_bed', header: 'Extra Bed', align: 'right', render: (i) => formatCurrencyIDR(i.extra_bed) },
+            { key: 'extra_bill', header: 'Extra Bill', align: 'right', render: (i) => formatCurrencyIDR(i.extra_bill) },
+            { key: 'late_charge', header: 'Late Charge', align: 'right', render: (i) => formatCurrencyIDR(i.late_charge) },
+            { key: 'discount', header: 'Discount', align: 'right', render: (i) => formatCurrencyIDR(i.discount) },
+            { key: 'meeting_room', header: 'Meeting Room', align: 'right', render: (i) => formatCurrencyIDR(i.meeting_room) },
+            { key: 'add_meeting_room', header: 'Add. Meeting Room', align: 'right', render: (i) => formatCurrencyIDR(i.add_meeting_room) },
+            { key: 'cash', header: 'Cash', align: 'right', render: (i) => formatCurrencyIDR(i.cash) },
+            { key: 'debet', header: 'Debet', align: 'right', render: (i) => formatCurrencyIDR(i.debet) },
+            { key: 'transfer', header: 'Transfer', align: 'right', render: (i) => formatCurrencyIDR(i.transfer) },
+            { key: 'voucher', header: 'Voucher', align: 'right', render: (i) => formatCurrencyIDR(i.voucher) },
+            { key: 'creditcard', header: 'Creditcard', align: 'right', render: (i) => formatCurrencyIDR(i.creditcard) },
+            { key: 'gl_minus', header: 'Guest Ledger -', align: 'right', render: (i) => formatCurrencyIDR(i.guest_ledger_minus) },
+            { key: 'gl_plus', header: 'Guest Ledger +', align: 'right', render: (i) => formatCurrencyIDR(i.guest_ledger_plus) },
+            { key: 'action', header: 'Action', align: 'center', width: '140px',
+              render: (i) => (
+                <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                  <Button variant="ghost" size="sm" onClick={() => handleEdit(i)}>Edit</Button>
+                  <Button variant="danger" size="sm" onClick={() => handleDelete(i)}>Del</Button>
+                </div>
+              ) }
+          ]}
+        />
 
         <UnifiedTableFooter
           startIndex={startIndex}
@@ -411,27 +307,8 @@ const NightAudit = () => {
 
         {/* Add/Edit Modal */}
         {showModal && (
-          <div className="modal-overlay" style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 1000
-          }}>
-            <div className="modal-content" style={{
-              backgroundColor: 'white',
-              padding: '20px',
-              borderRadius: '8px',
-              width: '700px',
-              maxWidth: '90%',
-              maxHeight: '90vh',
-              overflow: 'auto'
-            }}>
+          <div className="app-modal-overlay">
+            <div className="app-modal-card" style={{ maxWidth: '700px' }}>
               <h3 style={{ marginBottom: '20px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
                 {editingItem ? 'Edit Night Audit' : 'Tambah Data Night Audit'}
               </h3>
@@ -439,20 +316,20 @@ const NightAudit = () => {
               {/* Basic Info */}
               <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Date <span style={{color: 'red'}}>*</span></label>
+                  <label className="field-label">Date <span style={{color: 'red'}}>*</span></label>
                   <input
                     type="date"
                     value={formData.audit_date}
                     onChange={(e) => handleFormChange('audit_date', e.target.value)}
-                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                    className="form-input"
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Hotel <span style={{color: 'red'}}>*</span></label>
+                  <label className="field-label">Hotel <span style={{color: 'red'}}>*</span></label>
                   <select
                     value={formData.hotel_name}
                     onChange={(e) => handleFormChange('hotel_name', e.target.value)}
-                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                    className="form-input"
                   >
                     {hotels.map(hotel => (
                       <option key={hotel.id} value={hotel.name}>
@@ -465,23 +342,23 @@ const NightAudit = () => {
 
               <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Room Number <span style={{color: 'red'}}>*</span></label>
+                  <label className="field-label">Room Number <span style={{color: 'red'}}>*</span></label>
                   <input
                     type="text"
                     value={formData.room_number}
                     onChange={(e) => handleFormChange('room_number', e.target.value)}
                     placeholder="Enter room number"
-                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                    className="form-input"
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Guest Name</label>
+                  <label className="field-label">Guest Name</label>
                   <input
                     type="text"
                     value={formData.guest_name}
                     onChange={(e) => handleFormChange('guest_name', e.target.value)}
                     placeholder="Enter guest name"
-                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                    className="form-input"
                   />
                 </div>
               </div>
@@ -490,59 +367,59 @@ const NightAudit = () => {
               <h4 style={{ marginTop: '20px', marginBottom: '15px', borderBottom: '1px solid #ddd', paddingBottom: '10px', color: '#333' }}>Revenue Items</h4>
               <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Extra Bed</label>
+                  <label className="field-label">Extra Bed</label>
                   <input
                     type="number"
                     value={formData.extra_bed}
                     onChange={(e) => handleFormChange('extra_bed', parseFloat(e.target.value) || 0)}
-                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                    className="form-input"
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Extra Bill</label>
+                  <label className="field-label">Extra Bill</label>
                   <input
                     type="number"
                     value={formData.extra_bill}
                     onChange={(e) => handleFormChange('extra_bill', parseFloat(e.target.value) || 0)}
-                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                    className="form-input"
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Late Charge</label>
+                  <label className="field-label">Late Charge</label>
                   <input
                     type="number"
                     value={formData.late_charge}
                     onChange={(e) => handleFormChange('late_charge', parseFloat(e.target.value) || 0)}
-                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                    className="form-input"
                   />
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Discount</label>
+                  <label className="field-label">Discount</label>
                   <input
                     type="number"
                     value={formData.discount}
                     onChange={(e) => handleFormChange('discount', parseFloat(e.target.value) || 0)}
-                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                    className="form-input"
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Meeting Room</label>
+                  <label className="field-label">Meeting Room</label>
                   <input
                     type="number"
                     value={formData.meeting_room}
                     onChange={(e) => handleFormChange('meeting_room', parseFloat(e.target.value) || 0)}
-                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                    className="form-input"
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Add. Meeting Room</label>
+                  <label className="field-label">Add. Meeting Room</label>
                   <input
                     type="number"
                     value={formData.add_meeting_room}
                     onChange={(e) => handleFormChange('add_meeting_room', parseFloat(e.target.value) || 0)}
-                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                    className="form-input"
                   />
                 </div>
               </div>
@@ -551,50 +428,50 @@ const NightAudit = () => {
               <h4 style={{ marginTop: '20px', marginBottom: '15px', borderBottom: '1px solid #ddd', paddingBottom: '10px', color: '#333' }}>Payment Methods</h4>
               <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Cash</label>
+                  <label className="field-label">Cash</label>
                   <input
                     type="number"
                     value={formData.cash}
                     onChange={(e) => handleFormChange('cash', parseFloat(e.target.value) || 0)}
-                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                    className="form-input"
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Debet</label>
+                  <label className="field-label">Debet</label>
                   <input
                     type="number"
                     value={formData.debet}
                     onChange={(e) => handleFormChange('debet', parseFloat(e.target.value) || 0)}
-                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                    className="form-input"
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Transfer</label>
+                  <label className="field-label">Transfer</label>
                   <input
                     type="number"
                     value={formData.transfer}
                     onChange={(e) => handleFormChange('transfer', parseFloat(e.target.value) || 0)}
-                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                    className="form-input"
                   />
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Voucher</label>
+                  <label className="field-label">Voucher</label>
                   <input
                     type="number"
                     value={formData.voucher}
                     onChange={(e) => handleFormChange('voucher', parseFloat(e.target.value) || 0)}
-                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                    className="form-input"
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Creditcard</label>
+                  <label className="field-label">Creditcard</label>
                   <input
                     type="number"
                     value={formData.creditcard}
                     onChange={(e) => handleFormChange('creditcard', parseFloat(e.target.value) || 0)}
-                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                    className="form-input"
                   />
                 </div>
                 <div style={{ flex: 1 }}></div>
@@ -604,66 +481,44 @@ const NightAudit = () => {
               <h4 style={{ marginTop: '20px', marginBottom: '15px', borderBottom: '1px solid #ddd', paddingBottom: '10px', color: '#333' }}>Guest Ledger</h4>
               <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Guest Ledger - (Minus)</label>
+                  <label className="field-label">Guest Ledger - (Minus)</label>
                   <input
                     type="number"
                     value={formData.guest_ledger_minus}
                     onChange={(e) => handleFormChange('guest_ledger_minus', parseFloat(e.target.value) || 0)}
-                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                    className="form-input"
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Guest Ledger + (Plus)</label>
+                  <label className="field-label">Guest Ledger + (Plus)</label>
                   <input
                     type="number"
                     value={formData.guest_ledger_plus}
                     onChange={(e) => handleFormChange('guest_ledger_plus', parseFloat(e.target.value) || 0)}
-                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                    className="form-input"
                   />
                 </div>
               </div>
 
               {/* Notes */}
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Notes</label>
+                <label className="field-label">Notes</label>
                 <textarea
                   value={formData.notes}
                   onChange={(e) => handleFormChange('notes', e.target.value)}
                   rows="3"
                   placeholder="Enter notes..."
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', resize: 'vertical' }}
+                  className="form-input"
+                  style={{ resize: 'vertical' }}
                 />
               </div>
 
               {/* Buttons */}
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #ddd', paddingTop: '15px' }}>
-                <button
-                  onClick={() => setShowModal(false)}
-                  style={{
-                    padding: '8px 20px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px',
-                    backgroundColor: '#f5f5f5',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSave}
-                  disabled={processing}
-                  style={{
-                    padding: '8px 20px',
-                    border: 'none',
-                    borderRadius: '4px',
-                    backgroundColor: '#4CAF50',
-                    color: 'white',
-                    cursor: processing ? 'not-allowed' : 'pointer',
-                    opacity: processing ? 0.7 : 1
-                  }}
-                >
+                <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
+                <Button variant="success" onClick={handleSave} disabled={processing}>
                   {processing ? 'Saving...' : 'Save'}
-                </button>
+                </Button>
               </div>
             </div>
           </div>
