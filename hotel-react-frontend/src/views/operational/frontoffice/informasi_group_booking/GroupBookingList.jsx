@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../../../../api/api';
 import Layout from '../../../../ui/Layout';
+import Button from '../../../../ui/Button';
+import DataTable from '../../../../ui/DataTable';
 import UnifiedTableHeader from '../../../../ui/UnifiedTableHeader';
+import UnifiedTableFooter from '../../../../ui/UnifiedTableFooter';
 import { useAuth } from '../../../../state/AuthContext';
 import usePaginatedTable from '../../../../logic/usePaginatedTable';
 import { formatCurrencyIDRSymbol } from '../../../../utils/formatters';
@@ -167,137 +170,46 @@ const GroupBookingList = () => {
         />
 
         {/* Table Section */}
-        <div className="unified-table-wrapper">
-          <table className="reservation-table">
-            <colgroup>
-              <col style={{ width: '60px' }} />   {/* No */}
-              <col style={{ width: '100px' }} />  {/* Group ID */}
-              <col style={{ width: '180px' }} />  {/* Group Name */}
-              <col style={{ width: '150px' }} />  {/* PIC Name */}
-              <col style={{ width: '120px' }} />  {/* Phone */}
-              <col style={{ width: '110px' }} />  {/* Check-in */}
-              <col style={{ width: '110px' }} />  {/* Check-out */}
-              <col style={{ width: '80px' }} />   {/* Nights */}
-              <col style={{ width: '80px' }} />   {/* Rooms */}
-              <col style={{ width: '140px' }} />  {/* Payment Method */}
-              <col style={{ width: '130px' }} />  {/* Total Amount */}
-              <col style={{ width: '110px' }} />  {/* Booking Date */}
-              <col style={{ width: '100px' }} />  {/* Action */}
-            </colgroup>
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>Group ID</th>
-                <th>Group Name</th>
-                <th>PIC Name</th>
-                <th>Phone</th>
-                <th>Check-in</th>
-                <th>Check-out</th>
-                <th>Nights</th>
-                <th>Rooms</th>
-                <th>Payment Method</th>
-                <th className="align-right">Total Amount</th>
-                <th>Booking Date</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan="13" className="no-data">Loading...</td>
-                </tr>
-              ) : error ? (
-                <tr>
-                  <td colSpan="13" className="no-data">{error}</td>
-                </tr>
-              ) : currentBookings.length === 0 ? (
-                <tr>
-                  <td colSpan="13" className="no-data">No group bookings found</td>
-                </tr>
-              ) : (
-                currentBookings.map((booking, index) => (
-                  <tr key={booking.id}>
-                    <td>{indexOfFirstItem + index + 1}</td>
-                    <td style={{ fontWeight: '500' }}>GB-{booking.id}</td>
-                    <td style={{ fontWeight: '500' }}>{booking.group_name || 'N/A'}</td>
-                    <td>{booking.group_pic || 'N/A'}</td>
-                    <td>{booking.pic_phone || 'N/A'}</td>
-                    <td>{formatDate(booking.arrival_date)}</td>
-                    <td>{formatDate(booking.departure_date)}</td>
-                    <td className="align-center">
-                      {calculateNights(booking.arrival_date, booking.departure_date)}
-                    </td>
-                    <td className="align-center">{booking.total_rooms || 0}</td>
-                    <td>{booking.payment_method || 'N/A'}</td>
-                    <td className="align-right">{formatCurrencyIDRSymbol(booking.total_amount)}</td>
-                    <td>{formatDate(booking.created_at)}</td>
-                    <td className="align-center">
-                      {canEdit() && (
-                        <button className="btn-table-action" title="Edit Details" onClick={() => handleEditClick(booking)}>Edit</button>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          data={currentBookings}
+          loading={loading}
+          error={error}
+          emptyText="No group bookings found"
+          rowKey={(b) => b.id}
+          columns={[
+            { key: 'no', header: 'No', align: 'center', width: '60px',
+              render: (_b, i) => indexOfFirstItem + i + 1 },
+            { key: 'group_id', header: 'Group ID',
+              render: (b) => <span style={{ fontWeight: 500 }}>GB-{b.id}</span> },
+            { key: 'group_name', header: 'Group Name',
+              render: (b) => <span style={{ fontWeight: 500 }}>{b.group_name || 'N/A'}</span> },
+            { key: 'pic', header: 'PIC Name', render: (b) => b.group_pic || 'N/A' },
+            { key: 'phone', header: 'Phone', render: (b) => b.pic_phone || 'N/A' },
+            { key: 'checkin', header: 'Check-in', render: (b) => formatDate(b.arrival_date) },
+            { key: 'checkout', header: 'Check-out', render: (b) => formatDate(b.departure_date) },
+            { key: 'nights', header: 'Nights', align: 'center',
+              render: (b) => calculateNights(b.arrival_date, b.departure_date) },
+            { key: 'rooms', header: 'Rooms', align: 'center', render: (b) => b.total_rooms || 0 },
+            { key: 'payment', header: 'Payment Method', render: (b) => b.payment_method || 'N/A' },
+            { key: 'total', header: 'Total Amount', align: 'right', render: (b) => formatCurrencyIDRSymbol(b.total_amount) },
+            { key: 'booking_date', header: 'Booking Date', render: (b) => formatDate(b.created_at) },
+            ...(canEdit() ? [{
+              key: 'action', header: 'Action', align: 'center', width: '100px',
+              render: (b) => <Button variant="ghost" size="sm" onClick={() => handleEditClick(b)}>Edit</Button>
+            }] : [])
+          ]}
+        />
 
-        {/* Footer */}
-        <div className="unified-footer">
-          <div className="entries-info">
-            {`Showing ${filteredBookings.length > 0 ? indexOfFirstItem + 1 : 0} to ${Math.min(indexOfLastItem, filteredBookings.length)} of ${filteredBookings.length} entries`}
-          </div>
-          <div className="pagination">
-            <button
-              onClick={() => setCurrentPage(1)}
-              disabled={currentPage === 1}
-            >
-              First
-            </button>
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </button>
-            
-            {[...Array(totalPages)].map((_, idx) => {
-              const pageNum = idx + 1;
-              if (
-                pageNum === 1 ||
-                pageNum === totalPages ||
-                (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
-              ) {
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => setCurrentPage(pageNum)}
-                    className={currentPage === pageNum ? 'active' : ''}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              } else if (pageNum === currentPage - 2 || pageNum === currentPage + 2) {
-                return <span key={pageNum}>...</span>;
-              }
-              return null;
-            })}
-
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </button>
-            <button
-              onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage === totalPages}
-            >
-              Last
-            </button>
-          </div>
-        </div>
+        <UnifiedTableFooter
+          startIndex={indexOfFirstItem}
+          endIndex={indexOfLastItem}
+          total={filteredBookings.length}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          showPageNumbers
+          pageWindowSize={5}
+        />
       </div>
 
       {/* Success Message */}
@@ -319,99 +231,81 @@ const GroupBookingList = () => {
 
       {/* Edit Modal */}
       {showEditModal && editingItem && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '8px',
-            padding: '25px',
-            width: '500px',
-            maxHeight: '90vh',
-            overflow: 'auto'
-          }}>
+        <div className="app-modal-overlay">
+          <div className="app-modal-card" style={{ maxWidth: '500px' }}>
             <h3 style={{ marginBottom: '20px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
               Edit Group Booking: GB-{editingItem.id}
             </h3>
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Group Name *</label>
+              <label className="field-label">Group Name *</label>
               <input
                 type="text"
                 value={editFormData.group_name}
                 onChange={(e) => setEditFormData({...editFormData, group_name: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
               />
             </div>
 
             <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>PIC Name</label>
+                <label className="field-label">PIC Name</label>
                 <input
                   type="text"
                   value={editFormData.group_pic}
                   onChange={(e) => setEditFormData({...editFormData, group_pic: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                 />
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>PIC Phone</label>
+                <label className="field-label">PIC Phone</label>
                 <input
                   type="text"
                   value={editFormData.pic_phone}
                   onChange={(e) => setEditFormData({...editFormData, pic_phone: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                 />
               </div>
             </div>
 
             <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Arrival Date</label>
+                <label className="field-label">Arrival Date</label>
                 <input
                   type="date"
                   value={editFormData.arrival_date}
                   onChange={(e) => setEditFormData({...editFormData, arrival_date: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                 />
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Departure Date</label>
+                <label className="field-label">Departure Date</label>
                 <input
                   type="date"
                   value={editFormData.departure_date}
                   onChange={(e) => setEditFormData({...editFormData, departure_date: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                 />
               </div>
             </div>
 
             <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Arrival Time</label>
+                <label className="field-label">Arrival Time</label>
                 <input
                   type="text"
                   value={editFormData.arrival_time}
                   onChange={(e) => setEditFormData({...editFormData, arrival_time: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#f9f9f9' }}
+                  className="form-input"
                   readOnly
                 />
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Market Segment</label>
+                <label className="field-label">Market Segment</label>
                 <select
                   value={editFormData.market_segment}
                   onChange={(e) => setEditFormData({...editFormData, market_segment: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: 'white' }}
+                  className="form-input"
                 >
                   <option value="Normal">Normal</option>
                   {marketSegments.map(segment => (
@@ -425,72 +319,50 @@ const GroupBookingList = () => {
 
             <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Total Rooms</label>
+                <label className="field-label">Total Rooms</label>
                 <input
                   type="number"
                   value={editFormData.total_rooms}
                   onChange={(e) => setEditFormData({...editFormData, total_rooms: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                 />
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Payment Method</label>
+                <label className="field-label">Payment Method</label>
                 <input
                   type="text"
                   value={editFormData.payment_method}
                   onChange={(e) => setEditFormData({...editFormData, payment_method: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                 />
               </div>
             </div>
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Total Amount</label>
+              <label className="field-label">Total Amount</label>
               <input
                 type="number"
                 value={editFormData.total_amount}
                 onChange={(e) => setEditFormData({...editFormData, total_amount: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
               />
             </div>
 
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Notes</label>
+              <label className="field-label">Notes</label>
               <textarea
                 value={editFormData.notes}
                 onChange={(e) => setEditFormData({...editFormData, notes: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', minHeight: '60px' }}
+                className="form-input"
+                style={{ minHeight: '60px' }}
               />
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #ddd', paddingTop: '15px' }}>
-              <button
-                onClick={handleCloseModal}
-                style={{
-                  padding: '8px 20px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  backgroundColor: '#f5f5f5',
-                  cursor: 'pointer'
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveEdit}
-                disabled={processing}
-                style={{
-                  padding: '8px 20px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  backgroundColor: '#4CAF50',
-                  color: 'white',
-                  cursor: processing ? 'not-allowed' : 'pointer',
-                  opacity: processing ? 0.7 : 1
-                }}
-              >
+              <Button variant="secondary" onClick={handleCloseModal}>Cancel</Button>
+              <Button variant="success" onClick={handleSaveEdit} disabled={processing}>
                 {processing ? 'Saving...' : 'Save Changes'}
-              </button>
+              </Button>
             </div>
           </div>
         </div>

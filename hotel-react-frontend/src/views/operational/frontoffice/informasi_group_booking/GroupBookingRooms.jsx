@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../../../../api/api';
 import Layout from '../../../../ui/Layout';
+import Button from '../../../../ui/Button';
+import DataTable from '../../../../ui/DataTable';
 import UnifiedTableHeader from '../../../../ui/UnifiedTableHeader';
+import UnifiedTableFooter from '../../../../ui/UnifiedTableFooter';
 import { useAuth } from '../../../../state/AuthContext';
 import usePaginatedTable from '../../../../logic/usePaginatedTable';
 import { formatCurrencyIDRSymbol } from '../../../../utils/formatters';
@@ -73,6 +76,16 @@ const GroupBookingRooms = () => {
     return ['admin', 'manager', 'frontoffice'].includes(user?.role);
   };
 
+  const getStatusPill = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'checked in': return 'status-pill--approved';
+      case 'checked out': return 'status-pill--completed';
+      case 'cancelled': return 'status-pill--rejected';
+      case 'reserved': return 'status-pill--pending';
+      default: return 'status-pill--default';
+    }
+  };
+
   // Handle edit click
   const handleEditClick = (room) => {
     if (!canEdit()) return;
@@ -141,150 +154,50 @@ const GroupBookingRooms = () => {
         />
 
         {/* Table Section */}
-        <div className="unified-table-wrapper">
-          <table className="reservation-table">
-            <colgroup>
-              <col style={{ width: '60px' }} />   {/* No */}
-              <col style={{ width: '120px' }} />  {/* Group ID */}
-              <col style={{ width: '180px' }} />  {/* Group Name */}
-              <col style={{ width: '110px' }} />  {/* Reservation No */}
-              <col style={{ width: '100px' }} />  {/* Room Number */}
-              <col style={{ width: '130px' }} />  {/* Room Type */}
-              <col style={{ width: '180px' }} />  {/* Guest Name */}
-              <col style={{ width: '130px' }} />  {/* Mobile Phone */}
-              <col style={{ width: '110px' }} />  {/* Check In */}
-              <col style={{ width: '110px' }} />  {/* Check Out */}
-              <col style={{ width: '80px' }} />   {/* Nights */}
-              <col style={{ width: '100px' }} />  {/* Guests */}
-              <col style={{ width: '130px' }} />  {/* Rate */}
-              <col style={{ width: '130px' }} />  {/* Subtotal */}
-              <col style={{ width: '110px' }} />  {/* Status */}
-              <col style={{ width: '100px' }} />  {/* Action */}
-            </colgroup>
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>Group ID</th>
-                <th>Group Name</th>
-                <th>Reservation No</th>
-                <th>Room Number</th>
-                <th>Room Type</th>
-                <th>Guest Name</th>
-                <th>Mobile Phone</th>
-                <th>Check In</th>
-                <th>Check Out</th>
-                <th>Nights</th>
-                <th>Guests</th>
-                <th className="align-right">Rate</th>
-                <th className="align-right">Subtotal</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan="16" className="no-data">Loading...</td>
-                </tr>
-              ) : error ? (
-                <tr>
-                  <td colSpan="16" className="no-data">{error}</td>
-                </tr>
-              ) : currentRooms.length === 0 ? (
-                <tr>
-                  <td colSpan="16" className="no-data">No group booking rooms found</td>
-                </tr>
-              ) : (
-                currentRooms.map((room, index) => (
-                  <tr key={room.id}>
-                    <td>{indexOfFirstItem + index + 1}</td>
-                    <td style={{ fontWeight: '500' }}>{room.group_booking_id || 'N/A'}</td>
-                    <td style={{ fontWeight: '500' }}>{room.group_name || 'N/A'}</td>
-                    <td>{room.reservation_no || 'N/A'}</td>
-                    <td className="align-center">{room.room_number || 'N/A'}</td>
-                    <td>{room.room_type || 'N/A'}</td>
-                    <td>{room.guest_name || 'N/A'}</td>
-                    <td>{room.mobile_phone || 'N/A'}</td>
-                    <td>{formatDate(room.check_in_date)}</td>
-                    <td>{formatDate(room.check_out_date)}</td>
-                    <td className="align-center">{room.nights || 0}</td>
-                    <td className="align-center">
-                      M:{room.guest_count_male || 0} F:{room.guest_count_female || 0} C:{room.guest_count_child || 0}
-                    </td>
-                    <td className="align-right">{formatCurrencyIDRSymbol(room.rate)}</td>
-                    <td className="align-right">{formatCurrencyIDRSymbol(room.subtotal)}</td>
-                    <td>
-                      <span className={`status-badge status-${room.room_status?.toLowerCase().replace(' ', '-')}`}>
-                        {room.room_status || 'Reserved'}
-                      </span>
-                    </td>
-                    <td className="align-center">
-                      {canEdit() && (
-                        <button className="btn-table-action" title="Edit Details" onClick={() => handleEditClick(room)}>Edit</button>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          data={currentRooms}
+          loading={loading}
+          error={error}
+          emptyText="No group booking rooms found"
+          rowKey={(r) => r.id}
+          columns={[
+            { key: 'no', header: 'No', align: 'center', width: '60px',
+              render: (_r, i) => indexOfFirstItem + i + 1 },
+            { key: 'group_id', header: 'Group ID',
+              render: (r) => <span style={{ fontWeight: 500 }}>{r.group_booking_id || 'N/A'}</span> },
+            { key: 'group_name', header: 'Group Name',
+              render: (r) => <span style={{ fontWeight: 500 }}>{r.group_name || 'N/A'}</span> },
+            { key: 'res_no', header: 'Reservation No', render: (r) => r.reservation_no || 'N/A' },
+            { key: 'room_no', header: 'Room Number', align: 'center', render: (r) => r.room_number || 'N/A' },
+            { key: 'room_type', header: 'Room Type', render: (r) => r.room_type || 'N/A' },
+            { key: 'guest', header: 'Guest Name', render: (r) => r.guest_name || 'N/A' },
+            { key: 'phone', header: 'Mobile Phone', render: (r) => r.mobile_phone || 'N/A' },
+            { key: 'checkin', header: 'Check In', render: (r) => formatDate(r.check_in_date) },
+            { key: 'checkout', header: 'Check Out', render: (r) => formatDate(r.check_out_date) },
+            { key: 'nights', header: 'Nights', align: 'center', render: (r) => r.nights || 0 },
+            { key: 'guests', header: 'Guests', align: 'center',
+              render: (r) => `M:${r.guest_count_male || 0} F:${r.guest_count_female || 0} C:${r.guest_count_child || 0}` },
+            { key: 'rate', header: 'Rate', align: 'right', render: (r) => formatCurrencyIDRSymbol(r.rate) },
+            { key: 'subtotal', header: 'Subtotal', align: 'right', render: (r) => formatCurrencyIDRSymbol(r.subtotal) },
+            { key: 'status', header: 'Status', align: 'center',
+              render: (r) => <span className={`status-pill ${getStatusPill(r.room_status)}`}>{r.room_status || 'Reserved'}</span> },
+            ...(canEdit() ? [{
+              key: 'action', header: 'Action', align: 'center', width: '100px',
+              render: (r) => <Button variant="ghost" size="sm" onClick={() => handleEditClick(r)}>Edit</Button>
+            }] : [])
+          ]}
+        />
 
-        {/* Footer */}
-        <div className="unified-footer">
-          <div className="entries-info">
-            {`Showing ${filteredRooms.length > 0 ? indexOfFirstItem + 1 : 0} to ${Math.min(indexOfLastItem, filteredRooms.length)} of ${filteredRooms.length} entries`}
-          </div>
-          <div className="pagination">
-            <button
-              onClick={() => setCurrentPage(1)}
-              disabled={currentPage === 1}
-            >
-              First
-            </button>
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </button>
-            
-            {[...Array(totalPages)].map((_, idx) => {
-              const pageNum = idx + 1;
-              if (
-                pageNum === 1 ||
-                pageNum === totalPages ||
-                (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
-              ) {
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => setCurrentPage(pageNum)}
-                    className={currentPage === pageNum ? 'active' : ''}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              } else if (pageNum === currentPage - 2 || pageNum === currentPage + 2) {
-                return <span key={pageNum}>...</span>;
-              }
-              return null;
-            })}
-
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </button>
-            <button
-              onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage === totalPages}
-            >
-              Last
-            </button>
-          </div>
-        </div>
+        <UnifiedTableFooter
+          startIndex={indexOfFirstItem}
+          endIndex={indexOfLastItem}
+          total={filteredRooms.length}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          showPageNumbers
+          pageWindowSize={5}
+        />
       </div>
 
       {/* Success Message */}
@@ -306,110 +219,92 @@ const GroupBookingRooms = () => {
 
       {/* Edit Modal */}
       {showEditModal && editingItem && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '8px',
-            padding: '25px',
-            width: '500px',
-            maxHeight: '90vh',
-            overflow: 'auto'
-          }}>
+        <div className="app-modal-overlay">
+          <div className="app-modal-card" style={{ maxWidth: '500px' }}>
             <h3 style={{ marginBottom: '20px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
               Edit Room Booking: {editingItem.reservation_no || editingItem.id}
             </h3>
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Guest Name *</label>
+              <label className="field-label">Guest Name *</label>
               <input
                 type="text"
                 value={editFormData.guest_name}
                 onChange={(e) => setEditFormData({...editFormData, guest_name: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
               />
             </div>
 
             <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Room Number</label>
+                <label className="field-label">Room Number</label>
                 <input
                   type="text"
                   value={editFormData.room_number}
                   onChange={(e) => setEditFormData({...editFormData, room_number: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                 />
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Room Type</label>
+                <label className="field-label">Room Type</label>
                 <input
                   type="text"
                   value={editFormData.room_type}
                   onChange={(e) => setEditFormData({...editFormData, room_type: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                   disabled
                 />
               </div>
             </div>
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Mobile Phone</label>
+              <label className="field-label">Mobile Phone</label>
               <input
                 type="text"
                 value={editFormData.mobile_phone}
                 onChange={(e) => setEditFormData({...editFormData, mobile_phone: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
               />
             </div>
 
             <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Check-in Date</label>
+                <label className="field-label">Check-in Date</label>
                 <input
                   type="date"
                   value={editFormData.check_in_date}
                   onChange={(e) => setEditFormData({...editFormData, check_in_date: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                 />
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Check-out Date</label>
+                <label className="field-label">Check-out Date</label>
                 <input
                   type="date"
                   value={editFormData.check_out_date}
                   onChange={(e) => setEditFormData({...editFormData, check_out_date: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                 />
               </div>
             </div>
 
             <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Rate</label>
+                <label className="field-label">Rate</label>
                 <input
                   type="number"
                   value={editFormData.rate}
                   onChange={(e) => setEditFormData({...editFormData, rate: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                   disabled
                 />
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Status</label>
+                <label className="field-label">Status</label>
                 <select
                   value={editFormData.room_status}
                   onChange={(e) => setEditFormData({...editFormData, room_status: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                 >
                   <option value="Reserved">Reserved</option>
                   <option value="Checked In">Checked In</option>
@@ -420,42 +315,20 @@ const GroupBookingRooms = () => {
             </div>
 
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Notes</label>
+              <label className="field-label">Notes</label>
               <textarea
                 value={editFormData.notes}
                 onChange={(e) => setEditFormData({...editFormData, notes: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', minHeight: '60px' }}
+                className="form-input"
+                style={{ minHeight: '60px' }}
               />
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #ddd', paddingTop: '15px' }}>
-              <button
-                onClick={handleCloseModal}
-                style={{
-                  padding: '8px 20px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  backgroundColor: '#f5f5f5',
-                  cursor: 'pointer'
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveEdit}
-                disabled={processing}
-                style={{
-                  padding: '8px 20px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  backgroundColor: '#4CAF50',
-                  color: 'white',
-                  cursor: processing ? 'not-allowed' : 'pointer',
-                  opacity: processing ? 0.7 : 1
-                }}
-              >
+              <Button variant="secondary" onClick={handleCloseModal}>Cancel</Button>
+              <Button variant="success" onClick={handleSaveEdit} disabled={processing}>
                 {processing ? 'Saving...' : 'Save Changes'}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
