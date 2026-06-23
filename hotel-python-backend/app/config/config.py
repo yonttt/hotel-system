@@ -38,21 +38,15 @@ def get_secret_key() -> str:
 
 class Settings(BaseSettings):
     # --- LEGACY VARIABLES (Inactive) ---
-    # We keep these here so Pydantic doesn't throw "Extra inputs are not permitted" 
-    # if they are still inside your .env file, but they will NOT run or override anything.
+    # Kept so Pydantic doesn't throw "Extra inputs are not permitted" if these are
+    # still inside your .env file. They are NOT used by the application.
     MYSQL_HOST: str | None = None
     MYSQL_PORT: int | str | None = None
     MYSQL_USER: str | None = None
     MYSQL_PASSWORD: str | None = None
     MYSQL_DB_NAME: str | None = None
-    TIDB_HOST: str | None = None
-    TIDB_PORT: int | str | None = None
-    TIDB_USER: str | None = None
-    TIDB_PASSWORD: str | None = None
-    TIDB_DB_NAME: str | None = None
 
-    # The single source of truth for the database connection.
-    # This can point to a local MySQL/phpMyAdmin instance or a cloud database like TiDB.
+    # The single source of truth for the database connection (local MySQL / phpMyAdmin).
     DATABASE_URL: str = os.getenv("DATABASE_URL", "mysql+pymysql://user:password@localhost/hotel_system")
 
     # JWT settings - loaded from environment variable

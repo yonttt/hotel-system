@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import text
@@ -8,6 +9,8 @@ from app.config.database import get_db
 from app.config.auth import get_current_user
 from app.config.room_utils import update_room_status
 from app.tables import User
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -123,7 +126,7 @@ def get_checkout_today(
         return checkouts
         
     except Exception as e:
-        print(f"Error fetching checkout data: {e}")
+        logger.error(f"Error fetching checkout data: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Error fetching checkout data: {str(e)}"
@@ -255,7 +258,7 @@ def process_checkout(
         raise
     except Exception as e:
         db.rollback()
-        print(f"Error processing checkout: {e}")
+        logger.error(f"Error processing checkout: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Error processing checkout: {str(e)}"
@@ -326,7 +329,7 @@ def get_checkout_history(
         return history
         
     except Exception as e:
-        print(f"Error fetching checkout history: {e}")
+        logger.error(f"Error fetching checkout history: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Error fetching checkout history: {str(e)}"

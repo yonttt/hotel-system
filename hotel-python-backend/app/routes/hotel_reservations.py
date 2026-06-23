@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 import os
+import logging
 import uuid
 import shutil
 from datetime import datetime, timedelta
@@ -17,6 +18,8 @@ from app.rules import (
     ReservationUpdate,
     ReservationUpgrade
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -55,7 +58,7 @@ def upgrade_hotel_reservation(
     db.refresh(db_reservation)
 
     # TODO Requirement 14: Send notification to hotel unit about the change.
-    print(f"NOTIFICATION: Room upgraded from {old_room} to {new_room} for {db_reservation.guest_name}. Additional Deposit: {upgrade_data.additional_deposit}")
+    logger.info(f"Room upgraded from {old_room} to {new_room} for {db_reservation.guest_name}. Additional Deposit: {upgrade_data.additional_deposit}")
 
     return db_reservation
 
@@ -149,7 +152,7 @@ def create_hotel_reservation(
             )
         except Exception as e:
             # Log ignore failure so the booking still succeeds
-            print(f"Warning: Failed to send email: {str(e)}")
+            logger.warning(f"Failed to send email: {str(e)}")
             pass
 
         return db_reservation

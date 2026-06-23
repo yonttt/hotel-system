@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import Layout from '../ui/Layout';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+
 const WebsiteEditor = () => {
   const [activeTab, setActiveTab] = useState('hero');
   const [content, setContent] = useState({
@@ -19,7 +21,7 @@ const WebsiteEditor = () => {
 
   const fetchContent = async () => {
     try {
-      const response = await fetch('http://localhost:8000/cms/content', {
+      const response = await fetch(`${API_BASE_URL}/cms/content`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`
         }
@@ -45,7 +47,7 @@ const WebsiteEditor = () => {
     setMessage('');
     
     try {
-      const response = await fetch('http://localhost:8000/cms/content', {
+      const response = await fetch(`${API_BASE_URL}/cms/content`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

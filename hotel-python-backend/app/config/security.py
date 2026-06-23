@@ -68,9 +68,9 @@ def verify_token(token: str) -> Optional[str]:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
-            print("WARNING: Token payload missing 'sub' field")
+            logger.warning("Token payload missing 'sub' field")
             return None
         return username
     except JWTError as e:
-        print(f"JWT Error: {e}")
+        logger.warning(f"JWT validation error: {e}")
         return None

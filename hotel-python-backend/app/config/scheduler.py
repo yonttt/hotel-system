@@ -1,9 +1,12 @@
 import os
+import logging
 from datetime import datetime, timedelta
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from sqlalchemy.orm import Session
 from app.config.database import SessionLocal
 from app.tables import HotelReservation, GroupBooking
+
+logger = logging.getLogger(__name__)
 
 # Ensure the upload directory exists
 UPLOAD_DIR = "uploads/payment_proofs"
@@ -27,7 +30,7 @@ def cleanup_old_payment_proofs():
                     os.remove(res.payment_proof)
                     res.payment_proof = None # Clear path in DB
                 except Exception as e:
-                    print(f"Failed to delete {res.payment_proof}: {e}")
+                    logger.warning(f"Failed to delete {res.payment_proof}: {e}")
                     
         # Check Group Bookings
         old_groups = db.query(GroupBooking).filter(
@@ -41,11 +44,11 @@ def cleanup_old_payment_proofs():
                     os.remove(group.payment_proof)
                     group.payment_proof = None # Clear path in DB
                 except Exception as e:
-                    print(f"Failed to delete {group.payment_proof}: {e}")
+                    logger.warning(f"Failed to delete {group.payment_proof}: {e}")
                     
         db.commit()
     except Exception as e:
-        print(f"Scheduler error (cleanup_old_payment_proofs): {e}")
+        logger.error(f"Scheduler error (cleanup_old_payment_proofs): {e}")
     finally:
         db.close()
 
@@ -77,7 +80,7 @@ def expire_unpaid_bookings():
             
         db.commit()
     except Exception as e:
-        print(f"Scheduler error (expire_unpaid_bookings): {e}")
+        logger.error(f"Scheduler error (expire_unpaid_bookings): {e}")
     finally:
         db.close()
 
@@ -91,4 +94,4 @@ def start_scheduler():
     scheduler.add_job(expire_unpaid_bookings, 'interval', minutes=15)
     
     scheduler.start()
-    print("âœ… Background scheduler started for payment cleanup and booking expiration.")
+    logger.info("Background scheduler started for payment cleanup and booking expiration.")

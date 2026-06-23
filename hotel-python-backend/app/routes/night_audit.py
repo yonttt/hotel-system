@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import text
@@ -7,6 +8,8 @@ from pydantic import BaseModel
 from app.config.database import get_db
 from app.config.auth import get_current_user
 from app.tables import User
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -227,7 +230,7 @@ def get_night_audits(
         return audits
         
     except Exception as e:
-        print(f"Error fetching night audits: {e}")
+        logger.error(f"Error fetching night audits: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Error fetching night audits: {str(e)}"
@@ -291,7 +294,7 @@ def get_night_audit(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Error fetching night audit: {e}")
+        logger.error(f"Error fetching night audit: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Error fetching night audit: {str(e)}"
@@ -378,7 +381,7 @@ def create_night_audit(
         
     except Exception as e:
         db.rollback()
-        print(f"Error creating night audit: {e}")
+        logger.error(f"Error creating night audit: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Error creating night audit: {str(e)}"
@@ -448,7 +451,7 @@ def update_night_audit(
         raise
     except Exception as e:
         db.rollback()
-        print(f"Error updating night audit: {e}")
+        logger.error(f"Error updating night audit: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Error updating night audit: {str(e)}"
@@ -487,7 +490,7 @@ def delete_night_audit(
         raise
     except Exception as e:
         db.rollback()
-        print(f"Error deleting night audit: {e}")
+        logger.error(f"Error deleting night audit: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Error deleting night audit: {str(e)}"

@@ -1,22 +1,51 @@
-﻿from fastapi import FastAPI
+﻿import os
+import logging
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from slowapi.errors import RateLimitExceeded
-import os
 from app.routes import auth, users, hotel_rooms, room_pricing, guests, hotel_registrations, hotel_reservations, cities, nationalities, category_markets, market_segments, payment_methods, group_bookings, revenue_reports, master_data, room_rates, master_meja, kategori_menu_resto, checkin, checkout, night_audit, properties, laundry, account_receivable, adjustments, chatbot, public_website, cms
 from app.config.security_middleware import (
-    limiter, 
-    SecurityHeadersMiddleware, 
+    limiter,
+    SecurityHeadersMiddleware,
     LoginProtectionMiddleware,
     rate_limit_exceeded_handler
 )
+
+logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application startup/shutdown. Initializes DB tables and the background scheduler."""
+    # --- Startup ---
+    try:
+        from app.config.database import engine
+        from app.tables import Base
+        Base.metadata.create_all(bind=engine)
+        logger.info("Database tables created successfully")
+    except Exception as e:
+        logger.error(f"Database initialization failed: {e}")
+        logger.error("API will still work but database operations may fail")
+
+    try:
+        from app.config.scheduler import start_scheduler
+        start_scheduler()
+    except Exception as e:
+        logger.error(f"Background scheduler failed to start: {e}")
+
+    yield
+    # --- Shutdown (nothing to clean up currently) ---
+
 
 app = FastAPI(
     title="Hotel Management System API",
     description="Modern Python API for Eva Group Hotel Management System",
     version="2.0.0",
     docs_url="/docs",  # Swagger UI
-    redoc_url="/redoc"  # ReDoc
+    redoc_url="/redoc",  # ReDoc
+    lifespan=lifespan
 )
 
 # Add rate limiter state
@@ -90,18 +119,6 @@ app.include_router(adjustments.router, prefix="", tags=["adjustments"])
 app.include_router(chatbot.router, prefix="/chatbot", tags=["chatbot"])
 app.include_router(public_website.router, prefix="/public", tags=["public-website"])
 app.include_router(cms.router, prefix="/cms", tags=["cms"])
-
-@app.on_event("startup")
-async def startup_event():
-    """Initialize database tables on startup"""
-    try:
-        from app.config.database import engine
-        from app.tables import Base
-        Base.metadata.create_all(bind=engine)
-        print("âœ… Database tables created successfully")
-    except Exception as e:
-        print(f"âš ï¸ Database initialization failed: {e}")
-        print("API will still work but database operations may fail")
 
 from fastapi.responses import RedirectResponse
 

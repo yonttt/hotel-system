@@ -1,9 +1,12 @@
+import logging
 from fastapi import HTTPException, Depends, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from app.config.database import get_db
 from app.config.security import verify_token
 from app.tables import User
+
+logger = logging.getLogger(__name__)
 
 security = HTTPBearer()
 
@@ -13,11 +16,10 @@ def get_current_user(
 ) -> User:
     """Get current authenticated user from JWT token."""
     token = credentials.credentials
-    print(f"Received token: {token[:20]}..." if len(token) > 20 else token)
     username = verify_token(token)
-    
+
     if username is None:
-        print("ERROR: Token verification failed - username is None")
+        logger.warning("Token verification failed - username is None")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",

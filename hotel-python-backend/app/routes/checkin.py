@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import text
@@ -8,6 +9,8 @@ from app.config.database import get_db
 from app.config.auth import get_current_user
 from app.config.room_utils import update_room_status
 from app.tables import User
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -106,7 +109,7 @@ def get_checkin_today(
         return checkins
         
     except Exception as e:
-        print(f"Error fetching check-in data: {e}")
+        logger.error(f"Error fetching check-in data: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Error fetching check-in data: {str(e)}"
@@ -190,7 +193,7 @@ def process_checkin(
         raise
     except Exception as e:
         db.rollback()
-        print(f"Error processing check-in: {e}")
+        logger.error(f"Error processing check-in: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Error processing check-in: {str(e)}"
