@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../../../../state/AuthContext'
 import { apiService } from '../../../../api/api'
 import Layout from '../../../../ui/Layout'
+import Button from '../../../../ui/Button'
+import DataTable from '../../../../ui/DataTable'
 import UnifiedTableHeader from '../../../../ui/UnifiedTableHeader'
 import UnifiedTableFooter from '../../../../ui/UnifiedTableFooter'
 import useHotels from '../../../../logic/useHotels'
@@ -143,80 +145,31 @@ const ReservasiDeposit = () => {
         />
 
         {/* Table Section */}
-        <div className="unified-table-wrapper">
-          <table className="reservation-table">
-            <colgroup>
-              <col style={{ width: '56px' }} />
-              <col style={{ width: '200px' }} />
-              <col style={{ width: '140px' }} />
-              <col style={{ width: '160px' }} />
-              <col style={{ width: '140px' }} />
-              <col style={{ width: '120px' }} />
-              <col style={{ width: '100px' }} />
-              <col style={{ width: '120px' }} />
-              <col style={{ width: '120px' }} />
-              <col style={{ width: '140px' }} />
-              <col style={{ width: '120px' }} />
-              <col style={{ width: '110px' }} />
-            </colgroup>
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>Name</th>
-                <th>Group</th>
-                <th>Company</th>
-                <th>Telp/HP</th>
-                <th>Type</th>
-                <th>Room</th>
-                <th>Arrival Date</th>
-                <th>Departure Date</th>
-                <th>Deposit By</th>
-                <th>Deposit</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan="12" className="no-data">Loading...</td>
-                </tr>
-              ) : error ? (
-                <tr>
-                  <td colSpan="12" className="no-data">
-                    {error}
-                  </td>
-                </tr>
-              ) : currentReservations.length === 0 ? (
-                <tr>
-                  <td colSpan="12" className="no-data">
-                    No data available in table
-                  </td>
-                </tr>
-              ) : (
-                currentReservations.map((reservation, index) => (
-                  <tr key={reservation.id}>
-                    <td>{startIndex + index + 1}</td>
-                    <td title={reservation.guest_name || 'N/A'}>{reservation.guest_name || 'N/A'}</td>
-                    <td title={reservation.category_market || 'N/A'}>{reservation.category_market || 'N/A'}</td>
-                    <td title={reservation.transaction_by || 'N/A'}>{reservation.transaction_by || 'N/A'}</td>
-                    <td title={reservation.mobile_phone || 'N/A'}>{reservation.mobile_phone || 'N/A'}</td>
-                    <td title={reservation.transaction_status || 'N/A'}>{reservation.transaction_status || 'N/A'}</td>
-                    <td className="align-center" title={reservation.room_number || 'N/A'}>{reservation.room_number || '-'}</td>
-                    <td>{formatDate(reservation.arrival_date)}</td>
-                    <td>{formatDate(reservation.departure_date)}</td>
-                    <td title={reservation.payment_method || 'N/A'}>{reservation.payment_method || 'N/A'}</td>
-                    <td className="align-right">{formatCurrencyFixed4(reservation.deposit || 0)}</td>
-                    <td className="align-center">
-                      {canEdit() && (
-                        <button className="btn-table-action" title="Edit Details" onClick={() => handleEditClick(reservation)}>Edit</button>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          data={currentReservations}
+          loading={loading}
+          error={error}
+          emptyText="No data available in table"
+          rowKey={(r) => r.id}
+          columns={[
+            { key: 'no', header: 'No', align: 'center', width: '56px',
+              render: (_r, i) => startIndex + i + 1 },
+            { key: 'name', header: 'Name', render: (r) => r.guest_name || 'N/A' },
+            { key: 'group', header: 'Group', render: (r) => r.category_market || 'N/A' },
+            { key: 'company', header: 'Company', render: (r) => r.transaction_by || 'N/A' },
+            { key: 'phone', header: 'Telp/HP', render: (r) => r.mobile_phone || 'N/A' },
+            { key: 'type', header: 'Type', render: (r) => r.transaction_status || 'N/A' },
+            { key: 'room', header: 'Room', align: 'center', render: (r) => r.room_number || '-' },
+            { key: 'arrival', header: 'Arrival Date', render: (r) => formatDate(r.arrival_date) },
+            { key: 'departure', header: 'Departure Date', render: (r) => formatDate(r.departure_date) },
+            { key: 'deposit_by', header: 'Deposit By', render: (r) => r.payment_method || 'N/A' },
+            { key: 'deposit', header: 'Deposit', align: 'right', render: (r) => formatCurrencyFixed4(r.deposit || 0) },
+            ...(canEdit() ? [{
+              key: 'action', header: 'Action', align: 'center', width: '100px',
+              render: (r) => <Button variant="ghost" size="sm" onClick={() => handleEditClick(r)}>Edit</Button>
+            }] : [])
+          ]}
+        />
 
         <UnifiedTableFooter
           startIndex={startIndex}
@@ -247,140 +200,100 @@ const ReservasiDeposit = () => {
 
       {/* Edit Modal */}
       {showEditModal && editingItem && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '8px',
-            padding: '25px',
-            width: '500px',
-            maxHeight: '90vh',
-            overflow: 'auto'
-          }}>
+        <div className="app-modal-overlay">
+          <div className="app-modal-card" style={{ maxWidth: '500px' }}>
             <h3 style={{ marginBottom: '20px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
               Edit Reservation: {editingItem.reservation_no}
             </h3>
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Guest Name *</label>
+              <label className="field-label">Guest Name *</label>
               <input
                 type="text"
                 value={editFormData.guest_name}
                 onChange={(e) => setEditFormData({...editFormData, guest_name: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                className="form-input"
               />
             </div>
 
             <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Group/Category</label>
+                <label className="field-label">Group/Category</label>
                 <input
                   type="text"
                   value={editFormData.category_market}
                   onChange={(e) => setEditFormData({...editFormData, category_market: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                 />
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Phone</label>
+                <label className="field-label">Phone</label>
                 <input
                   type="text"
                   value={editFormData.mobile_phone}
                   onChange={(e) => setEditFormData({...editFormData, mobile_phone: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                 />
               </div>
             </div>
 
             <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Arrival Date</label>
+                <label className="field-label">Arrival Date</label>
                 <input
                   type="date"
                   value={editFormData.arrival_date}
                   onChange={(e) => setEditFormData({...editFormData, arrival_date: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                 />
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Departure Date</label>
+                <label className="field-label">Departure Date</label>
                 <input
                   type="date"
                   value={editFormData.departure_date}
                   onChange={(e) => setEditFormData({...editFormData, departure_date: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                 />
               </div>
             </div>
 
             <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Payment Method</label>
+                <label className="field-label">Payment Method</label>
                 <input
                   type="text"
                   value={editFormData.payment_method}
                   onChange={(e) => setEditFormData({...editFormData, payment_method: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                 />
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Deposit</label>
+                <label className="field-label">Deposit</label>
                 <input
                   type="number"
                   value={editFormData.deposit}
                   onChange={(e) => setEditFormData({...editFormData, deposit: e.target.value})}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  className="form-input"
                 />
               </div>
             </div>
 
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Notes</label>
+              <label className="field-label">Notes</label>
               <textarea
                 value={editFormData.notes}
                 onChange={(e) => setEditFormData({...editFormData, notes: e.target.value})}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', minHeight: '60px' }}
+                className="form-input"
+                style={{ minHeight: '60px' }}
               />
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #ddd', paddingTop: '15px' }}>
-              <button
-                onClick={handleCloseModal}
-                style={{
-                  padding: '8px 20px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  backgroundColor: '#f5f5f5',
-                  cursor: 'pointer'
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveEdit}
-                disabled={processing}
-                style={{
-                  padding: '8px 20px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  backgroundColor: '#4CAF50',
-                  color: 'white',
-                  cursor: processing ? 'not-allowed' : 'pointer',
-                  opacity: processing ? 0.7 : 1
-                }}
-              >
+              <Button variant="secondary" onClick={handleCloseModal}>Cancel</Button>
+              <Button variant="success" onClick={handleSaveEdit} disabled={processing}>
                 {processing ? 'Saving...' : 'Save Changes'}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
