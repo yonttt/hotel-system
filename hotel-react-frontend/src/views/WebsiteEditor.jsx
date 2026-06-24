@@ -14,6 +14,15 @@ const authHeaders = () => ({ Authorization: `Bearer ${localStorage.getItem('toke
 // so the nav reads like a map of the page.
 const SECTIONS = [
   {
+    key: 'header',
+    label: 'Headbar / Pengumuman',
+    icon: '📢',
+    hint: 'Teks promo di bar paling atas',
+    fields: [
+      { key: 'announcement_text', label: 'Teks Pengumuman (kosongkan untuk menyembunyikan bar)', type: 'text' },
+    ],
+  },
+  {
     key: 'hero',
     label: 'Banner Utama',
     icon: '🖼️',
@@ -88,6 +97,7 @@ const HOTELS_TAB = {
 };
 
 const DEFAULT_CONTENT = {
+  announcement_text: 'Selamat datang di EVA GROUP — pesan langsung di website untuk harga terbaik!',
   hero_title: 'Kemewahan yang Tak Terlupakan',
   hero_subtitle: 'Rasakan pengalaman menginap terbaik dengan fasilitas premium',
   hero_image_1: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1920&q=80',

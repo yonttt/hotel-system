@@ -1,6 +1,11 @@
 ﻿import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, ChevronDown, Phone, Globe, User } from 'lucide-react'
+import { Menu, X, User, UserPlus, LogOut, Megaphone } from 'lucide-react'
+import { fetchCMSContent } from '../data/hotels'
+
+// Shown until staff sets their own announcement in the CMS. Set it to empty in the
+// editor to hide the announcement bar entirely.
+const DEFAULT_ANNOUNCEMENT = 'Selamat datang di EVA GROUP — pesan langsung di website untuk harga terbaik!'
 
 const navLinks = [
   { name: 'Beranda', path: '/' },
@@ -16,7 +21,16 @@ const navLinks = [
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileOpen, setIsMobileOpen] = useState(false)
+  const [cms, setCms] = useState({})
   const location = useLocation()
+
+  useEffect(() => {
+    fetchCMSContent().then(setCms).catch(() => {})
+  }, [])
+
+  // Use the saved value when present (even if empty = intentionally hidden),
+  // otherwise fall back to the default welcome text.
+  const announcement = 'announcement_text' in cms ? cms.announcement_text : DEFAULT_ANNOUNCEMENT
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,29 +49,60 @@ export default function Navbar() {
     ? 'bg-hotel-dark/95 backdrop-blur-md shadow-lg'
     : 'bg-transparent'
 
+  // Customer auth state (lives in the top bar now).
+  const isLoggedIn = !!localStorage.getItem('customer_token')
+  const firstName =
+    (() => {
+      try {
+        return JSON.parse(localStorage.getItem('customer_user'))?.full_name?.split(' ')[0]
+      } catch {
+        return null
+      }
+    })() || 'User'
+  const handleLogout = () => {
+    localStorage.removeItem('customer_token')
+    localStorage.removeItem('customer_user')
+    window.location.reload()
+  }
+
   return (
     <>
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${navBg}`}>
-        {/* Top Bar */}
-        <div className={`border-b border-white/10 transition-all duration-300 ${isScrolled ? 'h-0 overflow-hidden opacity-0' : 'h-auto opacity-100'}`}>
+        {/* Top Bar — contact on the left, account actions on the right */}
+        <div className="border-b border-white/10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-10 text-xs text-white/70">
-              <div className="flex items-center gap-6">
-                <a href="tel:+62211234567" className="flex items-center gap-1 hover:text-gold-400 transition-colors">
-                  <Phone size={12} />
-                  <span>+62 21 1234 567</span>
-                </a>
-                <span className="hidden sm:inline">info@hotelresort.com</span>
+              <div className="flex items-center gap-2 min-w-0 mr-4">
+                {announcement && (
+                  <>
+                    <Megaphone size={13} className="text-gold-400 shrink-0" />
+                    <span className="truncate">{announcement}</span>
+                  </>
+                )}
               </div>
-              <div className="flex items-center gap-4">
-                <button className="flex items-center gap-1 hover:text-gold-400 transition-colors">
-                  <Globe size={12} />
-                  <span>ID</span>
-                  <ChevronDown size={12} />
-                </button>
-                <a href="/booking" className="hover:text-gold-400 transition-colors hidden sm:block">
-                  Member Login
-                </a>
+              <div className="flex items-center gap-3">
+                {isLoggedIn ? (
+                  <>
+                    <span className="text-white/80">Hello, {firstName}</span>
+                    <span className="text-white/20">|</span>
+                    <button onClick={handleLogout} className="flex items-center gap-1 hover:text-gold-400 transition-colors">
+                      <LogOut size={12} />
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" className="flex items-center gap-1 hover:text-gold-400 transition-colors">
+                      <User size={12} />
+                      Login
+                    </Link>
+                    <span className="text-white/20">|</span>
+                    <Link to="/register" className="flex items-center gap-1 hover:text-gold-400 transition-colors">
+                      <UserPlus size={12} />
+                      Daftar
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -82,7 +127,7 @@ export default function Navbar() {
             </Link>
 
             {/* Desktop Nav Links */}
-            <div className="hidden lg:flex items-center gap-8">
+            <div className="hidden lg:flex items-center gap-8 flex-1 justify-end">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
@@ -94,31 +139,6 @@ export default function Navbar() {
                   {link.name}
                 </Link>
               ))}
-            </div>
-
-            {/* CTA Button */}
-            <div className="hidden lg:flex items-center gap-4">
-              {localStorage.getItem('customer_token') ? (
-                <div className="flex items-center gap-4">
-                  <span className="text-white font-medium">Hello, {JSON.parse(localStorage.getItem('customer_user'))?.full_name?.split(' ')[0] || 'User'}</span>
-                  <button onClick={() => {localStorage.removeItem('customer_token'); localStorage.removeItem('customer_user'); window.location.reload();}} className="text-sm text-gray-300 hover:text-gold-400 font-semibold uppercase tracking-wider">Logout</button>
-                </div>
-              ) : (
-                <Link
-                  to="/login"
-                  className="text-white hover:text-gold-400 font-semibold text-sm tracking-wider uppercase flex items-center gap-2 transition-colors mr-2"
-                >
-                  <User size={18} />
-                  Login
-                </Link>
-              )}
-              <Link
-                to="/rooms"
-                className="bg-gold-500 text-white px-6 py-2.5 text-sm font-semibold tracking-wider 
-                  hover:bg-gold-400 transition-all duration-300 uppercase rounded"
-              >
-                Pesan Sekarang
-              </Link>
             </div>
 
             {/* Mobile Menu Button */}
@@ -185,28 +205,29 @@ export default function Navbar() {
             </div>
 
             <div className="mt-8 pt-6 border-t border-white/10 gap-3 flex flex-col">
-              {localStorage.getItem('customer_token') ? (
+              {isLoggedIn ? (
                 <button
-                  onClick={() => {localStorage.removeItem('customer_token'); localStorage.removeItem('customer_user'); window.location.reload();}}
+                  onClick={handleLogout}
                   className="block w-full border border-white/30 text-white text-center px-6 py-3 text-sm font-semibold tracking-wider hover:bg-white/10 transition-all duration-300 uppercase rounded"
                 >
                   Logout
                 </button>
               ) : (
-                <Link
-                  to="/login"
-                  className="block w-full border border-white/30 text-white text-center px-6 py-3 text-sm font-semibold tracking-wider hover:bg-white/10 transition-all duration-300 uppercase rounded"
-                >
-                  Login / Register
-                </Link>
+                <>
+                  <Link
+                    to="/login"
+                    className="block w-full bg-gold-500 text-white text-center px-6 py-3 text-sm font-semibold tracking-wider hover:bg-gold-400 transition-all duration-300 uppercase rounded"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="block w-full border border-white/30 text-white text-center px-6 py-3 text-sm font-semibold tracking-wider hover:bg-white/10 transition-all duration-300 uppercase rounded"
+                  >
+                    Daftar
+                  </Link>
+                </>
               )}
-              <Link
-                to="/rooms"
-                className="block w-full bg-gold-500 text-white text-center px-6 py-3 text-sm font-semibold 
-                  tracking-wider hover:bg-gold-400 transition-all duration-300 uppercase rounded"
-              >
-                Pesan Sekarang
-              </Link>
             </div>
 
             <div className="mt-6 text-white/50 text-xs space-y-2">
