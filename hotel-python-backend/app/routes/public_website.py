@@ -11,14 +11,24 @@ router = APIRouter()
 def get_public_rooms(db: Session = Depends(get_db)):
     """Fetch public room categories with their prices to show on the website."""
     try:
-        # Fetch active room categories
+        # Fetch active room categories. `physical_available` counts how many physical
+        # rooms of this type are currently vacant/ready (statuses VR/VC/available); the
+        # correlated subquery matches rooms by room_type = category_code within the hotel.
         categories = db.execute(
             text("""
-                SELECT id, category_code, category_name, description,
-                       normal_rate, weekend_rate, six_hours_rate, photo_url, discount_percentage, hotel_name
-                FROM room_categories
-                WHERE is_active = 1
-                ORDER BY hotel_name, normal_rate ASC
+                SELECT rc.id, rc.category_code, rc.category_name, rc.description,
+                       rc.normal_rate, rc.weekend_rate, rc.six_hours_rate, rc.photo_url,
+                       rc.discount_percentage, rc.hotel_name, rc.online_quota,
+                       rc.room_size, rc.bed_type, rc.capacity, rc.amenities,
+                       (SELECT COUNT(*) FROM hotel_rooms hr
+                          WHERE hr.is_active = 1
+                            AND hr.status IN ('available', 'VC', 'VR')
+                            AND hr.room_type = rc.category_code
+                            AND (hr.hotel_name = rc.hotel_name OR rc.hotel_name IS NULL)
+                       ) AS physical_available
+                FROM room_categories rc
+                WHERE rc.is_active = 1
+                ORDER BY rc.hotel_name, rc.normal_rate ASC
             """)
         ).fetchall()
 
@@ -39,7 +49,16 @@ def get_public_rooms(db: Session = Depends(get_db)):
             else:
                 cat_dict['image'] = cat_dict['photo_url']
 
-            cat_dict['amenities'] = ['WiFi Gratis', 'AC', 'TV LED', 'Room Service']
+            # Website-facing specs are editable per room type via the CMS. Fall back to
+            # sensible defaults when a field hasn't been filled in yet.
+            cat_dict['size'] = cat_dict.get('room_size') or '30 m²'
+            cat_dict['bed_type'] = cat_dict.get('bed_type') or 'King Size'
+            cat_dict['capacity'] = cat_dict.get('capacity') or 2
+            amenities_raw = cat_dict.get('amenities')
+            if amenities_raw:
+                cat_dict['amenities'] = [a.strip() for a in amenities_raw.split(',') if a.strip()]
+            else:
+                cat_dict['amenities'] = ['WiFi Gratis', 'AC', 'TV LED', 'Room Service']
 
             # Published price for the website = normal_rate minus the staff-configured discount.
             discount_pct = float(cat_dict.get('discount_percentage') or 0)
@@ -47,6 +66,13 @@ def get_public_rooms(db: Session = Depends(get_db)):
             cat_dict['original_rate'] = normal_rate
             cat_dict['discount_percentage'] = discount_pct
             cat_dict['published_rate'] = round(normal_rate * (1 - discount_pct / 100), 2) if discount_pct > 0 else normal_rate
+
+            # How many rooms to actually offer online. The staff-set online_quota lets the
+            # hotel hold some rooms back for walk-in guests: we never show more than the
+            # quota, and never more than what is physically available right now.
+            physical = int(cat_dict.get('physical_available') or 0)
+            quota = cat_dict.get('online_quota')
+            cat_dict['available_rooms'] = physical if quota is None else max(0, min(physical, int(quota)))
 
             result.append(cat_dict)
 
@@ -82,6 +108,33 @@ def get_public_hotels(db: Session = Depends(get_db)):
         ]
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+@router.get("/website-hotels")
+def get_website_hotels(db: Session = Depends(get_db)):
+    """Public list of hotels to show on the website Hotels page.
+
+    Only hotels explicitly enabled (show_on_website = 1) are returned, so staff can
+    control which of the shared/payroll hotel records appear publicly. Each hotel
+    also carries a count of its active room types.
+    """
+    try:
+        rows = db.execute(
+            text("""
+                SELECT h.id, h.name, h.address, h.phone, h.email, h.photo_url,
+                       h.logo_url, h.description,
+                       (SELECT COUNT(*) FROM room_categories rc
+                          WHERE rc.is_active = 1
+                            AND rc.hotel_name COLLATE utf8mb4_general_ci = h.name COLLATE utf8mb4_general_ci
+                       ) AS room_count
+                FROM hotels h
+                WHERE h.active = 1 AND h.show_on_website = 1
+                ORDER BY h.name
+            """)
+        ).fetchall()
+        return [dict(r._mapping) for r in rows]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
 
 @router.get("/booking-lookup")
 def lookup_booking(reservation_no: str, email: str, db: Session = Depends(get_db)):

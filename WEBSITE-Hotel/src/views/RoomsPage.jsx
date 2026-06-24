@@ -1,15 +1,8 @@
 ﻿﻿import { useState, useEffect } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
-import { Bed, Maximize2, Users, Wifi, Wind, Tv, Coffee, Bath, Star, Check } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Bed, Maximize2, Users, Wifi, Wind, Tv, Coffee, Bath, Check } from 'lucide-react'
 import { formatCurrency } from '../data/hotels'
 import { hotelAPI } from '../api/api'
-
-const roomTypes = [
-  { key: 'all', label: 'Semua' },
-  { key: 'standard', label: 'Standard' },
-  { key: 'suite', label: 'Suite' },
-  { key: 'family', label: 'Family' },
-]
 
 // Fallback/Sample Room Data for when API returns no rooms
 const fallbackRooms = [
@@ -32,9 +25,6 @@ const fallbackRooms = [
 ]
 
 export default function RoomsPage() {
-  const [searchParams] = useSearchParams()
-  const initialType = searchParams.get('type') || 'all'
-  const [selectedType, setSelectedType] = useState(initialType)
   const [allRooms, setAllRooms] = useState([])
   const [loading, setLoading] = useState(true)
   const [hotelPhones, setHotelPhones] = useState({})
@@ -53,27 +43,20 @@ export default function RoomsPage() {
     const fetchRooms = async () => {
       try {
         const response = await hotelAPI.getPublicRooms()
-        let mappedRooms = response.data.map(room => {
-          let type = 'standard'
-          const lowerName = String(room.category_name).toLowerCase()
-          const lowerCode = String(room.category_code).toLowerCase()
-
-          if (lowerName.includes('suite') || lowerCode.includes('apt') || lowerCode.includes('exe')) type = 'suite'
-          else if (lowerName.includes('bis') || lowerCode.includes('fam') || lowerCode.includes('ghs')) type = 'family'
-
+        const mappedRooms = response.data.map(room => {
           return {
             id: room.id,
             name: room.hotel_name + ' - ' + room.category_name,
             hotelName: room.hotel_name,
-            type: type,
             description: room.description || 'Pengalaman menginap yang istimewa di tipe ' + room.category_name + ' persembahan ' + room.hotel_name + '.',
             price: room.published_rate ?? room.normal_rate ?? 250000,
             originalPrice: room.discount_percentage > 0 ? (room.original_rate ?? room.normal_rate) : null,
             discountPercentage: room.discount_percentage || 0,
+            availableRooms: room.available_rooms,
             image: room.image || 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=800&auto=format&fit=crop',
-            size: '30 m²',
-            bed: 'Queen Size',
-            guests: 2,
+            size: room.size || '30 m²',
+            bed: room.bed_type || 'King Size',
+            guests: room.capacity || 2,
             amenities: room.amenities || ['WiFi Gratis', 'AC', 'TV LED', 'Room Service']
           }
         })
@@ -94,10 +77,6 @@ export default function RoomsPage() {
     fetchRooms()
   }, [])
 
-  const filteredRooms = selectedType === 'all'
-    ? allRooms
-    : allRooms.filter((room) => room.type === selectedType)
-
   return (
     <>
       {/* Hero Banner */}
@@ -109,29 +88,8 @@ export default function RoomsPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-hotel-dark/70 to-hotel-dark/50" />
         <div className="relative z-10 text-center">
           <p className="text-gold-400 tracking-[0.4em] uppercase text-sm font-medium mb-4">Akomodasi</p>
-          <h1 className="text-4xl md:text-6xl font-display font-bold text-white mb-4">Kamar & Suite</h1>
+          <h1 className="text-4xl md:text-6xl font-display font-bold text-white mb-4">Kamar</h1>
           <div className="gold-divider" />
-        </div>
-      </section>
-
-      {/* Room Types Filter */}
-      <section className="bg-white border-b border-gray-100 sticky top-16 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-center gap-4 flex-wrap">
-            {roomTypes.map((type) => (
-              <button
-                key={type.key}
-                onClick={() => setSelectedType(type.key)}
-                className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                  selectedType === type.key
-                    ? 'bg-gold-500 text-white shadow-lg'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                {type.label}
-              </button>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -147,19 +105,13 @@ export default function RoomsPage() {
             <div className="flex justify-center py-20">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500"></div>
             </div>
-          ) : filteredRooms.length === 0 ? (
+          ) : allRooms.length === 0 ? (
             <div className="text-center py-16">
-              <p className="text-gray-400 text-lg">Tidak ada kamar ditemukan untuk kategori ini.</p>
-              <button
-                onClick={() => setSelectedType('all')}
-                className="mt-4 text-gold-500 font-semibold hover:text-gold-400 transition-colors"
-              >
-                Lihat semua kamar
-              </button>
+              <p className="text-gray-400 text-lg">Belum ada kamar yang tersedia saat ini.</p>
             </div>
           ) : (
             <div className="space-y-12">
-              {filteredRooms.map((room, index) => (
+              {allRooms.map((room, index) => (
                 <div
                   key={room.id}
                   className={`bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 
@@ -183,19 +135,26 @@ export default function RoomsPage() {
                         DISKON {room.discountPercentage}%
                       </div>
                     )}
-                    <div className="absolute top-4 right-4 bg-hotel-dark/80 backdrop-blur text-white px-3 py-1 rounded-full text-xs font-medium capitalize">
-                      {room.type}
-                    </div>
                   </div>
 
                   {/* Content */}
                   <div className="lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center">
-                    <div className="flex items-center gap-1 mb-3">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star key={star} size={14} className="text-gold-400" fill="currentColor" />
-                      ))}
-                    </div>
                     <h2 className="text-3xl font-display font-bold text-hotel-dark mb-3">{room.name}</h2>
+                    {typeof room.availableRooms === 'number' && (
+                      <div className="mb-4">
+                        {room.availableRooms > 0 ? (
+                          <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-green-700 bg-green-50 px-3 py-1.5 rounded-full">
+                            <span className="w-2 h-2 rounded-full bg-green-500" />
+                            {room.availableRooms} kamar tersedia
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-red-600 bg-red-50 px-3 py-1.5 rounded-full">
+                            <span className="w-2 h-2 rounded-full bg-red-500" />
+                            Kamar penuh
+                          </span>
+                        )}
+                      </div>
+                    )}
                     <p className="text-gray-500 leading-relaxed mb-6">{room.description}</p>
 
                     {/* Room Specs */}
@@ -234,12 +193,18 @@ export default function RoomsPage() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-4">
-                      <Link
-                        to={`/booking?room=${room.id}`}
-                        className="btn-gold rounded-lg text-center"
-                      >
-                        Pesan Sekarang
-                      </Link>
+                      {room.availableRooms === 0 ? (
+                        <span className="rounded-lg text-center px-6 py-3 bg-gray-200 text-gray-500 font-semibold cursor-not-allowed">
+                          Kamar Penuh
+                        </span>
+                      ) : (
+                        <Link
+                          to={`/booking?room=${room.id}`}
+                          className="btn-gold rounded-lg text-center"
+                        >
+                          Pesan Sekarang
+                        </Link>
+                      )}
                       {hotelPhones[room.hotelName] && (
                         <a
                           href={`tel:${hotelPhones[room.hotelName]}`}

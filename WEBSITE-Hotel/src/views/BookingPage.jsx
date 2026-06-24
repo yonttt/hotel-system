@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import {
   CalendarDays, Users, CreditCard, User, Mail, Phone, Bed, Maximize2,
-  Star, Check, ChevronLeft, ArrowRight, CheckCircle, MapPin, Clock, AlertTriangle
+  Check, ChevronLeft, ArrowRight, CheckCircle, MapPin, Clock, AlertTriangle
 } from 'lucide-react'
 import { hotelAPI } from '../api/api'
 import { formatCurrency } from '../data/hotels'
@@ -617,9 +617,6 @@ export default function BookingPage() {
                 <div className="bg-white rounded-2xl shadow-md border border-gray-100 sticky top-24 overflow-hidden">
                   <img src={selectedRoomData.image} alt={selectedRoomData.category_name} className="w-full h-48 object-cover" />
                   <div className="p-6">
-                    <div className="flex items-center gap-1 mb-2">
-                      {[1,2,3,4,5].map(s => <Star key={s} size={12} className="text-gold-400" fill="currentColor" />)}
-                    </div>
                     <h3 className="font-display font-bold text-xl text-hotel-dark mb-1">{selectedRoomData.category_name}</h3>
                     <p className="text-xs text-gray-400 mb-4">{selectedRoomData.hotel_name}</p>
 

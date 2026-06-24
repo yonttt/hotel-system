@@ -4,7 +4,8 @@ import { Menu, X, ChevronDown, Phone, Globe, User } from 'lucide-react'
 
 const navLinks = [
   { name: 'Beranda', path: '/' },
-  { name: 'Kamar & Suite', path: '/rooms' },
+  { name: 'Hotel', path: '/hotels' },
+  { name: 'Kamar', path: '/rooms' },
   { name: 'Penawaran', path: '/offers' },
   { name: 'Galeri', path: '/gallery' },
   { name: 'Tentang Kami', path: '/about' },

@@ -18,13 +18,14 @@ export default function HeroSlider() {
           contentData[item.setting_key] = item.setting_value
         })
         
-        if (contentData.hero_title || contentData.hero_subtitle) {
+        if (contentData.hero_title || contentData.hero_subtitle || contentData.hero_image_1) {
           setSlides(prevSlides => {
             const newSlides = [...prevSlides]
             newSlides[0] = {
               ...newSlides[0],
               title: contentData.hero_title || newSlides[0].title,
               subtitle: contentData.hero_subtitle || newSlides[0].subtitle,
+              image: contentData.hero_image_1 || newSlides[0].image,
             }
             return newSlides
           })
@@ -91,10 +92,10 @@ export default function HeroSlider() {
               Selamat Datang
             </p>
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-white mb-6 leading-tight">
-              {heroSlides[current].title}
+              {slides[current].title}
             </h1>
             <p className="text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto font-light">
-              {heroSlides[current].subtitle}
+              {slides[current].subtitle}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link

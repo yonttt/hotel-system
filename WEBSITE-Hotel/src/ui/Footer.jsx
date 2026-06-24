@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { MapPin, Phone, Mail, Clock, ChevronRight, ArrowUp } from 'lucide-react'
+import { fetchCMSContent } from '../data/hotels'
 
 const quickLinks = [
   { name: 'Beranda', path: '/' },
-  { name: 'Kamar & Suite', path: '/rooms' },
+  { name: 'Hotel', path: '/hotels' },
+  { name: 'Kamar', path: '/rooms' },
   { name: 'Penawaran', path: '/offers' },
   { name: 'Galeri', path: '/gallery' },
   { name: 'Tentang Kami', path: '/about' },
@@ -23,6 +25,11 @@ const services = [
 export default function Footer() {
   const [email, setEmail] = useState('')
   const [subscribed, setSubscribed] = useState(false)
+  const [cms, setCms] = useState({})
+
+  useEffect(() => {
+    fetchCMSContent().then(setCms).catch(() => {})
+  }, [])
 
   const handleNewsletter = (e) => {
     e.preventDefault()
@@ -146,15 +153,15 @@ export default function Footer() {
             <ul className="space-y-4">
               <li className="flex items-start gap-3 text-white/60 text-sm">
                 <MapPin size={16} className="text-gold-500 mt-0.5 shrink-0" />
-                <span>Jl. Pramuka Raya No.26, Jakarta Timur, DKI Jakarta</span>
+                <span>{cms.contact_address || 'Jl. Pramuka Raya No.26, Jakarta Timur, DKI Jakarta'}</span>
               </li>
               <li className="flex items-center gap-3 text-white/60 text-sm">
                 <Phone size={16} className="text-gold-500 shrink-0" />
-                <a href="tel:+62218580224" className="hover:text-gold-400 transition-colors">+62 21 8580224</a>
+                <a href={`tel:${(cms.contact_phone || '+62 21 8580224').replace(/\s/g, '')}`} className="hover:text-gold-400 transition-colors">{cms.contact_phone || '+62 21 8580224'}</a>
               </li>
               <li className="flex items-center gap-3 text-white/60 text-sm">
                 <Mail size={16} className="text-gold-500 shrink-0" />
-                <a href="mailto:info@hotelnewidola.com" className="hover:text-gold-400 transition-colors">info@hotelnewidola.com</a>
+                <a href={`mailto:${cms.contact_email || 'info@hotelnewidola.com'}`} className="hover:text-gold-400 transition-colors">{cms.contact_email || 'info@hotelnewidola.com'}</a>
               </li>
               <li className="flex items-center gap-3 text-white/60 text-sm">
                 <Clock size={16} className="text-gold-500 shrink-0" />

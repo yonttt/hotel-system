@@ -1,10 +1,15 @@
-import { useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Tag, Clock, Building2 } from 'lucide-react'
-import { specialOffers } from '../data/hotels'
+import { specialOffers, fetchCMSContent } from '../data/hotels'
 
 export default function SpecialOffers() {
   const sectionRef = useRef(null)
+  const [cms, setCms] = useState({})
+
+  useEffect(() => {
+    fetchCMSContent().then(setCms).catch(() => {})
+  }, [])
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -36,14 +41,14 @@ export default function SpecialOffers() {
         {/* Header */}
         <div className="text-center mb-14 animate-on-scroll">
           <p className="text-gold-400 tracking-[0.3em] uppercase text-sm font-semibold mb-3">
-            Penawaran Spesial
+            {cms.offers_subtitle || 'Penawaran Spesial'}
           </p>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold mb-4">
-            Promo Menarik untuk Anda
+            {cms.offers_title || 'Promo Menarik untuk Anda'}
           </h2>
           <div className="gold-divider mb-6" />
           <p className="text-white/60 max-w-2xl mx-auto">
-            Nikmati penawaran eksklusif dan harga terbaik untuk pengalaman menginap yang tak terlupakan
+            {cms.offers_description || 'Nikmati penawaran eksklusif dan harga terbaik untuk pengalaman menginap yang tak terlupakan'}
           </p>
         </div>
 

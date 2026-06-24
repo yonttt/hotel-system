@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Bed, Maximize2, Users } from 'lucide-react'
-import { formatCurrency } from '../data/hotels'
+import { formatCurrency, fetchCMSContent } from '../data/hotels'
 import { hotelAPI } from '../api/api'
 
 // Fallback/Sample Room Data for when API returns no rooms
@@ -29,6 +29,11 @@ export default function RoomsSection() {
   const sectionRef = useRef(null)
   const [rooms, setRooms] = useState([])
   const [loading, setLoading] = useState(true)
+  const [cms, setCms] = useState({})
+
+  useEffect(() => {
+    fetchCMSContent().then(setCms).catch(() => {})
+  }, [])
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -45,6 +50,7 @@ export default function RoomsSection() {
           price: room.published_rate ?? room.normal_rate ?? 250000,
           originalPrice: room.discount_percentage > 0 ? (room.original_rate ?? room.normal_rate) : null,
           discountPercentage: room.discount_percentage || 0,
+          availableRooms: room.available_rooms,
           image: room.image || "https://images.unsplash.com/photo-1611892440504-42a792e24d32?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
         })).slice(0, 4)
         
@@ -80,24 +86,23 @@ export default function RoomsSection() {
     elements?.forEach((el) => observer.observe(el))
 
     return () => observer.disconnect()
-  }, [])
+    // Re-run after rooms load so the newly-rendered cards get observed (otherwise
+    // they stay at opacity:0 and the section looks empty).
+  }, [rooms])
 
   return (
-    <section 
-      ref={sectionRef} 
-      className="py-20 lg:py-28 bg-cover bg-center bg-fixed"
-      style={{
-        backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.95)), url('https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1920&q=80')`,
-      }}
+    <section
+      ref={sectionRef}
+      className="py-20 lg:py-28 bg-hotel-cream"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-14 animate-on-scroll">
-          <p className="section-subtitle">Akomodasi Premium</p>
-          <h2 className="section-title mb-4">Kamar & Suite</h2>
+          <p className="section-subtitle">{cms.rooms_subtitle || 'Akomodasi Premium'}</p>
+          <h2 className="section-title mb-4">{cms.rooms_title || 'Kamar'}</h2>
           <div className="gold-divider mb-6" />
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Pilih dari berbagai tipe kamar yang dirancang untuk kenyamanan dan kemewahan maksimal
+            {cms.rooms_description || 'Pilih dari berbagai tipe kamar yang dirancang untuk kenyamanan dan kemewahan maksimal'}
           </p>
         </div>
 
@@ -111,7 +116,7 @@ export default function RoomsSection() {
             {rooms.map((room, index) => (
               <div
                 key={room.id}
-                className="animate-on-scroll group bg-white/85 backdrop-blur-md rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 border border-white/40"
+                className="animate-on-scroll group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100"
                 style={{ transitionDelay: `${index * 100}ms` }}
               >
               <div className="relative h-64 overflow-hidden">
@@ -137,7 +142,24 @@ export default function RoomsSection() {
               <div className="p-6">
                 <h3 className="text-xl font-display font-bold text-hotel-dark mb-2">{room.name}</h3>
                 <p className="text-gray-500 text-sm mb-4 leading-relaxed">{room.description}</p>
-                
+
+                {/* Availability */}
+                {typeof room.availableRooms === 'number' && (
+                  <div className="mb-4">
+                    {room.availableRooms > 0 ? (
+                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-green-700 bg-green-50 px-3 py-1 rounded-full">
+                        <span className="w-2 h-2 rounded-full bg-green-500" />
+                        {room.availableRooms} kamar tersedia
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-red-600 bg-red-50 px-3 py-1 rounded-full">
+                        <span className="w-2 h-2 rounded-full bg-red-500" />
+                        Kamar penuh
+                      </span>
+                    )}
+                  </div>
+                )}
+
                 {/* Room Details */}
                 <div className="flex items-center gap-6 mb-4 text-sm text-gray-500">
                   <div className="flex items-center gap-1.5">

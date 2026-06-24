@@ -15,6 +15,7 @@ export const hotelAPI = {
   // Public Access APIs
   getPublicRooms: () => api.get('/public/rooms'),
   getPublicHotels: () => api.get('/public/hotels'),
+  getWebsiteHotels: () => api.get('/public/website-hotels'),
   getWebsiteContent: () => api.get('/cms/content'),
   lookupBooking: (reservationNo, email) => api.get('/public/booking-lookup', { params: { reservation_no: reservationNo, email } }),
 

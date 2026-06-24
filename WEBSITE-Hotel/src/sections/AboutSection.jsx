@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Sparkles, ShieldCheck, Heart, Leaf } from 'lucide-react'
+import { fetchCMSContent } from '../data/hotels'
 
 const features = [
   {
@@ -26,6 +27,11 @@ const features = [
 
 export default function AboutSection() {
   const sectionRef = useRef(null)
+  const [cms, setCms] = useState({})
+
+  useEffect(() => {
+    fetchCMSContent().then(setCms).catch(() => {})
+  }, [])
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -50,12 +56,14 @@ export default function AboutSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16 animate-on-scroll">
-          <p className="section-subtitle">Tentang Kami</p>
-          <h2 className="section-title mb-4">Kepercayaan Adalah Bukti<br />Dari Janji Yang Terpenuhi</h2>
+          <p className="section-subtitle">{cms.about_subtitle || 'Tentang Kami'}</p>
+          <h2 className="section-title mb-4">
+            {cms.about_title || <>Kepercayaan Adalah Bukti<br />Dari Janji Yang Terpenuhi</>}
+          </h2>
           <div className="gold-divider mb-6" />
           <p className="text-gray-600 max-w-3xl mx-auto text-lg leading-relaxed">
-            Kami adalah merek paling terpercaya dan dikenal secara luas yang telah melayani
-            jutaan tamu domestik dan mancanegara setiap bulan selama lebih dari dua dekade.
+            {cms.about_description ||
+              'Kami adalah merek paling terpercaya dan dikenal secara luas yang telah melayani jutaan tamu domestik dan mancanegara setiap bulan selama lebih dari dua dekade.'}
           </p>
         </div>
 
@@ -81,7 +89,7 @@ export default function AboutSection() {
         <div className="mt-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center animate-on-scroll">
           <div className="relative">
             <img
-              src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&q=80"
+              src={cms.about_image || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&q=80'}
               alt="Hotel exterior"
               className="w-full h-96 object-cover rounded-2xl shadow-xl"
             />

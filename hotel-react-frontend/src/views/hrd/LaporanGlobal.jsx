@@ -10,8 +10,52 @@ const LaporanGlobal = () => {
   // date filter when these are blank). Fill them in to narrow the range.
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [activePreset, setActivePreset] = useState('all');
   const [loading, setLoading] = useState(false);
   const [hotelRevenue, setHotelRevenue] = useState([]);
+
+  // Format a Date as YYYY-MM-DD using local time (avoids a UTC off-by-one).
+  const toYMD = (d) => {
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${d.getFullYear()}-${month}-${day}`;
+  };
+
+  // Quick period presets just fill From/To; the existing effect refetches.
+  const applyPreset = (preset) => {
+    const now = new Date();
+    let start = '';
+    let end = '';
+    if (preset === 'today') {
+      start = end = toYMD(now);
+    } else if (preset === 'week') {
+      // Current week, Monday through Sunday.
+      const daysSinceMonday = (now.getDay() + 6) % 7;
+      const monday = new Date(now);
+      monday.setDate(now.getDate() - daysSinceMonday);
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      start = toYMD(monday);
+      end = toYMD(sunday);
+    } else if (preset === 'month') {
+      start = toYMD(new Date(now.getFullYear(), now.getMonth(), 1));
+      end = toYMD(new Date(now.getFullYear(), now.getMonth() + 1, 0));
+    } else if (preset === 'year') {
+      start = toYMD(new Date(now.getFullYear(), 0, 1));
+      end = toYMD(new Date(now.getFullYear(), 11, 31));
+    }
+    setActivePreset(preset);
+    setStartDate(start);
+    setEndDate(end);
+  };
+
+  const PERIOD_PRESETS = [
+    { key: 'today', label: 'Hari Ini' },
+    { key: 'week', label: 'Minggu Ini' },
+    { key: 'month', label: 'Bulan Ini' },
+    { key: 'year', label: 'Tahun Ini' },
+    { key: 'all', label: 'Semua' },
+  ];
 
   // Fetch data from API
   const fetchRevenueData = async () => {
@@ -76,7 +120,7 @@ const LaporanGlobal = () => {
                 <input
                   type="date"
                   value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
+                  onChange={(e) => { setStartDate(e.target.value); setActivePreset('custom'); }}
                   className="header-hotel-select"
                   style={{ padding: '6px 12px' }}
                 />
@@ -86,7 +130,7 @@ const LaporanGlobal = () => {
                 <input
                   type="date"
                   value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
+                  onChange={(e) => { setEndDate(e.target.value); setActivePreset('custom'); }}
                   className="header-hotel-select"
                   style={{ padding: '6px 12px' }}
                 />
@@ -96,13 +140,33 @@ const LaporanGlobal = () => {
                   variant="secondary"
                   size="sm"
                   style={{ marginLeft: '10px' }}
-                  onClick={() => { setStartDate(''); setEndDate(''); }}
+                  onClick={() => applyPreset('all')}
                 >
                   Show All
                 </Button>
               )}
               <Button variant="success" size="sm" style={{ marginLeft: '10px' }} onClick={() => window.print()}>Cetak</Button>
             </div>
+          </div>
+
+          {/* Quick period presets — weekly / monthly / yearly reports */}
+          <div className="header-row" style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            <span style={{ fontWeight: 600, marginRight: '4px' }}>Periode:</span>
+            {PERIOD_PRESETS.map((p) => (
+              <Button
+                key={p.key}
+                variant={activePreset === p.key ? 'primary' : 'secondary'}
+                size="sm"
+                onClick={() => applyPreset(p.key)}
+              >
+                {p.label}
+              </Button>
+            ))}
+            <span style={{ marginLeft: 'auto', fontSize: '13px', color: '#666' }}>
+              {startDate || endDate
+                ? `Menampilkan: ${startDate || '...'} s/d ${endDate || '...'}`
+                : 'Menampilkan: Semua data'}
+            </span>
           </div>
         </div>
 
