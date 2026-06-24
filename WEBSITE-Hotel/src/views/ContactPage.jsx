@@ -62,15 +62,19 @@ export default function ContactPage() {
         </div>
       </section>
 
+      {/* Hotel Filter bar */}
+      {hotelNames.length > 0 && (
+        <section className="bg-white border-b border-gray-100 sticky top-16 z-30">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-center">
+            <HotelFilter hotels={hotelNames} value={selectedHotel} onChange={setSelectedHotel} />
+          </div>
+        </section>
+      )}
+
       {/* Hotel Contact Cards */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Filter sits over the hero edge */}
-          <div className="-mt-24 relative z-20 flex flex-col items-center gap-8">
-            {hotelNames.length > 0 && (
-              <HotelFilter hotels={hotelNames} value={selectedHotel} onChange={setSelectedHotel} />
-            )}
-
+          <div className="flex flex-col items-center gap-8">
             {displayedHotels.length === 0 ? (
               <div className="bg-white rounded-2xl p-8 shadow-xl border border-gray-100 text-center w-full">
                 <p className="text-gray-400">Informasi kontak hotel belum tersedia.</p>
