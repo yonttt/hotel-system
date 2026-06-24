@@ -1,6 +1,8 @@
-import { useState } from 'react'
-import { MapPin, Phone, Mail, Clock, Send, MessageSquare, Building2, Globe, CheckCircle, ChevronDown } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { MapPin, Phone, Mail, Clock, Send, MessageSquare, Building2, ChevronDown } from 'lucide-react'
 import { useNotification } from '../state/NotificationContext'
+import { hotelAPI } from '../api/api'
+import HotelFilter from '../ui/HotelFilter'
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -12,6 +14,13 @@ export default function ContactPage() {
   })
   const { showNotification } = useNotification()
 
+  const [hotels, setHotels] = useState([])
+  const [selectedHotel, setSelectedHotel] = useState('')
+
+  useEffect(() => {
+    hotelAPI.getWebsiteHotels().then((r) => setHotels(r.data || [])).catch(() => {})
+  }, [])
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
@@ -22,28 +31,20 @@ export default function ContactPage() {
     setFormData({ name: '', email: '', phone: '', subject: '', message: '' })
   }
 
-  const contactInfo = [
-    {
-      icon: MapPin,
-      title: 'Alamat',
-      lines: ['Jl. Pramuka Raya No.26', 'Jakarta Timur, DKI Jakarta'],
-    },
-    {
-      icon: Phone,
-      title: 'Telepon',
-      lines: ['+62 21 8580224'],
-    },
-    {
-      icon: Mail,
-      title: 'Email',
-      lines: ['info@hotelnewidola.com', 'reservasi@hotelnewidola.com'],
-    },
-    {
-      icon: Clock,
-      title: 'Jam Operasional',
-      lines: ['24/7 Customer Service', 'Reception: 24 Jam'],
-    },
-  ]
+  const hotelNames = hotels.map((h) => h.name)
+  const displayedHotels = selectedHotel ? hotels.filter((h) => h.name === selectedHotel) : hotels
+  // The hotel whose map/phone is featured: the selected one, else the first.
+  const activeHotel = (selectedHotel ? hotels.find((h) => h.name === selectedHotel) : hotels[0]) || null
+  const mapQuery = activeHotel
+    ? encodeURIComponent(`${activeHotel.name} ${activeHotel.address || ''}`)
+    : 'Hotel'
+  // Keep the cards balanced & centered regardless of how many hotels there are.
+  const cardGridCls =
+    displayedHotels.length === 1
+      ? 'grid-cols-1 max-w-md'
+      : displayedHotels.length === 2
+      ? 'grid-cols-1 sm:grid-cols-2 max-w-4xl'
+      : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl'
 
   return (
     <>
@@ -61,24 +62,64 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* Contact Info Cards */}
+      {/* Hotel Contact Cards */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 -mt-24 relative z-20">
-            {contactInfo.map((info, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-shadow duration-300 border border-gray-100 text-center"
-              >
-                <div className="w-14 h-14 bg-gold-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <info.icon size={24} className="text-gold-600" />
-                </div>
-                <h3 className="font-display font-bold text-hotel-dark mb-3">{info.title}</h3>
-                {info.lines.map((line, i) => (
-                  <p key={i} className="text-gray-500 text-sm">{line}</p>
+          {/* Filter sits over the hero edge */}
+          <div className="-mt-24 relative z-20 flex flex-col items-center gap-8">
+            {hotelNames.length > 0 && (
+              <HotelFilter hotels={hotelNames} value={selectedHotel} onChange={setSelectedHotel} />
+            )}
+
+            {displayedHotels.length === 0 ? (
+              <div className="bg-white rounded-2xl p-8 shadow-xl border border-gray-100 text-center w-full">
+                <p className="text-gray-400">Informasi kontak hotel belum tersedia.</p>
+              </div>
+            ) : (
+              <div className={`grid gap-6 w-full mx-auto ${cardGridCls}`}>
+                {displayedHotels.map((hotel) => (
+                  <div
+                    key={hotel.id}
+                    className="bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-shadow duration-300 border border-gray-100"
+                  >
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-12 h-12 bg-gold-100 rounded-xl flex items-center justify-center shrink-0">
+                        <Building2 size={22} className="text-gold-600" />
+                      </div>
+                      <h3 className="font-display font-bold text-hotel-dark leading-tight">{hotel.name}</h3>
+                    </div>
+                    <ul className="space-y-3 text-sm text-gray-500">
+                      {hotel.address && (
+                        <li className="flex items-start gap-2.5">
+                          <MapPin size={16} className="text-gold-500 mt-0.5 shrink-0" />
+                          <span>{hotel.address}</span>
+                        </li>
+                      )}
+                      {hotel.phone && (
+                        <li className="flex items-center gap-2.5">
+                          <Phone size={16} className="text-gold-500 shrink-0" />
+                          <a href={`tel:${hotel.phone.replace(/\s/g, '')}`} className="hover:text-gold-600 transition-colors">
+                            {hotel.phone}
+                          </a>
+                        </li>
+                      )}
+                      {hotel.email && (
+                        <li className="flex items-center gap-2.5">
+                          <Mail size={16} className="text-gold-500 shrink-0" />
+                          <a href={`mailto:${hotel.email}`} className="hover:text-gold-600 transition-colors">
+                            {hotel.email}
+                          </a>
+                        </li>
+                      )}
+                      <li className="flex items-center gap-2.5">
+                        <Clock size={16} className="text-gold-500 shrink-0" />
+                        <span>24/7 Customer Service</span>
+                      </li>
+                    </ul>
+                  </div>
                 ))}
               </div>
-            ))}
+            )}
           </div>
         </div>
       </section>
@@ -185,13 +226,13 @@ export default function ContactPage() {
             <div className="space-y-8">
               <div className="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100 h-80">
                 <iframe
-                  src="https://maps.google.com/maps?q=HOTEL%20NEW%20IDOLA,%20Jl.%20Pramuka%20Raya%20No.26%20Jakarta%20Timur&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                  src={`https://maps.google.com/maps?q=${mapQuery}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
                   allowFullScreen=""
                   loading="lazy"
-                  title="Location Map"
+                  title={activeHotel ? `Lokasi ${activeHotel.name}` : 'Location Map'}
                 />
               </div>
 
@@ -208,13 +249,17 @@ export default function ContactPage() {
                 <div className="bg-green-600 rounded-2xl p-6 text-center">
                   <Phone size={28} className="text-white mx-auto mb-3" />
                   <h4 className="text-white font-display font-bold mb-1">Telepon</h4>
-                  <p className="text-white/70 text-xs mb-3">Hubungi kami langsung</p>
-                  <a
-                    href="tel:+62218580224"
-                    className="bg-white text-green-600 px-5 py-2 rounded-full text-sm font-semibold hover:bg-green-50 transition-colors inline-block"
-                  >
-                    Panggil +62 21 8580224
-                  </a>
+                  <p className="text-white/70 text-xs mb-3">
+                    {activeHotel ? `Hubungi ${activeHotel.name}` : 'Hubungi kami langsung'}
+                  </p>
+                  {activeHotel?.phone && (
+                    <a
+                      href={`tel:${activeHotel.phone.replace(/\s/g, '')}`}
+                      className="bg-white text-green-600 px-5 py-2 rounded-full text-sm font-semibold hover:bg-green-50 transition-colors inline-block"
+                    >
+                      Panggil {activeHotel.phone}
+                    </a>
+                  )}
                 </div>
               </div>
 

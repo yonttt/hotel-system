@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, Bed, Maximize2, Users } from 'lucide-react'
 import { formatCurrency, fetchCMSContent } from '../data/hotels'
 import { hotelAPI } from '../api/api'
+import HotelFilter from '../ui/HotelFilter'
 
 // Fallback/Sample Room Data for when API returns no rooms
 const fallbackRooms = [
@@ -30,6 +31,7 @@ export default function RoomsSection() {
   const [rooms, setRooms] = useState([])
   const [loading, setLoading] = useState(true)
   const [cms, setCms] = useState({})
+  const [selectedHotel, setSelectedHotel] = useState('')
 
   useEffect(() => {
     fetchCMSContent().then(setCms).catch(() => {})
@@ -42,6 +44,7 @@ export default function RoomsSection() {
         const mappedRooms = response.data.map(room => ({
           id: room.id,
           name: room.category_name || room.category_code,
+          hotelName: room.hotel_name,
           description: room.description || `Menginap dengan nyaman di tipe ${room.category_name} di ${room.hotel_name}.`,
           size: room.size || '30 sqm',
           bed: room.bed_type || 'King Bed',
@@ -52,8 +55,8 @@ export default function RoomsSection() {
           discountPercentage: room.discount_percentage || 0,
           availableRooms: room.available_rooms,
           image: room.image || "https://images.unsplash.com/photo-1611892440504-42a792e24d32?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
-        })).slice(0, 4)
-        
+        }))
+
         // If the backend has no rooms yet, use some fallback data to still render nicely
         if (mappedRooms.length === 0) {
            setRooms(fallbackRooms); // Use the diverse fallback rooms
@@ -86,9 +89,12 @@ export default function RoomsSection() {
     elements?.forEach((el) => observer.observe(el))
 
     return () => observer.disconnect()
-    // Re-run after rooms load so the newly-rendered cards get observed (otherwise
-    // they stay at opacity:0 and the section looks empty).
-  }, [rooms])
+    // Re-run after rooms load / filter changes so the newly-rendered cards get
+    // observed (otherwise they stay at opacity:0 and the section looks empty).
+  }, [rooms, selectedHotel])
+
+  const hotelNames = [...new Set(rooms.map((r) => r.hotelName).filter(Boolean))]
+  const displayedRooms = (selectedHotel ? rooms.filter((r) => r.hotelName === selectedHotel) : rooms).slice(0, 4)
 
   return (
     <section
@@ -97,7 +103,7 @@ export default function RoomsSection() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-14 animate-on-scroll">
+        <div className="text-center mb-10 animate-on-scroll">
           <p className="section-subtitle">{cms.rooms_subtitle || 'Akomodasi Premium'}</p>
           <h2 className="section-title mb-4">{cms.rooms_title || 'Kamar'}</h2>
           <div className="gold-divider mb-6" />
@@ -106,6 +112,13 @@ export default function RoomsSection() {
           </p>
         </div>
 
+        {/* Hotel Filter */}
+        {hotelNames.length > 0 && (
+          <div className="flex justify-center mb-12 animate-on-scroll">
+            <HotelFilter hotels={hotelNames} value={selectedHotel} onChange={setSelectedHotel} />
+          </div>
+        )}
+
         {/* Rooms Grid */}
         {loading ? (
           <div className="flex justify-center py-20">
@@ -113,7 +126,7 @@ export default function RoomsSection() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {rooms.map((room, index) => (
+            {displayedRooms.map((room, index) => (
               <div
                 key={room.id}
                 className="animate-on-scroll group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100"

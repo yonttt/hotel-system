@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Bed, Maximize2, Users, Wifi, Wind, Tv, Coffee, Bath, Check } from 'lucide-react'
 import { formatCurrency } from '../data/hotels'
 import { hotelAPI } from '../api/api'
+import HotelFilter from '../ui/HotelFilter'
 
 // Fallback/Sample Room Data for when API returns no rooms
 const fallbackRooms = [
@@ -28,6 +29,7 @@ export default function RoomsPage() {
   const [allRooms, setAllRooms] = useState([])
   const [loading, setLoading] = useState(true)
   const [hotelPhones, setHotelPhones] = useState({})
+  const [selectedHotel, setSelectedHotel] = useState('')
 
   useEffect(() => {
     const fetchHotels = async () => {
@@ -77,6 +79,12 @@ export default function RoomsPage() {
     fetchRooms()
   }, [])
 
+  // Hotels that actually have rooms, for the filter dropdown.
+  const hotelNames = [...new Set(allRooms.map((r) => r.hotelName).filter(Boolean))]
+  const displayedRooms = selectedHotel
+    ? allRooms.filter((r) => r.hotelName === selectedHotel)
+    : allRooms
+
   return (
     <>
       {/* Hero Banner */}
@@ -93,6 +101,15 @@ export default function RoomsPage() {
         </div>
       </section>
 
+      {/* Hotel Filter */}
+      {hotelNames.length > 0 && (
+        <section className="bg-white border-b border-gray-100 sticky top-16 z-30">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-center">
+            <HotelFilter hotels={hotelNames} value={selectedHotel} onChange={setSelectedHotel} />
+          </div>
+        </section>
+      )}
+
       {/* Rooms Listing */}
       <section 
         className="py-16 lg:py-24 bg-cover bg-center bg-fixed"
@@ -105,13 +122,21 @@ export default function RoomsPage() {
             <div className="flex justify-center py-20">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500"></div>
             </div>
-          ) : allRooms.length === 0 ? (
+          ) : displayedRooms.length === 0 ? (
             <div className="text-center py-16">
-              <p className="text-gray-400 text-lg">Belum ada kamar yang tersedia saat ini.</p>
+              <p className="text-gray-400 text-lg">Belum ada kamar untuk hotel ini.</p>
+              {selectedHotel && (
+                <button
+                  onClick={() => setSelectedHotel('')}
+                  className="mt-4 text-gold-500 font-semibold hover:text-gold-400 transition-colors"
+                >
+                  Lihat semua hotel
+                </button>
+              )}
             </div>
           ) : (
             <div className="space-y-12">
-              {allRooms.map((room, index) => (
+              {displayedRooms.map((room, index) => (
                 <div
                   key={room.id}
                   className={`bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 
