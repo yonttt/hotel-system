@@ -40,12 +40,17 @@ async def lifespan(app: FastAPI):
     # --- Shutdown (nothing to clean up currently) ---
 
 
+# In production set ENVIRONMENT=production in the server's .env. This hides the
+# interactive API docs (/docs, /redoc) so the full API surface isn't public.
+# Locally it stays unset, so the docs work exactly as before.
+IS_PRODUCTION = os.getenv("ENVIRONMENT", "development").lower() == "production"
+
 app = FastAPI(
     title="Hotel Management System API",
     description="Modern Python API for Eva Group Hotel Management System",
     version="2.0.0",
-    docs_url="/docs",  # Swagger UI
-    redoc_url="/redoc",  # ReDoc
+    docs_url=None if IS_PRODUCTION else "/docs",   # Swagger UI (hidden in production)
+    redoc_url=None if IS_PRODUCTION else "/redoc",  # ReDoc (hidden in production)
     lifespan=lifespan
 )
 
@@ -70,9 +75,18 @@ ALLOWED_ORIGINS = [
     # "https://your-hotel-domain.com",
 ]
 
+# Production domains come from the server's .env so you never have to edit code.
+# Single domain:   FRONTEND_URL=https://yourhotel.com
+# Multiple domains: CORS_ORIGINS=https://yourhotel.com,https://admin.yourhotel.com
 FRONTEND_URL = os.getenv("FRONTEND_URL")
 if FRONTEND_URL:
-    ALLOWED_ORIGINS.append(FRONTEND_URL)
+    ALLOWED_ORIGINS.append(FRONTEND_URL.strip())
+
+CORS_ORIGINS = os.getenv("CORS_ORIGINS")
+if CORS_ORIGINS:
+    ALLOWED_ORIGINS.extend(
+        origin.strip() for origin in CORS_ORIGINS.split(",") if origin.strip()
+    )
 
 app.add_middleware(
     CORSMiddleware,

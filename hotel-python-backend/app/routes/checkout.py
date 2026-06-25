@@ -31,7 +31,8 @@ class CheckoutResponse(BaseModel):
     balance: Optional[float] = 0
     transaction_by: Optional[str] = None
     created_at: Optional[datetime] = None
-    
+    is_overdue: Optional[bool] = False  # departure_date is before today and still not checked out
+
     class Config:
         from_attributes = True
 
@@ -66,7 +67,8 @@ def get_checkout_today(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Get all registrations due for checkout today (departure_date = today) with status Check-in."""
+    """Get all registrations due for checkout today OR overdue (departure_date <= today)
+    that are still in Check-in status, so the front office never loses an overdue guest."""
     try:
         today = date.today()
         
@@ -88,7 +90,7 @@ def get_checkout_today(
                 transaction_by,
                 created_at
             FROM hotel_registrations
-            WHERE DATE(departure_date) = :today
+            WHERE DATE(departure_date) <= :today
             AND transaction_status = 'Check-in'
         """
         
@@ -105,6 +107,10 @@ def get_checkout_today(
         
         checkouts = []
         for row in rows:
+            departure = row[9]
+            # Overdue = departure date is strictly before today and guest still not checked out.
+            dep_date = departure.date() if hasattr(departure, "date") else departure
+            is_overdue = bool(dep_date and dep_date < today)
             checkouts.append({
                 "id": row[0],
                 "registration_no": row[1],
@@ -115,14 +121,15 @@ def get_checkout_today(
                 "room_number": row[6],
                 "nights": row[7] or 0,
                 "arrival_date": row[8],
-                "departure_date": row[9],
+                "departure_date": departure,
                 "payment_amount": float(row[10] or 0),
                 "deposit": float(row[11] or 0),
                 "balance": float(row[12] or 0),
                 "transaction_by": row[13],
-                "created_at": row[14]
+                "created_at": row[14],
+                "is_overdue": is_overdue,
             })
-        
+
         return checkouts
         
     except Exception as e:
@@ -240,10 +247,13 @@ def process_checkout(
             {"id": registration_id}
         )
         
-        # Update room status to CO (Checkout) then VD (Vacant Dirty) for housekeeping
+        # Set the room to VD (Vacant Dirty) so it enters the housekeeping flow.
+        # ('CO' left the room in limbo — neither available nor occupied — so it was
+        # invisible to new bookings until a human changed it. VD is in the available
+        # set, so the room re-enters inventory and housekeeping cleans it to VC/VR.)
         room_number = row[11]
         if room_number:
-            update_room_status(db, room_number, 'CO')
+            update_room_status(db, room_number, 'VD')
         
         db.commit()
         

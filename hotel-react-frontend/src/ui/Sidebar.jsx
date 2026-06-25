@@ -245,7 +245,8 @@ const Sidebar = () => {
               children: [
                 { title: 'In House Guest ', path: '/operational/frontoffice/informasi-tamu/in-house-guest' },
                 { title: 'Check in Today', path: '/operational/frontoffice/informasi-tamu/check-in-today' },
-                { title: 'Guest History', path: '/operational/frontoffice/informasi-tamu/guest-history' }
+                { title: 'Guest History', path: '/operational/frontoffice/informasi-tamu/guest-history' },
+                { title: 'Checkout History', path: '/operational/frontoffice/informasi-tamu/checkout-history' }
               ]
             },
             {

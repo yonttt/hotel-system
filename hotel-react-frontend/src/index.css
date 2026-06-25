@@ -117,7 +117,10 @@
 .btn--warning { background: var(--color-warning); color: #fff; }
 .btn--warning:hover:not(:disabled) { background: #b45309; }
 
-.btn--ghost { background: transparent; color: var(--color-primary); }
+/* Outlined button — used for secondary table actions like "Edit"/"Detail".
+   Given a visible border + white fill so it reads as a real button next to the
+   filled primary action (e.g. "Register"), instead of looking like plain text. */
+.btn--ghost { background: #fff; color: var(--color-primary); border-color: var(--color-primary); }
 .btn--ghost:hover:not(:disabled) { background: var(--color-primary-light); }
 
 /* ===================================
@@ -5095,12 +5098,37 @@ select, .form-select {
   color: white;
   padding: 16px 20px;
   border-bottom: 1px solid #dee2e6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .modal-header h3 {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
+}
+
+.modal-close {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .modal-body {

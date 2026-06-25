@@ -1,9 +1,13 @@
 // Mock data for the hotel website
 // In the future, this will be replaced with API calls to the shared backend
 
+// Same base URL the rest of the site uses. Falls back to localhost for local dev,
+// but in production it's set via VITE_API_URL at build time.
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
 export const fetchCMSContent = async () => {
   try {
-    const res = await fetch("http://localhost:8000/cms/content");
+    const res = await fetch(`${API_BASE_URL}/cms/content`);
     const data = await res.json();
     return data.reduce((acc, curr) => {
       acc[curr.setting_key] = curr.setting_value;

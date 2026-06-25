@@ -5,27 +5,6 @@ import { formatCurrency, fetchCMSContent } from '../data/hotels'
 import { hotelAPI } from '../api/api'
 import HotelFilter from '../ui/HotelFilter'
 
-// Fallback/Sample Room Data for when API returns no rooms
-const fallbackRooms = [
-  {
-    id: 'fb1', name: 'Deluxe Room - Hotel Jakarta', description: 'Kamar mewah dengan pemandangan kota.', size: '30 sqm', bed: 'King', guests: 2, amenities: ['WiFi', 'AC', 'TV', 'Minibar'], price: 1000000, 
-    image: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=800&auto=format&fit=crop"
-  },
-  {
-    id: 'fb2', name: 'Suite Ocean View - Hotel Bali', description: 'Suite luas dengan balkon pribadi menghadap laut.', size: '60 sqm', bed: 'King', guests: 3, amenities: ['WiFi', 'AC', 'TV', 'Minibar', 'Bathtub'], price: 2500000, 
-    image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=800&auto=format&fit=crop"
-  },
-  {
-    id: 'fb3', name: 'Family Room - Hotel Yogyakarta', description: 'Kamar nyaman untuk keluarga dengan 2 tempat tidur.', size: '45 sqm', bed: 'Twin', guests: 4, amenities: ['WiFi', 'AC', 'TV'], price: 1500000, 
-    image: "https://images.unsplash.com/photo-1582719508461-905c67379f03?q=80&w=800&auto=format&fit=crop"
-  },
-  {
-    id: 'fb4', name: 'Standard Twin - Hotel Surabaya', description: 'Kamar ekonomis dan bersih dengan dua ranjang single.', size: '25 sqm', bed: 'Single', guests: 2, amenities: ['WiFi', 'AC', 'TV'], price: 750000, 
-    image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=800&auto=format&fit=crop"
-  },
-];
-
-
 export default function RoomsSection() {
   const sectionRef = useRef(null)
   const [rooms, setRooms] = useState([])
@@ -57,14 +36,10 @@ export default function RoomsSection() {
           image: room.image || "https://images.unsplash.com/photo-1611892440504-42a792e24d32?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
         }))
 
-        // If the backend has no rooms yet, use some fallback data to still render nicely
-        if (mappedRooms.length === 0) {
-           setRooms(fallbackRooms); // Use the diverse fallback rooms
-        } else {
-           setRooms(mappedRooms)
-        }
+        setRooms(mappedRooms)
       } catch (error) {
         console.error("Failed to fetch rooms:", error)
+        setRooms([])
       } finally {
         setLoading(false)
       }
@@ -123,6 +98,14 @@ export default function RoomsSection() {
         {loading ? (
           <div className="flex justify-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500"></div>
+          </div>
+        ) : displayedRooms.length === 0 ? (
+          <div className="text-center py-16">
+            <p className="text-gray-400 text-lg">
+              {selectedHotel
+                ? 'Belum ada kamar untuk hotel ini.'
+                : 'Belum ada kamar yang tersedia saat ini.'}
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

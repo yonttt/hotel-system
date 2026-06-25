@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, User, UserPlus, LogOut, Megaphone } from 'lucide-react'
+import { Menu, X, User, UserPlus, LogOut, Megaphone, Phone } from 'lucide-react'
 import { fetchCMSContent } from '../data/hotels'
 
 // Shown until staff sets their own announcement in the CMS. Set it to empty in the

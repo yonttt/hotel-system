@@ -9,6 +9,7 @@ import ContactPage from './views/ContactPage'
 import OffersPage from './views/OffersPage'
 import GalleryPage from './views/GalleryPage'
 import BookingPage from './views/BookingPage'
+import SearchResultsPage from './views/SearchResultsPage'
 import BookingLookupPage from './views/BookingLookupPage'
 import HotelsPage from './views/HotelsPage'
 import HotelDetailPage from './views/HotelDetailPage'
@@ -30,6 +31,7 @@ function App() {
           <Route path="/offers" element={<OffersPage />} />
           <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/search" element={<SearchResultsPage />} />
           <Route path="/booking" element={<BookingPage />} />
           <Route path="/cek-booking" element={<BookingLookupPage />} />
           <Route path="/hotels" element={<HotelsPage />} />

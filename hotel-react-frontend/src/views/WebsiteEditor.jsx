@@ -16,7 +16,6 @@ const SECTIONS = [
   {
     key: 'header',
     label: 'Headbar / Pengumuman',
-    icon: '📢',
     hint: 'Teks promo di bar paling atas',
     fields: [
       { key: 'announcement_text', label: 'Teks Pengumuman (kosongkan untuk menyembunyikan bar)', type: 'text' },
@@ -25,7 +24,6 @@ const SECTIONS = [
   {
     key: 'hero',
     label: 'Banner Utama',
-    icon: '🖼️',
     hint: 'Judul besar & gambar paling atas',
     fields: [
       { key: 'hero_title', label: 'Judul Besar', type: 'text' },
@@ -36,7 +34,6 @@ const SECTIONS = [
   {
     key: 'about',
     label: 'Tentang Kami',
-    icon: 'ℹ️',
     hint: 'Bagian profil & foto hotel',
     fields: [
       { key: 'about_subtitle', label: 'Label Kecil (di atas judul)', type: 'text' },
@@ -48,7 +45,6 @@ const SECTIONS = [
   {
     key: 'rooms',
     label: 'Judul Bagian Kamar',
-    icon: '🏷️',
     hint: 'Teks di atas daftar kamar',
     fields: [
       { key: 'rooms_subtitle', label: 'Label Kecil', type: 'text' },
@@ -59,7 +55,6 @@ const SECTIONS = [
   {
     key: 'offers',
     label: 'Penawaran Spesial',
-    icon: '🎁',
     hint: 'Judul bagian promo',
     fields: [
       { key: 'offers_subtitle', label: 'Label Kecil', type: 'text' },
@@ -70,12 +65,23 @@ const SECTIONS = [
   {
     key: 'contact',
     label: 'Kontak (Footer)',
-    icon: '📞',
     hint: 'Alamat, telepon & email',
     fields: [
       { key: 'contact_address', label: 'Alamat', type: 'textarea' },
       { key: 'contact_phone', label: 'Telepon', type: 'text' },
-      { key: 'contact_email', label: 'Email', type: 'text' },
+      { key: 'contact_email', label: 'Email Kontak Publik (ditampilkan ke tamu)', type: 'text' },
+    ],
+  },
+  {
+    key: 'notifications',
+    label: 'Notifikasi Booking',
+    hint: 'Email tujuan pemberitahuan pesanan baru',
+    fields: [
+      {
+        key: 'notification_email',
+        label: 'Email Penerima Notifikasi Booking (kosongkan untuk pakai pengaturan server / .env)',
+        type: 'text',
+      },
     ],
   },
 ];
@@ -85,14 +91,12 @@ const SECTIONS = [
 const ROOMS_TAB = {
   key: '__rooms__',
   label: 'Foto & Deskripsi Kamar',
-  icon: '📸',
   hint: 'Foto, deskripsi, stok tiap tipe kamar',
 };
 
 const HOTELS_TAB = {
   key: '__hotels__',
   label: 'Daftar Hotel',
-  icon: '🏨',
   hint: 'Tampilkan & edit hotel di halaman Hotel',
 };
 
@@ -117,6 +121,7 @@ const DEFAULT_CONTENT = {
   contact_address: 'Jl. Pramuka Raya No.26, Jakarta Timur, DKI Jakarta',
   contact_phone: '+62 21 8580224',
   contact_email: 'info@hotelnewidola.com',
+  notification_email: '',
 };
 
 const inputStyle = {
@@ -596,6 +601,15 @@ const WebsiteEditor = () => {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null); // { type: 'success' | 'error', text }
   const [previewKey, setPreviewKey] = useState(0); // bump to remount/reload the preview iframe
+  // Focus mode: false = show the list of sections; true = focus on one section's editor
+  // (the list collapses and the editor expands to fill the space).
+  const [focused, setFocused] = useState(false);
+
+  // Open a section and switch into focus mode.
+  const openSection = (key) => {
+    setActiveSection(key);
+    setFocused(true);
+  };
 
   const notify = useCallback((msg) => {
     setMessage(msg);
@@ -689,7 +703,7 @@ const WebsiteEditor = () => {
             <a href={PUBLIC_SITE_URL} target="_blank" rel="noopener noreferrer" style={{ ...secondaryBtn, textDecoration: 'none', display: 'inline-block' }}>
               Buka di tab baru &#8599;
             </a>
-            {!isDataTab && (
+            {focused && !isDataTab && (
               <button type="button" onClick={handleSave} disabled={saving} style={primaryBtn(saving)}>
                 {saving ? 'Menyimpan...' : 'Simpan Perubahan'}
               </button>
@@ -716,11 +730,13 @@ const WebsiteEditor = () => {
           <div style={{ padding: '20px' }}>Memuat editor...</div>
         ) : (
           <div style={{ display: 'flex', gap: '16px', alignItems: 'stretch', height: '80vh' }}>
-            {/* LEFT: editor panel */}
+            {/* LEFT: editor panel. In list mode it's a compact column of sections;
+                in focus mode it expands (flex: 1) so the editor has room to breathe. */}
             <div
               style={{
-                width: '440px',
-                minWidth: '360px',
+                width: focused ? undefined : '440px',
+                minWidth: focused ? '560px' : '360px',
+                flex: focused ? 1 : undefined,
                 display: 'flex',
                 flexDirection: 'column',
                 border: '1px solid #e5e7eb',
@@ -729,79 +745,91 @@ const WebsiteEditor = () => {
                 overflow: 'hidden',
               }}
             >
-              {/* Section navigation — ordered top-to-bottom like the public page */}
-              <div style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
-                <div style={navGroupLabel}>Bagian Halaman</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  {SECTIONS.map((s, i) => {
-                    const active = activeSection === s.key;
-                    return (
-                      <button key={s.key} type="button" onClick={() => setActiveSection(s.key)} style={navBtn(active)}>
-                        <span style={navNumber(active)}>{i + 1}</span>
+              {!focused ? (
+                /* ===== LIST MODE: pick a section to edit ===== */
+                <div style={{ padding: '12px', overflowY: 'auto', flex: 1 }}>
+                  <div style={navGroupLabel}>Bagian Halaman</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    {SECTIONS.map((s, i) => (
+                      <button key={s.key} type="button" onClick={() => openSection(s.key)} style={navBtn(false)}>
+                        <span style={navNumber(false)}>{i + 1}</span>
                         <span style={{ flex: 1, minWidth: 0 }}>
-                          <span style={{ display: 'block', fontSize: '13px', fontWeight: 600 }}>{s.icon} {s.label}</span>
-                          <span style={{ display: 'block', fontSize: '11px', color: active ? '#3b82f6' : '#9ca3af', marginTop: '1px' }}>{s.hint}</span>
+                          <span style={{ display: 'block', fontSize: '13px', fontWeight: 600 }}>{s.label}</span>
+                          <span style={{ display: 'block', fontSize: '11px', color: '#9ca3af', marginTop: '1px' }}>{s.hint}</span>
                         </span>
+                        <span style={{ color: '#9ca3af', fontSize: '18px', lineHeight: 1 }}>&rsaquo;</span>
                       </button>
-                    );
-                  })}
-                </div>
+                    ))}
+                  </div>
 
-                <div style={{ ...navGroupLabel, marginTop: '14px' }}>Kelola Data</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  {[ROOMS_TAB, HOTELS_TAB].map((t) => {
-                    const active = activeSection === t.key;
-                    return (
-                      <button key={t.key} type="button" onClick={() => setActiveSection(t.key)} style={navBtn(active)}>
-                        <span style={navNumber(active)}>{t.icon}</span>
+                  <div style={{ ...navGroupLabel, marginTop: '14px' }}>Kelola Data</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    {[ROOMS_TAB, HOTELS_TAB].map((t, i) => (
+                      <button key={t.key} type="button" onClick={() => openSection(t.key)} style={navBtn(false)}>
+                        <span style={navNumber(false)}>{SECTIONS.length + i + 1}</span>
                         <span style={{ flex: 1, minWidth: 0 }}>
                           <span style={{ display: 'block', fontSize: '13px', fontWeight: 600 }}>{t.label}</span>
-                          <span style={{ display: 'block', fontSize: '11px', color: active ? '#3b82f6' : '#9ca3af', marginTop: '1px' }}>{t.hint}</span>
+                          <span style={{ display: 'block', fontSize: '11px', color: '#9ca3af', marginTop: '1px' }}>{t.hint}</span>
                         </span>
+                        <span style={{ color: '#9ca3af', fontSize: '18px', lineHeight: 1 }}>&rsaquo;</span>
                       </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Body for the active section */}
-              <div style={{ padding: '16px', overflowY: 'auto', flex: 1 }}>
-                {!isDataTab && (
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#1f2937', marginBottom: '14px', paddingBottom: '10px', borderBottom: '1px dashed #e5e7eb' }}>
-                    Mengedit: {SECTIONS.find((s) => s.key === activeSection)?.icon} {SECTIONS.find((s) => s.key === activeSection)?.label}
+                    ))}
                   </div>
-                )}
-                {isRoomsTab ? (
-                  <RoomsEditor onNotify={notify} onSaved={reloadPreview} />
-                ) : isHotelsTab ? (
-                  <HotelsEditor onNotify={notify} onSaved={reloadPreview} />
-                ) : (
-                  activeFields.map((f) => (
-                    <div key={f.key} style={{ marginBottom: '16px' }}>
-                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
-                        {f.label}
-                      </label>
-                      {f.type === 'textarea' ? (
-                        <textarea
-                          value={content[f.key] || ''}
-                          onChange={(e) => setField(f.key, e.target.value)}
-                          rows={3}
-                          style={{ ...inputStyle, resize: 'vertical' }}
-                        />
-                      ) : f.type === 'image' ? (
-                        <ImageField value={content[f.key]} onChange={(v) => setField(f.key, v)} onNotify={notify} />
-                      ) : (
-                        <input
-                          type="text"
-                          value={content[f.key] || ''}
-                          onChange={(e) => setField(f.key, e.target.value)}
-                          style={inputStyle}
-                        />
-                      )}
+                </div>
+              ) : (
+                /* ===== FOCUS MODE: edit one section, full width ===== */
+                <>
+                  <div style={{ padding: '12px 16px', borderBottom: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <button type="button" onClick={() => setFocused(false)} style={secondaryBtn}>
+                      &larr; Kembali ke semua bagian
+                    </button>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#1f2937' }}>
+                      {isRoomsTab ? ROOMS_TAB.label
+                        : isHotelsTab ? HOTELS_TAB.label
+                        : `Edit: ${SECTIONS.find((s) => s.key === activeSection)?.label}`}
                     </div>
-                  ))
-                )}
-              </div>
+                  </div>
+
+                  <div style={{ padding: '20px', overflowY: 'auto', flex: 1 }}>
+                    {isRoomsTab ? (
+                      <RoomsEditor onNotify={notify} onSaved={reloadPreview} />
+                    ) : isHotelsTab ? (
+                      <HotelsEditor onNotify={notify} onSaved={reloadPreview} />
+                    ) : (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '18px' }}>
+                        {activeFields.map((f) => (
+                          <div
+                            key={f.key}
+                            // Long fields take the full row; short text fields sit side by side.
+                            style={{ gridColumn: (f.type === 'textarea' || f.type === 'image') ? '1 / -1' : 'auto' }}
+                          >
+                            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
+                              {f.label}
+                            </label>
+                            {f.type === 'textarea' ? (
+                              <textarea
+                                value={content[f.key] || ''}
+                                onChange={(e) => setField(f.key, e.target.value)}
+                                rows={4}
+                                style={{ ...inputStyle, resize: 'vertical' }}
+                              />
+                            ) : f.type === 'image' ? (
+                              <ImageField value={content[f.key]} onChange={(v) => setField(f.key, v)} onNotify={notify} />
+                            ) : (
+                              <input
+                                type="text"
+                                value={content[f.key] || ''}
+                                onChange={(e) => setField(f.key, e.target.value)}
+                                style={inputStyle}
+                              />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
 
             {/* RIGHT: live preview of the public site */}

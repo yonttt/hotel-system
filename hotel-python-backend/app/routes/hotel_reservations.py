@@ -10,7 +10,6 @@ from typing import List
 from app.config.database import get_db
 from app.config.auth import get_current_user, get_current_manager_or_admin_user, get_optional_user
 from app.config.room_utils import update_room_status
-from app.config.email_utils import send_booking_notification
 from app.tables import User, HotelReservation, Guest
 from app.rules import (
     ReservationCreate, 
@@ -133,27 +132,9 @@ def create_hotel_reservation(
         db.commit()
         db.refresh(db_reservation)
 
-        # Send Email Notification
-        try:
-            # We run it synchronously or rely on it not blocking too long/failing silently
-            # Safely format dates
-            ci_str = str(db_reservation.arrival_date) if db_reservation.arrival_date else str(reservation.arrival_date)
-            co_str = str(db_reservation.departure_date) if db_reservation.departure_date else str(reservation.departure_date)
-            
-            guest_email = db_reservation.email if hasattr(db_reservation, 'email') else reservation.email
-
-            send_booking_notification(
-                reservation_no=db_reservation.reservation_no,
-                guest_name=db_reservation.guest_name,
-                guest_email=guest_email,
-                room_number=db_reservation.room_number,
-                check_in=ci_str,
-                check_out=co_str
-            )
-        except Exception as e:
-            # Log ignore failure so the booking still succeeds
-            logger.warning(f"Failed to send email: {str(e)}")
-            pass
+        # Booking notification emails are sent from the public website frontend
+        # via EmailJS (see WEBSITE-Hotel/src/lib/email.js), so no server-side
+        # email is sent here.
 
         return db_reservation
     except HTTPException:

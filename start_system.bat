@@ -1,7 +1,13 @@
 @echo off
 echo Starting Hotel Management System...
 
-start "Backend" cmd /c "cd hotel-python-backend && python run.py"
+REM Use the project's virtual environment (.venv) which has all required packages
+REM (midtransclient, apscheduler, etc). Falls back to system python if .venv is missing.
+if exist ".venv\Scripts\python.exe" (
+    start "Backend" cmd /c "cd hotel-python-backend && ..\.venv\Scripts\python.exe run.py"
+) else (
+    start "Backend" cmd /c "cd hotel-python-backend && python run.py"
+)
 
 echo Waiting a few seconds for the backend to start before launching ngrok...
 timeout /t 6 /nobreak >nul

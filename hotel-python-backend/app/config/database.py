@@ -27,33 +27,47 @@ def get_db():
         db.close()
 
 def ensure_payment_columns():
-    """Idempotently add Midtrans columns to hotel_reservations.
+    """Idempotently add columns the ORM models expect but that may be missing on
+    older databases.
 
     SQLAlchemy's create_all() only creates missing tables, never adds columns
-    to existing ones, so we add them here via information_schema checks.
+    to existing ones, so we add them here via information_schema checks. This keeps
+    fresh deployments (e.g. the production server) from crashing on schema drift.
     """
     from sqlalchemy import text
-    columns = {
-        "midtrans_order_id": "VARCHAR(100) NULL",
-        "midtrans_payment_status": "VARCHAR(30) NULL",
-        "midtrans_snap_token": "VARCHAR(255) NULL",
+    # table_name -> { column_name: column DDL }
+    table_columns = {
+        "hotel_reservations": {
+            "midtrans_order_id": "VARCHAR(100) NULL",
+            "midtrans_payment_status": "VARCHAR(30) NULL",
+            "midtrans_snap_token": "VARCHAR(255) NULL",
+        },
+        # The GroupBooking model + scheduler reference these, but the table was
+        # created before they were added — without these the group-bookings list
+        # endpoint fails with "Unknown column 'group_bookings.payment_proof'".
+        "group_bookings": {
+            "payment_proof": "VARCHAR(255) NULL",
+            "payment_proof_at": "DATETIME NULL",
+            "payment_deadline": "DATETIME NULL",
+        },
     }
     try:
         with engine.begin() as conn:
-            for name, ddl in columns.items():
-                exists = conn.execute(text(
-                    """
-                    SELECT COUNT(*) FROM information_schema.columns
-                    WHERE table_schema = DATABASE()
-                      AND table_name = 'hotel_reservations'
-                      AND column_name = :col
-                    """
-                ), {"col": name}).scalar()
-                if not exists:
-                    conn.execute(text(
-                        f"ALTER TABLE hotel_reservations ADD COLUMN {name} {ddl}"
-                    ))
-                    logger.info(f"Added column hotel_reservations.{name}")
+            for table, columns in table_columns.items():
+                for name, ddl in columns.items():
+                    exists = conn.execute(text(
+                        """
+                        SELECT COUNT(*) FROM information_schema.columns
+                        WHERE table_schema = DATABASE()
+                          AND table_name = :tbl
+                          AND column_name = :col
+                        """
+                    ), {"tbl": table, "col": name}).scalar()
+                    if not exists:
+                        conn.execute(text(
+                            f"ALTER TABLE {table} ADD COLUMN {name} {ddl}"
+                        ))
+                        logger.info(f"Added column {table}.{name}")
     except Exception as e:
         logger.error(f"ensure_payment_columns failed: {e}")
 

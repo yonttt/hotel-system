@@ -151,7 +151,16 @@ const FrontDeskAction = ({ mode }) => {
             { key: 'type', header: 'Type', render: (i) => i.guest_type || 'N/A' },
             { key: 'room', header: 'Room', align: 'center', render: (i) => i.room_number || '-' },
             { key: 'arrival', header: 'Arrival Date', render: (i) => formatDate(i.arrival_date) },
-            { key: 'departure', header: 'Departure Date', render: (i) => formatDate(i.departure_date) },
+            { key: 'departure', header: 'Departure Date', render: (i) => (
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                {formatDate(i.departure_date)}
+                {i.is_overdue && (
+                  <span style={{ background: '#fee2e2', color: '#b91c1c', fontSize: '10px', fontWeight: 700, padding: '2px 6px', borderRadius: '9999px', whiteSpace: 'nowrap' }}>
+                    OVERDUE
+                  </span>
+                )}
+              </span>
+            ) },
             { key: 'charge', header: 'Total Charge', align: 'right', render: (i) => formatCurrencyFixed4(i.payment_amount || 0) },
             { key: 'deposit', header: 'Total Deposit', align: 'right', render: (i) => formatCurrencyFixed4(i.deposit || 0) },
             { key: 'balance', header: 'Balance', align: 'right', render: (i) => formatCurrencyFixed4(calculateBalance(i.payment_amount, i.deposit)) },

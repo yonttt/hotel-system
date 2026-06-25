@@ -5,26 +5,6 @@ import { formatCurrency } from '../data/hotels'
 import { hotelAPI } from '../api/api'
 import HotelFilter from '../ui/HotelFilter'
 
-// Fallback/Sample Room Data for when API returns no rooms
-const fallbackRooms = [
-  {
-    id: 'fb1', name: 'Deluxe Room - Hotel Jakarta', type: 'standard', description: 'Kamar mewah dengan pemandangan kota.', price: 1000000, size: '30 m²', bed: 'King Size', guests: 2, amenities: ['WiFi Gratis', 'AC', 'TV LED', 'Room Service'],
-    image: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=800&auto=format&fit=crop"
-  },
-  {
-    id: 'fb2', name: 'Suite Ocean View - Hotel Bali', type: 'suite', description: 'Suite luas dengan balkon pribadi menghadap laut.', price: 2500000, size: '60 m²', bed: 'King Size', guests: 3, amenities: ['WiFi Gratis', 'AC', 'TV LED', 'Minibar', 'Bathtub'],
-    image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=800&auto=format&fit=crop"
-  },
-  {
-    id: 'fb3', name: 'Family Room - Hotel Yogyakarta', type: 'family', description: 'Kamar nyaman untuk keluarga dengan 2 tempat tidur.', price: 1500000, size: '45 m²', bed: 'Twin Size', guests: 4, amenities: ['WiFi Gratis', 'AC', 'TV LED'],
-    image: "https://images.unsplash.com/photo-1582719508461-905c67379f03?q=80&w=800&auto=format&fit=crop"
-  },
-  {
-    id: 'fb4', name: 'Executive Suite - Hotel Surabaya', type: 'suite', description: 'Kamar eksekutif dengan ruang kerja terpisah.', price: 1800000, size: '50 m²', bed: 'King Size', guests: 2, amenities: ['WiFi Gratis', 'AC', 'TV LED', 'Desk'],
-    image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=800&auto=format&fit=crop"
-  },
-]
-
 export default function RoomsPage() {
   const [allRooms, setAllRooms] = useState([])
   const [loading, setLoading] = useState(true)
@@ -63,14 +43,10 @@ export default function RoomsPage() {
           }
         })
 
-        if (mappedRooms.length === 0) {
-          setAllRooms(fallbackRooms)
-        } else {
-          setAllRooms(mappedRooms)
-        }
+        setAllRooms(mappedRooms)
       } catch (error) {
         console.error('Failed to fetch rooms', error)
-        setAllRooms(fallbackRooms)
+        setAllRooms([])
       } finally {
         setLoading(false)
       }
@@ -124,7 +100,11 @@ export default function RoomsPage() {
             </div>
           ) : displayedRooms.length === 0 ? (
             <div className="text-center py-16">
-              <p className="text-gray-400 text-lg">Belum ada kamar untuk hotel ini.</p>
+              <p className="text-gray-400 text-lg">
+                {selectedHotel
+                  ? 'Belum ada kamar untuk hotel ini.'
+                  : 'Belum ada kamar yang tersedia saat ini.'}
+              </p>
               {selectedHotel && (
                 <button
                   onClick={() => setSelectedHotel('')}

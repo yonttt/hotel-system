@@ -7,6 +7,7 @@ import {
 import { hotelAPI } from '../api/api'
 import { formatCurrency } from '../data/hotels'
 import { useNotification } from '../state/NotificationContext'
+import { sendBookingEmail, sendGuestEmail } from '../lib/email'
 
 export default function BookingPage() {
   const [searchParams] = useSearchParams()
@@ -204,6 +205,30 @@ export default function BookingPage() {
       const created = await hotelAPI.createReservation(payload)
       const reservationId = created.data?.id
       setBookingId(payload.reservation_no)
+
+      // Send booking emails via EmailJS: one to the hotel/staff (notification) and
+      // one to the guest (confirmation). The staff email goes to the hotel's own
+      // email when set in the DB, otherwise falls back to the system email.
+      // Fire-and-forget: never let an email failure block the booking flow.
+      const hotelInfo = dynamicHotels.find(h => h.name === formData.destination)
+      const emailDetails = {
+        hotelEmail: hotelInfo?.email,
+        hotelName: formData.destination,
+        reservationNo: payload.reservation_no,
+        guestName: payload.guest_name,
+        guestEmail: formData.email,
+        guestPhone: formData.phone,
+        checkIn: formData.checkIn,
+        checkOut: formData.checkOut,
+        nights,
+        rooms: formData.rooms || 1,
+        roomType: selectedRoomData?.category_name || '',
+        total: formatCurrency(totalPrice),
+        paymentMethod: formData.paymentMethod,
+        specialRequests: formData.specialRequests,
+      }
+      sendBookingEmail(emailDetails)
+      sendGuestEmail(emailDetails)
 
       // For online payment methods, open the Midtrans popup immediately.
       // "Bayar di Hotel" skips online payment (pay at the front desk).

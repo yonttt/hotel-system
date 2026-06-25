@@ -97,6 +97,7 @@ import ReservasiToday from './views/operational/frontoffice/informasi_reservasi/
 // Operational - Front Office - Informasi Tamu
 import CheckinToday from './views/operational/frontoffice/informasi_tamu/CheckinToday';
 import GuestHistory from './views/operational/frontoffice/informasi_tamu/GuestHistory';
+import CheckoutHistory from './views/operational/frontoffice/informasi_tamu/CheckoutHistory';
 import InhouseGuest from './views/operational/frontoffice/informasi_tamu/InhouseGuest';
 
 // Operational - Front Office - Front Desk Actions
@@ -446,15 +447,25 @@ function App() {
                 </ProtectedRoute>
               } 
             />
-            <Route 
-              path="/operational/frontoffice/informasi-tamu/guest-history" 
+            <Route
+              path="/operational/frontoffice/informasi-tamu/guest-history"
               element={
                 <ProtectedRoute>
                   <ErrorBoundary>
                     <GuestHistory />
                   </ErrorBoundary>
                 </ProtectedRoute>
-              } 
+              }
+            />
+            <Route
+              path="/operational/frontoffice/informasi-tamu/checkout-history"
+              element={
+                <ProtectedRoute>
+                  <ErrorBoundary>
+                    <CheckoutHistory />
+                  </ErrorBoundary>
+                </ProtectedRoute>
+              }
             />
             <Route
               path="/operational/frontoffice/informasi-tamu/in-house-guest"
