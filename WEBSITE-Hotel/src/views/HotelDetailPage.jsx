@@ -187,7 +187,7 @@ export default function HotelDetailPage() {
                   <div className="relative h-48 overflow-hidden">
                     <img src={room.image} alt={room.category_name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                     <div className="absolute bottom-3 right-3 bg-gold-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                      {formatCurrency(room.published_rate ?? room.normal_rate)}
+                      {formatCurrency(room.published_rate ?? room.normal_rate)}<span title="Belum termasuk pajak & layanan">++</span>
                     </div>
                   </div>
                   <div className="p-5">

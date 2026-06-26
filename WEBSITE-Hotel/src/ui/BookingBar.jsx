@@ -8,16 +8,16 @@ const toDateStr = (d) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 
 const today = () => toDateStr(new Date())
-const tomorrow = () => {
-  const d = new Date()
-  d.setDate(d.getDate() + 1)
+// Add N days to a YYYY-MM-DD string.
+const addDays = (dateStr, n) => {
+  const d = new Date(dateStr)
+  d.setDate(d.getDate() + Number(n))
   return toDateStr(d)
 }
-// One day after the given YYYY-MM-DD string.
-const dayAfter = (dateStr) => {
-  const d = new Date(dateStr)
-  d.setDate(d.getDate() + 1)
-  return toDateStr(d)
+// Whole nights between two YYYY-MM-DD date strings (min 1).
+const nightsBetween = (inStr, outStr) => {
+  const n = Math.round((new Date(outStr) - new Date(inStr)) / 86400000)
+  return n > 0 ? n : 1
 }
 
 // `overlap` = true: sits on top of the homepage hero (pulled up with negative margin).
@@ -32,7 +32,12 @@ export default function BookingBar({ overlap = true }) {
   const [formData, setFormData] = useState({
     destination: searchParams.get('destination') || '',
     checkIn: searchParams.get('checkIn') || today(),
-    checkOut: searchParams.get('checkOut') || tomorrow(),
+    // Guest picks the number of nights; check-out is derived from it.
+    // When arriving with checkIn+checkOut in the URL, back-calculate nights.
+    nights:
+      searchParams.get('checkIn') && searchParams.get('checkOut')
+        ? nightsBetween(searchParams.get('checkIn'), searchParams.get('checkOut'))
+        : Number(searchParams.get('nights')) || 1,
     guests: searchParams.get('guests') || '2',
     rooms: searchParams.get('rooms') || '1',
   })
@@ -53,12 +58,11 @@ export default function BookingBar({ overlap = true }) {
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData((prev) => {
-      const next = { ...prev, [name]: value }
-      // Keep check-out strictly after check-in.
-      if (name === 'checkIn' && next.checkOut <= value) {
-        next.checkOut = dayAfter(value)
+      // Number of nights must be a whole number, at least 1.
+      if (name === 'nights') {
+        return { ...prev, nights: Math.max(1, parseInt(value || '1', 10)) }
       }
-      return next
+      return { ...prev, [name]: value }
     })
     setError('')
   }
@@ -66,18 +70,18 @@ export default function BookingBar({ overlap = true }) {
   const handleSearch = (e) => {
     e.preventDefault()
 
-    // All three are required before searching.
+    // Destination + check-in required; check-out is derived from nights.
     if (!formData.destination) {
       setError('Silakan pilih hotel tujuan terlebih dahulu')
       return
     }
-    if (!formData.checkIn || !formData.checkOut) {
-      setError('Silakan isi tanggal check-in dan check-out')
+    if (!formData.checkIn) {
+      setError('Silakan isi tanggal check-in')
       return
     }
 
+    const nights = Math.max(1, parseInt(formData.nights || '1', 10))
     const checkInDate = new Date(formData.checkIn)
-    const checkOutDate = new Date(formData.checkOut)
     const start = new Date()
     start.setHours(0, 0, 0, 0)
 
@@ -85,15 +89,15 @@ export default function BookingBar({ overlap = true }) {
       setError('Tanggal check-in tidak boleh di masa lalu')
       return
     }
-    if (checkOutDate <= checkInDate) {
-      setError('Tanggal check-out harus setelah check-in')
-      return
-    }
+
+    // Check-out date is calculated automatically from check-in + nights.
+    const checkOut = addDays(formData.checkIn, nights)
 
     const params = new URLSearchParams()
     params.set('destination', formData.destination)
     params.set('checkIn', formData.checkIn)
-    params.set('checkOut', formData.checkOut)
+    params.set('checkOut', checkOut)
+    params.set('nights', String(nights))
     params.set('guests', formData.guests)
     params.set('rooms', formData.rooms)
 
@@ -147,22 +151,28 @@ export default function BookingBar({ overlap = true }) {
               />
             </div>
 
-            {/* Check Out — must be after check-in */}
+            {/* Length of stay — guest picks number of nights; check-out is auto-calculated */}
             <div className="space-y-2">
               <label className="text-gold-400 text-xs font-semibold tracking-wider uppercase flex items-center gap-1.5">
                 <CalendarDays size={14} />
-                Check-out
+                Jumlah Malam
               </label>
               <input
-                type="date"
-                name="checkOut"
-                value={formData.checkOut}
-                min={dayAfter(formData.checkIn)}
+                type="number"
+                name="nights"
+                min={1}
+                max={30}
+                value={formData.nights}
                 onChange={handleChange}
                 className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white text-sm
                   focus:outline-none focus:border-gold-400 focus:ring-1 focus:ring-gold-400/50 transition-all
                   [color-scheme:dark]"
               />
+              {formData.checkIn && (
+                <p className="text-white/60 text-[11px]">
+                  Check-out: {addDays(formData.checkIn, formData.nights)}
+                </p>
+              )}
             </div>
 
             {/* Guests */}

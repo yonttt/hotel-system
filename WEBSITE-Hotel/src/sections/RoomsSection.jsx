@@ -132,7 +132,7 @@ export default function RoomsSection() {
                   {room.originalPrice && (
                     <p className="text-xs font-normal text-white/50 line-through">{formatCurrency(room.originalPrice)}</p>
                   )}
-                  <p className="text-sm font-bold">{formatCurrency(room.price)}<span className="text-xs font-normal text-white/70">/malam</span></p>
+                  <p className="text-sm font-bold">{formatCurrency(room.price)}<span title="Belum termasuk pajak & layanan">++</span><span className="text-xs font-normal text-white/70">/malam</span></p>
                 </div>
               </div>
               <div className="p-6">

@@ -458,7 +458,7 @@ export default function BookingPage() {
                         {room.discount_percentage > 0 && (
                           <span className="line-through text-white/70">{formatCurrency(room.normal_rate)}</span>
                         )}
-                        {formatCurrency(room.published_rate ?? room.normal_rate)}/malam
+                        {formatCurrency(room.published_rate ?? room.normal_rate)}<span title="Belum termasuk pajak & layanan">++</span>/malam
                       </div>
                     </div>
                     <div className="p-5">
@@ -652,7 +652,7 @@ export default function BookingPage() {
                           {selectedRoomData.discount_percentage > 0 && (
                             <span className="line-through text-gray-400 text-xs">{formatCurrency(selectedRoomData.normal_rate)}</span>
                           )}
-                          {formatCurrency(selectedRoomData.published_rate ?? selectedRoomData.normal_rate)}
+                          {formatCurrency(selectedRoomData.published_rate ?? selectedRoomData.normal_rate)}<span title="Belum termasuk pajak & layanan">++</span>
                         </span>
                       </div>
                       <div className="flex justify-between text-sm">

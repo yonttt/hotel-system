@@ -152,7 +152,7 @@ export default function FeaturedHotels() {
                               <span>{room.size}</span>
                             </div>
                             <p className="text-sm font-bold text-gold-600 mt-1.5">
-                              {formatCurrency(room.published_rate ?? room.normal_rate)}
+                              {formatCurrency(room.published_rate ?? room.normal_rate)}<span title="Belum termasuk pajak & layanan">++</span>
                             </p>
                           </div>
                         </Link>

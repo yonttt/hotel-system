@@ -133,7 +133,7 @@ export default function RoomsPage() {
                       {room.originalPrice && (
                         <span className="text-xs line-through text-white/70">{formatCurrency(room.originalPrice)}</span>
                       )}
-                      {formatCurrency(room.price)}/malam
+                      {formatCurrency(room.price)}<span title="Belum termasuk pajak & layanan">++</span>/malam
                     </div>
                     {room.discountPercentage > 0 && (
                       <div className="absolute bottom-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold">
