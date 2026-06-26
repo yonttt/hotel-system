@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Layout from '../../ui/Layout';
 import Button from '../../ui/Button';
+import DataTable from '../../ui/DataTable';
 import { useAuth } from '../../state/AuthContext';
 import apiService from '../../api/api';
 
@@ -171,81 +172,55 @@ const LaporanGlobal = () => {
         </div>
 
         {/* Hotel Revenue Table */}
-        <div className="unified-table-wrapper">
-          <table className="reservation-table">
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>Hotel Name</th>
-                <th>Availabe Rooms</th>
-                <th>Room Sales</th>
-                <th>Occ</th>
-                <th>ARR</th>
-                <th>Rev From NA</th>
-                <th>Total Cash Summary Report</th>
-                <th>Colection</th>
-                <th>Bank Distribution</th>
-                <th>Balance</th>
-                <th>Operational Exp</th>
-                <th>Non Operational Exp</th>
-                <th>Owner Receive/Exp</th>
-                <th>Total Expense</th>
-                <th>Net Income</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan="16" className="no-data">Loading...</td>
-                </tr>
-              ) : hotelRevenue.length === 0 ? (
-                <tr>
-                  <td colSpan="16" className="no-data">No data available in table</td>
-                </tr>
-              ) : (
-                <>
-                  {hotelRevenue.map((item) => (
-                    <tr key={item.no}>
-                      <td>{item.no}</td>
-                      <td style={{ color: '#007bff', cursor: 'pointer' }}>{item.hotelName}</td>
-                      <td>{item.availableRooms}</td>
-                      <td>{item.roomSales}</td>
-                      <td>{item.occ}</td>
-                      <td>{item.arr}</td>
-                      <td>{formatNumber(item.revFromNA)}</td>
-                      <td>{formatNumber(item.totalCash)}</td>
-                      <td style={{ color: '#007bff', cursor: 'pointer' }}>{formatNumber(item.colection)}</td>
-                      <td style={{ color: '#007bff', cursor: 'pointer' }}>{formatNumber(item.bankDist)}</td>
-                      <td>{formatNumber(item.balance)}</td>
-                      <td>{formatNumber(item.operationalExp)}</td>
-                      <td style={{ color: '#007bff', cursor: 'pointer' }}>{formatNumber(item.nonOperationalExp)}</td>
-                      <td style={{ color: '#007bff', cursor: 'pointer' }}>{formatNumber(item.ownerReceive)}</td>
-                      <td>{formatNumber(item.totalExpense)}</td>
-                      <td style={{ color: item.netIncome < 0 ? '#dc3545' : 'inherit' }}>{formatNumber(item.netIncome)}</td>
-                    </tr>
-                  ))}
-                  <tr style={{ background: '#f8f9fa', fontWeight: 'bold' }}>
-                    <td colSpan="2">TOTAL</td>
-                    <td>{hotelTotals.availableRooms}</td>
-                    <td>{hotelTotals.roomSales}</td>
-                    <td>{hotelTotals.occ}</td>
-                    <td>{formatNumber(hotelTotals.arr)}</td>
-                    <td>{formatNumber(hotelTotals.revFromNA)}</td>
-                    <td>{formatNumber(hotelTotals.totalCash)}</td>
-                    <td>{formatNumber(hotelTotals.colection)}</td>
-                    <td>{formatNumber(hotelTotals.bankDist)}</td>
-                    <td>{formatNumber(hotelTotals.balance)}</td>
-                    <td>{formatNumber(hotelTotals.operationalExp)}</td>
-                    <td>{formatNumber(hotelTotals.nonOperationalExp)}</td>
-                    <td>{formatNumber(hotelTotals.ownerReceive)}</td>
-                    <td>{formatNumber(hotelTotals.totalExpense)}</td>
-                    <td style={{ color: hotelTotals.netIncome < 0 ? '#dc3545' : 'inherit' }}>{formatNumber(hotelTotals.netIncome)}</td>
-                  </tr>
-                </>
-              )}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          data={hotelRevenue}
+          loading={loading}
+          emptyText="No data available in table"
+          rowKey={(item) => item.no}
+          columns={[
+            { key: 'no', header: 'No', align: 'center', width: '50px', render: (i) => i.no },
+            { key: 'hotelName', header: 'Hotel Name',
+              render: (i) => <span style={{ color: '#007bff', cursor: 'pointer' }}>{i.hotelName}</span> },
+            { key: 'availableRooms', header: 'Availabe Rooms', align: 'right', render: (i) => i.availableRooms },
+            { key: 'roomSales', header: 'Room Sales', align: 'right', render: (i) => i.roomSales },
+            { key: 'occ', header: 'Occ', align: 'center', render: (i) => i.occ },
+            { key: 'arr', header: 'ARR', align: 'right', render: (i) => formatNumber(i.arr) },
+            { key: 'revFromNA', header: 'Rev From NA', align: 'right', render: (i) => formatNumber(i.revFromNA) },
+            { key: 'totalCash', header: 'Total Cash Summary Report', align: 'right', render: (i) => formatNumber(i.totalCash) },
+            { key: 'colection', header: 'Colection', align: 'right',
+              render: (i) => <span style={{ color: '#007bff', cursor: 'pointer' }}>{formatNumber(i.colection)}</span> },
+            { key: 'bankDist', header: 'Bank Distribution', align: 'right',
+              render: (i) => <span style={{ color: '#007bff', cursor: 'pointer' }}>{formatNumber(i.bankDist)}</span> },
+            { key: 'balance', header: 'Balance', align: 'right', render: (i) => formatNumber(i.balance) },
+            { key: 'operationalExp', header: 'Operational Exp', align: 'right', render: (i) => formatNumber(i.operationalExp) },
+            { key: 'nonOperationalExp', header: 'Non Operational Exp', align: 'right',
+              render: (i) => <span style={{ color: '#007bff', cursor: 'pointer' }}>{formatNumber(i.nonOperationalExp)}</span> },
+            { key: 'ownerReceive', header: 'Owner Receive/Exp', align: 'right',
+              render: (i) => <span style={{ color: '#007bff', cursor: 'pointer' }}>{formatNumber(i.ownerReceive)}</span> },
+            { key: 'totalExpense', header: 'Total Expense', align: 'right', render: (i) => formatNumber(i.totalExpense) },
+            { key: 'netIncome', header: 'Net Income', align: 'right',
+              render: (i) => <span style={{ color: i.netIncome < 0 ? '#dc3545' : 'inherit' }}>{formatNumber(i.netIncome)}</span> },
+          ]}
+          footer={(
+            <tr>
+              <td colSpan={2} className="dt-left">TOTAL</td>
+              <td className="dt-right">{hotelTotals.availableRooms}</td>
+              <td className="dt-right">{hotelTotals.roomSales}</td>
+              <td className="dt-center">{hotelTotals.occ}</td>
+              <td className="dt-right">{formatNumber(hotelTotals.arr)}</td>
+              <td className="dt-right">{formatNumber(hotelTotals.revFromNA)}</td>
+              <td className="dt-right">{formatNumber(hotelTotals.totalCash)}</td>
+              <td className="dt-right">{formatNumber(hotelTotals.colection)}</td>
+              <td className="dt-right">{formatNumber(hotelTotals.bankDist)}</td>
+              <td className="dt-right">{formatNumber(hotelTotals.balance)}</td>
+              <td className="dt-right">{formatNumber(hotelTotals.operationalExp)}</td>
+              <td className="dt-right">{formatNumber(hotelTotals.nonOperationalExp)}</td>
+              <td className="dt-right">{formatNumber(hotelTotals.ownerReceive)}</td>
+              <td className="dt-right">{formatNumber(hotelTotals.totalExpense)}</td>
+              <td className="dt-right" style={{ color: hotelTotals.netIncome < 0 ? '#dc3545' : 'inherit' }}>{formatNumber(hotelTotals.netIncome)}</td>
+            </tr>
+          )}
+        />
       </div>
     </Layout>
   );

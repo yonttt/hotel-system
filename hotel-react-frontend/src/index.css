@@ -171,6 +171,14 @@
 }
 .dt-error { color: var(--color-danger); }
 
+/* Footer/total row for <DataTable footer={...}> */
+.data-table tfoot td {
+  padding: 12px 16px;
+  font-weight: 700;
+  background: var(--color-surface-alt);
+  border-top: 2px solid var(--color-border);
+}
+
 /* Shared status pill */
 .status-pill {
   display: inline-block;

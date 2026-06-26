@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { apiService } from '../../../api/api';
 import Layout from '../../../ui/Layout';
 import Button from '../../../ui/Button';
+import DataTable from '../../../ui/DataTable';
 import UnifiedTableHeader from '../../../ui/UnifiedTableHeader';
 import UnifiedTableFooter from '../../../ui/UnifiedTableFooter';
 import { useAuth } from '../../../state/AuthContext';
@@ -405,102 +406,46 @@ const PropertyList = () => {
         )}
 
         {/* Table Section */}
-        <div className="unified-table-wrapper">
-          <table className="reservation-table">
-            <colgroup>
-              <col style={{ width: '50px' }} />    {/* No */}
-              <col style={{ width: '90px' }} />    {/* Categories */}
-              <col style={{ width: '180px' }} />   {/* Property Name */}
-              <col style={{ width: '220px' }} />   {/* Address */}
-              <col style={{ width: '120px' }} />   {/* Phone */}
-              <col style={{ width: '120px' }} />   {/* Fax */}
-              <col style={{ width: '70px' }} />    {/* Photo */}
-              <col style={{ width: '70px' }} />    {/* Logo */}
-              <col style={{ width: '100px' }} />   {/* UMH */}
-              <col style={{ width: '100px' }} />   {/* UMK */}
-              <col style={{ width: '80px' }} />    {/* Plafon Covid */}
-              <col style={{ width: '90px' }} />    {/* Sub Cabang */}
-              <col style={{ width: '100px' }} />   {/* T. Tetap */}
-              <col style={{ width: '100px' }} />   {/* T. Jabatan */}
-              <col style={{ width: '110px' }} />   {/* T. Penempatan */}
-              <col style={{ width: '70px' }} />    {/* Extrabed */}
-              <col style={{ width: '100px' }} />   {/* Action */}
-            </colgroup>
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>Categories</th>
-                <th>Property Name</th>
-                <th>Address</th>
-                <th>Phone</th>
-                <th>Fax</th>
-                <th>Photo</th>
-                <th>Logo</th>
-                <th style={{ textAlign: 'right' }}>UMH</th>
-                <th style={{ textAlign: 'right' }}>UMK</th>
-                <th>Plafon Covid</th>
-                <th style={{ textAlign: 'right' }}>Sub Cabang</th>
-                <th style={{ textAlign: 'right' }}>T. Tetap</th>
-                <th style={{ textAlign: 'right' }}>T. Jabatan</th>
-                <th style={{ textAlign: 'right' }}>T. Penempatan</th>
-                <th style={{ textAlign: 'right' }}>Extrabed</th>
-                <th style={{ textAlign: 'center' }}>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan="17" className="no-data">Loading...</td>
-                </tr>
-              ) : currentProperties.length === 0 ? (
-                <tr>
-                  <td colSpan="17" className="no-data">
-                    No data available in table
-                  </td>
-                </tr>
-              ) : (
-                currentProperties.map((prop, idx) => (
-                  <tr key={prop.id}>
-                    <td>{startIndex + idx + 1}</td>
-                    <td>{prop.category}</td>
-                    <td style={{ color: '#007bff', fontWeight: '500' }}>{prop.name}</td>
-                    <td title={prop.address}>{prop.address}</td>
-                    <td>{prop.phone}</td>
-                    <td>{prop.fax}</td>
-                    <td style={{ textAlign: 'center' }}>
-                      {prop.photo_url ? (
-                        <img src={prop.photo_url} alt="photo" style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }} />
-                      ) : (
-                        <span style={{ color: '#aaa', fontSize: '11px' }}>No img</span>
-                      )}
-                    </td>
-                    <td style={{ textAlign: 'center' }}>
-                      {prop.logo_url ? (
-                        <img src={prop.logo_url} alt="logo" style={{ width: '50px', height: '50px', objectFit: 'contain', borderRadius: '4px' }} />
-                      ) : (
-                        <span style={{ color: '#aaa', fontSize: '11px' }}>No logo</span>
-                      )}
-                    </td>
-                    <td style={{ textAlign: 'right' }}>{formatCurrencyIDR(prop.umh)}</td>
-                    <td style={{ textAlign: 'right' }}>{formatCurrencyIDR(prop.umk)}</td>
-                    <td style={{ textAlign: 'center' }}>{prop.plafon_covid}</td>
-                    <td style={{ textAlign: 'right' }}>{formatCurrencyIDR(prop.sub_cabang)}</td>
-                    <td style={{ textAlign: 'right' }}>{formatCurrencyIDR(prop.t_tetap)}</td>
-                    <td style={{ textAlign: 'right' }}>{formatCurrencyIDR(prop.t_jabatan)}</td>
-                    <td style={{ textAlign: 'right' }}>{formatCurrencyIDR(prop.t_penempatan)}</td>
-                    <td style={{ textAlign: 'right' }}>{prop.extrabed}</td>
-                    <td style={{ textAlign: 'center' }}>
-                      <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
-                        <Button variant="ghost" size="sm" onClick={() => handleEditClick(prop)}>Edit</Button>
-                        <Button variant="danger" size="sm" onClick={() => handleDeleteProperty(prop.id, prop.name)}>Delete</Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          data={currentProperties}
+          loading={loading}
+          emptyText="No data available in table"
+          rowKey={(prop) => prop.id}
+          columns={[
+            { key: 'no', header: 'No', align: 'center', width: '50px',
+              render: (_p, i) => startIndex + i + 1 },
+            { key: 'category', header: 'Categories', render: (p) => p.category },
+            { key: 'name', header: 'Property Name',
+              render: (p) => <span style={{ color: '#007bff', fontWeight: 500 }}>{p.name}</span> },
+            { key: 'address', header: 'Address', render: (p) => <span title={p.address}>{p.address}</span> },
+            { key: 'phone', header: 'Phone', render: (p) => p.phone },
+            { key: 'fax', header: 'Fax', render: (p) => p.fax },
+            { key: 'photo', header: 'Photo', align: 'center', render: (p) => (
+              p.photo_url
+                ? <img src={p.photo_url} alt="photo" style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }} />
+                : <span style={{ color: '#aaa', fontSize: '11px' }}>No img</span>
+            ) },
+            { key: 'logo', header: 'Logo', align: 'center', render: (p) => (
+              p.logo_url
+                ? <img src={p.logo_url} alt="logo" style={{ width: '50px', height: '50px', objectFit: 'contain', borderRadius: '4px' }} />
+                : <span style={{ color: '#aaa', fontSize: '11px' }}>No logo</span>
+            ) },
+            { key: 'umh', header: 'UMH', align: 'right', render: (p) => formatCurrencyIDR(p.umh) },
+            { key: 'umk', header: 'UMK', align: 'right', render: (p) => formatCurrencyIDR(p.umk) },
+            { key: 'plafon_covid', header: 'Plafon Covid', align: 'center', render: (p) => p.plafon_covid },
+            { key: 'sub_cabang', header: 'Sub Cabang', align: 'right', render: (p) => formatCurrencyIDR(p.sub_cabang) },
+            { key: 't_tetap', header: 'T. Tetap', align: 'right', render: (p) => formatCurrencyIDR(p.t_tetap) },
+            { key: 't_jabatan', header: 'T. Jabatan', align: 'right', render: (p) => formatCurrencyIDR(p.t_jabatan) },
+            { key: 't_penempatan', header: 'T. Penempatan', align: 'right', render: (p) => formatCurrencyIDR(p.t_penempatan) },
+            { key: 'extrabed', header: 'Extrabed', align: 'right', render: (p) => p.extrabed },
+            { key: 'action', header: 'Action', align: 'center', width: '120px', render: (p) => (
+              <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                <Button variant="ghost" size="sm" onClick={() => handleEditClick(p)}>Edit</Button>
+                <Button variant="danger" size="sm" onClick={() => handleDeleteProperty(p.id, p.name)}>Delete</Button>
+              </div>
+            ) },
+          ]}
+        />
 
         <UnifiedTableFooter
           startIndex={startIndex}

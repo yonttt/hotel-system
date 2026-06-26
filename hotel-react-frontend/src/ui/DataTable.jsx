@@ -34,6 +34,7 @@ const DataTable = ({
   emptyText = 'No data found',
   rowKey,
   loadingText = 'Loading...',
+  footer = null,
 }) => {
   const colSpan = columns.length;
 
@@ -72,6 +73,9 @@ const DataTable = ({
             ))
           )}
         </tbody>
+        {footer && !loading && !error && data.length > 0 && (
+          <tfoot>{footer}</tfoot>
+        )}
       </table>
     </div>
   );
