@@ -51,17 +51,6 @@ const Header = () => {
 
       {/* Right side - User menu and logout */}
       <div className="header-right">
-        {/* Refresh Button */}
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={handleRefreshClick}
-          title="Refresh Current Page"
-          icon={<ArrowPathIcon className="w-4 h-4" />}
-        >
-          Refresh
-        </Button>
-
         {/* User Menu */}
         <div className="header-user-menu">
           <button 
@@ -121,6 +110,17 @@ const Header = () => {
             </div>
           )}
         </div>
+
+        {/* Refresh Button */}
+        <Button
+          variant="primary"
+          size="sm"
+          onClick={handleRefreshClick}
+          title="Refresh Current Page"
+          icon={<ArrowPathIcon className="w-4 h-4" />}
+        >
+          Refresh
+        </Button>
 
         {/* Logout Button */}
         <Button
