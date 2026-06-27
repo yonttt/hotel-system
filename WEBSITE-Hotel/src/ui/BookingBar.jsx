@@ -105,7 +105,7 @@ export default function BookingBar({ overlap = true }) {
   }
 
   return (
-    <div className={overlap ? 'relative z-20 -mt-16 md:-mt-12' : 'relative z-20'}>
+    <div className={overlap ? 'relative z-20 mt-6 md:-mt-12' : 'relative z-20'}>
       <div className="max-w-6xl mx-auto px-4">
         <form
           onSubmit={handleSearch}
@@ -152,7 +152,7 @@ export default function BookingBar({ overlap = true }) {
             </div>
 
             {/* Length of stay — guest picks number of nights; check-out is auto-calculated */}
-            <div className="space-y-2">
+            <div className="space-y-2 lg:relative">
               <label className="text-gold-400 text-xs font-semibold tracking-wider uppercase flex items-center gap-1.5">
                 <CalendarDays size={14} />
                 Jumlah Malam
@@ -169,7 +169,7 @@ export default function BookingBar({ overlap = true }) {
                   [color-scheme:dark]"
               />
               {formData.checkIn && (
-                <p className="text-white/60 text-[11px]">
+                <p className="text-white/60 text-[11px] whitespace-nowrap lg:absolute lg:left-0 lg:top-full lg:mt-1">
                   Check-out: {addDays(formData.checkIn, formData.nights)}
                 </p>
               )}
