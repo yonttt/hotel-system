@@ -75,6 +75,9 @@ htmlcov/
 # Vite cache
 .vite/
 
+# Database dumps / backups (contain guest PII — never commit)
+*.sql
+
 # Frontend source: re-include src/lib (the Python "lib/" rule above otherwise hides
 # WEBSITE-Hotel/src/lib/email.js, which the public site needs to build)
 !WEBSITE-Hotel/src/lib/

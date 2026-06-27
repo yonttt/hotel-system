@@ -97,7 +97,10 @@ app.add_middleware(
     expose_headers=["X-RateLimit-Limit", "X-RateLimit-Remaining", "X-RateLimit-Reset"],
 )
 
-# Serve uploaded files (payment proofs, etc.) so the frontend can display them directly
+# Serve uploaded files (payment proofs, etc.) so the frontend can display them directly.
+# Create the folder if missing — git doesn't track empty dirs, so a fresh clone or
+# deployment won't have it, and StaticFiles would crash on startup without this.
+os.makedirs("uploads", exist_ok=True)
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 # Health check endpoint

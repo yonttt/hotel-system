@@ -16,6 +16,7 @@ import HotelDetailPage from './views/HotelDetailPage'
 import LoginPage from './views/LoginPage'
 import RegisterPage from './views/RegisterPage'
 import TopProgressBar from './ui/TopProgressBar'
+import HotelChatbot from './ui/HotelChatbot'
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
         </Routes>
       </main>
       <Footer />
+      <HotelChatbot />
     </div>
   )
 }

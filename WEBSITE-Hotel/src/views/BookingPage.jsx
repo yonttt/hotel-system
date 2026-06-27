@@ -81,6 +81,16 @@ export default function BookingPage() {
     fetchPublicRooms()
   }, [])
 
+  // Re-sync selected room when the URL ?room= param changes while the page
+  // is already mounted (e.g. picking another room from the chatbot links).
+  useEffect(() => {
+    if (preselectedRoom) {
+      setSelectedRoom(Number(preselectedRoom))
+      setStep(2)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }, [preselectedRoom])
+
   // Timer Effect untuk Pelunasan (2 jam)
   useEffect(() => {
     let timer;
