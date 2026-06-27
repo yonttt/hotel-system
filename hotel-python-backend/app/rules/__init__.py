@@ -132,6 +132,8 @@ class TransactionStatus(str, Enum):
     Pending = "Pending"
     Confirmed = "Confirmed"
     Cancelled = "Cancelled"
+    CheckedIn = "Checked-in"
+    CheckedOut = "Checked-out"
 
 class ReservationBase(BaseModel):
     reservation_no: str
