@@ -152,9 +152,10 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu — z-[60] so it sits ABOVE the fixed navbar (z-50),
+          otherwise the header/announcement bar overlaps the drawer. */}
       <div
-        className={`fixed inset-0 z-40 lg:hidden transition-all duration-300 ${
+        className={`fixed inset-0 z-[60] lg:hidden transition-all duration-300 ${
           isMobileOpen ? 'visible' : 'invisible'
         }`}
       >
