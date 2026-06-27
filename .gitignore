@@ -74,3 +74,15 @@ htmlcov/
 
 # Vite cache
 .vite/
+
+# Frontend source: re-include src/lib (the Python "lib/" rule above otherwise hides
+# WEBSITE-Hotel/src/lib/email.js, which the public site needs to build)
+!WEBSITE-Hotel/src/lib/
+!WEBSITE-Hotel/src/lib/**
+!hotel-react-frontend/src/lib/
+!hotel-react-frontend/src/lib/**
+
+# Local-only files (not needed in the repo; the .ps1 contains a Wazuh agent key)
+install-wazuh-agent.ps1
+Chapter3-Script-Word.txt
+Chapter3-Script.md
