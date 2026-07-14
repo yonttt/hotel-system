@@ -34,10 +34,19 @@ export default function BookingLookupPage() {
     setError('')
     setBooking(null)
     try {
-      const res = await hotelAPI.lookupBooking(form.reservation_no.trim(), form.email.trim())
+      // Normalize: strip all spaces from the reservation number (customers often
+      // type "RSV 12345678") and trim the email before querying.
+      const resNo = form.reservation_no.replace(/\s+/g, '').toUpperCase()
+      const res = await hotelAPI.lookupBooking(resNo, form.email.trim())
       setBooking(res.data)
     } catch (err) {
-      setError(err.response?.data?.detail || 'Booking tidak ditemukan. Periksa kembali nomor reservasi dan email Anda.')
+      if (err.response) {
+        // Backend answered (404 etc.) — the booking really wasn't found.
+        setError(err.response.data?.detail || 'Booking tidak ditemukan. Periksa kembali nomor reservasi dan email Anda.')
+      } else {
+        // No response at all — network / server down, NOT a wrong number.
+        setError('Tidak dapat terhubung ke server. Periksa koneksi internet Anda dan coba lagi.')
+      }
     } finally {
       setLoading(false)
     }

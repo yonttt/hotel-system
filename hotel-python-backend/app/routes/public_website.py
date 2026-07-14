@@ -143,6 +143,11 @@ def lookup_booking(reservation_no: str, email: str, db: Session = Depends(get_db
     Requires both reservation_no and the email used at booking time, so a
     guest can't enumerate other people's reservations by guessing numbers.
     """
+    # Normalize inputs: customers may type spaces inside the reservation number
+    # or copy the email with surrounding whitespace.
+    reservation_no = "".join(reservation_no.split())
+    email = email.strip()
+
     reservation = db.query(HotelReservation).filter(
         HotelReservation.reservation_no == reservation_no,
         HotelReservation.email == email
