@@ -513,8 +513,9 @@ export default function BookingPage() {
             </button>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Form */}
-              <div className="lg:col-span-2">
+              {/* Form — on mobile the order summary renders first (order-1) so the
+                  guest sees the room & total BEFORE the Konfirmasi button */}
+              <div className="order-2 lg:order-1 lg:col-span-2">
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Stay Details */}
                   <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
@@ -647,9 +648,9 @@ export default function BookingPage() {
                 </form>
               </div>
 
-              {/* Order Summary Sidebar */}
-              <div className="lg:col-span-1">
-                <div className="bg-white rounded-2xl shadow-md border border-gray-100 sticky top-24 overflow-hidden">
+              {/* Order Summary Sidebar — first on mobile, right column on desktop */}
+              <div className="order-1 lg:order-2 lg:col-span-1">
+                <div className="bg-white rounded-2xl shadow-md border border-gray-100 lg:sticky lg:top-24 overflow-hidden">
                   <img src={selectedRoomData.image} alt={selectedRoomData.category_name} className="w-full h-48 object-cover" />
                   <div className="p-6">
                     <h3 className="font-display font-bold text-xl text-hotel-dark mb-1">{selectedRoomData.category_name}</h3>

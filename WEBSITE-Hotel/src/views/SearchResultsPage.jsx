@@ -83,11 +83,13 @@ export default function SearchResultsPage() {
       {/* Spacer clears the fixed navbar so it's visible at the very top of the page */}
       <div className="h-28 bg-hotel-dark" />
 
-      {/* Sticky search bar — sticks to the very top and (because z-[60] sits above
-          the navbar's z-50, with a full-width opaque background) covers the navbar
-          as the guest scrolls. Result: only the booking bar follows the scroll,
-          the navbar disappears behind it. */}
-      <div className="sticky top-0 z-[60] bg-hotel-dark shadow-xl py-5">
+      {/* Sticky search bar — desktop only. On lg+ it sticks to the very top and
+          (because z-[60] sits above the navbar's z-50, with a full-width opaque
+          background) covers the navbar as the guest scrolls, so only the booking
+          bar follows the scroll. On mobile the bar's fields stack vertically and
+          would cover the results and the menu button, so it stays in normal flow
+          and simply scrolls away with the page. */}
+      <div className="lg:sticky lg:top-0 lg:z-[60] bg-hotel-dark shadow-xl py-5">
         <BookingBar overlap={false} />
       </div>
 
