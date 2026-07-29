@@ -299,6 +299,7 @@ function RoomsEditor({ onNotify, onSaved }) {
           bed_type: room.bed_type ?? '',
           capacity: Number(room.capacity) || 0,
           amenities: room.amenities ?? '',
+          show_on_website: room.show_on_website !== 0 && room.show_on_website !== false,
           ...(quotaEmpty ? { clear_quota: true } : { online_quota: Number(room.online_quota) }),
         }),
       });
@@ -347,6 +348,16 @@ function RoomsEditor({ onNotify, onSaved }) {
               </span>
             ) : null}
           </div>
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '12px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={room.show_on_website !== 0 && room.show_on_website !== false}
+              onChange={(e) => setRoomField(room.id, 'show_on_website', e.target.checked ? 1 : 0)}
+            />
+            Tampilkan di website
+            <span style={{ fontWeight: 400, color: '#9ca3af', fontSize: '11px' }}>(matikan untuk sembunyikan kamar ini dari website)</span>
+          </label>
 
           <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#374151', marginBottom: '5px' }}>Foto Kamar</label>
           <ImageField

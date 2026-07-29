@@ -50,6 +50,13 @@ def ensure_payment_columns():
             "payment_proof_at": "DATETIME NULL",
             "payment_deadline": "DATETIME NULL",
         },
+        # Website-facing content fields added after the tables were first created.
+        "room_categories": {
+            "show_on_website": "TINYINT(1) DEFAULT 1",
+        },
+        "hotels": {
+            "description": "TEXT NULL",
+        },
     }
     try:
         with engine.begin() as conn:

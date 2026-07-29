@@ -27,7 +27,7 @@ def get_public_rooms(db: Session = Depends(get_db)):
                             AND (hr.hotel_name = rc.hotel_name OR rc.hotel_name IS NULL)
                        ) AS physical_available
                 FROM room_categories rc
-                WHERE rc.is_active = 1
+                WHERE rc.is_active = 1 AND COALESCE(rc.show_on_website, 1) = 1
                 ORDER BY rc.hotel_name, rc.normal_rate ASC
             """)
         ).fetchall()

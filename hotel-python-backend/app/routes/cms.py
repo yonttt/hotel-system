@@ -124,7 +124,7 @@ def get_cms_rooms(db: Session = Depends(get_db), current_user: Any = Depends(get
             text("""
                 SELECT rc.id, rc.category_code, rc.category_name, rc.description,
                        rc.normal_rate, rc.photo_url, rc.discount_percentage, rc.is_active,
-                       rc.hotel_name, rc.online_quota,
+                       rc.show_on_website, rc.hotel_name, rc.online_quota,
                        rc.room_size, rc.bed_type, rc.capacity, rc.amenities,
                        (SELECT COUNT(*) FROM hotel_rooms hr
                           WHERE hr.is_active = 1
@@ -155,6 +155,8 @@ class RoomCMSUpdate(BaseModel):
     bed_type: Optional[str] = None
     capacity: Optional[int] = None
     amenities: Optional[str] = None  # comma-separated list, e.g. "WiFi, AC, TV"
+    # Whether this room type appears on the public website (does not affect walk-in/admin use).
+    show_on_website: Optional[bool] = None
 
 
 @router.put("/rooms/{room_id}")
@@ -211,6 +213,9 @@ def update_cms_room(
         if payload.amenities is not None:
             fields.append("amenities = :amenities")
             params["amenities"] = payload.amenities
+        if payload.show_on_website is not None:
+            fields.append("show_on_website = :show_on_website")
+            params["show_on_website"] = 1 if payload.show_on_website else 0
 
         if not fields:
             return {"message": "Tidak ada perubahan"}

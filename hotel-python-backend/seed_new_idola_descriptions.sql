@@ -2,6 +2,9 @@
 -- Jalankan di server:  sudo mysql hotel_system < hotel-python-backend/seed_new_idola_descriptions.sql
 SET NAMES utf8mb4;
 
+-- Kolom untuk menyembunyikan tipe kamar dari website (tanpa mematikan is_active operasional).
+ALTER TABLE `room_categories` ADD COLUMN IF NOT EXISTS `show_on_website` TINYINT(1) DEFAULT 1;
+
 -- ============ DESKRIPSI KAMAR ============
 
 -- STANDARD (16 m2, 1 single bed)
