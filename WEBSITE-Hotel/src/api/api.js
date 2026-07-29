@@ -56,6 +56,8 @@ export const hotelAPI = {
 
   // Midtrans payment
   createPayment: (reservationId, amount = null) => api.post('/payments/create', { reservation_id: reservationId, amount }),
+  // Current payment status (updated by the Midtrans webhook) — used to confirm real success
+  getPaymentStatus: (reservationId) => api.get('/payments/status/' + reservationId),
 }
 
 export default api

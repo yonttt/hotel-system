@@ -42,6 +42,8 @@ export default function BookingPage() {
   const [errorMsg, setErrorMsg] = useState('')
   const [timeLeft, setTimeLeft] = useState(7200) // 2 hours in seconds
   const [paymentExpired, setPaymentExpired] = useState(false)
+  const [reservationId, setReservationId] = useState(null)
+  const [paymentStatus, setPaymentStatus] = useState('pending') // 'pending' | 'paid'
   const [dynamicHotels, setDynamicHotels] = useState([])
   const [dynamicCities, setDynamicCities] = useState([])
   const [dynamicCountries, setDynamicCountries] = useState([])
@@ -111,6 +113,63 @@ export default function BookingPage() {
     }
     return () => clearInterval(timer)
   }, [submitted, timeLeft, paymentExpired, formData.paymentMethod])
+
+  // Poll the backend for the REAL payment status (set by the Midtrans webhook), so the
+  // confirmation screen only shows "success" once the payment is actually confirmed.
+  useEffect(() => {
+    const isOnline = formData.paymentMethod !== 'pay_at_hotel'
+    if (!submitted || !isOnline || !reservationId || paymentStatus === 'paid' || paymentExpired) return
+    let active = true
+    const check = async () => {
+      try {
+        const res = await hotelAPI.getPaymentStatus(reservationId)
+        const ps = res.data?.payment_status
+        const ts = res.data?.transaction_status
+        if (active && (ps === 'paid' || ts === 'Confirmed')) setPaymentStatus('paid')
+      } catch { /* ignore transient errors and keep polling */ }
+    }
+    check()
+    const id = setInterval(check, 5000)
+    return () => { active = false; clearInterval(id) }
+  }, [submitted, reservationId, paymentStatus, paymentExpired, formData.paymentMethod])
+
+  // Open the Midtrans Snap popup for a reservation. Used both on submit and on "Bayar Sekarang".
+  const startMidtransPayment = async (resId) => {
+    try {
+      const payRes = await hotelAPI.createPayment(resId)
+      const token = payRes.data?.token
+      if (token && window.snap) {
+        window.snap.pay(token, {
+          onSuccess: () => {
+            setPaymentStatus('paid')
+            showNotification('success', 'Pembayaran berhasil! Reservasi Anda dikonfirmasi.')
+            setSubmitted(true)
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+          },
+          onPending: () => {
+            showNotification('success', 'Reservasi dibuat. Selesaikan pembayaran Anda sebelum batas waktu.')
+            setSubmitted(true)
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+          },
+          onError: () => {
+            showNotification('error', 'Pembayaran gagal. Anda dapat mencoba lagi dari halaman konfirmasi.')
+            setSubmitted(true)
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+          },
+          onClose: () => {
+            showNotification('error', 'Anda menutup pembayaran. Reservasi tersimpan — selesaikan pembayaran sebelum batas waktu.')
+            setSubmitted(true)
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+          },
+        })
+        return true
+      }
+    } catch (payErr) {
+      console.error('Failed to start Midtrans payment:', payErr)
+      showNotification('error', 'Gagal membuka pembayaran. Silakan coba lagi.')
+    }
+    return false
+  }
 
   const handleExpire = async () => {
     setPaymentExpired(true)
@@ -213,8 +272,10 @@ export default function BookingPage() {
       payload.guest_female = 0
       payload.guest_child = 0
       const created = await hotelAPI.createReservation(payload)
-      const reservationId = created.data?.id
+      const resId = created.data?.id
       setBookingId(payload.reservation_no)
+      setReservationId(resId)
+      setPaymentStatus('pending')
 
       // Send booking emails via EmailJS: one to the hotel/staff (notification) and
       // one to the guest (confirmation). The staff email goes to the hotel's own
@@ -242,37 +303,9 @@ export default function BookingPage() {
 
       // For online payment methods, open the Midtrans popup immediately.
       // "Bayar di Hotel" skips online payment (pay at the front desk).
-      if (formData.paymentMethod !== 'pay_at_hotel' && reservationId) {
-        try {
-          const payRes = await hotelAPI.createPayment(reservationId)
-          const token = payRes.data?.token
-          if (token && window.snap) {
-            window.snap.pay(token, {
-              onSuccess: () => {
-                showNotification('success', 'Pembayaran berhasil! Reservasi Anda dikonfirmasi.')
-                setSubmitted(true)
-                window.scrollTo({ top: 0, behavior: 'smooth' })
-              },
-              onPending: () => {
-                showNotification('success', 'Reservasi dibuat. Selesaikan pembayaran Anda.')
-                setSubmitted(true)
-                window.scrollTo({ top: 0, behavior: 'smooth' })
-              },
-              onError: () => {
-                showNotification('error', 'Pembayaran gagal. Silakan coba lagi.')
-              },
-              onClose: () => {
-                showNotification('error', 'Anda menutup pembayaran. Reservasi tersimpan, selesaikan pembayaran sebelum batas waktu.')
-                setSubmitted(true)
-                window.scrollTo({ top: 0, behavior: 'smooth' })
-              },
-            })
-            return // popup handles the rest
-          }
-        } catch (payErr) {
-          console.error('Failed to start Midtrans payment:', payErr)
-          // Booking is still created; fall through to the success screen.
-        }
+      if (formData.paymentMethod !== 'pay_at_hotel' && resId) {
+        const opened = await startMidtransPayment(resId)
+        if (opened) return // popup handles the rest; the confirmation screen polls for real status
       }
 
       showNotification('success', 'Reservasi Berhasil! Silakan periksa detail pesanan Anda.')
@@ -296,6 +329,8 @@ export default function BookingPage() {
   }
 
   if (submitted) {
+    // Only call it a "success" once the payment is truly confirmed (or it's pay-at-hotel).
+    const awaitingPayment = formData.paymentMethod !== 'pay_at_hotel' && paymentStatus !== 'paid' && !paymentExpired
     return (
       <>
         <section className="relative h-[35vh] min-h-[300px] flex items-center justify-center">
@@ -307,6 +342,12 @@ export default function BookingPage() {
                 <AlertTriangle size={48} className="text-red-500 mx-auto mb-4" />
                 <h1 className="text-3xl md:text-5xl font-display font-bold text-white mb-2">Reservasi Gagal / Batal</h1>
                 <p className="text-white/70">Pembayaran untuk <span className="text-red-400 font-semibold">{bookingId}</span> telah melampaui batas waktu.</p>
+              </>
+            ) : awaitingPayment ? (
+              <>
+                <Clock size={48} className="text-amber-400 mx-auto mb-4" />
+                <h1 className="text-3xl md:text-5xl font-display font-bold text-white mb-2">Reservasi Dibuat</h1>
+                <p className="text-white/70">Menunggu Pembayaran &middot; Nomor Booking: <span className="text-gold-400 font-semibold">{bookingId}</span></p>
               </>
             ) : (
               <>
@@ -321,7 +362,7 @@ export default function BookingPage() {
         <section className="py-16 bg-gray-50">
           <div className="max-w-2xl mx-auto px-4">
 
-            {!paymentExpired && formData.paymentMethod !== 'pay_at_hotel' && (
+            {awaitingPayment && (
               <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-r-2xl mb-8 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
                 <div>
                   <h3 className="font-bold text-red-800 text-lg flex items-center gap-2">
@@ -331,10 +372,26 @@ export default function BookingPage() {
                     Batas waktu pelunasan adalah <strong>2 Jam</strong> dari sekarang. Lewat dari batas waktu, pesanan Anda akan otomatis dibatalkan.
                   </p>
                 </div>
-                <div className="bg-white px-6 py-3 rounded-xl border border-red-200 text-center min-w-[140px] shadow-sm">
-                  <span className="block text-xs font-semibold text-gray-500 mb-1">Sisa Waktu</span>
-                  <span className="text-2xl font-bold font-mono text-red-600">{formatTime(timeLeft)}</span>
+                <div className="flex items-center gap-3">
+                  <div className="bg-white px-6 py-3 rounded-xl border border-red-200 text-center min-w-[140px] shadow-sm">
+                    <span className="block text-xs font-semibold text-gray-500 mb-1">Sisa Waktu</span>
+                    <span className="text-2xl font-bold font-mono text-red-600">{formatTime(timeLeft)}</span>
+                  </div>
+                  <button
+                    onClick={() => startMidtransPayment(reservationId)}
+                    className="btn-gold rounded-lg px-6 py-3 font-semibold whitespace-nowrap"
+                  >
+                    Bayar Sekarang
+                  </button>
                 </div>
+              </div>
+            )}
+
+            {formData.paymentMethod !== 'pay_at_hotel' && paymentStatus === 'paid' && !paymentExpired && (
+              <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-2xl mb-8">
+                <p className="text-green-800 font-semibold flex items-center gap-2">
+                  <CheckCircle size={18} /> Pembayaran telah diterima. Terima kasih!
+                </p>
               </div>
             )}
 
