@@ -17,6 +17,7 @@ class Hotel(Base):
     email = Column(String(100), nullable=True)
     photo_url = Column(String(500), nullable=True)
     logo_url = Column(String(500), nullable=True)
+    description = Column(Text, nullable=True)
     umh = Column(DECIMAL(15, 0), default=0)
     umk = Column(DECIMAL(15, 0), default=0)
     plafon_covid = Column(String(20), default='100%')
