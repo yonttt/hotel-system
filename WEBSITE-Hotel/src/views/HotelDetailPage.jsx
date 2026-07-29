@@ -1,20 +1,20 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { MapPin, Users, Maximize2, ArrowRight, Phone, Mail, BedDouble, Check, Wifi, Waves, Utensils, Dumbbell, Coffee } from 'lucide-react'
+import { MapPin, Users, Maximize2, ArrowRight, Phone, Mail, BedDouble, Wifi, Utensils, Coffee, Car, Clock, Wind } from 'lucide-react'
 import { formatCurrency } from '../data/hotels'
 import { hotelAPI } from '../api/api'
 
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1920&q=80'
 
-// We don't track per-hotel facilities in the database yet, so show a standard set
-// of amenities every property offers.
+// Standard facilities shown on the hotel detail page. Matches what Hotel New Idola
+// actually offers (no pool/gym — recreation is at nearby venues per the listing).
 const standardFacilities = [
   { name: 'WiFi Gratis', Icon: Wifi },
   { name: 'Restoran', Icon: Utensils },
-  { name: 'Kolam Renang', Icon: Waves },
-  { name: 'Fitness Center', Icon: Dumbbell },
+  { name: 'Area Parkir', Icon: Car },
+  { name: 'Resepsionis 24 Jam', Icon: Clock },
+  { name: 'AC', Icon: Wind },
   { name: 'Layanan Kamar', Icon: Coffee },
-  { name: 'Resepsionis 24 Jam', Icon: Check },
 ]
 
 export default function HotelDetailPage() {
