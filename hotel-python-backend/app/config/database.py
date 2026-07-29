@@ -56,6 +56,7 @@ def ensure_payment_columns():
         },
         "hotels": {
             "description": "TEXT NULL",
+            "facilities": "VARCHAR(500) NULL",
         },
     }
     try:

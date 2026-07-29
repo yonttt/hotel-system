@@ -242,7 +242,7 @@ def get_cms_hotels(db: Session = Depends(get_db), current_user: Any = Depends(ge
         rows = db.execute(
             text("""
                 SELECT h.id, h.name, h.address, h.phone, h.email, h.photo_url,
-                       h.logo_url, h.description, h.show_on_website,
+                       h.logo_url, h.description, h.facilities, h.show_on_website,
                        (SELECT COUNT(*) FROM room_categories rc
                           WHERE rc.is_active = 1
                             AND rc.hotel_name COLLATE utf8mb4_general_ci = h.name COLLATE utf8mb4_general_ci
@@ -263,6 +263,7 @@ class HotelCMSUpdate(BaseModel):
     email: Optional[str] = None
     photo_url: Optional[str] = None
     description: Optional[str] = None
+    facilities: Optional[str] = None  # comma-separated list, e.g. "WiFi Gratis, Restoran, Parkir"
     show_on_website: Optional[bool] = None
 
 
@@ -286,7 +287,7 @@ def update_cms_hotel(
 
         fields = []
         params: Dict[str, Any] = {"id": hotel_id}
-        for col in ("address", "phone", "email", "photo_url", "description"):
+        for col in ("address", "phone", "email", "photo_url", "description", "facilities"):
             val = getattr(payload, col)
             if val is not None:
                 fields.append(f"{col} = :{col}")

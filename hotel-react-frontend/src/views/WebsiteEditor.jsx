@@ -513,6 +513,7 @@ function HotelsEditor({ onNotify, onSaved }) {
           email: hotel.email ?? '',
           photo_url: hotel.photo_url ?? '',
           description: hotel.description ?? '',
+          facilities: hotel.facilities ?? '',
           show_on_website: !!hotel.show_on_website,
         }),
       });
@@ -581,6 +582,11 @@ function HotelsEditor({ onNotify, onSaved }) {
 
             <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#374151', margin: '12px 0 5px' }}>Alamat</label>
             <input type="text" value={hotel.address || ''} onChange={(e) => setHotelField(hotel.id, 'address', e.target.value)} style={inputStyle} />
+
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#374151', margin: '12px 0 5px' }}>
+              Fasilitas <span style={{ fontWeight: 400, color: '#9ca3af' }}>(pisahkan dengan koma — tampil sebagai ikon di halaman hotel)</span>
+            </label>
+            <input type="text" value={hotel.facilities || ''} onChange={(e) => setHotelField(hotel.id, 'facilities', e.target.value)} style={inputStyle} placeholder="WiFi Gratis, Restoran, Area Parkir, Resepsionis 24 Jam, AC, Lift" />
 
             <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
               <div style={{ flex: 1 }}>

@@ -1,21 +1,29 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { MapPin, Users, Maximize2, ArrowRight, Phone, Mail, BedDouble, Wifi, Utensils, Coffee, Car, Clock, Wind } from 'lucide-react'
+import { MapPin, Users, Maximize2, ArrowRight, Phone, Mail, BedDouble, Wifi, Utensils, Coffee, Car, Clock, Wind, Tv, ArrowUpDown, Check } from 'lucide-react'
 import { formatCurrency } from '../data/hotels'
 import { hotelAPI } from '../api/api'
 
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1920&q=80'
 
-// Standard facilities shown on the hotel detail page. Matches what Hotel New Idola
-// actually offers (no pool/gym — recreation is at nearby venues per the listing).
-const standardFacilities = [
-  { name: 'WiFi Gratis', Icon: Wifi },
-  { name: 'Restoran', Icon: Utensils },
-  { name: 'Area Parkir', Icon: Car },
-  { name: 'Resepsionis 24 Jam', Icon: Clock },
-  { name: 'AC', Icon: Wind },
-  { name: 'Layanan Kamar', Icon: Coffee },
-]
+// Fallback facilities used only when a hotel has none set in the CMS.
+const DEFAULT_FACILITIES = ['WiFi Gratis', 'Restoran', 'Resepsionis 24 Jam', 'Area Parkir', 'AC', 'Layanan Kamar']
+
+// Facilities are free-text and editable in the CMS ("Fasilitas" per hotel), so map each
+// name to an icon by keyword and fall back to a generic check for anything unrecognised.
+function facilityIcon(name) {
+  const n = (name || '').toLowerCase()
+  if (n.includes('wifi') || n.includes('internet')) return Wifi
+  if (n.includes('restoran') || n.includes('resto') || n.includes('makan')) return Utensils
+  if (n.includes('parkir')) return Car
+  if (n.includes('resepsionis') || n.includes('24 jam') || n.includes('reception')) return Clock
+  if (n.includes('lift') || n.includes('elevator')) return ArrowUpDown
+  if (n.includes('tv')) return Tv
+  if (n.includes('ac') || n.includes('pendingin')) return Wind
+  if (n.includes('kopi') || n.includes('teh') || n.includes('kafe') || n.includes('cafe')) return Coffee
+  if (n.includes('kamar') || n.includes('layanan')) return Coffee
+  return Check
+}
 
 export default function HotelDetailPage() {
   const { id } = useParams()
@@ -69,6 +77,13 @@ export default function HotelDetailPage() {
     hotel.description ||
     `${hotel.name} menghadirkan kenyamanan dan pelayanan terbaik untuk setiap tamu. Dengan ${rooms.length || 'beragam'} tipe kamar yang dirancang untuk kenyamanan maksimal, setiap tamu akan merasakan pengalaman menginap yang tak terlupakan.`
 
+  // Editable per-hotel facilities (comma-separated) from the CMS; fall back to a default set.
+  const facilityNames = (hotel.facilities || '').split(',').map((s) => s.trim()).filter(Boolean)
+  const facilities = (facilityNames.length ? facilityNames : DEFAULT_FACILITIES).map((name) => ({
+    name,
+    Icon: facilityIcon(name),
+  }))
+
   return (
     <>
       {/* Hero */}
@@ -97,7 +112,7 @@ export default function HotelDetailPage() {
             </div>
             <div className="w-px h-10 bg-gray-200" />
             <div>
-              <p className="text-2xl font-display font-bold text-gold-500">{standardFacilities.length}</p>
+              <p className="text-2xl font-display font-bold text-gold-500">{facilities.length}</p>
               <p className="text-xs text-gray-500 uppercase tracking-wider">Fasilitas</p>
             </div>
             <div className="w-px h-10 bg-gray-200" />
@@ -152,7 +167,7 @@ export default function HotelDetailPage() {
               <p className="text-gold-500 text-sm font-semibold tracking-widest uppercase mb-3">Fasilitas</p>
               <h2 className="text-3xl font-display font-bold text-hotel-dark mb-6">Fasilitas Unggulan</h2>
               <div className="grid grid-cols-2 gap-4">
-                {standardFacilities.map(({ name, Icon }) => (
+                {facilities.map(({ name, Icon }) => (
                   <div key={name} className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                     <Icon size={24} className="text-gold-500 mb-3" />
                     <p className="font-semibold text-hotel-dark text-sm">{name}</p>

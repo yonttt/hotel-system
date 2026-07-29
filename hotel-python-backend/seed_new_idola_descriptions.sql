@@ -48,12 +48,14 @@ FROM `room_categories`
 WHERE hotel_name = 'HOTEL NEW IDOLA' AND category_code IN ('STD','DLX','SPR','EXE');
 
 -- ============ DESKRIPSI & KONTAK HOTEL ============
--- Tambah kolom description bila belum ada (aman untuk dijalankan ulang).
+-- Tambah kolom description & facilities bila belum ada (aman untuk dijalankan ulang).
 ALTER TABLE `hotels` ADD COLUMN IF NOT EXISTS `description` TEXT NULL;
+ALTER TABLE `hotels` ADD COLUMN IF NOT EXISTS `facilities` VARCHAR(500) NULL;
 
 UPDATE `hotels` SET
   description = 'Hotel New Idola adalah hotel bujet yang hadir untuk menjawab kebutuhan akomodasi terjangkau di Jakarta. Berlokasi strategis tepat di pinggir Jalan Pramuka Raya, Matraman, hotel ini mudah ditemukan dan dekat dengan Stasiun Senen, Stasiun Jatinegara, Pasar Pramuka, serta ITC Cempaka Putih. Sangat cocok untuk backpacker maupun pelancong bisnis, Hotel New Idola menawarkan kenyamanan yang dibalut kesederhanaan. Setiap kamar dilengkapi AC, WiFi, TV kabel, dan pembuat teh/kopi, dengan kamar mandi ber-shower dan toiletries. Tersedia pula restoran New Idola Restaurant (menu Indonesian dan Chinese Food), area parkir luas, Ruang TV umum, lift, dan resepsionis 24 jam. Check-in mulai pukul 14.00 dan check-out sebelum pukul 12.00.',
+  facilities = 'WiFi Gratis, Restoran, Area Parkir, Resepsionis 24 Jam, AC, Lift, Layanan Kamar, Ruang TV',
   address = 'Jalan Pramuka Raya No. 26, Matraman, Jakarta Timur, DKI Jakarta 13120'
 WHERE name = 'HOTEL NEW IDOLA';
 
-SELECT name, address, LEFT(description, 80) AS description_preview FROM `hotels` WHERE name = 'HOTEL NEW IDOLA';
+SELECT name, facilities, LEFT(description, 70) AS description_preview FROM `hotels` WHERE name = 'HOTEL NEW IDOLA';

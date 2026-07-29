@@ -121,7 +121,7 @@ def get_website_hotels(db: Session = Depends(get_db)):
         rows = db.execute(
             text("""
                 SELECT h.id, h.name, h.address, h.phone, h.email, h.photo_url,
-                       h.logo_url, h.description,
+                       h.logo_url, h.description, h.facilities,
                        (SELECT COUNT(*) FROM room_categories rc
                           WHERE rc.is_active = 1
                             AND rc.hotel_name COLLATE utf8mb4_general_ci = h.name COLLATE utf8mb4_general_ci
