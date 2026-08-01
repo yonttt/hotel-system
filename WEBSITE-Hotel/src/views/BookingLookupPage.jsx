@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Search, CheckCircle, Clock, XCircle, Image as ImageIcon, CalendarDays, BedDouble } from 'lucide-react'
-import { hotelAPI, API_BASE_URL } from '../api/api'
+import { Search, CheckCircle, Clock, XCircle, CalendarDays, BedDouble } from 'lucide-react'
+import { hotelAPI } from '../api/api'
 import { formatCurrency } from '../data/hotels'
 
 const STATUS_INFO = {
@@ -146,24 +146,6 @@ export default function BookingLookupPage() {
                   <span className="font-semibold text-hotel-dark">Sisa Pembayaran</span>
                   <span className="text-lg font-bold text-gold-600">{formatCurrency(booking.balance)}</span>
                 </div>
-              </div>
-
-              <div>
-                <p className="text-sm font-semibold text-hotel-dark mb-3 flex items-center gap-2">
-                  <ImageIcon size={16} className="text-gold-500" />
-                  Bukti Pembayaran
-                </p>
-                {booking.payment_proof ? (
-                  <img
-                    src={`${API_BASE_URL}${booking.payment_proof}`}
-                    alt="Bukti pembayaran"
-                    className="w-full max-h-80 object-contain rounded-xl border border-gray-100 bg-gray-50"
-                  />
-                ) : (
-                  <p className="text-sm text-gray-400 bg-gray-50 rounded-xl p-4 text-center">
-                    Belum ada bukti pembayaran yang diunggah untuk booking ini.
-                  </p>
-                )}
               </div>
             </div>
           )}

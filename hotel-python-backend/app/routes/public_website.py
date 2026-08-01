@@ -169,7 +169,6 @@ def lookup_booking(reservation_no: str, email: str, db: Session = Depends(get_db
         "payment_amount": reservation.payment_amount,
         "deposit": reservation.deposit,
         "balance": reservation.balance,
-        "payment_proof": f"/{reservation.payment_proof}" if reservation.payment_proof else None,
         "payment_deadline": reservation.payment_deadline,
     }
 

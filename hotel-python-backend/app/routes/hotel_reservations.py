@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+﻿from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 import os
 import logging
 import uuid
@@ -116,7 +116,7 @@ def create_hotel_reservation(
             del reservation_data['arrival_time']
         
         # Calculate payment deadline based on business rules (2 hours if unpaid/Pending, else 24 hours)
-        is_paid = reservation_data.get('transaction_status') == 'Confirmed' or reservation_data.get('payment_proof') is not None
+        is_paid = reservation_data.get('transaction_status') == 'Confirmed'
         
         # Determine duration: 2 hours if not paid, otherwise maybe not needed or 24 hrs
         deadline_hours = 24 if is_paid else 2
@@ -288,46 +288,3 @@ def cancel_reservation_by_number(
     db.commit()
 
     return {"message": "Reservation cancelled successfully"}
-ALLOWED_PROOF_EXTENSIONS = {"jpg", "jpeg", "png", "webp"}
-
-@router.post("/number/{reservation_no}/upload-proof")
-async def upload_payment_proof(
-    reservation_no: str,
-    file: UploadFile = File(...),
-    db: Session = Depends(get_db)
-):
-    db_reservation = db.query(HotelReservation).filter(HotelReservation.reservation_no == reservation_no).first()
-    if db_reservation is None:
-        raise HTTPException(status_code=404, detail="Reservation not found")
-
-    if db_reservation.transaction_status != 'Pending':
-        raise HTTPException(
-            status_code=409,
-            detail="Payment proof can only be uploaded for a pending reservation."
-        )
-
-    if not file.content_type or not file.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="File must be an image")
-
-    ext = file.filename.rsplit(".", 1)[-1].lower() if file.filename and "." in file.filename else ""
-    if ext not in ALLOWED_PROOF_EXTENSIONS:
-        raise HTTPException(status_code=400, detail="Unsupported file type. Allowed: jpg, jpeg, png, webp")
-
-    # Filename is fully synthetic (no user input) to rule out path traversal.
-    filename = f"{uuid.uuid4().hex}.{ext}"
-    file_path = os.path.join("uploads/payment_proofs", filename)
-    
-    try:
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Could not save file: {e}")
-    
-    db_reservation.payment_proof = file_path
-    db_reservation.payment_proof_at = datetime.now()
-    if db_reservation.transaction_status == 'Pending':
-        db_reservation.transaction_status = 'Confirmed'
-    
-    db.commit()
-    
-    return {"message": "Payment proof uploaded successfully", "file_path": f"/uploads/payment_proofs/{filename}"}
