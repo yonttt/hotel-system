@@ -106,8 +106,13 @@ async def upload_website_image(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Gagal menyimpan file: {e}")
 
-    # str(request.base_url) already ends with a trailing slash.
-    url = f"{str(request.base_url).rstrip('/')}/{WEBSITE_UPLOAD_DIR}/{filename}"
+    # Build the public URL. Prefer an explicitly configured PUBLIC_API_URL (set on the
+    # server, e.g. https://api.evahotel.web.id) so the stored image URL is always the
+    # correct public https:// address. Falling back to request.base_url is only safe for
+    # local dev: behind a reverse proxy it can resolve to http:// (blocked on the https
+    # website as mixed content) or an internal host, breaking the image.
+    public_base = os.getenv("PUBLIC_API_URL", "").rstrip("/") or str(request.base_url).rstrip("/")
+    url = f"{public_base}/{WEBSITE_UPLOAD_DIR}/{filename}"
     return {"url": url, "message": "Gambar berhasil diunggah"}
 
 
