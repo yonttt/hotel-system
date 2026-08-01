@@ -78,6 +78,13 @@ htmlcov/
 # Database dumps / backups (contain guest PII — never commit)
 *.sql
 
+# Uploaded media (room/hotel/gallery photos, payment proofs).
+# These live only on the server's disk. Ignoring the folder keeps "git clean"
+# during redeploy from wiping uploaded photos, so they PERSIST across deploys.
+# The backend recreates the folders on startup, so a fresh clone is fine too.
+hotel-python-backend/uploads/
+uploads/
+
 # Frontend source: re-include src/lib (the Python "lib/" rule above otherwise hides
 # WEBSITE-Hotel/src/lib/email.js, which the public site needs to build)
 !WEBSITE-Hotel/src/lib/
