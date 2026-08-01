@@ -63,7 +63,7 @@ export default function FeaturedHotels() {
           <h2 className="section-title mb-4">Hotel-Hotel Pilihan</h2>
           <div className="gold-divider mb-6" />
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Temukan koleksi hotel dan resort terbaik kami beserta tipe kamar unggulannya
+            Temukan koleksi hotel terbaik kami beserta tipe kamar unggulannya
           </p>
         </div>
 

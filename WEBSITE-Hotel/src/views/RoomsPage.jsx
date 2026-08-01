@@ -241,8 +241,8 @@ export default function RoomsPage() {
             <Link to="/contact" className="btn-gold rounded-lg">
               Hubungi Kami
             </Link>
-            <a href="tel:+62211234567" className="btn-outline-white rounded-lg">
-              +62 21 1234 567
+            <a href="tel:+62218580224" className="btn-outline-white rounded-lg">
+              +62 21 8580224
             </a>
           </div>
         </div>

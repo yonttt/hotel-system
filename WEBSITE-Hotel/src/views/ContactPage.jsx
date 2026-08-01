@@ -165,7 +165,7 @@ export default function ContactPage() {
                       value={formData.email}
                       onChange={handleChange}
                       required
-                      placeholder="john@example.com"
+                      placeholder="nama@email.com"
                       className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none 
                         focus:border-gold-400 focus:ring-2 focus:ring-gold-400/20 transition-all"
                     />

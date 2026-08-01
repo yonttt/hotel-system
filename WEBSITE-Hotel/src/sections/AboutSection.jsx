@@ -5,23 +5,23 @@ import { fetchCMSContent } from '../data/hotels'
 const features = [
   {
     icon: Sparkles,
-    title: 'Pengalaman Mewah',
-    description: 'Setiap detail dirancang untuk memberikan kenyamanan dan kemewahan terbaik bagi tamu kami.',
+    title: 'Harga Terjangkau',
+    description: 'Kamar bersih dan nyaman dengan harga yang ramah di kantong.',
   },
   {
     icon: ShieldCheck,
-    title: 'Pelayanan Terpercaya',
-    description: 'Lebih dari dua dekade melayani jutaan tamu domestik dan mancanegara.',
+    title: 'Melayani Sejak 2003',
+    description: 'Pengalaman panjang mengelola budget hotel di berbagai kota di Indonesia.',
   },
   {
     icon: Heart,
-    title: 'Sentuhan Personal',
-    description: 'Pengalaman spesial yang dipersonalisasi dengan keunikan dan kebutuhan setiap tamu.',
+    title: 'Lokasi Strategis',
+    description: 'Berada di pusat kota, dekat stasiun, pusat perbelanjaan, dan tempat wisata.',
   },
   {
     icon: Leaf,
-    title: 'Ramah Lingkungan',
-    description: 'Komitmen terhadap keberlanjutan dan pelestarian lingkungan di setiap properti.',
+    title: 'Bersih & Nyaman',
+    description: 'Mengusung moto “Murah dan Bersih” di setiap properti kami.',
   },
 ]
 
@@ -63,7 +63,7 @@ export default function AboutSection() {
           <div className="gold-divider mb-6" />
           <p className="text-gray-600 max-w-3xl mx-auto text-lg leading-relaxed">
             {cms.about_description ||
-              'Kami adalah merek paling terpercaya dan dikenal secara luas yang telah melayani jutaan tamu domestik dan mancanegara setiap bulan selama lebih dari dua dekade.'}
+              'Eva Group adalah jaringan budget hotel yang mengutamakan kebersihan dan pelayanan, hadir di berbagai kota di Indonesia sejak 2003 dengan moto “Murah dan Bersih”.'}
           </p>
         </div>
 
@@ -105,30 +105,30 @@ export default function AboutSection() {
             </h3>
             <div className="gold-divider-left mb-6" />
             <p className="text-gray-600 leading-relaxed mb-6">
-              Keunikan pengalaman lokal yang dipadukan dengan karakter autentik. Melalui ide-ide 
-              yang inovatif dan pelayanan yang ramah, setiap hotel dan individu merasakan pengalaman 
-              spesial yang dipersonalisasi dengan setiap keunikan dan kebutuhan bagi setiap tamu.
+              Sejak 2003, Eva Group berkembang dari satu properti di Jakarta menjadi jaringan
+              budget hotel di beberapa kota. Kami mengutamakan kebersihan, kenyamanan, dan
+              pelayanan yang ramah dengan harga terjangkau.
             </p>
             <p className="text-gray-600 leading-relaxed mb-8">
-              Fasilitas modern, desain yang elegan, dan lokasi strategis menjadikan hotel kami
-              pilihan utama bagi wisatawan dan pelaku bisnis dari seluruh dunia.
+              Fasilitas standar yang lengkap dan lokasi strategis di pusat kota menjadikan hotel
+              kami pilihan tepat bagi backpacker maupun pelaku perjalanan bisnis.
             </p>
             <div className="flex flex-wrap gap-6">
               <div>
-                <p className="text-3xl font-display font-bold text-gold-600">50+</p>
-                <p className="text-sm text-gray-500">Hotel & Resort</p>
+                <p className="text-3xl font-display font-bold text-gold-600">5</p>
+                <p className="text-sm text-gray-500">Hotel</p>
               </div>
               <div>
-                <p className="text-3xl font-display font-bold text-gold-600">15K+</p>
+                <p className="text-3xl font-display font-bold text-gold-600">300+</p>
                 <p className="text-sm text-gray-500">Kamar</p>
               </div>
               <div>
-                <p className="text-3xl font-display font-bold text-gold-600">2M+</p>
-                <p className="text-sm text-gray-500">Tamu/Tahun</p>
+                <p className="text-3xl font-display font-bold text-gold-600">4</p>
+                <p className="text-sm text-gray-500">Kota</p>
               </div>
               <div>
-                <p className="text-3xl font-display font-bold text-gold-600">98%</p>
-                <p className="text-sm text-gray-500">Kepuasan</p>
+                <p className="text-3xl font-display font-bold text-gold-600">2003</p>
+                <p className="text-sm text-gray-500">Sejak</p>
               </div>
             </div>
           </div>

@@ -95,19 +95,19 @@ export default function Footer() {
             </p>
             {/* Social */}
             <div className="flex gap-3">
-              <a href="https://facebook.com/hotelresort" target="_blank" rel="noopener noreferrer"
+              <a href="#" target="_blank" rel="noopener noreferrer"
                   className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-gold-500 transition-colors duration-300" aria-label="facebook">
                 <span className="text-xs uppercase font-bold">F</span>
               </a>
-              <a href="https://instagram.com/hotelresort" target="_blank" rel="noopener noreferrer"
+              <a href="#" target="_blank" rel="noopener noreferrer"
                   className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-gold-500 transition-colors duration-300" aria-label="instagram">
                 <span className="text-xs uppercase font-bold">I</span>
               </a>
-              <a href="https://twitter.com/hotelresort" target="_blank" rel="noopener noreferrer"
+              <a href="#" target="_blank" rel="noopener noreferrer"
                   className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-gold-500 transition-colors duration-300" aria-label="twitter">
                 <span className="text-xs uppercase font-bold">T</span>
               </a>
-              <a href="https://youtube.com/hotelresort" target="_blank" rel="noopener noreferrer"
+              <a href="#" target="_blank" rel="noopener noreferrer"
                   className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-gold-500 transition-colors duration-300" aria-label="youtube">
                 <span className="text-xs uppercase font-bold">Y</span>
               </a>

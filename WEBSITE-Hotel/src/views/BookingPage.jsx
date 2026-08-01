@@ -650,7 +650,7 @@ export default function BookingPage() {
                       </div>
                       <div>
                         <label className="block text-sm font-semibold text-hotel-dark mb-2">Email *</label>
-                        <input type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="john@example.com"
+                        <input type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="nama@email.com"
                           className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400 focus:ring-2 focus:ring-gold-400/20" />
                       </div>
                       <div>

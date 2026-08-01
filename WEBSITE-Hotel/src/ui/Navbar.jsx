@@ -232,11 +232,11 @@ export default function Navbar() {
             </div>
 
             <div className="mt-6 text-white/50 text-xs space-y-2">
-              <a href="tel:+62211234567" className="flex items-center gap-2 hover:text-gold-400 transition-colors">
+              <a href="tel:+62218580224" className="flex items-center gap-2 hover:text-gold-400 transition-colors">
                 <Phone size={14} />
-                +62 21 1234 567
+                +62 21 8580224
               </a>
-              <p>info@hotelresort.com</p>
+              <p>info@hotelnewidola.com</p>
             </div>
           </div>
         </div>

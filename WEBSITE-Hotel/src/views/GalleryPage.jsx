@@ -7,7 +7,7 @@ const categories = [
   { key: 'exterior', label: 'Eksterior' },
   { key: 'rooms', label: 'Kamar' },
   { key: 'dining', label: 'Kuliner' },
-  { key: 'spa', label: 'Spa' },
+  { key: 'facility', label: 'Fasilitas' },
 ]
 
 export default function GalleryPage() {
@@ -153,16 +153,16 @@ export default function GalleryPage() {
           <Instagram size={40} className="text-gold-400 mx-auto mb-4" />
           <h3 className="text-2xl font-display font-bold text-white mb-3">Ikuti Kami di Instagram</h3>
           <p className="text-white/50 text-sm mb-6">
-            Bagikan momen liburan Anda bersama kami dengan hashtag #HotelResortMoments
+            Bagikan momen liburan Anda bersama kami dengan hashtag #HotelNewIdola
           </p>
           <a
-            href="https://instagram.com/hotelresort"
+            href="#"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-full text-sm font-semibold hover:opacity-90 transition-opacity"
           >
             <Instagram size={18} />
-            @hotelresort
+            @hotelnewidola
           </a>
         </div>
       </section>
