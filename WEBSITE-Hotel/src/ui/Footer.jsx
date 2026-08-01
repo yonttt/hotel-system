@@ -14,12 +14,12 @@ const quickLinks = [
 ]
 
 const services = [
-  'Spa & Wellness',
-  'Restoran & Bar',
-  'Meeting & Events',
-  'Airport Transfer',
-  'Concierge Service',
-  'Laundry Service',
+  'Restoran',
+  'WiFi Gratis',
+  'Resepsionis 24 Jam',
+  'Area Parkir',
+  'Lift',
+  'Layanan Kamar',
 ]
 
 export default function Footer() {
@@ -90,8 +90,8 @@ export default function Footer() {
               </div>
             </Link>
             <p className="text-white/50 text-sm leading-relaxed mb-6">
-              Kami adalah merek paling terpercaya yang telah melayani jutaan tamu domestik dan 
-              mancanegara selama lebih dari dua dekade.
+              Eva Group mengelola jaringan budget hotel yang bersih dan terjangkau di berbagai
+              kota di Indonesia sejak 2003, dengan moto “Murah dan Bersih”.
             </p>
             {/* Social */}
             <div className="flex gap-3">
@@ -134,7 +134,7 @@ export default function Footer() {
 
           {/* Services */}
           <div>
-            <h4 className="text-lg font-display font-bold mb-6 text-gold-400">Layanan</h4>
+            <h4 className="text-lg font-display font-bold mb-6 text-gold-400">Fasilitas</h4>
             <ul className="space-y-3">
               {services.map((service) => (
                 <li key={service}>
@@ -153,7 +153,7 @@ export default function Footer() {
             <ul className="space-y-4">
               <li className="flex items-start gap-3 text-white/60 text-sm">
                 <MapPin size={16} className="text-gold-500 mt-0.5 shrink-0" />
-                <span>{cms.contact_address || 'Jl. Pramuka Raya No.26, Jakarta Timur, DKI Jakarta'}</span>
+                <span>{cms.contact_address || 'Jl. Pramuka Raya No. 26, Matraman, Jakarta Timur, DKI Jakarta 13120'}</span>
               </li>
               <li className="flex items-center gap-3 text-white/60 text-sm">
                 <Phone size={16} className="text-gold-500 shrink-0" />
@@ -172,39 +172,12 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Certifications Bar */}
-      <div className="border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-6">
-              <div className="text-center">
-                <div className="text-xs text-white/40 mb-1">Certified</div>
-                <div className="text-sm font-semibold text-white/70">ISO 9001</div>
-              </div>
-              <div className="w-px h-8 bg-white/10" />
-              <div className="text-center">
-                <div className="text-xs text-white/40 mb-1">Certified</div>
-                <div className="text-sm font-semibold text-white/70">ISO 14001</div>
-              </div>
-              <div className="w-px h-8 bg-white/10" />
-              <div className="text-center">
-                <div className="text-xs text-white/40 mb-1">Certified</div>
-                <div className="text-sm font-semibold text-white/70">ISO 45001</div>
-              </div>
-            </div>
-            <div className="text-white/30 text-xs">
-              Awards & Recognition ★ Top Hospitality Brand
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Bottom Bar */}
       <div className="border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-white/40 text-xs">
-              Copyright {new Date().getFullYear()} © Hotel & Resort. All rights reserved.
+              Copyright {new Date().getFullYear()} © Eva Hotel Management Group. All rights reserved.
             </p>
             <div className="flex items-center gap-6 text-xs text-white/40">
               <Link to="/about" className="hover:text-gold-400 transition-colors">Privacy Policy</Link>
