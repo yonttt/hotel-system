@@ -79,11 +79,11 @@ export default function RoomsSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-10 animate-on-scroll">
-          <p className="section-subtitle">{cms.rooms_subtitle || 'Akomodasi Premium'}</p>
+          <p className="section-subtitle">{cms.rooms_subtitle || 'Pilihan Kamar'}</p>
           <h2 className="section-title mb-4">{cms.rooms_title || 'Kamar'}</h2>
           <div className="gold-divider mb-6" />
           <p className="text-gray-600 max-w-2xl mx-auto">
-            {cms.rooms_description || 'Pilih dari berbagai tipe kamar yang dirancang untuk kenyamanan dan kemewahan maksimal'}
+            {cms.rooms_description || 'Pilih dari berbagai tipe kamar yang bersih dan nyaman dengan harga terjangkau'}
           </p>
         </div>
 
