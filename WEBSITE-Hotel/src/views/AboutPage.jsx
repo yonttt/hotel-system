@@ -21,10 +21,10 @@ const values = [
 ]
 
 const stats = [
-  { icon: Building2, number: '25+', label: 'Hotel & Akomodasi' },
+  { icon: Building2, number: '5', label: 'Hotel' },
   { icon: Globe, number: '4', label: 'Kota' },
-  { icon: Users, number: '500+', label: 'Karyawan' },
-  { icon: Award, number: '15+', label: 'Penghargaan' },
+  { icon: Users, number: '300+', label: 'Kamar' },
+  { icon: Award, number: '20+', label: 'Tahun' },
 ]
 
 export default function AboutPage() {
