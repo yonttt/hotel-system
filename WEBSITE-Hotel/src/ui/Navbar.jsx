@@ -87,14 +87,14 @@ export default function Navbar() {
                     <span className="text-white/20">|</span>
                     <button onClick={handleLogout} className="flex items-center gap-1 hover:text-gold-400 transition-colors">
                       <LogOut size={12} />
-                      Logout
+                      Keluar
                     </button>
                   </>
                 ) : (
                   <>
                     <Link to="/login" className="flex items-center gap-1 hover:text-gold-400 transition-colors">
                       <User size={12} />
-                      Login
+                      Masuk
                     </Link>
                     <span className="text-white/20">|</span>
                     <Link to="/register" className="flex items-center gap-1 hover:text-gold-400 transition-colors">
@@ -211,7 +211,7 @@ export default function Navbar() {
                   onClick={handleLogout}
                   className="block w-full border border-white/30 text-white text-center px-6 py-3 text-sm font-semibold tracking-wider hover:bg-white/10 transition-all duration-300 uppercase rounded"
                 >
-                  Logout
+                  Keluar
                 </button>
               ) : (
                 <>
@@ -219,7 +219,7 @@ export default function Navbar() {
                     to="/login"
                     className="block w-full bg-gold-500 text-white text-center px-6 py-3 text-sm font-semibold tracking-wider hover:bg-gold-400 transition-all duration-300 uppercase rounded"
                   >
-                    Login
+                    Masuk
                   </Link>
                   <Link
                     to="/register"

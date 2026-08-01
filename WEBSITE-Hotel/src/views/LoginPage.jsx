@@ -22,12 +22,12 @@ export default function LoginPage() {
       localStorage.setItem('customer_token', response.data.access_token);
       localStorage.setItem('customer_user', JSON.stringify(response.data.user));
       
-      showNotification('success', 'Logged in successfully');
+      showNotification('success', 'Berhasil masuk');
       setTimeout(() => {
         window.location.href = '/'; // Refresh to load avatar
       }, 1000);
     } catch (err) {
-      showNotification('error', 'Invalid email or password');
+      showNotification('error', 'Email atau password salah');
     } finally {
       setLoading(false);
     }
@@ -36,7 +36,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen py-32 flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl">
-        <h2 className="text-3xl font-bold text-center mb-6 text-hotel-dark">Sign In</h2>
+        <h2 className="text-3xl font-bold text-center mb-6 text-hotel-dark">Masuk</h2>
         
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
@@ -44,15 +44,15 @@ export default function LoginPage() {
             <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Kata Sandi</label>
             <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500" />
           </div>
           <button type="submit" disabled={loading} className="w-full btn-gold rounded-lg py-3">
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'Memproses...' : 'Masuk'}
           </button>
         </form>
         <p className="mt-4 text-center text-sm text-gray-600">
-          Don't have an account? <Link to="/register" className="text-gold-600 hover:underline">Register here</Link>
+          Belum punya akun? <Link to="/register" className="text-gold-600 hover:underline">Daftar di sini</Link>
         </p>
       </div>
     </div>

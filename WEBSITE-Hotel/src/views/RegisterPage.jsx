@@ -14,10 +14,10 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await hotelAPI.registerCustomer(formData);
-      showNotification('success', 'Registration successful! Please log in.');
+      showNotification('success', 'Pendaftaran berhasil! Silakan masuk.');
       navigate('/login');
     } catch (err) {
-      showNotification('error', err.response?.data?.detail || 'Registration failed');
+      showNotification('error', err.response?.data?.detail || 'Pendaftaran gagal');
     } finally {
       setLoading(false);
     }
@@ -26,11 +26,11 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen py-32 flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl">
-        <h2 className="text-3xl font-bold text-center mb-6 text-hotel-dark">Create Account</h2>
+        <h2 className="text-3xl font-bold text-center mb-6 text-hotel-dark">Buat Akun</h2>
         
         <form onSubmit={handleRegister} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
             <input type="text" required value={formData.full_name} onChange={(e) => setFormData({...formData, full_name: e.target.value})} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500" />
           </div>
           <div>
@@ -38,19 +38,19 @@ export default function RegisterPage() {
             <input type="email" required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Nomor Telepon</label>
             <input type="text" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Kata Sandi</label>
             <input type="password" required value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500" />
           </div>
           <button type="submit" disabled={loading} className="w-full btn-gold rounded-lg py-3">
-            {loading ? 'Registering...' : 'Create Account'}
+            {loading ? 'Memproses...' : 'Buat Akun'}
           </button>
         </form>
         <p className="mt-4 text-center text-sm text-gray-600">
-          Already have an account? <Link to="/login" className="text-gold-600 hover:underline">Sign In</Link>
+          Sudah punya akun? <Link to="/login" className="text-gold-600 hover:underline">Masuk</Link>
         </p>
       </div>
     </div>

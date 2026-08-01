@@ -58,7 +58,7 @@ export default function GalleryPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-hotel-dark/70 to-hotel-dark/50" />
         <div className="relative z-10 text-center">
-          <p className="text-gold-400 tracking-[0.4em] uppercase text-sm font-medium mb-4">Visual Journey</p>
+          <p className="text-gold-400 tracking-[0.4em] uppercase text-sm font-medium mb-4">Galeri Foto</p>
           <h1 className="text-4xl md:text-6xl font-display font-bold text-white mb-4">Galeri</h1>
           <div className="gold-divider" />
         </div>

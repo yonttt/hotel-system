@@ -93,7 +93,7 @@ export const specialOffers = [
   {
     id: 2, title: 'Menginap Hemat', description: 'Kamar bersih mulai Rp270.000 per malam, sudah termasuk WiFi dan sarapan.',
     discount: 'Mulai 270K', image: 'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800&q=80',
-    badge: 'Best Value', validUntil: 'Setiap hari', hotels: 5,
+    badge: 'Hemat', validUntil: 'Setiap hari', hotels: 5,
   },
   {
     id: 3, title: 'Pesan Langsung Online', description: 'Pesan lewat website resmi untuk konfirmasi cepat tanpa perantara.',

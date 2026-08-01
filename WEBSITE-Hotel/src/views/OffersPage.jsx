@@ -11,7 +11,7 @@ const extendedOffers = [
     description: 'Menginap beberapa malam dengan harga lebih hemat dan waktu check-out yang fleksibel.',
     discount: 'Hemat',
     image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80',
-    badge: 'Long Stay',
+    badge: 'Menginap Lama',
     validUntil: 'Setiap hari',
     hotels: 5,
     benefits: ['Harga lebih hemat', 'Sarapan', 'WiFi Gratis', 'Resepsionis 24 Jam'],
@@ -52,13 +52,13 @@ export default function OffersPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-hotel-dark/70 to-hotel-dark/50" />
         <div className="relative z-10 text-center">
-          <p className="text-gold-400 tracking-[0.4em] uppercase text-sm font-medium mb-4">Exclusive Deals</p>
+          <p className="text-gold-400 tracking-[0.4em] uppercase text-sm font-medium mb-4">Penawaran Spesial</p>
           <h1 className="text-4xl md:text-6xl font-display font-bold text-white mb-4">Penawaran Spesial</h1>
           <div className="gold-divider" />
         </div>
       </section>
 
-      {/* Best Rate Guarantee Banner */}
+      {/* Jaminan Harga Terbaik Banner */}
       <section className="bg-gold-500 py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -67,7 +67,7 @@ export default function OffersPage() {
                 <Check size={24} className="text-white" />
               </div>
               <div>
-                <h3 className="text-white font-display font-bold text-lg">Best Rate Guarantee</h3>
+                <h3 className="text-white font-display font-bold text-lg">Jaminan Harga Terbaik</h3>
                 <p className="text-white/80 text-sm">Harga terbaik dijamin hanya di website resmi kami</p>
               </div>
             </div>
