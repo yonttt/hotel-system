@@ -71,7 +71,7 @@ export default function OffersPage() {
                 <p className="text-white/80 text-sm">Harga terbaik dijamin hanya di website resmi kami</p>
               </div>
             </div>
-            <Link to="/contact" className="bg-white text-gold-600 px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-gold-50 transition-colors">
+            <Link to="/register" className="bg-white text-gold-600 px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-gold-50 transition-colors">
               Menjadi Member
             </Link>
           </div>
