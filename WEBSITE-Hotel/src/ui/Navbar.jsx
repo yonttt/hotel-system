@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, User, UserPlus, LogOut, Megaphone, Phone } from 'lucide-react'
+import { Menu, X, User, UserPlus, LogOut, Megaphone, Phone, ClipboardList } from 'lucide-react'
 import { fetchCMSContent } from '../data/hotels'
 
 // Shown until staff sets their own announcement in the CMS. Set it to empty in the
@@ -83,7 +83,12 @@ export default function Navbar() {
               <div className="flex items-center gap-3">
                 {isLoggedIn ? (
                   <>
-                    <span className="text-white/80">Hello, {firstName}</span>
+                    <span className="text-white/80">Halo, {firstName}</span>
+                    <span className="text-white/20">|</span>
+                    <Link to="/my-bookings" className="flex items-center gap-1 hover:text-gold-400 transition-colors">
+                      <ClipboardList size={12} />
+                      Riwayat Booking
+                    </Link>
                     <span className="text-white/20">|</span>
                     <button onClick={handleLogout} className="flex items-center gap-1 hover:text-gold-400 transition-colors">
                       <LogOut size={12} />
@@ -207,12 +212,20 @@ export default function Navbar() {
 
             <div className="mt-8 pt-6 border-t border-white/10 gap-3 flex flex-col">
               {isLoggedIn ? (
-                <button
-                  onClick={handleLogout}
-                  className="block w-full border border-white/30 text-white text-center px-6 py-3 text-sm font-semibold tracking-wider hover:bg-white/10 transition-all duration-300 uppercase rounded"
-                >
-                  Keluar
-                </button>
+                <>
+                  <Link
+                    to="/my-bookings"
+                    className="block w-full bg-gold-500 text-white text-center px-6 py-3 text-sm font-semibold tracking-wider hover:bg-gold-400 transition-all duration-300 uppercase rounded"
+                  >
+                    Riwayat Booking
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full border border-white/30 text-white text-center px-6 py-3 text-sm font-semibold tracking-wider hover:bg-white/10 transition-all duration-300 uppercase rounded"
+                  >
+                    Keluar
+                  </button>
+                </>
               ) : (
                 <>
                   <Link

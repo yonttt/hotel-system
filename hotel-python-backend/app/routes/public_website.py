@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, Depends, HTTPException
+﻿from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 
@@ -229,3 +229,34 @@ def login_customer(form_data: OAuth2PasswordRequestForm = Depends(), db: Session
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/my-bookings")
+def get_my_bookings(authorization: str = Header(default=""), db: Session = Depends(get_db)):
+    """Return the booking history for the logged-in customer.
+
+    The customer JWT carries their account email in `sub`; bookings are matched by
+    the email used at reservation time. Only tokens with role=customer are accepted.
+    """
+    from jose import jwt, JWTError
+    from app.config.config import settings
+
+    if not authorization.lower().startswith("bearer "):
+        raise HTTPException(status_code=401, detail="Silakan masuk terlebih dahulu.")
+    token = authorization.split(" ", 1)[1]
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Sesi berakhir. Silakan masuk lagi.")
+    if payload.get("role") != "customer":
+        raise HTTPException(status_code=403, detail="Akun ini bukan akun customer.")
+    email = payload.get("sub")
+
+    rows = db.execute(text("""
+        SELECT reservation_no, hotel_name, room_type, arrival_date, departure_date,
+               nights, transaction_status, payment_amount, deposit, balance, created_at
+        FROM hotel_reservations
+        WHERE email = :email
+        ORDER BY created_at DESC
+    """), {"email": email}).fetchall()
+    return [dict(r._mapping) for r in rows]

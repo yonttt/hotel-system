@@ -22,6 +22,10 @@ export const hotelAPI = {
   // Customer Auth
   loginCustomer: (data) => api.post('/public/login', data, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}),
   registerCustomer: (data) => api.post('/public/register', data),
+  // Booking history for the logged-in customer (matched by their account email)
+  getMyBookings: () => api.get('/public/my-bookings', {
+    headers: { Authorization: `Bearer ${localStorage.getItem('customer_token')}` },
+  }),
 
   // Properties / Hotels
   getProperties: () => api.get('/properties/'),

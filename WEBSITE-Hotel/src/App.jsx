@@ -15,6 +15,7 @@ import HotelsPage from './views/HotelsPage'
 import HotelDetailPage from './views/HotelDetailPage'
 import LoginPage from './views/LoginPage'
 import RegisterPage from './views/RegisterPage'
+import MyBookingsPage from './views/MyBookingsPage'
 import TopProgressBar from './ui/TopProgressBar'
 import HotelChatbot from './ui/HotelChatbot'
 
@@ -39,6 +40,7 @@ function App() {
           <Route path="/hotels/:id" element={<HotelDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/my-bookings" element={<MyBookingsPage />} />
         </Routes>
       </main>
       <Footer />
