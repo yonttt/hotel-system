@@ -693,6 +693,13 @@ const WebsiteEditor = () => {
   const isDataTab = isRoomsTab || isHotelsTab; // special editors that save per-item
   const activeFields = SECTIONS.find((s) => s.key === activeSection)?.fields || [];
 
+  // The preview follows whatever section is being edited: room types -> /rooms,
+  // hotel profiles -> /hotels, contact -> /contact; the rest live on the homepage.
+  const previewPath = isRoomsTab ? '/rooms'
+    : isHotelsTab ? '/hotels'
+    : activeSection === 'contact' ? '/contact'
+    : '/';
+
   return (
     <Layout>
       <div style={{ padding: '16px' }}>
@@ -717,7 +724,7 @@ const WebsiteEditor = () => {
             <button type="button" onClick={reloadPreview} style={secondaryBtn}>
               &#8635; Muat ulang preview
             </button>
-            <a href={PUBLIC_SITE_URL} target="_blank" rel="noopener noreferrer" style={{ ...secondaryBtn, textDecoration: 'none', display: 'inline-block' }}>
+            <a href={`${PUBLIC_SITE_URL}${previewPath}`} target="_blank" rel="noopener noreferrer" style={{ ...secondaryBtn, textDecoration: 'none', display: 'inline-block' }}>
               Buka di tab baru &#8599;
             </a>
             {focused && !isDataTab && (
@@ -873,13 +880,13 @@ const WebsiteEditor = () => {
                   gap: '8px',
                 }}
               >
-                <span>Preview Website Publik — {PUBLIC_SITE_URL}</span>
+                <span>Preview Website Publik — {PUBLIC_SITE_URL}{previewPath}</span>
                 <span style={{ color: '#9ca3af' }}>Pastikan website publik sedang berjalan</span>
               </div>
               <iframe
-                key={previewKey}
+                key={`${previewKey}-${previewPath}`}
                 title="Preview Website Publik"
-                src={`${PUBLIC_SITE_URL}/?cmsPreview=${previewKey}`}
+                src={`${PUBLIC_SITE_URL}${previewPath}?cmsPreview=${previewKey}`}
                 style={{ flex: 1, width: '100%', border: 'none' }}
               />
             </div>
