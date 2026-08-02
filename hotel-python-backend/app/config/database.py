@@ -61,6 +61,23 @@ def ensure_payment_columns():
     }
     try:
         with engine.begin() as conn:
+            # Table backing the "forgot password" flow. We store only a SHA-256 hash
+            # of the reset token (never the raw token), an expiry, and a used flag —
+            # so a database leak can't be used to reset anyone's password.
+            conn.execute(text(
+                """
+                CREATE TABLE IF NOT EXISTS password_reset_tokens (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    email VARCHAR(255) NOT NULL,
+                    token_hash CHAR(64) NOT NULL,
+                    expires_at DATETIME NOT NULL,
+                    used TINYINT(1) NOT NULL DEFAULT 0,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    INDEX idx_prt_token_hash (token_hash),
+                    INDEX idx_prt_email (email)
+                )
+                """
+            ))
             for table, columns in table_columns.items():
                 for name, ddl in columns.items():
                     exists = conn.execute(text(

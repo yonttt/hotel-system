@@ -22,6 +22,9 @@ export const hotelAPI = {
   // Customer Auth
   loginCustomer: (data) => api.post('/public/login', data, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}),
   registerCustomer: (data) => api.post('/public/register', data),
+  // Password reset ("forgot password") flow
+  forgotPassword: (email) => api.post('/public/forgot-password', { email }),
+  resetPassword: (token, newPassword) => api.post('/public/reset-password', { token, new_password: newPassword }),
   // Booking history for the logged-in customer (matched by their account email)
   getMyBookings: () => api.get('/public/my-bookings', {
     headers: { Authorization: `Bearer ${localStorage.getItem('customer_token')}` },

@@ -57,6 +57,10 @@ class Settings(BaseSettings):
     # API settings
     API_V1_STR: str = os.getenv("API_V1_STR", "/api")
     PROJECT_NAME: str = os.getenv("PROJECT_NAME", "Hotel Management System")
+
+    # Public website base URL — used to build links inside emails (e.g. the
+    # password-reset link). Must point at the customer-facing site, not the API.
+    PUBLIC_SITE_URL: str = os.getenv("PUBLIC_SITE_URL", "https://evahotel.web.id")
     
     # Security settings
     RATE_LIMIT_PER_MINUTE: int = int(os.getenv("RATE_LIMIT_PER_MINUTE", "200"))

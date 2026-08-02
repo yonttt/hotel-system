@@ -172,9 +172,18 @@ def lookup_booking(reservation_no: str, email: str, db: Session = Depends(get_db
         "payment_deadline": reservation.payment_deadline,
     }
 
+import secrets
+import hashlib
+import logging
+from datetime import datetime, timedelta
+
 from fastapi.security import OAuth2PasswordRequestForm
 from app.config.security import get_password_hash, verify_password, create_access_token
+from app.config.config import settings
+from app.utils.email_sender import send_email, password_reset_email_html
 from pydantic import BaseModel
+
+logger = logging.getLogger(__name__)
 
 class CustomerRegister(BaseModel):
     email: str
@@ -260,3 +269,117 @@ def get_my_bookings(authorization: str = Header(default=""), db: Session = Depen
         ORDER BY created_at DESC
     """), {"email": email}).fetchall()
     return [dict(r._mapping) for r in rows]
+
+
+# ---------------------------------------------------------------------------
+# Password reset ("forgot password") flow
+#
+# Security design:
+#  - The reset link carries a 32-byte random token (secrets.token_urlsafe).
+#  - Only the SHA-256 HASH of that token is stored — a DB leak can't reset accounts.
+#  - Each token expires after 30 minutes and can be used only once.
+#  - /forgot-password always returns the same generic message whether or not the
+#    email exists, so attackers can't use it to discover which emails are registered.
+# ---------------------------------------------------------------------------
+
+RESET_TOKEN_TTL_MINUTES = 30
+_GENERIC_FORGOT_MESSAGE = {
+    "message": "Jika email tersebut terdaftar, kami telah mengirim tautan untuk mengatur ulang kata sandi."
+}
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+
+
+@router.post("/forgot-password")
+def forgot_password(data: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    """Start the reset flow: email a one-time, time-limited reset link."""
+    email = data.email.strip().lower()
+
+    user = db.execute(
+        text("SELECT id, email, full_name FROM customer_accounts WHERE LOWER(email) = :email"),
+        {"email": email},
+    ).first()
+
+    # Never reveal whether the account exists (prevents account enumeration).
+    if not user:
+        return _GENERIC_FORGOT_MESSAGE
+
+    raw_token = secrets.token_urlsafe(32)
+    token_hash = hashlib.sha256(raw_token.encode()).hexdigest()
+    expires_at = datetime.utcnow() + timedelta(minutes=RESET_TOKEN_TTL_MINUTES)
+
+    try:
+        # Invalidate any earlier unused tokens for this account, then store the new one.
+        db.execute(
+            text("UPDATE password_reset_tokens SET used = 1 WHERE email = :email AND used = 0"),
+            {"email": user.email},
+        )
+        db.execute(
+            text("INSERT INTO password_reset_tokens (email, token_hash, expires_at) "
+                 "VALUES (:email, :hash, :exp)"),
+            {"email": user.email, "hash": token_hash, "exp": expires_at},
+        )
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        logger.error("forgot_password: failed to store token: %s", e)
+        # Still return the generic message so the flow doesn't leak internals.
+        return _GENERIC_FORGOT_MESSAGE
+
+    reset_link = f"{settings.PUBLIC_SITE_URL.rstrip('/')}/reset-password?token={raw_token}"
+    # Logged so a developer can retrieve the link if SMTP isn't configured yet.
+    logger.info("Password reset link for %s: %s", user.email, reset_link)
+
+    send_email(
+        to_email=user.email,
+        subject="Atur Ulang Kata Sandi — Eva Group Hotel",
+        html_body=password_reset_email_html(user.full_name, reset_link),
+    )
+
+    return _GENERIC_FORGOT_MESSAGE
+
+
+@router.post("/reset-password")
+def reset_password(data: ResetPasswordRequest, db: Session = Depends(get_db)):
+    """Complete the reset flow: verify the token and set the new password."""
+    if len(data.new_password) < 6:
+        raise HTTPException(status_code=400, detail="Kata sandi minimal 6 karakter.")
+
+    token_hash = hashlib.sha256(data.token.strip().encode()).hexdigest()
+    row = db.execute(
+        text("SELECT id, email, expires_at, used FROM password_reset_tokens "
+             "WHERE token_hash = :hash"),
+        {"hash": token_hash},
+    ).first()
+
+    if not row or row.used or row.expires_at < datetime.utcnow():
+        raise HTTPException(
+            status_code=400,
+            detail="Tautan reset tidak valid atau sudah kedaluwarsa. Silakan minta tautan baru.",
+        )
+
+    try:
+        hashed_pw = get_password_hash(data.new_password)
+        db.execute(
+            text("UPDATE customer_accounts SET password = :pw WHERE email = :email"),
+            {"pw": hashed_pw, "email": row.email},
+        )
+        # One-time use: burn the token so the same link can't be replayed.
+        db.execute(
+            text("UPDATE password_reset_tokens SET used = 1 WHERE id = :id"),
+            {"id": row.id},
+        )
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        logger.error("reset_password: failed to update password: %s", e)
+        raise HTTPException(status_code=500, detail="Gagal mengubah kata sandi. Coba lagi nanti.")
+
+    return {"message": "Kata sandi berhasil diubah. Silakan masuk dengan kata sandi baru Anda."}

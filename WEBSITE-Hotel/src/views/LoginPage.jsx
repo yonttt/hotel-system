@@ -47,6 +47,9 @@ export default function LoginPage() {
             <label className="block text-sm font-medium text-gray-700 mb-1">Kata Sandi</label>
             <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500" />
           </div>
+          <div className="text-right -mt-1">
+            <Link to="/forgot-password" className="text-sm text-gold-600 hover:underline">Lupa kata sandi?</Link>
+          </div>
           <button type="submit" disabled={loading} className="w-full btn-gold rounded-lg py-3">
             {loading ? 'Memproses...' : 'Masuk'}
           </button>
