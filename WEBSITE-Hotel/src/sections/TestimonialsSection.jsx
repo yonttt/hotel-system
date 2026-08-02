@@ -65,11 +65,9 @@ export default function TestimonialsSection() {
                 ))}
               </div>
               <div className="flex items-center gap-3">
-                <img
-                  src={item.avatar}
-                  alt={item.name}
-                  className="w-12 h-12 rounded-full object-cover border-2 border-gold-500/50"
-                />
+                <div className="w-12 h-12 rounded-full border-2 border-gold-500/50 bg-gold-500/20 flex items-center justify-center text-gold-300 font-bold text-sm shrink-0">
+                  {item.name.replace(/[^A-Za-z]/g, '')}
+                </div>
                 <div>
                   <p className="text-white font-semibold text-sm">{item.name}</p>
                   <p className="text-white/50 text-xs">{item.role}</p>
@@ -83,10 +81,10 @@ export default function TestimonialsSection() {
         <div className="mt-16 text-center animate-on-scroll">
           <div className="inline-flex flex-col sm:flex-row items-center gap-4 bg-gold-500/10 border border-gold-500/30 rounded-2xl px-8 py-6">
             <div className="text-left">
-              <h3 className="text-xl font-display font-bold text-white">Best Rate Guarantee</h3>
+              <h3 className="text-xl font-display font-bold text-white">Jaminan Harga Terbaik</h3>
               <p className="text-white/60 text-sm">Temukan harga terbaik langsung di website kami</p>
             </div>
-            <Link to="/contact" className="bg-gold-500 text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-gold-400 transition-colors whitespace-nowrap">
+            <Link to="/register" className="bg-gold-500 text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-gold-400 transition-colors whitespace-nowrap">
               Menjadi Member
             </Link>
           </div>

@@ -5,7 +5,6 @@ import FeaturedHotels from '../sections/FeaturedHotels'
 import RoomsSection from '../sections/RoomsSection'
 import SpecialOffers from '../sections/SpecialOffers'
 import TestimonialsSection from '../sections/TestimonialsSection'
-import NewsSection from '../sections/NewsSection'
 import InstagramFeed from '../sections/InstagramFeed'
 
 export default function HomePage() {
@@ -18,7 +17,6 @@ export default function HomePage() {
       <FeaturedHotels />
       <SpecialOffers />
       <TestimonialsSection />
-      <NewsSection />
       <InstagramFeed />
     </>
   )
