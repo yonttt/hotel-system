@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Tag, Clock, Building2, Check } from 'lucide-react'
 import { specialOffers } from '../data/hotels'
@@ -30,18 +29,6 @@ const extendedOffers = [
 ]
 
 export default function OffersPage() {
-  const [nlEmail, setNlEmail] = useState('')
-  const [nlSuccess, setNlSuccess] = useState(false)
-
-  const handleNewsletter = (e) => {
-    e.preventDefault()
-    if (nlEmail) {
-      setNlSuccess(true)
-      setNlEmail('')
-      setTimeout(() => setNlSuccess(false), 4000)
-    }
-  }
-
   return (
     <>
       {/* Hero Banner */}
@@ -139,34 +126,6 @@ export default function OffersPage() {
         </div>
       </section>
 
-      {/* Newsletter CTA */}
-      <section className="relative py-20 bg-hotel-dark">
-        <div className="max-w-4xl mx-auto text-center px-4">
-          <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-4">
-            Jangan Lewatkan Penawaran Terbaru
-          </h2>
-          <p className="text-white/60 mb-8">
-            Daftar newsletter kami dan dapatkan notifikasi penawaran eksklusif langsung di inbox
-          </p>
-          <form className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto" onSubmit={handleNewsletter}>
-            <input
-              type="email"
-              placeholder="Email Anda"
-              value={nlEmail}
-              onChange={(e) => setNlEmail(e.target.value)}
-              required
-              className="w-full bg-white/10 border border-white/20 rounded-lg px-5 py-3 text-white text-sm 
-                placeholder-white/40 focus:outline-none focus:border-gold-400 transition-all"
-            />
-            <button className="bg-gold-500 text-white px-8 py-3 rounded-lg text-sm font-semibold hover:bg-gold-400 transition-colors whitespace-nowrap">
-              {nlSuccess ? '✓ Terdaftar!' : 'Daftar'}
-            </button>
-          </form>
-          {nlSuccess && (
-            <p className="text-green-400 text-sm mt-3">Terima kasih! Anda akan menerima penawaran eksklusif.</p>
-          )}
-        </div>
-      </section>
     </>
   )
 }

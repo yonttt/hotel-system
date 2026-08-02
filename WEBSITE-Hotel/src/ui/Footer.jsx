@@ -23,22 +23,11 @@ const services = [
 ]
 
 export default function Footer() {
-  const [email, setEmail] = useState('')
-  const [subscribed, setSubscribed] = useState(false)
   const [cms, setCms] = useState({})
 
   useEffect(() => {
     fetchCMSContent().then(setCms).catch(() => {})
   }, [])
-
-  const handleNewsletter = (e) => {
-    e.preventDefault()
-    if (email) {
-      setSubscribed(true)
-      setEmail('')
-      setTimeout(() => setSubscribed(false), 4000)
-    }
-  }
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -46,35 +35,6 @@ export default function Footer() {
 
   return (
     <footer className="bg-hotel-dark text-white">
-      {/* Newsletter */}
-      <div className="border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-              <h3 className="text-2xl font-display font-bold mb-1">Dapatkan Penawaran Eksklusif</h3>
-              <p className="text-white/50 text-sm">Daftar newsletter dan dapatkan promo spesial langsung di inbox Anda</p>
-            </div>
-            <form className="flex w-full md:w-auto gap-2" onSubmit={handleNewsletter}>
-              <input
-                type="email"
-                placeholder="Alamat email Anda"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full md:w-80 bg-white/10 border border-white/20 rounded-lg px-5 py-3 text-sm 
-                  text-white placeholder-white/40 focus:outline-none focus:border-gold-400 focus:ring-1 focus:ring-gold-400/50 transition-all"
-              />
-              <button className="bg-gold-500 hover:bg-gold-400 text-white px-6 py-3 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap">
-                {subscribed ? '✓ Terdaftar!' : 'Daftar'}
-              </button>
-            </form>
-            {subscribed && (
-              <p className="text-green-400 text-sm mt-2 md:mt-0">Terima kasih! Anda akan menerima penawaran eksklusif.</p>
-            )}
-          </div>
-        </div>
-      </div>
-
       {/* Main Footer */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
