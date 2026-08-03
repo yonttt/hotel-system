@@ -3,6 +3,7 @@ import { apiService } from '../../api/api';
 import Layout from '../../ui/Layout';
 import { useAuth } from '../../state/AuthContext';
 import useHotels from '../../logic/useHotels';
+import { formatDate, formatCurrencyIDR as formatCurrency } from '../../utils/formatters';
 
 const LaundryPage = () => {
   const { user } = useAuth();
@@ -79,16 +80,6 @@ const LaundryPage = () => {
 
   const canEdit = () => ['admin', 'manager'].includes(user?.role?.toLowerCase());
 
-  const formatCurrency = (amount) => {
-    if (!amount) return '0';
-    return parseFloat(amount).toLocaleString('id-ID');
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return `${date.getDate()} ${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`;
-  };
 
   // Calculate total price when quantity or unit_price changes
   const handleFormChange = (field, value) => {

@@ -5,6 +5,7 @@ import Button from './Button';
 import DataTable from './DataTable';
 import { useAuth } from '../state/AuthContext';
 import useHotels from '../logic/useHotels';
+import { formatDate, formatCurrencyIDR as formatCurrency } from '../utils/formatters';
 
 /**
  * Reusable Adjustment Page component for all adjustment categories.
@@ -96,16 +97,6 @@ const AdjustmentPageTemplate = ({ category, title, subtitle, icon, adjTypes = []
 
   const canEdit = () => ['admin', 'manager'].includes(user?.role?.toLowerCase());
 
-  const formatCurrency = (amount) => {
-    if (!amount) return '0';
-    return parseFloat(amount).toLocaleString('id-ID');
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return `${date.getDate()} ${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`;
-  };
 
   const handleFormChange = (field, value) => {
     const updated = { ...formData, [field]: value };
