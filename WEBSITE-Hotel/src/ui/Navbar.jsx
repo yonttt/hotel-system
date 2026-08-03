@@ -2,6 +2,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { Menu, X, User, UserPlus, LogOut, Megaphone, Phone, ClipboardList } from 'lucide-react'
 import { fetchCMSContent } from '../data/hotels'
+import { getCustomerFirstName } from '../utils/customer'
 
 // Shown until staff sets their own announcement in the CMS. Set it to empty in the
 // editor to hide the announcement bar entirely.
@@ -51,14 +52,7 @@ export default function Navbar() {
 
   // Customer auth state (lives in the top bar now).
   const isLoggedIn = !!localStorage.getItem('customer_token')
-  const firstName =
-    (() => {
-      try {
-        return JSON.parse(localStorage.getItem('customer_user'))?.full_name?.split(' ')[0]
-      } catch {
-        return null
-      }
-    })() || 'User'
+  const firstName = getCustomerFirstName() || 'User'
   const handleLogout = () => {
     localStorage.removeItem('customer_token')
     localStorage.removeItem('customer_user')

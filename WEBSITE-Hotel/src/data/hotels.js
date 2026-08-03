@@ -172,3 +172,14 @@ export const formatCurrency = (amount) => {
     maximumFractionDigits: 0,
   }).format(amount)
 }
+
+// Shared date formatter (Indonesian long form, e.g. "5 Agustus 2026").
+// Used by the booking pages so the format stays consistent everywhere.
+export const formatDate = (dateStr) => {
+  if (!dateStr) return '-'
+  try {
+    return new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+  } catch {
+    return dateStr
+  }
+}

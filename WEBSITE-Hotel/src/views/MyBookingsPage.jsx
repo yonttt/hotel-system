@@ -1,25 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { CheckCircle, Clock, XCircle, CalendarDays, BedDouble, Search } from 'lucide-react'
+import { CalendarDays, BedDouble, Search } from 'lucide-react'
 import { hotelAPI } from '../api/api'
-import { formatCurrency } from '../data/hotels'
-
-const STATUS_INFO = {
-  Pending: { label: 'Menunggu Pembayaran', color: 'text-amber-600 bg-amber-50 border-amber-200', icon: Clock },
-  Confirmed: { label: 'Terkonfirmasi', color: 'text-green-600 bg-green-50 border-green-200', icon: CheckCircle },
-  'Checked-in': { label: 'Sudah Check-in', color: 'text-blue-600 bg-blue-50 border-blue-200', icon: CheckCircle },
-  'Checked-out': { label: 'Sudah Check-out', color: 'text-gray-600 bg-gray-50 border-gray-200', icon: CheckCircle },
-  Cancelled: { label: 'Dibatalkan', color: 'text-red-600 bg-red-50 border-red-200', icon: XCircle },
-}
-
-const formatDate = (dateStr) => {
-  if (!dateStr) return '-'
-  try {
-    return new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
-  } catch {
-    return dateStr
-  }
-}
+import { formatCurrency, formatDate } from '../data/hotels'
+import { STATUS_INFO } from '../utils/bookingStatus'
+import { getCustomerFirstName } from '../utils/customer'
 
 export default function MyBookingsPage() {
   const navigate = useNavigate()
@@ -27,10 +12,7 @@ export default function MyBookingsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  const customerName = (() => {
-    try { return JSON.parse(localStorage.getItem('customer_user'))?.full_name?.split(' ')[0] || '' }
-    catch { return '' }
-  })()
+  const customerName = getCustomerFirstName() || ''
 
   useEffect(() => {
     if (!localStorage.getItem('customer_token')) {

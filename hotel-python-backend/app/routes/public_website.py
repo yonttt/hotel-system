@@ -1,10 +1,13 @@
-﻿from fastapi import APIRouter, Depends, HTTPException, Header
+﻿import logging
+
+from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 
 from app.config.database import get_db
 from app.tables import HotelReservation
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 @router.get("/rooms")
@@ -78,7 +81,8 @@ def get_public_rooms(db: Session = Depends(get_db)):
 
         return result
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        logger.error("public_website DB error: %s", e)
+        raise HTTPException(status_code=500, detail="Terjadi kesalahan pada server. Silakan coba lagi nanti.")
 
 @router.get("/hotels")
 def get_public_hotels(db: Session = Depends(get_db)):
@@ -107,7 +111,8 @@ def get_public_hotels(db: Session = Depends(get_db)):
             for name in names
         ]
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        logger.error("public_website DB error: %s", e)
+        raise HTTPException(status_code=500, detail="Terjadi kesalahan pada server. Silakan coba lagi nanti.")
 
 @router.get("/website-hotels")
 def get_website_hotels(db: Session = Depends(get_db)):
@@ -133,7 +138,8 @@ def get_website_hotels(db: Session = Depends(get_db)):
         ).fetchall()
         return [dict(r._mapping) for r in rows]
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        logger.error("public_website DB error: %s", e)
+        raise HTTPException(status_code=500, detail="Terjadi kesalahan pada server. Silakan coba lagi nanti.")
 
 
 @router.get("/booking-lookup")
@@ -154,7 +160,7 @@ def lookup_booking(reservation_no: str, email: str, db: Session = Depends(get_db
     ).first()
 
     if not reservation:
-        raise HTTPException(status_code=404, detail="Booking not found. Periksa kembali nomor reservasi dan email Anda.")
+        raise HTTPException(status_code=404, detail="Booking tidak ditemukan. Periksa kembali nomor reservasi dan email Anda.")
 
     return {
         "reservation_no": reservation.reservation_no,
@@ -174,7 +180,6 @@ def lookup_booking(reservation_no: str, email: str, db: Session = Depends(get_db
 
 import secrets
 import hashlib
-import logging
 from datetime import datetime, timedelta
 
 from fastapi.security import OAuth2PasswordRequestForm
@@ -182,8 +187,6 @@ from app.config.security import get_password_hash, verify_password, create_acces
 from app.config.config import settings
 from app.utils.email_sender import send_email, password_reset_email_html
 from pydantic import BaseModel
-
-logger = logging.getLogger(__name__)
 
 class CustomerRegister(BaseModel):
     email: str
@@ -197,7 +200,7 @@ def register_customer(data: CustomerRegister, db: Session = Depends(get_db)):
         # Check if email exists
         existing = db.execute(text("SELECT id FROM customer_accounts WHERE email = :email"), {"email": data.email}).first()
         if existing:
-            raise HTTPException(status_code=400, detail="Email already registered")
+            raise HTTPException(status_code=400, detail="Email sudah terdaftar.")
             
         hashed_pw = get_password_hash(data.password)
         db.execute(text(
@@ -214,14 +217,15 @@ def register_customer(data: CustomerRegister, db: Session = Depends(get_db)):
         raise
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("public_website error: %s", e)
+        raise HTTPException(status_code=500, detail="Terjadi kesalahan pada server. Silakan coba lagi nanti.")
 
 @router.post("/login")
 def login_customer(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     try:
         user = db.execute(text("SELECT id, email, password, full_name, phone FROM customer_accounts WHERE email = :email"), {"email": form_data.username}).first()
         if not user or not verify_password(form_data.password, user.password):
-            raise HTTPException(status_code=401, detail="Incorrect email or password")
+            raise HTTPException(status_code=401, detail="Email atau kata sandi salah.")
             
         token = create_access_token(data={"sub": user.email, "role": "customer", "customer_id": user.id})
         return {
@@ -237,7 +241,8 @@ def login_customer(form_data: OAuth2PasswordRequestForm = Depends(), db: Session
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("public_website error: %s", e)
+        raise HTTPException(status_code=500, detail="Terjadi kesalahan pada server. Silakan coba lagi nanti.")
 
 
 @router.get("/my-bookings")
