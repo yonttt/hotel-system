@@ -5,7 +5,7 @@ import Button from './Button';
 import DataTable from './DataTable';
 import { useAuth } from '../state/AuthContext';
 import useHotels from '../logic/useHotels';
-import { formatDate, formatCurrencyIDR as formatCurrency } from '../utils/formatters';
+import { formatDate, formatCurrencyIDR as formatCurrency, getLocalToday, toLocalYMD } from '../utils/formatters';
 
 /**
  * Reusable Adjustment Page component for all adjustment categories.
@@ -34,7 +34,7 @@ const AdjustmentPageTemplate = ({ category, title, subtitle, icon, adjTypes = []
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({
     hotel_name: '',
-    adj_date: new Date().toISOString().split('T')[0],
+    adj_date: getLocalToday(),
     adj_type: adjTypes.length > 0 ? adjTypes[0] : '',
     category: category,
     reference_no: '',
@@ -109,7 +109,7 @@ const AdjustmentPageTemplate = ({ category, title, subtitle, icon, adjTypes = []
   const handleAddClick = () => {
     setFormData({
       hotel_name: hotels.length > 0 ? hotels[0].name : '',
-      adj_date: new Date().toISOString().split('T')[0],
+      adj_date: getLocalToday(),
       adj_type: adjTypes.length > 0 ? adjTypes[0] : '',
       category: category,
       reference_no: '',
@@ -150,7 +150,7 @@ const AdjustmentPageTemplate = ({ category, title, subtitle, icon, adjTypes = []
     setEditingItem(item);
     setFormData({
       hotel_name: item.hotel_name || '',
-      adj_date: item.adj_date ? new Date(item.adj_date).toISOString().split('T')[0] : '',
+      adj_date: item.adj_date ? toLocalYMD(item.adj_date) : '',
       adj_type: item.adj_type || '',
       category: category,
       reference_no: item.reference_no || '',

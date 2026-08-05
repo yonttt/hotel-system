@@ -9,7 +9,7 @@ import UnifiedTableHeader from '../../../../ui/UnifiedTableHeader'
 import UnifiedTableFooter from '../../../../ui/UnifiedTableFooter'
 import useHotels from '../../../../logic/useHotels'
 import usePaginatedTable from '../../../../logic/usePaginatedTable'
-import { formatDate, formatCurrencyFixed4 } from '../../../../utils/formatters'
+import { formatDate, formatCurrencyFixed4, getLocalToday } from '../../../../utils/formatters'
 
 const ReservasiToday = () => {
   const navigate = useNavigate()
@@ -46,7 +46,7 @@ const ReservasiToday = () => {
       setLoading(true)
       setError(null)
       const response = await apiService.getHotelReservations(0, 100)
-      const today = new Date().toISOString().split('T')[0]
+      const today = getLocalToday()
       const todayReservations = (response.data || []).filter(r => {
         const a = r.arrival_date?.split('T')[0]
         const d = r.departure_date?.split('T')[0]

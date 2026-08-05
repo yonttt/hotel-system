@@ -8,7 +8,7 @@ import UnifiedTableHeader from '../../../../ui/UnifiedTableHeader'
 import UnifiedTableFooter from '../../../../ui/UnifiedTableFooter'
 import useHotels from '../../../../logic/useHotels'
 import usePaginatedTable from '../../../../logic/usePaginatedTable'
-import { formatCurrencyFixed4 } from '../../../../utils/formatters'
+import { formatCurrencyFixed4, toLocalYMD } from '../../../../utils/formatters'
 
 const GuestHistory = () => {
   const { user } = useAuth()
@@ -19,8 +19,8 @@ const GuestHistory = () => {
   const [successMessage, setSuccessMessage] = useState(null)
 
   // Default date range: last 30 days to today
-  const today = new Date().toISOString().split('T')[0]
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+  const today = toLocalYMD(new Date())
+  const thirtyDaysAgo = toLocalYMD(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
   const [dateFrom, setDateFrom] = useState(thirtyDaysAgo)
   const [dateTo, setDateTo] = useState(today)
 

@@ -8,6 +8,7 @@ import { hotelAPI } from '../api/api'
 import { formatCurrency } from '../data/hotels'
 import { useNotification } from '../state/NotificationContext'
 import { sendBookingEmail, sendGuestEmail } from '../lib/email'
+import { getLocalToday } from '../utils/date'
 
 export default function BookingPage() {
   const [searchParams] = useSearchParams()
@@ -609,13 +610,13 @@ export default function BookingPage() {
                       <div>
                         <label className="block text-sm font-semibold text-hotel-dark mb-2">Check-in *</label>
                         <input type="date" name="checkIn" value={formData.checkIn} onChange={handleChange} required
-                          min={new Date().toISOString().split('T')[0]}
+                          min={getLocalToday()}
                           className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400 focus:ring-2 focus:ring-gold-400/20" />
                       </div>
                       <div>
                         <label className="block text-sm font-semibold text-hotel-dark mb-2">Check-out *</label>
                         <input type="date" name="checkOut" value={formData.checkOut} onChange={handleChange} required
-                          min={formData.checkIn || new Date().toISOString().split('T')[0]}
+                          min={formData.checkIn || getLocalToday()}
                           className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold-400 focus:ring-2 focus:ring-gold-400/20" />
                       </div>
                     </div>

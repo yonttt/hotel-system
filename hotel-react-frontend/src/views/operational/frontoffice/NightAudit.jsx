@@ -8,7 +8,7 @@ import UnifiedTableFooter from '../../../ui/UnifiedTableFooter';
 import { useAuth } from '../../../state/AuthContext';
 import useHotels from '../../../logic/useHotels';
 import usePaginatedTable from '../../../logic/usePaginatedTable';
-import { formatCurrencyIDR } from '../../../utils/formatters';
+import { formatCurrencyIDR, getLocalToday } from '../../../utils/formatters';
 import { useNotification } from '../../../state/NotificationContext';
 
 const NightAudit = () => {
@@ -18,10 +18,7 @@ const NightAudit = () => {
   const [audits, setAudits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(() => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  });
+  const [selectedDate, setSelectedDate] = useState(() => getLocalToday());
 
   // Add/Edit modal state
   const [showModal, setShowModal] = useState(false);

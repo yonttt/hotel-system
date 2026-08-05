@@ -8,6 +8,7 @@ import useHotels from '../../../../logic/useHotels'
 import { payReservation } from '../../../../logic/payment'
 
 import { formatCountriesOptions, formatCitiesOptions, formatPaymentMethodsOptions } from '../../../../helpers/dropdownFormatters';
+import { getLocalToday, toLocalYMD } from '../../../../utils/formatters';
 
 const ReservasiPage = () => {
   const { user } = useAuth()
@@ -38,9 +39,9 @@ const ReservasiPage = () => {
     nationality: '',
     city: '',
     email: '',
-    arrival_date: new Date().toISOString().split('T')[0],
+    arrival_date: getLocalToday(),
     arrival_time: new Date().toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' }),
-    departure_date: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0],
+    departure_date: toLocalYMD(new Date(Date.now() + 86400000)),
     nights: 1,
     guest_type: 'Normal',
     guest_count_male: 1,
@@ -76,7 +77,7 @@ const ReservasiPage = () => {
       departureDate.setDate(departureDate.getDate() + parseInt(formData.nights, 10))
       setFormData(prev => ({
         ...prev,
-        departure_date: departureDate.toISOString().split('T')[0]
+        departure_date: toLocalYMD(departureDate)
       }))
     }
   }, [formData.arrival_date, formData.nights])

@@ -40,3 +40,22 @@ export const calculateBalance = (totalCharge, totalDeposit) => {
   const deposit = parseFloat(totalDeposit || 0);
   return charge - deposit;
 };
+
+/**
+ * Format a date as YYYY-MM-DD using LOCAL time (WIB), not UTC.
+ * `new Date().toISOString()` shifts to UTC, so between 00:00-07:00 WIB it
+ * returns the previous day. This uses local calendar components instead, so
+ * "today" and date-input defaults are always the operator's real local date.
+ * Returns '' for empty/invalid input.
+ */
+export const toLocalYMD = (dateInput) => {
+  const d = dateInput != null ? new Date(dateInput) : new Date();
+  if (isNaN(d.getTime())) return '';
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+};
+
+// Today's date as YYYY-MM-DD in local time (WIB).
+export const getLocalToday = () => toLocalYMD(new Date());

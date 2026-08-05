@@ -3,7 +3,7 @@ import { apiService } from '../../api/api';
 import Layout from '../../ui/Layout';
 import { useAuth } from '../../state/AuthContext';
 import useHotels from '../../logic/useHotels';
-import { formatDate, formatCurrencyIDR as formatCurrency } from '../../utils/formatters';
+import { formatDate, formatCurrencyIDR as formatCurrency, toLocalYMD } from '../../utils/formatters';
 
 const AccountReceivablePage = () => {
   const { user } = useAuth();
@@ -155,7 +155,7 @@ const AccountReceivablePage = () => {
       amount: item.amount || 0,
       paid_amount: item.paid_amount || 0,
       balance: item.balance || 0,
-      due_date: item.due_date ? new Date(item.due_date).toISOString().split('T')[0] : '',
+      due_date: item.due_date ? toLocalYMD(item.due_date) : '',
       status: item.status || 'Outstanding',
       payment_method: item.payment_method || '',
       notes: item.notes || ''

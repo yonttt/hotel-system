@@ -8,7 +8,7 @@ import UnifiedTableHeader from '../../../../ui/UnifiedTableHeader'
 import UnifiedTableFooter from '../../../../ui/UnifiedTableFooter'
 import useHotels from '../../../../logic/useHotels'
 import usePaginatedTable from '../../../../logic/usePaginatedTable'
-import { formatDate, formatCurrencyFixed4, calculateBalance } from '../../../../utils/formatters'
+import { formatDate, formatCurrencyFixed4, calculateBalance, getLocalToday } from '../../../../utils/formatters'
 
 const CheckinToday = () => {
   const { user } = useAuth()
@@ -40,7 +40,7 @@ const CheckinToday = () => {
       setLoading(true)
       setError(null)
       const response = await apiService.getHotelRegistrations(0, 100)
-      const today = new Date().toISOString().split('T')[0]
+      const today = getLocalToday()
       const todayCheckins = (response.data || []).filter(r => {
         const arrival = r.arrival_date?.split('T')[0]
         return arrival === today

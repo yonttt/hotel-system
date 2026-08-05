@@ -6,6 +6,7 @@ import SearchableSelect from '../../../../ui/SearchableSelect'
 import useHotels from '../../../../logic/useHotels'
 
 import { formatCountriesOptions, formatCitiesOptions, formatPaymentMethodsOptions } from '../../../../helpers/dropdownFormatters';
+import { getLocalToday, toLocalYMD } from '../../../../utils/formatters';
 
 const GroupBooking = () => {
   const { user } = useAuth()
@@ -30,9 +31,9 @@ const GroupBooking = () => {
     pic_phone: '',
     pic_email: '',
     market_segment: 'Normal',
-    arrival_date: new Date().toISOString().split('T')[0],
+    arrival_date: getLocalToday(),
     arrival_time: new Date().toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' }),
-    departure_date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+    departure_date: toLocalYMD(new Date(Date.now() + 86400000)),
     nights: 1,
     payment_method: '',
     total_deposit: 0,
@@ -86,7 +87,7 @@ const GroupBooking = () => {
       departure.setDate(departure.getDate() + groupInfo.nights)
       setGroupInfo(prev => ({
         ...prev,
-        departure_date: departure.toISOString().split('T')[0]
+        departure_date: toLocalYMD(departure)
       }))
     }
   }, [groupInfo.arrival_date, groupInfo.nights])
@@ -441,9 +442,9 @@ const GroupBooking = () => {
         pic_phone: '',
         pic_email: '',
         market_segment: 'Normal',
-        arrival_date: new Date().toISOString().split('T')[0],
+        arrival_date: getLocalToday(),
         arrival_time: new Date().toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' }),
-        departure_date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+        departure_date: toLocalYMD(new Date(Date.now() + 86400000)),
         nights: 1,
         payment_method: '',
         total_deposit: 0,

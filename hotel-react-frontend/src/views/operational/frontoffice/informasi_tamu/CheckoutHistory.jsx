@@ -6,7 +6,7 @@ import UnifiedTableHeader from '../../../../ui/UnifiedTableHeader'
 import UnifiedTableFooter from '../../../../ui/UnifiedTableFooter'
 import useHotels from '../../../../logic/useHotels'
 import usePaginatedTable from '../../../../logic/usePaginatedTable'
-import { formatCurrencyFixed4 } from '../../../../utils/formatters'
+import { formatCurrencyFixed4, toLocalYMD } from '../../../../utils/formatters'
 
 // Read-only archive of every guest the front office has checked out. The data is
 // written to the checkout_history table at checkout time (see backend checkout.py).
@@ -17,8 +17,8 @@ const CheckoutHistory = () => {
   const [error, setError] = useState(null)
 
   // Default date range: last 30 days to today (filtered by checkout date).
-  const today = new Date().toISOString().split('T')[0]
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+  const today = toLocalYMD(new Date())
+  const thirtyDaysAgo = toLocalYMD(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
   const [dateFrom, setDateFrom] = useState(thirtyDaysAgo)
   const [dateTo, setDateTo] = useState(today)
 

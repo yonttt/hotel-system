@@ -8,7 +8,7 @@ import UnifiedTableHeader from '../../../../ui/UnifiedTableHeader'
 import UnifiedTableFooter from '../../../../ui/UnifiedTableFooter'
 import useHotels from '../../../../logic/useHotels'
 import usePaginatedTable from '../../../../logic/usePaginatedTable'
-import { formatDate, formatCurrencyFixed4, calculateBalance } from '../../../../utils/formatters'
+import { formatDate, formatCurrencyFixed4, calculateBalance, getLocalToday } from '../../../../utils/formatters'
 
 const InhouseGuest = () => {
   const { user } = useAuth()
@@ -41,7 +41,7 @@ const InhouseGuest = () => {
       setError(null)
       const response = await apiService.getHotelRegistrations(0, 100)
       // Inhouse guests are those currently staying (checked in, not yet departed)
-      const today = new Date().toISOString().split('T')[0]
+      const today = getLocalToday()
       const inhouseGuests = (response.data || []).filter(r => {
         const arrival = r.arrival_date?.split('T')[0]
         const departure = r.departure_date?.split('T')[0]

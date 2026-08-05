@@ -3,7 +3,7 @@ import { apiService } from '../../api/api';
 import Layout from '../../ui/Layout';
 import { useAuth } from '../../state/AuthContext';
 import useHotels from '../../logic/useHotels';
-import { formatDate, formatCurrencyIDR as formatCurrency } from '../../utils/formatters';
+import { formatDate, formatCurrencyIDR as formatCurrency, getLocalToday, toLocalYMD } from '../../utils/formatters';
 
 const LaundryPage = () => {
   const { user } = useAuth();
@@ -26,7 +26,7 @@ const LaundryPage = () => {
     room_number: '',
     guest_name: '',
     registration_no: '',
-    order_date: new Date().toISOString().split('T')[0],
+    order_date: getLocalToday(),
     item_name: '',
     quantity: 1,
     unit_price: 0,
@@ -96,7 +96,7 @@ const LaundryPage = () => {
       room_number: '',
       guest_name: '',
       registration_no: '',
-      order_date: new Date().toISOString().split('T')[0],
+      order_date: getLocalToday(),
       item_name: '',
       quantity: 1,
       unit_price: 0,
@@ -133,7 +133,7 @@ const LaundryPage = () => {
       room_number: item.room_number || '',
       guest_name: item.guest_name || '',
       registration_no: item.registration_no || '',
-      order_date: item.order_date ? new Date(item.order_date).toISOString().split('T')[0] : '',
+      order_date: item.order_date ? toLocalYMD(item.order_date) : '',
       item_name: item.item_name || '',
       quantity: item.quantity || 1,
       unit_price: item.unit_price || 0,
