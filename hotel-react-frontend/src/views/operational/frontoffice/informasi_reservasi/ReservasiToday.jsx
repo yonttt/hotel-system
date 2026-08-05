@@ -64,7 +64,8 @@ const ReservasiToday = () => {
 
   const matchesStatus = (r) => {
     if (statusFilter !== 'Active') return true
-    return !['Registered', 'Registration', 'Check-in', 'Check-out', 'Cancelled'].includes(r.transaction_status)
+    // Registered reservations become 'Checked-in' (HotelReservation enum) — exclude both spellings.
+    return !['Registered', 'Registration', 'Check-in', 'Checked-in', 'Check-out', 'Checked-out', 'Cancelled'].includes(r.transaction_status)
   }
 
   const {

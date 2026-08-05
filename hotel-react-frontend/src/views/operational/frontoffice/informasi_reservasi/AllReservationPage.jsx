@@ -57,7 +57,10 @@ const AllReservationPage = () => {
 
   const matchesStatus = (reservation) => {
     if (statusFilter !== 'Active') return true;
-    return !['Registered', 'Registration', 'Check-in', 'Check-out', 'Cancelled'].includes(reservation.transaction_status);
+    // Reservations use the 'Checked-in'/'Checked-out' spelling (HotelReservation enum);
+    // once staff register a guest the reservation becomes 'Checked-in' and must drop off
+    // the Pending/Confirmed view. Keep the 'Check-in'/'Check-out' variants too for safety.
+    return !['Registered', 'Registration', 'Check-in', 'Checked-in', 'Check-out', 'Checked-out', 'Cancelled'].includes(reservation.transaction_status);
   };
 
   const {
