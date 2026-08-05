@@ -16,35 +16,52 @@ import { useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
-// Render markdown-style links [label](url) as clickable links.
+// Render markdown-style images ![alt](url) as pictures and links [label](url) as
+// clickable links. The optional leading "!" distinguishes an image from a link.
 // Internal links (starting with "/") navigate within the app; the rest open normally.
 function renderText(text, onLink) {
-  const re = /\[([^\]]+)\]\(([^)]+)\)/g;
+  const re = /(!?)\[([^\]]+)\]\(([^)]+)\)/g;
   const parts = [];
   let lastIndex = 0;
   let match;
   let key = 0;
   while ((match = re.exec(text)) !== null) {
     if (match.index > lastIndex) parts.push(text.slice(lastIndex, match.index));
-    const label = match[1];
-    const href = match[2];
-    parts.push(
-      <a
-        key={key++}
-        href={href}
-        onClick={(e) => {
-          if (href.startsWith("/")) {
-            e.preventDefault();
-            onLink(href);
-          }
-        }}
-        target={href.startsWith("/") ? undefined : "_blank"}
-        rel="noopener noreferrer"
-        style={{ color: "#028090", fontWeight: 600, textDecoration: "underline" }}
-      >
-        {label}
-      </a>
-    );
+    const isImage = match[1] === "!";
+    const label = match[2];
+    const href = match[3];
+    if (isImage) {
+      parts.push(
+        <img
+          key={key++}
+          src={href}
+          alt={label}
+          loading="lazy"
+          style={{
+            display: "block", width: "100%", maxWidth: "100%", height: "150px",
+            objectFit: "cover", borderRadius: "10px", margin: "8px 0",
+          }}
+        />
+      );
+    } else {
+      parts.push(
+        <a
+          key={key++}
+          href={href}
+          onClick={(e) => {
+            if (href.startsWith("/")) {
+              e.preventDefault();
+              onLink(href);
+            }
+          }}
+          target={href.startsWith("/") ? undefined : "_blank"}
+          rel="noopener noreferrer"
+          style={{ color: "#028090", fontWeight: 600, textDecoration: "underline" }}
+        >
+          {label}
+        </a>
+      );
+    }
     lastIndex = match.index + match[0].length;
   }
   if (lastIndex < text.length) parts.push(text.slice(lastIndex));

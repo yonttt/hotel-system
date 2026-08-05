@@ -180,6 +180,14 @@ WHEN A GUEST WANTS TO BOOK A ROOM:
 - Only use links that appear in the context. Never invent a link or a room id.
 - Example reply (Indonesian): "Tentu! Silakan klik link berikut untuk memesan Kamar Standard: [Book Standard Room](/booking?room=3). Setelah halaman terbuka, lengkapi tanggal menginap dan data Anda untuk menyelesaikan pemesanan. 😊"
 
+SHOWING ROOM PHOTOS:
+- The "AVAILABLE ROOMS & BOOKING LINKS" section lists each room type with a "photo token" like [[img:3]].
+- When you describe a SPECIFIC room type — its details, its price, or what it includes — add that room's photo token on its own line so the guest can see a picture of it.
+- Copy the token EXACTLY as written (e.g. [[img:3]]). Never invent a token, and only use a token that appears in the context.
+- Include AT MOST ONE photo token per reply, even if the guest asks about several room types — pick the single most relevant room. Do not claim to show more than one picture.
+- Add the photo AFTER your text about that room.
+- Do NOT add a photo for general questions (e.g. check-in time, facilities, breakfast) — only when the answer is about a specific room type.
+
 The phone/WhatsApp/email contact details are only for when a guest asks how to CONTACT the hotel, or when the requested information is not available — NOT for making a booking.
 
 If the answer is not in the context, say (in the guest's language):
@@ -189,21 +197,59 @@ Keep answers concise, friendly, and professional.
 Never make up information not in the context.
 """
 
-def get_booking_context(db: Session, hotel_id: Optional[int] = None) -> str:
-    """Fetch active room categories and build a booking-link reference for the LLM."""
+def _placeholder_image(name: str, code: str) -> str:
+    """Category-based stock photo used when a room type has no staff-uploaded
+    photo. Mirrors the fallback logic on the public website (public_website.py)
+    so the chatbot shows the same picture the website does."""
+    name_l = str(name or "").lower()
+    code_l = str(code or "").lower()
+    if "suite" in name_l or "exe" in code_l:
+        return "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800&q=80"
+    if "dlx" in code_l or "deluxe" in name_l:
+        return "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800&q=80"
+    return "https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=800&q=80"
+
+
+def _absolute_image_url(photo_url: str) -> str:
+    """Make a stored photo_url an absolute public URL so it also loads inside the
+    chat widget. New uploads already store an absolute https URL (built from
+    PUBLIC_API_URL in cms.py), but older rows may hold a relative path such as
+    '/uploads/website/x.jpg'. Those are prefixed with PUBLIC_API_URL — the same
+    base the upload endpoint uses — so the picture resolves to the API host
+    instead of the website host. Absolute URLs and data URIs are left untouched."""
+    url = (photo_url or "").strip()
+    if not url or url.startswith(("http://", "https://", "data:")):
+        return url
+    base = os.getenv("PUBLIC_API_URL", "").rstrip("/")
+    if not base:
+        return url  # local dev without PUBLIC_API_URL — leave the path as-is
+    return f"{base}/{url.lstrip('/')}"
+
+
+def get_booking_context(db: Session, hotel_id: Optional[int] = None):
+    """Fetch active room categories and build a booking-link + photo reference for
+    the LLM.
+
+    Returns a tuple (context_str, room_media) where room_media maps
+    {category_id: {"name", "image"}} so image tokens the model emits — e.g.
+    [[img:3]] — can be expanded into real pictures after generation. Keeping the
+    real URL out of the model's hands avoids URL hallucination: the model only
+    reproduces the small room id, exactly as it already does for booking links.
+    """
     from sqlalchemy import text
     try:
         sql = """
-            SELECT id, category_name, normal_rate, hotel_name
+            SELECT id, category_code, category_name, normal_rate, hotel_name, photo_url
             FROM room_categories
             WHERE is_active = 1
             ORDER BY hotel_name, normal_rate ASC
         """
         rows = db.execute(text(sql)).fetchall()
         if not rows:
-            return ""
+            return "", {}
         from urllib.parse import quote
         lines = []
+        room_media = {}
         for r in rows:
             d = dict(r._mapping)
             try:
@@ -213,13 +259,51 @@ def get_booking_context(db: Session, hotel_id: Optional[int] = None) -> str:
             link = f"/booking?room={d['id']}"
             if d.get("hotel_name"):
                 link += f"&destination={quote(str(d['hotel_name']))}"
-            lines.append(
-                f"- {d['category_name']} ({rate}/night) → booking link: {link}"
+            photo = d.get("photo_url")
+            image = _absolute_image_url(photo) if photo else _placeholder_image(
+                d.get("category_name"), d.get("category_code")
             )
-        return "AVAILABLE ROOMS & BOOKING LINKS:\n" + "\n".join(lines)
+            room_media[d["id"]] = {
+                "name": d.get("category_name") or d.get("category_code"),
+                "image": image,
+            }
+            lines.append(
+                f"- {d['category_name']} ({rate}/night) → booking link: {link} "
+                f"· photo token: [[img:{d['id']}]]"
+            )
+        context = "AVAILABLE ROOMS & BOOKING LINKS:\n" + "\n".join(lines)
+        return context, room_media
     except Exception as e:
         logger.warning(f"Could not load booking rooms: {e}")
+        return "", {}
+
+
+# Matches the photo placeholder the model is told to emit, e.g. [[img:3]].
+_IMG_TOKEN_RE = re.compile(r"\[\[img:(\d+)\]\]")
+
+
+def expand_image_tokens(text: str, room_media: dict) -> str:
+    """Replace [[img:ID]] tokens in the model's answer with real markdown images
+    ![Room Name](image_url). At most ONE picture is shown per reply — the first
+    valid token is expanded and any further tokens are dropped, so a single bubble
+    never stacks multiple images. Unknown or garbled ids are dropped silently so
+    the guest never sees a broken token."""
+    if not text:
         return ""
+
+    shown = False
+
+    def repl(match):
+        nonlocal shown
+        if shown:
+            return ""  # only one image per reply — strip the rest
+        info = room_media.get(int(match.group(1))) if room_media else None
+        if not info:
+            return ""
+        shown = True
+        return f"\n![{info['name']}]({info['image']})\n"
+
+    return _IMG_TOKEN_RE.sub(repl, text)
 
 
 def generate_llm_answer(query: str, context: str, lang: str = "en") -> str:
@@ -370,6 +454,12 @@ def ask_chatbot(request: ChatbotAskRequest, db: Session = Depends(get_db)):
 
         lang = detect_language(request.message)
 
+        # Room list + booking links + photo tokens. Built once and used as grounding
+        # for BOTH the availability and the knowledge-base answers, so whichever branch
+        # runs, any photo token the model emits refers to a real room and can be
+        # expanded to the correct picture.
+        booking_context, room_media = get_booking_context(db, request.hotel_id)
+
         # Refuse confidential / financial questions
         if is_confidential_question(request.message):
             bot_response = _fallback(lang, "confidential")
@@ -377,7 +467,13 @@ def ask_chatbot(request: ChatbotAskRequest, db: Session = Depends(get_db)):
         elif is_realtime_question(request.message):
             logger.info(f"[Chatbot] Real-time: {request.message}")
             realtime_context = get_realtime_context(request.message, db)
+            # Ground photo tokens here too so an availability answer shows the right
+            # room picture instead of leaking an invented token.
+            if booking_context:
+                realtime_context += "\n\n" + booking_context
             bot_response = generate_llm_answer(request.message, realtime_context, lang)
+            if bot_response:
+                bot_response = expand_image_tokens(bot_response, room_media)
             if not bot_response:
                 bot_response = _fallback(lang, "realtime")
         else:
@@ -387,16 +483,24 @@ def ask_chatbot(request: ChatbotAskRequest, db: Session = Depends(get_db)):
                 context = "\n\n".join(
                     f"Q: {e['question']}\nA: {e['answer']}" for e in entries
                 )
-                # Append live room list + booking links so Eva can guide bookings
-                booking_context = get_booking_context(db, request.hotel_id)
+                # Append live room list + booking links + photo tokens so Eva can
+                # guide bookings and show a picture of the room being discussed.
                 if booking_context:
                     context += "\n\n" + booking_context
                 bot_response = generate_llm_answer(request.message, context, lang)
+                # Turn any [[img:ID]] tokens the model emitted into real pictures.
+                if bot_response:
+                    bot_response = expand_image_tokens(bot_response, room_media)
             if not bot_response:
                 bot_response = keyword_match(request.message, entries)
 
         if not bot_response:
             bot_response = _fallback(lang, "generic")
+
+        # Safety net: strip any leftover [[img:ID]] token so a raw token can never
+        # leak into the chat — e.g. from the keyword fallback or a token the model
+        # invented that did not match a real room.
+        bot_response = _IMG_TOKEN_RE.sub("", bot_response).strip()
 
         # Save session log
         session_log = ChatbotSession(
