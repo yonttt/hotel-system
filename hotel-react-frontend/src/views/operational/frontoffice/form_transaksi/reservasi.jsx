@@ -49,7 +49,7 @@ const ReservasiPage = () => {
     extra_bed: 0,
     room_number: '',
     room_type: '',
-    transaction_status: 'Reservation',
+    transaction_status: 'Pending',
     payment_method: '',
     notes: '',
     payment_amount: 0,
@@ -558,12 +558,12 @@ const ReservasiPage = () => {
               <div className="form-column">
                   <div className="form-group">
                     <label>Transaction Status</label>
-                    <input 
-                      type="text" 
-                      name="transaction_status" 
-                      value="Reservation" 
-                      className="form-input" 
-                      readOnly 
+                    <input
+                      type="text"
+                      name="transaction_status"
+                      value="Pending"
+                      className="form-input"
+                      readOnly
                     />
                   </div>
                   <div className="form-group">
