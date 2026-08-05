@@ -4,7 +4,8 @@ from datetime import datetime, timedelta
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from sqlalchemy.orm import Session
 from app.config.database import SessionLocal
-from app.tables import HotelReservation, GroupBooking
+from app.config.room_utils import update_room_status
+from app.tables import HotelReservation, GroupBooking, GroupBookingRoom
 
 logger = logging.getLogger(__name__)
 
@@ -67,17 +68,28 @@ def expire_unpaid_bookings():
         for res in expired_reservations:
             res.transaction_status = 'Cancelled'
             res.note = (res.note or "") + f" [Auto-cancelled due to unpaid status at {now.strftime('%Y-%m-%d %H:%M')}]"
-            
+            # Release the held room so it doesn't stay stuck at 'AR' (Arrival) forever —
+            # same as the manual cancel/delete endpoints, which reset the room to 'VR'.
+            if res.room_number:
+                update_room_status(db, res.room_number, 'VR')
+
         # Expire Group Bookings
         expired_groups = db.query(GroupBooking).filter(
             GroupBooking.status == 'Pending', # or 'Active' depending on how it's handled initially
             GroupBooking.payment_deadline < now
         ).all()
-        
+
         for group in expired_groups:
             group.status = 'Cancelled'
             group.notes = (group.notes or "") + f" [Auto-cancelled due to unpaid status at {now.strftime('%Y-%m-%d %H:%M')}]"
-            
+            # Release every room this group was holding.
+            group_rooms = db.query(GroupBookingRoom).filter(
+                GroupBookingRoom.group_booking_id == group.group_booking_id
+            ).all()
+            for gr in group_rooms:
+                if gr.room_number:
+                    update_room_status(db, gr.room_number, 'VR')
+
         db.commit()
     except Exception as e:
         logger.error(f"Scheduler error (expire_unpaid_bookings): {e}")
