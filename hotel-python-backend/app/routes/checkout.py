@@ -3,11 +3,14 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from typing import List, Optional
-from datetime import datetime, date
+from datetime import datetime, date, timezone, timedelta
 from pydantic import BaseModel
 from app.config.database import get_db
 from app.config.auth import get_current_user
 from app.config.room_utils import update_room_status
+
+# Compute "today" in WIB (UTC+7); the server runs in UTC, a day behind at night.
+WIB = timezone(timedelta(hours=7))
 from app.tables import User
 
 logger = logging.getLogger(__name__)
@@ -70,7 +73,7 @@ def get_checkout_today(
     """Get all registrations due for checkout today OR overdue (departure_date <= today)
     that are still in Check-in status, so the front office never loses an overdue guest."""
     try:
-        today = date.today()
+        today = datetime.now(WIB).date()
         
         query = """
             SELECT 

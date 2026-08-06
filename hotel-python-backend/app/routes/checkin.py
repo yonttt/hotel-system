@@ -3,11 +3,16 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from typing import List, Optional
-from datetime import datetime, date
+from datetime import datetime, date, timezone, timedelta
 from pydantic import BaseModel
 from app.config.database import get_db
 from app.config.auth import get_current_user
 from app.config.room_utils import update_room_status
+
+# The production server runs in UTC, which is a day behind WIB (UTC+7) late at
+# night / early morning. Compute "today" in WIB so date filters match the dates
+# guests actually pick (which the frontend stores in local WIB time).
+WIB = timezone(timedelta(hours=7))
 from app.tables import User
 
 logger = logging.getLogger(__name__)
@@ -49,7 +54,7 @@ def get_checkin_today(
 ):
     """Get all registrations due for check-in today (arrival_date = today) with status Registration."""
     try:
-        today = date.today()
+        today = datetime.now(WIB).date()
         
         query = """
             SELECT 
