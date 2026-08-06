@@ -46,10 +46,14 @@ const ReservasiDeposit = () => {
       // Use the real API to get hotel reservations filtered by deposit
       const response = await apiService.getHotelReservations(0, 100)
       
-      // Filter reservations that have deposit information
-      const depositReservations = response.data ? response.data.filter(reservation => 
-        (reservation.deposit ?? 0) > 0
-      ) : []
+      // Show only ACTIVE reservations that have a deposit — once a reservation is
+      // registered/checked-in/out (or cancelled) it should drop off this list,
+      // just like the other reservation views.
+      const excluded = ['Registered', 'Registration', 'Check-in', 'Checked-in', 'Check-out', 'Checked-out', 'Cancelled']
+      const depositReservations = (response.data || []).filter(reservation =>
+        (reservation.deposit ?? 0) > 0 &&
+        !excluded.includes(reservation.transaction_status)
+      )
       
       setReservations(depositReservations)
       
