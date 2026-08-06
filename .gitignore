@@ -96,3 +96,13 @@ uploads/
 install-wazuh-agent.ps1
 Chapter3-Script-Word.txt
 Chapter3-Script.md
+
+# Defense / presentation artifacts (documents & media — keep local, never commit)
+*.pdf
+*.pptx
+*.ppt
+*.docx
+*.wav
+*.mp3
+# Office/temp lock files
+~$*
