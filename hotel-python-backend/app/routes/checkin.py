@@ -70,7 +70,7 @@ def get_checkin_today(
                 transaction_by,
                 created_at
             FROM hotel_registrations
-            WHERE DATE(arrival_date) = :today
+            WHERE DATE(arrival_date) <= :today
             AND transaction_status = 'Registration'
         """
         
